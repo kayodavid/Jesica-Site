@@ -1,5 +1,5 @@
 {
-  "name": "search-flix",
+  "name": "jesica-site",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -8,10 +8,12 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "vite": "^4.3.9"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
-    "tailwindcss": "^3.3.2",
-    "vite": "^4.3.9"
+    "tailwindcss": "^3.3.2"
   }
 }
