@@ -1,114 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
   <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Bruna Alves</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jessica Melo Nutri</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <style type="text/tailwindcss">
     body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f7fafc;
-        }
-        .main-screen {
-            display: block;
-        }
-        .scheduling-screen {
-            display: none;
-        }
-    </style>
+      font-family: 'Roboto', sans-serif;
+      background-color: #f7fafc;
+    }
+    .main-screen {
+      display: block;
+    }
+    .scheduling-screen {
+      display: none;
+    }
+  </style>
 </head>
-
 <body class="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+
+  <!-- Tela Principal -->
   <div class="w-full max-w-md mx-auto p-4 md:p-8 main-screen" id="main-screen">
     <header class="text-center mb-8">
       <img alt="Foto de Bruna Alves" class="w-28 h-28 rounded-full mx-auto mb-4 object-cover"
         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqgBMP4Y0sTeyyX3hnQywDBvhY45mR1MdbVxjj6u82l844lOzerXXrbYOVz-tukjdqfW4TaMnXWCRxNheTTlhfn1rOlcU-QguJkb5tkJId_vI0gDvUmBB1scRoxT1fhukYi2sr6A_9TxXinU3KHVL7IAN1uNyLEHLM6rbTGA0vlPezzn2mWSjLI7PAjhaS3fCBR5c5gsfbzeXHvZckZxbYgb8XoT_qZVq5WkODA2cJHxRGLl3QMUa999QBH6w_pPrYmpBO5CL57V0" />
-      <h1 class="text-2xl font-bold text-gray-800">jessica </h1>
-      <p class="text-sm text-gray-500 mt-2">CONTATO &amp; ORÇAMENTOS 💌 </p>
+      <h1 class="text-2xl font-bold text-gray-800">Jessica</h1>
+      <p class="text-sm text-gray-500 mt-2">CONTATO & ORÇAMENTOS 💌</p>
     </header>
     <main class="space-y-4">
-      <a class="block w-full text-center bg-black text-white py-4 px-6 rounded-lg shadow-sm hover:bg-gray-800 transition-colors"
+      <a class="block w-full text-center bg-gray-600 text-white py-4 px-6 rounded-lg shadow-sm hover:bg-gray-800 transition-colors"
         href="https://wa.me/5562991159026">Entrar em Contato</a>
-      <button
-        class="block w-full text-center bg-gray-600 text-white py-4 px-6 rounded-lg shadow-sm hover:bg-gray-700 transition-colors"
-        id="schedule-btn" onclick="showScheduling()">Agendar Consulta</button>
+      <a href="/agemdar.html" class="block w-full text-center bg-gray-600 text-white py-4 px-6 rounded-lg shadow-sm hover:bg-gray-700 transition-colors">
+        Agendar Consulta
+      </a>
     </main>
   </div>
-  <div class="w-full max-w-md mx-auto p-4 md:p-8 scheduling-screen" id="scheduling-screen">
-    <header class="text-center mb-8">
-      <button class="absolute top-4 left-4 text-gray-600 hover:text-gray-800" onclick="showMain()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-        </svg>
-      </button>
-      <h1 class="text-2xl font-bold text-gray-800">Agendar Consulta</h1>
-      <p class="text-sm text-gray-500 mt-2">Selecione uma data e horário disponíveis</p>
-    </header>
-    <main>
-      <form class="space-y-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700" for="date">Data</label>
-          <div class="mt-1">
-            <input
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              id="date" name="date" type="date" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700" for="time">Horário</label>
-          <div class="mt-1">
-            <select
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              id="time" name="time">
-              <option>09:00</option>
-              <option>10:00</option>
-              <option>11:00</option>
-              <option>14:00</option>
-              <option>15:00</option>
-              <option>16:00</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700" for="name">Nome Completo</label>
-          <div class="mt-1">
-            <input autocomplete="name"
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              id="name" name="name" required="" type="text" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700" for="email">E-mail</label>
-          <div class="mt-1">
-            <input autocomplete="email"
-              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              id="email" name="email" required="" type="email" />
-          </div>
-        </div>
-        <div>
-          <button
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            type="submit">
-            Confirmar Agendamento
-          </button>
-        </div>
-      </form>
-    </main>
-  </div>
-  <script>
-    function showScheduling() {
-      document.getElementById('main-screen').style.display = 'none';
-      document.getElementById('scheduling-screen').style.display = 'block';
-    }
-    function showMain() {
-      document.getElementById('main-screen').style.display = 'block';
-      document.getElementById('scheduling-screen').style.display = 'none';
-    }
+
+  <!-- Tela de Agendamento -->
+
   </script>
-
 </body>
-
 </html>
