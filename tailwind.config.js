@@ -3,11 +3,9 @@
 export default {
   content: [
     "./index.html",
-    "./agemdar.html", // Adicione esta linha
-    // ou, para ser mais abrangente:
-    // "./*.html",
+    "./agemdar.html",
     "./**/*.{js,ts,jsx,tsx}",
-    "./movie-details.html",
+    // "./movie-details.html", // <--- Remova esta linha
   ],
   theme: {
     extend: {
