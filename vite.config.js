@@ -1,3 +1,4 @@
+// vite.config.js - CORRIGIDO
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -7,7 +8,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        details: 'movie-details.html',
+        agendamento: 'agemdar.html', 
       },
     },
   },
