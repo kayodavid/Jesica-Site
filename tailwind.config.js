@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        bacground: '#dbc279',
+        bacground: '#c7b88b',
         bacground_2: '#EDF5F2',
         black_2: '#262626',
       },
