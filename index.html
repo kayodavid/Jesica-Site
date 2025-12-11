@@ -1,56 +1,437 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jessica Melo Nutri</title>
-  <link href="/style.css" rel="stylesheet" />
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nutricionista Jessica Melo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/images/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#a88b36",
+              secondary: "#d4b76a",
+              accent: "#f5e6c8",
+              dark: "#3d3226",
+              light: "#faf8f3",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #a88b36 0%, #d4b76a 100%);
+      }
+      .scroll-smooth {
+        scroll-behavior: smooth;
+      }
+    </style>
+  </head>
+  <body class="scroll-smooth bg-light">
+    <!-- Header/Navbar -->
+    <nav class="bg-white shadow-md fixed w-full h-20 top-0 z-50">
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+      <a href="/index.html">        
+        <img src="/assets/images/logo_sem_fundo.png" class="w-44" alt="Jessica Melo Nutricionista">
+    </a>
+        <div class="hidden md:flex space-x-6">
+          <a href="/index.html" class="text-dark hover:text-primary transition"
+            >Início</a
+          >
+          <a
+            href="#especialidades"
+            class="text-dark hover:text-primary transition"
+            >Especialidades</a
+          >
+          <a href="#depoimentos" class="text-dark hover:text-primary transition"
+            >Depoimentos</a
+          >
+          <a href="#sobre" class="text-dark hover:text-primary transition"
+            >Sobre</a
+          >
+          <a
+            href="/agendamento.html"
+            class="bg-primary text-white px-6 py-2 rounded-full hover:bg-secondary hover:text-dark transition"
+            >Agendar</a
+          >
+        </div>
+        <button class="md:hidden text-dark">
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
 
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
-
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
-  
-  <style type="text/tailwindcss">
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #a88b36;
-    }
-    .main-screen {
-      display: block;
-    }
-    .scheduling-screen {
-      display: none;
-    }
-  </style>
-</head>
-<body class="flex flex-col items-center justify-start sm:justify-center min-h-screen bg-bacground px-4">
-
-  <div class="w-full max-w-md mx-auto p-4 sm:p-6 md:p-8 pt-10 sm:pt-0 main-screen" id="main-screen">
-    <header class="text-center mb-8">
-      <img 
-        alt="Foto de Jessica" 
-        class="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 object-cover"
-        src="/assets/images/Jessica-site2.jpg" 
-      />
-      <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Jessica Melo | Nutricionista</h1>
-      <p class="text-sm sm:text-base text-gray-800 mt-1 pb-0">Te ajudo a ter resultados enquanto a vida acontece</p>
-      <p class="text-sm sm:text-base text-gray-600 mt-1 pb-0"> </p>
-    </header>
-
-    <main class="space-y-4 text-center">
-      <a 
-  class="block w-full text-center text-gray-800 py-4 px-6 rounded-lg transition-colors font-medium shadow-gray-400 shadow-sm"
-  style="background-color:#c9be9d; border: 2px solid #1c1c1c;"
-  href="https://wa.me/5562991159026"
->
-  Agende sua consulta
-</a>
-
-
-      
-    </main>
+    <!-- Hero Section -->
+<section id="inicio" class="gradient-bg mt-20 px-4 h-[50px] flex items-center justify-center">
+  <div class="container mx-auto text-center text-white">
+    <p class="text-sm md:text-base">"Te ajudo a ter resultados enquanto a vida acontece."</p>
   </div>
+</section>
 
-</body>
+     <!-- Sobre Section -->
+    <section id="sobre" class="py-20 px-4 bg-light">
+      <div class="container mx-auto max-w-4xl">
+        <h2 class="text-4xl font-bold text-center mb-12 text-dark">
+          Quem sou eu
+        </h2>
+        <div
+          class="bg-white rounded-lg shadow-lg p-8 border-t-4 border-primary"
+        >
+          <p class="text-lg text-gray-700 leading-relaxed">
+            Sou natural de Ceres, em Goiás, e foi por meio de uma convivência
+            próxima com profissionais de saúde, em um contexto pessoal, que
+            descobri minha verdadeira vocação para a Nutrição. Minha trajetória
+            acadêmica iniciou-se com a graduação em Biologia, experiência que me
+            permitiu atuar como educadora no Instituto Federal Goiano. Após essa
+            experiência, decidi trilhar o caminho da Nutrição, uma transição de
+            carreira movida pela certeza de estar seguindo meu propósito de
+            cuidar das pessoas através da alimentação. Comprometida com uma
+            formação de excelência, dediquei-me intensamente aos estudos durante
+            minha graduação no CEUB - DF. Realizei meu trabalho de conclusão de
+            curso com o tema "Relação do transtorno de compulsão alimentar em
+            adultos com sobrepeso e obesidade". Foi nesse período que aprendi
+            sobre os malefícios das dietas restritivas e dos modismos
+            passageiros. Ao final da graduação, recebi um convite para integrar
+            a diretoria da ANDF - Associação de Nutricionistas do Distrito
+            Federal, onde atuo como conselheira fiscal, contribuindo com as
+            discussões da nossa categoria. Atuo com foco em emagrecimento,
+            comportamento e performance, por meio de uma abordagem descomplicada
+            e sem modismos, sempre fundamentada em evidências científicas. Meu
+            objetivo é oferecer um atendimento acolhedor e prático, criando as
+            condições ideais para promover mudanças reais e sustentáveis. Será
+            um prazer fazer parte da sua jornada. Seja bem-vindo(a)!
+            
+            <br><b>Jessica Melo, Nutricionista </b>
+            <br>
+            <b>CRN-1: 27052</b>
+          </p>
+        </div>
+      </div>
+    </section>
+
+        <!-- CTA Section -->
+    <section class="py-16 px-4 bg-primary text-white">
+      <div class="container mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+          Faça seu agendamento online ou presencial
+        </h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+         
+        </p>
+        <a
+          href="/agendamento.html"
+          class="bg-white text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-accent hover:text-dark transition inline-block shadow-lg"
+          >Agendar Agora</a
+        >
+      </div>
+    </section>
+
+    <!-- Quote Section -->
+    <section class="py-16 px-4 bg-secondary/20">
+      <div class="container mx-auto max-w-4xl text-center">
+        <div class="text-6xl text-primary mb-6"></div>
+        <p class="text-2xl text-dark italic mb-8">
+          Na busca por uma alimentação saudável, priorize a ciência, não as tendências. Comer bem é uma jornada pessoal, muito mais significativa do que seguir regras. Encontrar a segurança para fazer suas próprias escolhas é libertador, e meu papel é caminhar ao seu lado nesse processo.
+        </p>
+        
+        <p class="text-lg font-semibold text-primary">- Dra. Jessica Melo</p>
+      </div>
+    </section>
+
+    <!-- Depoimentos Section -->
+    <section id="depoimentos" class="py-20 px-4 bg-white">
+      <div class="container mx-auto">
+        <h2 class="text-4xl font-bold text-center mb-16 text-dark">
+          Confira alguns depoimentos de pacientes
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Depoimento 1 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-primary hover:shadow-xl transition"
+          >
+            <div class="flex mb-4">
+              <span class="text-yellow-500">⭐⭐⭐⭐⭐</span>
+            </div>
+            <p class="text-gray-600 mb-4">
+              "Parceria, é o que define o atendimento e profissionalismo da Dra
+              Helen, para uma vida saudável sem deixar de lado a empatia pelas
+              oscilações que vivemos com a correria do dia a dia."
+            </p>
+            <p class="font-semibold text-primary">Simony</p>
+          </div>
+
+          <!-- Depoimento 2 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-secondary hover:shadow-xl transition"
+          >
+            <div class="flex mb-4">
+              <span class="text-yellow-500">⭐⭐⭐⭐⭐</span>
+            </div>
+            <p class="text-gray-600 mb-4">
+              "Agilidade no agendamento, e tranquilidade com objetividade no
+              atendimento, ela não enrola, mas ouve atentamente cada queixa,
+              você sente que ela faz parte do tratamento junto."
+            </p>
+            <p class="font-semibold text-primary">Thiago</p>
+          </div>
+
+          <!-- Depoimento 3 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-accent hover:shadow-xl transition"
+          >
+            <div class="flex mb-4">
+              <span class="text-yellow-500">⭐⭐⭐⭐⭐</span>
+            </div>
+            <p class="text-gray-600 mb-4">
+              "Foi fundamental ter a Dra Helen na minha gestação, seu
+              profissionalismo e conhecimento somado ao seu bom senso e empatia
+              tornaram as mudanças do meu corpo mais tranquilas no pós."
+            </p>
+            <p class="font-semibold text-primary">Tabatta</p>
+          </div>
+
+          <!-- Depoimento 4 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-primary hover:shadow-xl transition"
+          >
+            <div class="flex mb-4">
+              <span class="text-yellow-500">⭐⭐⭐⭐⭐</span>
+            </div>
+            <p class="text-gray-600 mb-4">
+              "Gratidão define, ela vibra por cada conquista e puxa sua orelha
+              com carinho por cada deslize, estou muito feliz por tê-la nessa
+              caminhada rumo a vida saudável."
+            </p>
+            <p class="font-semibold text-primary">Anni</p>
+          </div>
+
+          <!-- Depoimento 5 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-secondary hover:shadow-xl transition"
+          >
+            <div class="flex mb-4">
+              <span class="text-yellow-500">⭐⭐⭐⭐⭐</span>
+            </div>
+            <p class="text-gray-600 mb-4">
+              "Mais do que uma profissional ela se torna uma amiga, daquelas que
+              te entendem e só ela pode brigar, com carinho mostra que comer bem
+              não precisa ser punição."
+            </p>
+            <p class="font-semibold text-primary">Gabriel</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Especialidades Section -->
+    <section id="especialidades" class="py-20 px-4 bg-white">
+      <div class="container mx-auto">
+        <h2 class="text-4xl font-bold text-center mb-16 text-dark">
+          Áreas de Especialização
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Card 1 -->
+          <div
+            class="bg-light rounded-lg shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-2 border-t-4 border-primary"
+          >
+            <h3 class="text-2xl font-semibold mb-4 text-dark">
+              Gastroenterologia
+            </h3>
+            <p class="text-gray-600">
+              Tratamento nutricional para doenças do estômago (gastrite,
+              refluxo, hérnia de hiato, úlcera) e doenças do intestino
+              (constipação, diarreia, doença diverticular, intolerâncias,
+              disbiose, síndrome do intestino irritável e doenças inflamatórias
+              intestinais).
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div
+            class="bg-light rounded-lg shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-2 border-t-4 border-secondary"
+          >
+            <div class="text-primary text-5xl mb-4"></div>
+            <h3 class="text-2xl font-semibold mb-4 text-dark">
+              Cardiologia e Endocrinologia
+            </h3>
+            <p class="text-gray-600">
+              Tratamento nutricional para sobrepeso e obesidade, doenças
+              cardiovasculares, dislipidemias, diabetes, hipertensão, síndrome
+              metabólica, gestação de risco, síndrome dos ovários policísticos,
+              climatério e menopausa.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div
+            class="bg-light rounded-lg shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-2 border-t-4 border-accent"
+          >
+            <div class="text-primary text-5xl mb-4"></div>
+            <h3 class="text-2xl font-semibold mb-4 text-dark">
+              Comportamento Alimentar
+            </h3>
+            <p class="text-gray-600">
+              Terapia nutricional baseada nos princípios da nutrição
+              comportamental para tratamento da obesidade, compulsão alimentar e
+              comer transtornado. Adequação para melhora das funções
+              metabólicas.
+            </p>
+          </div>
+
+          <!-- Card 4 -->
+          <div
+            class="bg-light rounded-lg shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-2 border-t-4 border-primary"
+          >
+            <div class="text-primary text-5xl mb-4"></div>
+            <h3 class="text-2xl font-semibold mb-4 text-dark">
+              Fitness e Wellness
+            </h3>
+            <p class="text-gray-600">
+              Acompanhamento nutricional na prática de exercícios físicos para
+              saúde, qualidade de vida ou estética. Avaliação nutricional e da
+              composição corporal por exame de bioimpedância elétrica InBody270.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>   
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-4 bg-white">
+      <div class="container mx-auto max-w-4xl">
+        <h2 class="text-4xl font-bold text-center mb-16 text-dark">
+          Dicas úteis de Nutrição e Perguntas Frequentes
+        </h2>
+        <div class="space-y-6">
+          <!-- FAQ 1 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-primary hover:shadow-lg transition"
+          >
+            <h3 class="text-xl font-semibold mb-3 text-primary">
+              Qual é a melhor dieta para emagrecer?
+            </h3>
+            <p class="text-gray-600">
+              Existem várias estratégias – com respaldo científico – para
+              emagrecimento. A ciência mostra que a estratégia mais eficiente é
+              aquela que é viável para você, pois depende dos seus hábitos e
+              preferências alimentares, estilo de vida, rotina e condições de
+              saúde. O melhor tratamento é escolhido em conjunto com o paciente,
+              em consulta.
+            </p>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-secondary hover:shadow-lg transition"
+          >
+            <h3 class="text-xl font-semibold mb-3 text-primary">
+              Dieta FODMAP emagrece?
+            </h3>
+            <p class="text-gray-600">
+              A DIETA POBRE EM FODMAP (LOW FODMAP) é um protocolo criado pela
+              Monash University, inicialmente para tratamento da Síndrome do
+              Intestino Irritável (SII). A dieta é composta por 3 fases,
+              conduzidas pela nutricionista, de forma a entender quais alimentos
+              e quantidades provocam sintomas ao paciente. É um protocolo
+              conduzido por profissional treinado e possui começo, meio e fim.
+            </p>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-accent hover:shadow-lg transition"
+          >
+            <h3 class="text-xl font-semibold mb-3 text-primary">
+              Qual a relação entre a microbiota e a obesidade?
+            </h3>
+            <p class="text-gray-600">
+              O desequilíbrio na microbiota intestinal pode interferir de forma
+              negativa na saúde e na integridade do intestino. Essa inflamação
+              sistêmica crônica de baixo grau influencia na forma como nosso
+              organismo estoca e utiliza a energia proveniente dos alimentos.
+              Cuidar do processo digestivo como um todo é parte fundamental no
+              tratamento da obesidade.
+            </p>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div
+            class="bg-light rounded-lg p-6 shadow-md border-l-4 border-primary hover:shadow-lg transition"
+          >
+            <h3 class="text-xl font-semibold mb-3 text-primary">
+              O que é o Protocolo 5R?
+            </h3>
+            <p class="text-gray-600">
+              É uma abordagem nutricional aprovada pela Federação Brasileira de
+              Gastroenterologia que visa restabelecer o pleno funcionamento de
+              todo o processo digestivo, melhorar a microbiota e a saúde
+              intestinal. É utilizada para o tratamento de pacientes com queixas
+              relacionadas à má digestão, disbiose, gastrite, refluxo, até
+              síndrome do intestino irritável ou doenças inflamatórias
+              intestinais.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-8 px-4">
+      <div class="container mx-auto text-center">
+        <p class="mb-2">
+          © 2025 Jessica Melo - Nutricionista
+        </p>
+        <p class="text-gray-400">
+          CRN-1: 27052 | Atendimento Online e Presencial
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Smooth scroll para links internos
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
