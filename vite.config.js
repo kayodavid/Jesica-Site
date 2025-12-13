@@ -1,19 +1,24 @@
-// vite.config.js - CORRIGIDO
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
   build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
     rollupOptions: {
       input: {
-        main: 'index.html',
-        agendamento: 'agendamento.html', 
+        main: resolve(__dirname, 'index.html'),
+        agendamento: resolve(__dirname, 'agendamento.html')
       },
-    },
+      output: {
+        // Gera arquivos em pastas separadas para URLs limpas
+        entryFileNames: '[name]/index.js',
+        chunkFileNames: '[name]/[hash].js',
+        assetFileNames: 'assets/[name].[hash][extname]'
+      }
+    }
   },
-  server: {
+  // Configuração para preview local com URLs limpas
+  preview: {
     port: 3000,
-    open: true,
-  },
-});
+    strictPort: false,
+  }
+})
