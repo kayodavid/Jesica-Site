@@ -13,7 +13,7 @@
     />
     <link rel="manifest" href="/site.webmanifest" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script>
@@ -32,7 +32,6 @@
       };
     </script>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
       body {
         font-family: "Poppins", sans-serif;
       }
@@ -42,98 +41,110 @@
       .scroll-smooth {
         scroll-behavior: smooth;
       }
+      
+      /* Menu Mobile */
+      .mobile-menu {
+        display: none;
+      }
+      .mobile-menu.active {
+        display: block;
+      }
     </style>
   </head>
   <body class="scroll-smooth bg-light">
     <!-- Header/Navbar -->
-    <nav class="bg-white shadow-md fixed w-full h-20 top-0 z-50">
-      <div
-        class="container mx-auto px-4 py-4 flex justify-between items-center"
-      >
-      <a href="/index.html">        
-        <img src="/assets/images/logo_sem_fundo.png" class="w-44" alt="Jessica Melo Nutricionista">
-    </a>
-        <div class="hidden md:flex space-x-6">
-          <a href="/index.html" class="text-dark hover:text-primary transition"
-            >Início</a
-          >
-          <a
-            href="/agendamento.html"
-            class="bg-primary text-white px-6 py-2 rounded-full hover:bg-secondary hover:text-dark transition"
-            >Agendar</a
-          >
+    <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+      <div class="container mx-auto px-4 py-3 sm:py-4">
+        <div class="flex justify-between items-center">
+          <a href="/index.html">        
+            <img src="/assets/images/logo_sem_fundo.png" class="w-32 sm:w-44" alt="Jessica Melo Nutricionista">
+          </a>
+          
+          <!-- Desktop Menu -->
+          <div class="hidden md:flex space-x-6">
+            <a href="/index.html" class="text-dark hover:text-primary transition">Início</a>
+            <a
+              href="/agendamento.html"
+              class="bg-primary text-white px-6 py-2 rounded-full hover:bg-secondary hover:text-dark transition"
+            >Agendar</a>
+          </div>
+          
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-btn" class="md:hidden text-dark p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
         </div>
-        <button class="md:hidden text-dark">
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            ></path>
-          </svg>
-        </button>
+        
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4">
+          <a href="/index.html" class="block py-2 text-dark hover:text-primary transition">Início</a>
+          <a href="/agendamento.html" class="block mt-2 bg-primary text-white px-4 py-2 rounded-full hover:bg-secondary hover:text-dark transition text-center">Agendar</a>
+        </div>
       </div>
     </nav>
 
     <!-- Hero Section -->
-<section id="inicio" class="gradient-bg mt-20 px-4 h-[50px] flex items-center justify-center">
-  <div class="container mx-auto text-center text-white">
-    <p class="text-sm md:text-base">"Te ajudo a ter resultados enquanto a vida acontece."</p>
-  </div>
-</section>
-
-     <!-- Sobre Section -->
-    <section id="sobre" class="py-20 px-4 bg-light">
-      <div class="container mx-auto max-w-4xl">
-        <h2 class="text-4xl font-bold text-center mb-12 text-dark">
-          Quem sou eu
-        </h2>
-<div class="bg-white rounded-lg shadow-lg p-8 border-t-4 border-primary">
-  <p class="text-lg text-gray-700 leading-relaxed text-justify">
-    Sou natural de Ceres, em Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um contexto pessoal, que descobri minha verdadeira vocação para a Nutrição. <br><br>
-    
-    Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da alimentação. <br><br>
-    
-    Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das dietas restritivas e dos modismos passageiros. <br><br>
-    
-    Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria. <br><br>
-    
-    Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor e prático, criando as condições ideais para promover mudanças reais e sustentáveis. <br><br>
-    
-    Será um prazer fazer parte da sua jornada. <br><br>
-    
-    Seja bem-vindo(a)! <br><br>
-    
-    <b>Jessica Melo, Nutricionista</b><br>
-    <b>CRN-1: 27052</b>
-  </p>
-</div>
+    <section id="inicio" class="gradient-bg mt-16 sm:mt-20 px-4 py-6 sm:py-8 flex items-center justify-center">
+      <div class="container mx-auto text-center text-white">
+        <p class="text-sm sm:text-base md:text-lg px-2">"Te ajudo a ter resultados enquanto a vida acontece."</p>
       </div>
     </section>
 
-        <!-- CTA Section -->
-    <section class="py-16 px-4 bg-primary text-white">
+    <!-- Sobre Section -->
+    <section id="sobre" class="py-12 sm:py-16 md:py-20 px-4 bg-light">
+      <div class="container mx-auto max-w-4xl">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-dark">
+          Quem sou eu
+        </h2>
+        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 border-t-4 border-primary">
+          <p class="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-justify">
+            Sou natural de Ceres, em Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um contexto pessoal, que descobri minha verdadeira vocação para a Nutrição. <br><br>
+            
+            Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da alimentação. <br><br>
+            
+            Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das dietas restritivas e dos modismos passageiros. <br><br>
+            
+            Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria. <br><br>
+            
+            Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor e prático, criando as condições ideais para promover mudanças reais e sustentáveis. <br><br>
+            
+            Será um prazer fazer parte da sua jornada. <br><br>
+            
+            Seja bem-vindo(a)! <br><br>
+            
+            <strong>Jessica Melo, Nutricionista</strong><br>
+            <strong>CRN-1: 27052</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-12 sm:py-16 px-4 bg-primary text-white">
       <div class="container mx-auto text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 px-2">
           Faça seu agendamento online
         </h2>
-        <p class="text-xl mb-8 max-w-2xl mx-auto">
-         
+        <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
+          Agende sua consulta de forma rápida e prática
         </p>
         <a
           href="/agendamento.html"
-          class="bg-white text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-accent hover:text-dark transition inline-block shadow-lg"
-          >Agendar Agora</a
-        >
+          class="bg-white text-primary px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg hover:bg-accent hover:text-dark transition inline-block shadow-lg"
+        >Agendar Agora</a>
       </div>
     </section>
 
-    
+    <script>
+      // Mobile Menu Toggle
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+      });
+    </script>
   </body>
 </html>
