@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nutricionista Jessica Melo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/images/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#a88b36",
+              secondary: "#d4b76a",
+              accent: "#f5e6c8",
+              dark: "#3d3226",
+              light: "#faf8f3",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #a88b36 0%, #d4b76a 100%);
+      }
+      .scroll-smooth {
+        scroll-behavior: smooth;
+      }
+      
+      /* Menu Mobile */
+      .mobile-menu {
+        display: none;
+      }
+      .mobile-menu.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="scroll-smooth bg-light">
+    <!-- Header/Navbar -->
+    <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+      <div class="container mx-auto px-4 py-3 sm:py-4">
+        <div class="flex justify-between items-center">
+          <a href="/index.html">        
+            <img src="/assets/images/logo_sem_fundo.png" class="w-32 sm:w-44" alt="Jessica Melo Nutricionista">
+          </a>
+          
+          <!-- Desktop Menu -->
+          <div class="hidden md:flex items-center space-x-6">
+            <a href="/index.html" class="text-dark hover:text-primary transition">Início</a>
+            <a href="/blog.html" class="text-dark hover:text-primary transition">Blog</a>
+            <a
+              href="/agendamento.html"
+              class="bg-primary text-white px-6 py-2 rounded-full hover:bg-secondary hover:text-dark transition"
+            >Agendar</a>
+          </div>
+          
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-btn" class="md:hidden text-dark p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4">
+          <a href="/index.html" class="block py-2 text-dark hover:text-primary transition border-b border-gray-100">Início</a>
+          <a href="/blog.html" class="block py-2 text-dark hover:text-primary transition border-b border-gray-100">Blog</a>
+          <a href="/agendamento.html" class="block mt-4 bg-primary text-white px-4 py-2 rounded-full hover:bg-secondary hover:text-dark transition text-center">Agendar</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="gradient-bg mt-16 sm:mt-20 px-4 py-6 sm:py-8 flex items-center justify-center">
+      <div class="container mx-auto text-center text-white">
+        <p class="text-sm sm:text-base md:text-lg px-2">"Te ajudo a ter resultados enquanto a vida acontece."</p>
+      </div>
+    </section>
+
+    <!-- Sobre Section -->
+    <section id="sobre" class="py-12 sm:py-16 md:py-20 px-4 bg-light">
+      <div class="container mx-auto max-w-4xl">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-dark">
+          Quem sou eu
+        </h2>
+        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 border-t-4 border-primary">
+          <p class="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-justify">
+            Sou natural de Ceres, Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um contexto pessoal, que descobri minha verdadeira vocação para a Nutrição. <br><br>
+            
+            Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da alimentação. <br><br>
+            
+            Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das dietas restritivas e dos modismos passageiros. <br><br>
+            
+            Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria. <br><br>
+            
+            Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor e prático, criando as condições ideais para promover mudanças reais e sustentáveis. <br><br>
+            
+            Será um prazer fazer parte da sua jornada. <br><br>
+            
+            Seja bem-vindo(a)! <br><br>
+            
+            <strong>Jessica Melo, Nutricionista</strong><br>
+            <strong>CRN-1: 27052</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-12 sm:py-16 px-4 bg-primary text-white">
+      <div class="container mx-auto text-center">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 px-2">
+          Faça seu agendamento
+        </h2>
+        
+        <a
+          href="/agendamento.html"
+          class="bg-white text-primary px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg hover:bg-accent hover:text-dark transition inline-block shadow-lg"
+        >Agendar consulta</a>
+      </div>
+    </section>
+
+    <script>
+      // Mobile Menu Toggle
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+      });
+    </script>
+  </body>
+</html>
