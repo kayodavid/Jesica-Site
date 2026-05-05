@@ -5,6 +5,10 @@
     {
       "source": "/agendamento",
       "destination": "/agendamento.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
     }
   ]
 }
