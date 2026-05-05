@@ -2,10 +2,8 @@
 // tailwind.config.js
 export default {
   content: [
-    "./index.html",
-    "./agemdar.html",
+    "./*.html",
     "./**/*.{js,ts,jsx,tsx}",
-    // "./movie-details.html", // <--- Remova esta linha
   ],
   theme: {
     extend: {

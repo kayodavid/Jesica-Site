@@ -6,7 +6,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        agendamento: resolve(__dirname, 'agendamento.html')
+        agendamento: resolve(__dirname, 'agendamento.html'),
+        blog: resolve(__dirname, 'blog.html')
       },
       output: {
         // Gera arquivos em pastas separadas para URLs limpas
