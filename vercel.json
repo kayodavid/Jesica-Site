@@ -3,8 +3,8 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/agendamento",
-      "destination": "/agendamento.html"
+      "source": "/agende-sua-consulta",
+      "destination": "/agende-sua-consulta.html"
     },
     {
       "source": "/blog",
