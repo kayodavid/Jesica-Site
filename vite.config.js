@@ -6,7 +6,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        'agende-sua-consulta': resolve(__dirname, 'agende-sua-consulta.html'),
+        'agendar-consulta': resolve(__dirname, 'agendar-consulta.html'),
         blog: resolve(__dirname, 'blog.html')
       },
       output: {
