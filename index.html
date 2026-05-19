@@ -24,6 +24,7 @@
           animation: {
             'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
             'float': 'float 4s ease-in-out infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           },
           keyframes: {
             fadeInUp: {
@@ -60,6 +61,32 @@
     .mobile-menu.active {
       display: block;
     }
+    
+    /* Custom checkmark list style */
+    .check-list li {
+      position: relative;
+      padding-left: 2rem;
+      margin-bottom: 1rem;
+    }
+    .check-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a88b36' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    /* FAQ accordion styles */
+    details > summary {
+      list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
   </style>
 </head>
 
@@ -79,10 +106,13 @@
             Início
             <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full"></span>
           </a>
+          <a href="/sobre.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
+            Quem sou eu
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
+          </a>
           <a href="/blog.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
             Blog
-            <span
-              class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/agendar-consulta.html"
             class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Agendar</a>
@@ -100,8 +130,8 @@
       <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4 animate-fade-in-up">
         <div class="flex flex-col space-y-2 bg-white/90 rounded-2xl p-4 shadow-lg border border-gray-100">
           <a href="/index.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Início</a>
-          <a href="/blog.html"
-            class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Blog</a>
+          <a href="/sobre.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Quem sou eu</a>
+          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Blog</a>
           <a href="/agendar-consulta.html"
             class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md">Agendar</a>
         </div>
@@ -110,129 +140,166 @@
   </nav>
 
   <!-- Hero Section -->
-  <section id="inicio"
-    class="gradient-bg pt-32 pb-16 sm:pt-40 sm:pb-20 px-4 flex items-center justify-center min-h-[70vh] sm:min-h-[85vh] relative overflow-hidden">
-    <!-- Decorative background element -->
+  <section class="gradient-bg pt-32 pb-16 sm:pt-40 sm:pb-24 px-4 relative overflow-hidden">
+    <!-- Decorative background elements -->
     <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-10 w-64 h-64 bg-accent opacity-20 rounded-full blur-3xl"></div>
 
-    <div class="container mx-auto max-w-6xl">
+    <div class="container mx-auto max-w-6xl relative z-10">
       <div class="flex flex-col md:flex-row items-center justify-between gap-12">
-        <div class="w-full md:w-1/2 text-center md:text-left z-10 animate-fade-in-up">
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-            Te ajudo a ter <span class="text-dark">resultados</span> enquanto a vida acontece.
+        <div class="w-full md:w-1/2 text-center md:text-left animate-fade-in-up">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-normal mb-8">
+            Atendimento nutricional <span class="text-dark">personalizado</span>, baseado em ciência e adaptado às suas necessidades individuais.
           </h1>
-          <p class="text-lg sm:text-xl text-white/90 mb-10 max-w-lg mx-auto md:mx-0">
-            Transforme sua relação com a comida e atinja seus objetivos com uma abordagem leve e sem restrições
-            extremas.
-          </p>
           <a href="/agendar-consulta.html"
-            class="inline-block bg-dark text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-dark transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-            Agendar minha consulta
+            class="inline-block bg-dark text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-dark transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 border border-transparent hover:border-dark/10">
+            AGENDAR ATENDIMENTO
           </a>
         </div>
+        
         <div class="w-full md:w-5/12 flex justify-center opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-          <div class="relative">
+          <div class="relative w-72 sm:w-80 md:w-full max-w-sm">
             <!-- Glow effect behind image -->
-            <div class="absolute inset-0 bg-white rounded-3xl blur-2xl opacity-20 transform rotate-6"></div>
-            <img src="/assets/images/Jessica-site2.jpg" alt="Jessica Melo"
-              class="relative w-72 sm:w-80 md:w-full h-auto object-cover rounded-[2rem] shadow-2xl animate-float border-4 border-white/20">
+            <div class="absolute inset-0 bg-white rounded-3xl blur-2xl opacity-20 transform rotate-3"></div>
+            <img src="/assets/images/Jessica-site2.jpg" alt="Nutricionista Jessica Melo"
+              class="relative w-full h-auto object-cover rounded-[2rem] shadow-2xl animate-float border-4 border-white/20 aspect-[3/4]">
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Sobre Section -->
-  <section id="sobre" class="py-20 sm:py-28 px-4 bg-light relative">
-    <!-- Decorative element -->
-    <div class="absolute top-20 left-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+  <!-- Propósito Section -->
+  <section class="py-20 px-4 bg-white relative">
+    <div class="container mx-auto max-w-4xl relative z-10 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.3s_forwards]">
+      <div class="bg-light/50 border border-primary/10 rounded-3xl p-8 sm:p-12 shadow-sm text-center">
+        <div class="w-16 h-1 bg-primary mx-auto rounded-full mb-8"></div>
+        <p class="text-lg sm:text-xl text-dark leading-relaxed font-medium">
+          O objetivo é orientar e apoiar em sua jornada, com escuta ativa, combinando nutrição, comportamento alimentar, rotina e autoconsciência para melhora dos desfechos de saúde.
+        </p>
+      </div>
+    </div>
+  </section>
 
-    <div class="container mx-auto max-w-4xl relative z-10">
-      <div class="text-center opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 sm:mb-16 text-dark relative inline-block">
-          Quem sou eu
-          <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-primary rounded-full"></span>
+  <!-- Sem Sofrer Section -->
+  <section class="py-20 px-4 bg-light relative">
+    <div class="container mx-auto max-w-3xl text-center opacity-0 animate-[fadeInUp_0.8s_ease-out_0.4s_forwards]">
+      
+      <div class="py-12 border-y border-primary/20 my-8">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark leading-tight space-y-2">
+          <span class="block">Sem sofrer,</span>
+          <span class="block">Sem passar fome,</span>
+          <span class="block text-primary">Comendo o que você gosta.</span>
         </h2>
       </div>
 
-      <div
-        class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-12 md:p-14 border border-white/60 relative overflow-hidden group opacity-0 animate-[fadeInUp_0.8s_ease-out_0.4s_forwards]">
-        <!-- Subtle hover effect border -->
-        <div
-          class="absolute inset-0 border-2 border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-500">
-        </div>
-
-        <div class="relative z-10">
-          <div class="text-base sm:text-lg text-gray-600 leading-relaxed space-y-6 text-justify">
-            <p>
-              Sou natural de Ceres, Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um
-              contexto pessoal, que descobri minha verdadeira vocação para a Nutrição.
-            </p>
-            <p>
-              Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como
-              educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma
-              transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da
-              alimentação.
-            </p>
-            <p>
-              Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação
-              no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão
-              alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das
-              dietas restritivas e dos modismos passageiros.
-            </p>
-            <p>
-              Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas
-              do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria.
-            </p>
-            <p>
-              Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem
-              modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor
-              e prático, criando as condições ideais para promover mudanças reais e sustentáveis.
-            </p>
-
-            <div class="text-center pt-8 mt-8 border-t border-gray-100">
-              <p class="font-medium text-dark text-xl">Será um prazer fazer parte da sua jornada.</p>
-              <p class="text-primary mt-2 text-lg">Seja bem-vindo(a)!</p>
-              <div
-                class="mt-8 inline-block text-center bg-light px-6 py-4 rounded-2xl border border-gray-100 shadow-sm">
-                <strong class="block text-dark text-lg">Jessica Melo</strong>
-                <span class="text-gray-500 text-sm">Nutricionista | CRN-1: 27052</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="mt-12">
+        <a href="/agendar-consulta.html"
+          class="inline-block bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-dark transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+          EU QUERO INVESTIR NA MINHA SAÚDE
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- CTA Section -->
-  <section class="relative py-20 sm:py-28 px-4 overflow-hidden">
-    <!-- Premium Background -->
-    <div class="absolute inset-0 bg-dark"></div>
-    <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-transparent"></div>
+  <!-- Quando Buscar Section -->
+  <section class="py-20 sm:py-24 px-4 bg-white relative overflow-hidden">
+    <!-- Decorative element -->
+    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-64 bg-accent opacity-30 rounded-full blur-3xl"></div>
 
-    <div class="container mx-auto text-center relative z-10">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
-        Pronto para transformar sua rotina?
-      </h2>
-      <p class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
-        Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.
-      </p>
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <div class="text-center mb-16 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark relative inline-block">
+          Quando buscar atendimento nutricional?
+          <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1.5 bg-primary rounded-full"></span>
+        </h2>
+      </div>
 
-      <a href="/agendar-consulta.html"
-        class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-dark bg-white rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
-        <span
-          class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
-        <span class="relative flex items-center gap-2">
-          Agendar consulta
-          <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none"
-            stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-          </svg>
-        </span>
-      </a>
+      <div class="bg-light/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-primary/10 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.4s_forwards]">
+        <ul class="check-list text-lg sm:text-xl text-gray-700 space-y-6">
+          <li class="font-medium">Baixa energia, fadiga constante ou dificuldade de concentração;</li>
+          <li class="font-medium">Para reduzir problemas emocionais, como estresse e ansiedade;</li>
+          <li class="font-medium">Não saber o que comer, quanto comer e quando comer;</li>
+          <li class="font-medium">Sensação de culpa ou obsessão com alimentação;</li>
+          <li class="font-medium">Vive em um ciclo de engorda e emagrece infinito;</li>
+          <li class="font-medium">Sofrimento com dietas restritivas.</li>
+        </ul>
+      </div>
     </div>
   </section>
+
+  <!-- FAQ Section -->
+  <section class="py-24 px-4 bg-light relative">
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark">Perguntas Frequentes</h2>
+        <div class="w-16 h-1.5 bg-primary mx-auto rounded-full mt-4"></div>
+      </div>
+
+      <div class="space-y-4 mb-16">
+        <!-- FAQ Item 1 -->
+        <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+          <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-6 text-lg text-dark hover:bg-gray-50 transition-colors">
+            <span>1. Já testei várias dietas e não funcionaram. O que muda aqui?</span>
+            <span class="transition group-open:rotate-180">
+              <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+            </span>
+          </summary>
+          <div class="text-gray-600 p-6 pt-0 text-base leading-relaxed border-t border-gray-50 mt-2">
+            O meu trabalho tem como base a mudança de comportamento, antes da mudança alimentar. Vou entender o porquê que você não consegue emagrecer ou alcançar seus objetivos e te direcionar em um caminho com mais clareza. Além disso, o atendimento é individualizado, levando em conta sua rotina, preferências e histórico de saúde, sempre baseado em evidências científicas.
+          </div>
+        </details>
+
+        <!-- FAQ Item 2 -->
+        <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+          <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-6 text-lg text-dark hover:bg-gray-50 transition-colors">
+            <span>2. A consulta é só sobre dieta?</span>
+            <span class="transition group-open:rotate-180">
+              <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+            </span>
+          </summary>
+          <div class="text-gray-600 p-6 pt-0 text-base leading-relaxed border-t border-gray-50 mt-2">
+            Não. O atendimento também gira em torno de hábitos de vida, relação com a comida, sinais de fome e saciedade, comportamento alimentar, além de estratégias práticas para o seu dia-a-dia.
+          </div>
+        </details>
+
+        <!-- FAQ Item 3 -->
+        <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+          <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-6 text-lg text-dark hover:bg-gray-50 transition-colors">
+            <span>3. Vou ter que parar de comer tudo o que eu gosto?</span>
+            <span class="transition group-open:rotate-180">
+              <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+            </span>
+          </summary>
+          <div class="text-gray-600 p-6 pt-0 text-base leading-relaxed border-t border-gray-50 mt-2">
+            Não. O objetivo não é tirar seus alimentos preferidos, mas sim cuidar da sua saúde nutricional encontrando um equilíbrio que funciona para você, dentro da sua rotina.
+          </div>
+        </details>
+      </div>
+
+      <!-- Final CTA -->
+      <div class="text-center mt-12">
+        <a href="/agendar-consulta.html"
+          class="group relative inline-flex items-center justify-center px-10 py-5 font-bold text-dark bg-white rounded-full overflow-hidden transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_40px_rgba(168,139,54,0.4)] border border-gray-100">
+          <span
+            class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-20 bg-gradient-to-b from-primary via-primary to-dark"></span>
+          <span class="relative flex items-center gap-2 text-lg">
+            AGENDAR CONSULTA
+            <svg class="w-6 h-6 transform group-hover:translate-x-1 transition-transform text-primary" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-dark text-white py-8 px-4 border-t border-white/10">
+    <div class="container mx-auto text-center">
+      <p class="text-sm opacity-75">&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+    </div>
+  </footer>
 
   <script>
     // Mobile Menu Toggle

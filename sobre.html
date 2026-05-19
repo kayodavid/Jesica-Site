@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quem sou eu - Nutricionista Jessica Melo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#a88b36",
+            secondary: "#d4b76a",
+            accent: "#f5e6c8",
+            dark: "#3d3226",
+            light: "#faf8f3",
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'float': 'float 4s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #a88b36 0%, #d4b76a 100%);
+    }
+
+    .scroll-smooth {
+      scroll-behavior: smooth;
+    }
+
+    /* Menu Mobile */
+    .mobile-menu {
+      display: none;
+    }
+
+    .mobile-menu.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body class="scroll-smooth bg-light">
+  <!-- Header/Navbar -->
+  <nav
+    class="bg-white/80 backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.05)] border-b border-white/50 fixed w-full top-0 z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 sm:py-4">
+      <div class="flex justify-between items-center">
+        <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
+          <img src="/assets/images/logo_sem_fundo.png" class="w-32 sm:w-44" alt="Jessica Melo Nutricionista">
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/index.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
+            Início
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
+          </a>
+          <a href="/sobre.html" class="text-dark font-medium relative group">
+            Quem sou eu
+            <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full"></span>
+          </a>
+          <a href="/blog.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
+            Blog
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
+          </a>
+          <a href="/agendar-consulta.html"
+            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Agendar</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden text-dark p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Menu Dropdown -->
+      <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4 animate-fade-in-up">
+        <div class="flex flex-col space-y-2 bg-white/90 rounded-2xl p-4 shadow-lg border border-gray-100">
+          <a href="/index.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Início</a>
+          <a href="/sobre.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Quem sou eu</a>
+          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Blog</a>
+          <a href="/agendar-consulta.html"
+            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md">Agendar</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Title Section -->
+  <section class="pt-32 pb-8 sm:pt-40 px-4 bg-light relative">
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <div class="text-center animate-fade-in-up">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-dark mb-4">Quem sou eu</h1>
+        <p class="text-lg text-gray-600">Conheça um pouco sobre mim e meu propósito na nutrição.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sobre Section -->
+  <section id="sobre" class="py-12 sm:py-16 px-4 bg-light relative">
+    <!-- Decorative element -->
+    <div class="absolute top-20 left-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <div
+        class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-12 md:p-14 border border-white/60 relative overflow-hidden group animate-fade-in-up">
+        <!-- Subtle hover effect border -->
+        <div
+          class="absolute inset-0 border-2 border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-500">
+        </div>
+
+        <div class="relative z-10">
+          <div class="text-base sm:text-lg text-gray-600 leading-relaxed space-y-6 text-justify">
+            <p>
+              Sou natural de Ceres, Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um
+              contexto pessoal, que descobri minha verdadeira vocação para a Nutrição.
+            </p>
+            <p>
+              Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como
+              educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma
+              transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da
+              alimentação.
+            </p>
+            <p>
+              Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação
+              no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão
+              alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das
+              dietas restritivas e dos modismos passageiros.
+            </p>
+            <p>
+              Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas
+              do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria.
+            </p>
+            <p>
+              Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem
+              modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor
+              e prático, criando as condições ideais para promover mudanças reais e sustentáveis.
+            </p>
+
+            <div class="text-center pt-8 mt-8 border-t border-gray-100">
+              <p class="font-medium text-dark text-xl">Será um prazer fazer parte da sua jornada.</p>
+              <p class="text-primary mt-2 text-lg">Seja bem-vindo(a)!</p>
+              <div
+                class="mt-8 inline-block text-center bg-light px-6 py-4 rounded-2xl border border-gray-100 shadow-sm">
+                <strong class="block text-dark text-lg">Jessica Melo</strong>
+                <span class="text-gray-500 text-sm">Nutricionista | CRN-1: 27052</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="relative py-20 sm:py-28 px-4 overflow-hidden">
+    <!-- Premium Background -->
+    <div class="absolute inset-0 bg-dark"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-transparent"></div>
+
+    <div class="container mx-auto text-center relative z-10">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
+        Pronto para transformar sua rotina?
+      </h2>
+      <p class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
+        Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.
+      </p>
+
+      <a href="/agendar-consulta.html"
+        class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-dark bg-white rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+        <span
+          class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+        <span class="relative flex items-center gap-2">
+          Agendar atendimento
+          <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="bg-dark text-white py-8 px-4 border-t border-white/10">
+    <div class="container mx-auto text-center">
+      <p class="text-sm opacity-75">&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+    });
+  </script>
+</body>
+
+</html>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog | Nutricionista Jessica Melo</title>
+  <title>Quem sou eu - Nutricionista Jessica Melo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAA4FJREFUOE8VwulP22UAwPHv8+t9t3K0UMpRXBlKoVAYyshgmzB068BlL5iZd0xMTEhcMpPFZP4DvjJZfGGiia/UmOzVojMzI8tCwiE4BEbXAjLKURgUCi294DHm8xG3vrot00cF4rEl1BKuna3HZNQz+/cCh1gYGfsHb5WTx3OrOA0aQr0BXGUmpicjeErsiNc735BotRgo0FbhwOO0MDkfI5stUFVejFUtcFaV8XBkGrtKQ5PfTUNbKb//GaG+3IV4u39A2oxGaq3HjE2v4LIY2DnIUFpejMNmQKvWcL79BPeGx3E7rTQ2VJFIbLKbOaD5lQbEB9ffkzrSRGcW+fLamwR91eSyeSZnF1nXaojE4ljNJkqdatbi63gcdqTM0X6mhP3dAuLM2UuyqVJgyQhuvR9CySso1nIyyT2m/o3y106WZ/ML1Ll01AZcmBw6rE4NKiXHYWwP0XfxkqzUJ9Hl9dz+5CqqvBq0ZhZWtphdWCBT7GAu+pyDrXWCjUUoHomtvJraEiOxSBhRGQjKnhN6tlaOOResZzuR5sOLnUxE4qzG45RWlBBOpFheWuYldZ6SZgO+9g7E/gYVFhCNnX2yyydYfprgztAV9DoHBrWKg3QOrc5AeCHKMyC8GGcpOs/VUDPWJjsvdhVOVR4h/M1e2dd9ktWnBT7rCeCy2tFo9KRSBbZTKYQoEM3kyB0fMTET4bVADcX1SUamD3krUI24EqqXg4MDjN5fxKaHy4GXUaXMHBeM5DT7ZJQs3z+YpPdCC5uxNfYTCbp6vPw0HMZtdiA+H2qTp3x+xif2yAs1G8/jfDHQTbm9lM3kCzbSOb779QEdvadp8tqZn5qgNVjDk9Uk4n+j334qh8fGCCdsdHS0c/feI4rUCjeuh1CptGQLkq9/+JlzvR143C7EYZLR8Sk6W2pIao4Rd2/2y/sjT9B6XqXW62ZnN83e8ho3Phpk/zDDN788ZCm+Rn+Xj2BrI5sbOwSKbNjUCorFgLh5oU5mMaKvqKbW4+ZISiZGw+j0Rh7PxIjvpWjxmnn3cgsVpQ4OsmbafLVopJr8wTZiqNsn/X4/qzmo85YhFS1/PJojsppkeWMbs8lEmSnPO6F2yuw6HM46XGYjhXQWlUpB3Pn4tNzN2TjSQsDnRmswMTqT4MffxpGKCo3WgMeh0HrSRVewhqy043c7SO2nkCo9/wGZP2PtnoViZgAAAABJRU5ErkJggg==" />
   <link rel="manifest" href="/site.webmanifest" />
@@ -23,11 +23,16 @@
           },
           animation: {
             'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'float': 'float 4s ease-in-out infinite',
           },
           keyframes: {
             fadeInUp: {
               '0%': { opacity: '0', transform: 'translateY(20px)' },
               '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
             }
           }
         },
@@ -74,13 +79,13 @@
             Início
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
-          <a href="/sobre.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
+          <a href="/sobre.html" class="text-dark font-medium relative group">
             Quem sou eu
-            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
-          </a>
-          <a href="/blog.html" class="text-dark font-medium relative group">
-            Blog
             <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full"></span>
+          </a>
+          <a href="/blog.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
+            Blog
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/agendar-consulta.html"
             class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Agendar</a>
@@ -98,8 +103,8 @@
       <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4 animate-fade-in-up">
         <div class="flex flex-col space-y-2 bg-white/90 rounded-2xl p-4 shadow-lg border border-gray-100">
           <a href="/index.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Início</a>
-          <a href="/sobre.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Quem sou eu</a>
-          <a href="/blog.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Blog</a>
+          <a href="/sobre.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Quem sou eu</a>
+          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Blog</a>
           <a href="/agendar-consulta.html"
             class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md">Agendar</a>
         </div>
@@ -107,106 +112,69 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section
-    class="gradient-bg pt-32 pb-16 sm:pt-40 sm:pb-20 px-4 flex items-center justify-center relative overflow-hidden">
-    <!-- Decorative background element -->
-    <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl"></div>
-
-    <div class="container mx-auto text-center text-white relative z-10 animate-fade-in-up">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">Blog</h1>
-      <p class="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto">Artigos, dicas e reflexões para uma vida mais
-        saudável e equilibrada.</p>
+  <!-- Title Section -->
+  <section class="pt-32 pb-8 sm:pt-40 px-4 bg-light relative">
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <div class="text-center animate-fade-in-up">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-dark mb-4">Minha Trajetória</h1>
+        <p class="text-lg text-gray-600">Conheça um pouco sobre mim e meu propósito na nutrição.</p>
+      </div>
     </div>
   </section>
 
-  <!-- Blog Content Section -->
-  <section class="py-16 sm:py-24 md:py-28 px-4 bg-light relative">
+  <!-- Sobre Section -->
+  <section id="sobre" class="py-12 sm:py-16 px-4 bg-light relative">
     <!-- Decorative element -->
     <div class="absolute top-20 left-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+
     <div class="container mx-auto max-w-4xl relative z-10">
-      <article
-        class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden relative group opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
-        <div class="p-8 sm:p-12 md:p-16">
-          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-10 leading-tight relative inline-block">
-            Por que a mentalidade do "tudo ou nada" está fadada ao fracasso?
-          </h2>
+      <div
+        class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 sm:p-12 md:p-14 border border-white/60 relative overflow-hidden group animate-fade-in-up">
+        <!-- Subtle hover effect border -->
+        <div
+          class="absolute inset-0 border-2 border-transparent group-hover:border-primary/10 rounded-3xl transition-colors duration-500">
+        </div>
 
-          <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 text-justify">
+        <div class="relative z-10">
+          <div class="text-base sm:text-lg text-gray-600 leading-relaxed space-y-6 text-justify">
             <p>
-              Imagine que você está tomando sol com a intenção de se bronzear. Você tem duas opções:
+              Sou natural de Ceres, Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um
+              contexto pessoal, que descobri minha verdadeira vocação para a Nutrição.
             </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-              <div class="bg-accent/30 p-4 rounded-xl border-l-4 border-primary">
-                <p class="font-semibold text-dark">1. Você fica gravemente queimado de sol.</p>
-              </div>
-              <div class="bg-accent/30 p-4 rounded-xl border-l-4 border-primary">
-                <p class="font-semibold text-dark">2. Você não se bronzeia.</p>
-              </div>
-            </div>
-
-            <div class="my-10">
-              <img src="/assets/sunburn.301bec9c.jpg" alt="Ilustração de queimadura de sol vs bronzeado"
-                class="rounded-2xl shadow-md w-full object-cover h-64 md:h-80">
-              <p class="text-sm text-gray-500 mt-2 text-center italic">O excesso ou a falta total impedem o resultado
-                desejado.</p>
-            </div>
-
-            <p class="text-xl font-medium text-dark italic border-l-4 border-secondary pl-4">
-              Você não escolheria nenhuma dessas opções, certo?!
-            </p>
-
-            <p>E se você estivesse tentando perder peso?</p>
-
-            <div class="space-y-4">
-              <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
-                <p><span class="font-bold text-primary">1.</span> Você elimina todos os seus alimentos calóricos
-                  favoritos, deixa de participar de eventos sociais, come refeições diferentes do resto da sua família,
-                  força a ingestão de alimentos que não gosta e vai à academia sete dias por semana.</p>
-              </div>
-
-              <div class="flex justify-center">
-                <img src="/assets/gym_burnout.c782dc43.jpg" alt="Excesso de exercícios e restrição"
-                  class="rounded-xl shadow-sm w-full max-w-md h-48 object-cover">
-              </div>
-
-              <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
-                <p><span class="font-bold text-primary">2.</span> Você come muitos alimentos calóricos, faz pedido de
-                  comida todos os dias, cancela sua matrícula na academia e se torna completamente sedentário.</p>
-              </div>
-            </div>
-
             <p>
-              É assim que a mentalidade do "tudo ou nada" se manifesta. O risco é que o "tudo" seja tão intenso que
-              simplesmente não consiga ser consistente. O resultado é que, naturalmente, o "nada" acaba vindo em
-              seguida.
+              Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como
+              educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma
+              transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da
+              alimentação.
             </p>
-
-            <div class="my-10">
-              <img src="/assets/alimentacao.865851b5.png" alt="Equilíbrio alimentar"
-                class="rounded-2xl shadow-md w-full h-auto object-contain">
-            </div>
-
             <p>
-              Para evitar essas duas situações prejudiciais, o segredo é sempre manter o equilíbrio. Por exemplo,
-              incluir alguns alimentos calóricos com moderação e pedir comida de vez em quando é como usar um protetor
-              solar FPS 30. Você está no sol, mas tem uma proteção que te impede de ser muito agressivo, enquanto ainda
-              consegue se bronzear.
+              Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação
+              no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão
+              alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das
+              dietas restritivas e dos modismos passageiros.
+            </p>
+            <p>
+              Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas
+              do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria.
+            </p>
+            <p>
+              Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem
+              modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor
+              e prático, criando as condições ideais para promover mudanças reais e sustentáveis.
             </p>
 
-            <blockquote class="text-2xl font-bold text-center text-primary py-8 border-y-2 border-accent my-10">
-              "O segredo é sempre ter equilíbrio."
-            </blockquote>
-
-            <div class="flex flex-col items-center pt-6 border-t border-gray-100">
-              <p class="font-bold text-dark">Jessica Melo</p>
-              <p class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p>
+            <div class="text-center pt-8 mt-8 border-t border-gray-100">
+              <p class="font-medium text-dark text-xl">Será um prazer fazer parte da sua jornada.</p>
+              <p class="text-primary mt-2 text-lg">Seja bem-vindo(a)!</p>
+              <div
+                class="mt-8 inline-block text-center bg-light px-6 py-4 rounded-2xl border border-gray-100 shadow-sm">
+                <strong class="block text-dark text-lg">Jessica Melo</strong>
+                <span class="text-gray-500 text-sm">Nutricionista | CRN-1: 27052</span>
+              </div>
             </div>
           </div>
         </div>
-      </article>
+      </div>
     </div>
   </section>
 
@@ -216,9 +184,9 @@
     <div class="absolute inset-0 bg-dark"></div>
     <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-transparent"></div>
 
-    <div class="container mx-auto text-center relative z-10 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.4s_forwards]">
+    <div class="container mx-auto text-center relative z-10">
       <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
-        Quer encontrar o seu equilíbrio?
+        Pronto para transformar sua rotina?
       </h2>
       <p class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
         Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.
@@ -239,7 +207,7 @@
     </div>
   </section>
 
-  <footer class="bg-dark text-white py-8 px-4">
+  <footer class="bg-dark text-white py-8 px-4 border-t border-white/10">
     <div class="container mx-auto text-center">
       <p class="text-sm opacity-75">&copy; 2024 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
     </div>
