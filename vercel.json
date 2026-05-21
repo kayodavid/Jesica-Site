@@ -2,17 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/agendar-consulta",
-      "destination": "/agendar-consulta.html"
-    },
-    {
-      "source": "/blog",
-      "destination": "/blog.html"
-    },
-    {
-      "source": "/sobre",
-      "destination": "/sobre.html"
-    }
+    { "source": "/agendar-consulta", "destination": "/agendar-consulta.html" },
+    { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/sobre", "destination": "/sobre.html" }
   ]
 }
