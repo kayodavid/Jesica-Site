@@ -111,7 +111,7 @@
           <div class="flex flex-wrap gap-4 text-sm">
             <div class="flex items-center gap-2">
               <span class="w-8 h-8 rounded-lg bg-green-500 text-white font-bold flex items-center justify-center shadow-sm">A</span>
-              <span class="text-gray-700 font-medium">Alimentação Boa</span>
+              <span class="text-gray-700 font-medium">Alimentação adequada</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="w-8 h-8 rounded-lg bg-purple-600 text-white font-bold flex items-center justify-center shadow-sm">T</span>
@@ -201,7 +201,7 @@
           <input type="checkbox" id="modal-check-a" class="w-5 h-5 rounded text-green-600 focus:ring-green-500 border-gray-300" />
           <div>
             <span class="font-bold text-green-600 mr-1.5 bg-green-50 px-2 py-0.5 rounded text-sm">A</span>
-            <span class="text-sm text-gray-700 font-medium">Alimentação Boa</span>
+            <span class="text-sm text-gray-700 font-medium">Alimentação adequada</span>
           </div>
         </label>
 
@@ -217,9 +217,15 @@
           <input type="checkbox" id="modal-check-h" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
           <div>
             <span class="font-bold text-blue-600 mr-1.5 bg-blue-50 px-2 py-0.5 rounded text-sm">H</span>
-            <span class="text-sm text-gray-700 font-medium">Hidratei-me Adequadamente</span>
+            <span class="text-sm text-gray-700 font-medium">Hidratei-me adequadamente</span>
           </div>
         </label>
+      </div>
+
+      <!-- Campo de Observações -->
+      <div class="mb-6">
+        <label for="modal-observations" class="block text-sm font-bold text-dark mb-2">Observações:</label>
+        <textarea id="modal-observations" placeholder="Adicione suas observações para este dia..." class="w-full h-24 px-3.5 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 text-gray-700 bg-light/30 resize-none transition-all text-sm"></textarea>
       </div>
 
       <div class="flex gap-2">
@@ -284,6 +290,7 @@
     const modalCheckA = document.getElementById('modal-check-a');
     const modalCheckT = document.getElementById('modal-check-t');
     const modalCheckH = document.getElementById('modal-check-h');
+    const modalObservations = document.getElementById('modal-observations');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
@@ -482,6 +489,10 @@
       modalCheckA.checked = dayData.A;
       modalCheckT.checked = dayData.T;
       modalCheckH.checked = dayData.H;
+      
+      // Carregar observação do dia
+      const observation = db.getDayObservation(targetEmail, selectedYear, selectedMonth, day);
+      modalObservations.value = observation;
 
       dayModal.classList.remove('hidden');
       setTimeout(() => {
@@ -510,6 +521,10 @@
           T: modalCheckT.checked,
           H: modalCheckH.checked
         };
+        
+        // Salvar observação do dia
+        db.saveDayObservation(targetEmail, selectedYear, selectedMonth, activeDayForModal, modalObservations.value);
+        
         renderCalendar();
         updateStats();
         closeDayModal();

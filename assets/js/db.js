@@ -191,5 +191,31 @@ export const db = {
         calendars[email][key] = { days, notes };
         localStorage.setItem(DB_KEY_CALENDARS, JSON.stringify(calendars));
         return { success: true };
+    },
+
+    saveDayObservation(email, year, month, day, observation) {
+        const calendars = JSON.parse(localStorage.getItem(DB_KEY_CALENDARS)) || {};
+        const key = `${year}-${month}`;
+        if (!calendars[email]) {
+            calendars[email] = {};
+        }
+        if (!calendars[email][key]) {
+            calendars[email][key] = { days: {}, notes: '', dayObservations: {} };
+        }
+        if (!calendars[email][key].dayObservations) {
+            calendars[email][key].dayObservations = {};
+        }
+        calendars[email][key].dayObservations[day] = observation;
+        localStorage.setItem(DB_KEY_CALENDARS, JSON.stringify(calendars));
+        return { success: true };
+    },
+
+    getDayObservation(email, year, month, day) {
+        const calendars = JSON.parse(localStorage.getItem(DB_KEY_CALENDARS)) || {};
+        const key = `${year}-${month}`;
+        if (calendars[email] && calendars[email][key] && calendars[email][key].dayObservations) {
+            return calendars[email][key].dayObservations[day] || '';
+        }
+        return '';
     }
 };
