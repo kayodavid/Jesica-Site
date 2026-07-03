@@ -12,7 +12,10 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         sobre: resolve(__dirname, 'sobre.html'),
         'agendar-consulta': resolve(__dirname, 'agendar-consulta.html'),
-        blog: resolve(__dirname, 'blog.html')
+        blog: resolve(__dirname, 'blog.html'),
+        login: resolve(__dirname, 'login.html'),
+        admin: resolve(__dirname, 'admin.html'),
+        calendario: resolve(__dirname, 'calendario.html')
       },
       output: {
         // Gera arquivos em pastas separadas para URLs limpas
