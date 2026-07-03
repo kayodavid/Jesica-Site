@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendário de Automonitoramento - Jessica Melo Nutri</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#a88b36",
+            secondary: "#d4b76a",
+            accent: "#f5e6c8",
+            dark: "#3d3226",
+            light: "#faf8f3",
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col justify-between">
+  <!-- Nav header -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-white/40 fixed w-full top-0 z-50 py-3 shadow-sm">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
+        <img src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
+      </a>
+      <div class="flex items-center gap-3">
+        <span id="user-display-name" class="text-sm font-semibold text-dark hidden md:inline">Paciente</span>
+        <button id="change-pass-nav-btn" class="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all hidden">
+          Alterar Senha
+        </button>
+        <button id="logout-btn" class="bg-dark/10 hover:bg-dark hover:text-white text-dark px-4 py-2 rounded-xl text-sm font-medium transition-all">
+          Sair
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Calendario Container -->
+  <div class="flex-grow pt-24 pb-12 px-4">
+    <div class="container mx-auto max-w-5xl">
+      <!-- Alerta de primeiro acesso -->
+      <div id="first-access-alert" class="hidden mb-6 bg-red-100 border border-red-300 text-red-800 px-6 py-4 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-pulse">
+        <div>
+          <h4 class="font-bold text-sm">🔒 Atenção: Altere sua senha provisória!</h4>
+          <p class="text-xs text-red-700 mt-0.5">Por motivos de segurança, você deve definir uma senha pessoal no seu primeiro acesso.</p>
+        </div>
+        <button id="first-access-change-btn" class="bg-red-800 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-red-900 transition-all shrink-0">
+          Alterar Senha Agora
+        </button>
+      </div>
+
+      <!-- Back button for Admin viewing mode -->
+      <div id="admin-view-alert" class="hidden mb-4 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-2xl flex justify-between items-center">
+        <span class="font-medium text-sm">Visualizando como Nutricionista (Modo Leitura / Edição)</span>
+        <button id="back-to-admin-btn" class="bg-yellow-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-yellow-900 transition-all">
+          Voltar ao Painel Admin
+        </button>
+      </div>
+
+      <!-- Main Box -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+        
+        <!-- Top bar (Title, Month selector, Notes title) -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-gray-100">
+          <div>
+            <h1 class="text-3xl font-extrabold text-primary tracking-wide">JULHO</h1>
+            <p class="text-xs sm:text-sm font-bold text-dark tracking-widest uppercase">CALENDÁRIO DE AUTOMONITORAMENTO</p>
+          </div>
+
+          <!-- Mês e Ano Seletores -->
+          <div class="flex items-center gap-2">
+            <select id="select-month" class="bg-light text-dark px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 font-semibold text-sm">
+              <option value="0">Janeiro</option>
+              <option value="1">Fevereiro</option>
+              <option value="2">Março</option>
+              <option value="3">Abril</option>
+              <option value="4">Maio</option>
+              <option value="5">Junho</option>
+              <option value="6" selected>Julho</option>
+              <option value="7">Agosto</option>
+              <option value="8">Setembro</option>
+              <option value="9">Outubro</option>
+              <option value="10">Novembro</option>
+              <option value="11">Dezembro</option>
+            </select>
+            <select id="select-year" class="bg-light text-dark px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 font-semibold text-sm">
+              <option value="2025">2025</option>
+              <option value="2026" selected>2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Legenda Interactiva -->
+        <div class="bg-light/60 border border-primary/10 rounded-2xl p-4 sm:p-5 mb-8">
+          <h3 class="text-xs font-bold text-dark uppercase mb-3 tracking-widest">Legenda dos Marcadores (Toque em cada dia para preencher)</h3>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-green-500 text-white font-bold flex items-center justify-center shadow-sm">A</span>
+              <span class="text-gray-700 font-medium">Alimentação Boa</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-purple-600 text-white font-bold flex items-center justify-center shadow-sm">T</span>
+              <span class="text-gray-700 font-medium">Treinei</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-blue-500 text-white font-bold flex items-center justify-center shadow-sm">H</span>
+              <span class="text-gray-700 font-medium">Hidratei-me adequadamente</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade do Calendário -->
+        <div class="overflow-x-auto">
+          <div class="min-w-[640px]">
+            <!-- Dias da Semana Header -->
+            <div class="grid grid-cols-7 gap-2 mb-2">
+              <div class="py-3 text-center bg-pink-100 rounded-xl font-bold text-pink-700 text-sm">DOM</div>
+              <div class="py-3 text-center bg-light rounded-xl font-bold text-dark text-sm">SEG</div>
+              <div class="py-3 text-center bg-light rounded-xl font-bold text-dark text-sm">TER</div>
+              <div class="py-3 text-center bg-light rounded-xl font-bold text-dark text-sm">QUA</div>
+              <div class="py-3 text-center bg-light rounded-xl font-bold text-dark text-sm">QUI</div>
+              <div class="py-3 text-center bg-light rounded-xl font-bold text-dark text-sm">SEX</div>
+              <div class="py-3 text-center bg-light rounded-xl font-bold text-dark text-sm">SÁB</div>
+            </div>
+
+            <!-- Dias do Mês Dinâmicos -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+              <!-- Renderizado dinamicamente pelo JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Notas e Progresso do Mês -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-100">
+          <!-- Campo de Notas -->
+          <div class="md:col-span-2">
+            <label for="monthly-notes" class="block text-sm font-bold text-dark uppercase tracking-wider mb-2">Anotações da semana/mês:</label>
+            <textarea id="monthly-notes" placeholder="Descreva aqui suas principais percepções, dificuldades, vitórias ou observações sobre sua rotina alimentar e treinos..." class="w-full h-32 px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 text-gray-700 bg-light/30 resize-none transition-all"></textarea>
+          </div>
+
+          <!-- Métricas e Resumos -->
+          <div class="bg-light/40 border border-gray-100 rounded-2xl p-5 flex flex-col justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-dark uppercase tracking-wider mb-3">Estatísticas do Mês</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">Alimentação Boa (A):</span>
+                  <span id="stats-a" class="font-bold text-green-600 bg-green-50 px-2.5 py-0.5 rounded-lg">0 dias</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">Treinos (T):</span>
+                  <span id="stats-t" class="font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-lg">0 dias</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">Hidratação (H):</span>
+                  <span id="stats-h" class="font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-lg">0 dias</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão de Salvar -->
+            <button id="save-calendar-btn" class="w-full mt-5 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-all duration-300 shadow-md">
+              Salvar Alterações
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-6 px-4 text-center text-xs">
+    <div class="container mx-auto">
+      <p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Modal para Configurar o Dia -->
+  <div id="day-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+      <h3 class="text-lg font-bold text-dark mb-1">Dia <span id="modal-day-num">0</span></h3>
+      <p class="text-xs text-gray-500 mb-5">Selecione suas atividades concluídas hoje:</p>
+
+      <div class="space-y-3 mb-6">
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 hover:bg-green-50/50 cursor-pointer transition-colors">
+          <input type="checkbox" id="modal-check-a" class="w-5 h-5 rounded text-green-600 focus:ring-green-500 border-gray-300" />
+          <div>
+            <span class="font-bold text-green-600 mr-1.5 bg-green-50 px-2 py-0.5 rounded text-sm">A</span>
+            <span class="text-sm text-gray-700 font-medium">Alimentação Boa</span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 hover:bg-purple-50/50 cursor-pointer transition-colors">
+          <input type="checkbox" id="modal-check-t" class="w-5 h-5 rounded text-purple-600 focus:ring-purple-500 border-gray-300" />
+          <div>
+            <span class="font-bold text-purple-700 mr-1.5 bg-purple-50 px-2 py-0.5 rounded text-sm">T</span>
+            <span class="text-sm text-gray-700 font-medium">Treinei</span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 hover:bg-blue-50/50 cursor-pointer transition-colors">
+          <input type="checkbox" id="modal-check-h" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
+          <div>
+            <span class="font-bold text-blue-600 mr-1.5 bg-blue-50 px-2 py-0.5 rounded text-sm">H</span>
+            <span class="text-sm text-gray-700 font-medium">Hidratei-me Adequadamente</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="modal-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-xs hover:bg-gray-200 transition-colors">Cancelar</button>
+        <button id="modal-confirm-btn" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-xs hover:bg-dark transition-colors">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alterar Senha Paciente -->
+  <div id="password-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+      <h3 class="text-xl font-bold text-dark mb-2">Alterar Minha Senha</h3>
+      <p class="text-xs text-gray-500 mb-5">Escolha uma nova senha para acessar o portal do paciente.</p>
+
+      <form id="password-form" class="space-y-4">
+        <div>
+          <label for="new-pass-input" class="block text-sm font-semibold text-dark mb-1">Nova Senha</label>
+          <input type="password" id="new-pass-input" required minlength="4" placeholder="Mínimo 4 caracteres" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+        </div>
+
+        <div>
+          <label for="confirm-pass-input" class="block text-sm font-semibold text-dark mb-1">Confirmar Nova Senha</label>
+          <input type="password" id="confirm-pass-input" required minlength="4" placeholder="Repita a nova senha" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+        </div>
+
+        <div class="flex gap-2 pt-4">
+          <button type="button" id="pass-modal-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Atualizar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from '/assets/js/db.js';
+
+    // Estado da página
+    let targetEmail = '';
+    let isAdminViewing = false;
+    let selectedYear = new Date().getFullYear();
+    let selectedMonth = new Date().getMonth();
+    let currentDaysData = {}; // Guarda estado dos dias selecionados no calendário atual
+    let activeDayForModal = null;
+
+    // Elementos do DOM
+    const userDisplayName = document.getElementById('user-display-name');
+    const selectMonth = document.getElementById('select-month');
+    const selectYear = document.getElementById('select-year');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthlyNotes = document.getElementById('monthly-notes');
+    const saveCalendarBtn = document.getElementById('save-calendar-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const statsA = document.getElementById('stats-a');
+    const statsT = document.getElementById('stats-t');
+    const statsH = document.getElementById('stats-h');
+    const titleHeader = document.querySelector('h1.text-3xl');
+
+    // Elementos do Modal
+    const dayModal = document.getElementById('day-modal');
+    const modalDayNum = document.getElementById('modal-day-num');
+    const modalCheckA = document.getElementById('modal-check-a');
+    const modalCheckT = document.getElementById('modal-check-t');
+    const modalCheckH = document.getElementById('modal-check-h');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+
+    // Alertas de Admin
+    const adminViewAlert = document.getElementById('admin-view-alert');
+    const backToAdminBtn = document.getElementById('back-to-admin-btn');
+
+    // Elementos de Troca de Senha
+    const firstAccessAlert = document.getElementById('first-access-alert');
+    const firstAccessChangeBtn = document.getElementById('first-access-change-btn');
+    const changePassNavBtn = document.getElementById('change-pass-nav-btn');
+    const passwordModal = document.getElementById('password-modal');
+    const passwordForm = document.getElementById('password-form');
+    const passModalCancelBtn = document.getElementById('pass-modal-cancel-btn');
+    const newPassInput = document.getElementById('new-pass-input');
+    const confirmPassInput = document.getElementById('confirm-pass-input');
+
+    // Mapeamento de nomes de meses em PT-BR
+    const monthNames = [
+      'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+      'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
+    ];
+
+    // Verificar login
+    const session = db.getCurrentSession();
+    if (!session) {
+      window.location.href = '/login.html';
+    }
+
+    // Gerenciar primeiro acesso e troca de senha do paciente
+    if (session.role === 'patient') {
+      changePassNavBtn.classList.remove('hidden'); // Pacientes podem mudar senha na nav
+      
+      if (session.isFirstAccess) {
+        firstAccessAlert.classList.remove('hidden');
+      }
+    }
+
+    // Abrir modal de senha
+    function openPasswordModal() {
+      passwordModal.classList.remove('hidden');
+      setTimeout(() => {
+        passwordModal.classList.add('opacity-100');
+        passwordModal.querySelector('.transform').classList.remove('scale-95');
+        passwordModal.querySelector('.transform').classList.add('scale-100');
+      }, 10);
+    }
+
+    // Fechar modal de senha
+    function closePasswordModal() {
+      passwordModal.classList.remove('opacity-100');
+      passwordModal.querySelector('.transform').classList.remove('scale-100');
+      passwordModal.querySelector('.transform').classList.add('scale-95');
+      setTimeout(() => {
+        passwordModal.classList.add('hidden');
+      }, 300);
+      passwordForm.reset();
+    }
+
+    if (changePassNavBtn) changePassNavBtn.addEventListener('click', openPasswordModal);
+    if (firstAccessChangeBtn) firstAccessChangeBtn.addEventListener('click', openPasswordModal);
+    if (passModalCancelBtn) passModalCancelBtn.addEventListener('click', closePasswordModal);
+
+    passwordForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nPass = newPassInput.value;
+      const cPass = confirmPassInput.value;
+
+      if (nPass !== cPass) {
+        alert('As senhas não coincidem!');
+        return;
+      }
+
+      const res = db.changePassword(session.email, nPass);
+      if (res.success) {
+        alert('Senha atualizada com sucesso!');
+        firstAccessAlert.classList.add('hidden'); // Oculta aviso de primeiro acesso caso estivesse visível
+        closePasswordModal();
+      } else {
+        alert(res.message);
+      }
+    });
+
+    // Configurar o público/alvo do calendário
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewEmailParam = urlParams.get('email');
+
+    if (session.role === 'admin') {
+      if (viewEmailParam) {
+        targetEmail = viewEmailParam;
+        isAdminViewing = true;
+        adminViewAlert.classList.remove('hidden');
+        userDisplayName.innerText = `Nutricionista (Vendo: ${targetEmail})`;
+      } else {
+        // Redireciona admin se tentar entrar sem paciente selecionado
+        window.location.href = '/admin.html';
+      }
+    } else {
+      targetEmail = session.email;
+      userDisplayName.innerText = session.name;
+    }
+
+    // Ao mudar filtros de Mês e Ano
+    selectMonth.value = selectedMonth;
+    selectYear.value = selectedYear;
+
+    function handleFilterChange() {
+      selectedMonth = parseInt(selectMonth.value);
+      selectedYear = parseInt(selectYear.value);
+      titleHeader.innerText = monthNames[selectedMonth];
+      loadCalendarData();
+    }
+
+    selectMonth.addEventListener('change', handleFilterChange);
+    selectYear.addEventListener('change', handleFilterChange);
+
+    // Carregar dados
+    function loadCalendarData() {
+      const data = db.getCalendarData(targetEmail, selectedYear, selectedMonth);
+      currentDaysData = data.days || {};
+      monthlyNotes.value = data.notes || '';
+      renderCalendar();
+      updateStats();
+    }
+
+    // Renderizar a grade do calendário
+    function renderCalendar() {
+      calendarGrid.innerHTML = '';
+      
+      // Encontrar o dia da semana em que o mês começa
+      const firstDayIndex = new Date(selectedYear, selectedMonth, 1).getDay();
+      // Quantidade total de dias no mês
+      const totalDays = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+      
+      // Renderizar caixas vazias para os dias anteriores do início do mês
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'aspect-video sm:aspect-square bg-gray-50/40 border border-gray-100 rounded-2xl';
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      // Renderizar cada dia
+      for (let day = 1; day <= totalDays; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'aspect-video sm:aspect-square bg-white border border-gray-200 rounded-2xl p-2 flex flex-col justify-between hover:shadow-md cursor-pointer transition-all relative overflow-hidden group';
+        dayCell.dataset.day = day;
+
+        // Número do Dia
+        const dayNum = document.createElement('span');
+        dayNum.className = 'text-xs sm:text-sm font-semibold text-gray-500';
+        dayNum.innerText = day;
+        dayCell.appendChild(dayNum);
+
+        // Grid interno para os marcadores A, T, H
+        const badgesContainer = document.createElement('div');
+        badgesContainer.className = 'flex gap-1 flex-wrap mt-1 justify-end';
+
+        const dayData = currentDaysData[day] || { A: false, T: false, H: false };
+
+        if (dayData.A) {
+          const badge = document.createElement('span');
+          badge.className = 'w-5 h-5 rounded-md bg-green-500 text-white font-bold flex items-center justify-center text-[10px] shadow-sm';
+          badge.innerText = 'A';
+          badgesContainer.appendChild(badge);
+        }
+        if (dayData.T) {
+          const badge = document.createElement('span');
+          badge.className = 'w-5 h-5 rounded-md bg-purple-600 text-white font-bold flex items-center justify-center text-[10px] shadow-sm';
+          badge.innerText = 'T';
+          badgesContainer.appendChild(badge);
+        }
+        if (dayData.H) {
+          const badge = document.createElement('span');
+          badge.className = 'w-5 h-5 rounded-md bg-blue-500 text-white font-bold flex items-center justify-center text-[10px] shadow-sm';
+          badge.innerText = 'H';
+          badgesContainer.appendChild(badge);
+        }
+
+        dayCell.appendChild(badgesContainer);
+
+        // Evento de clique para configurar o dia
+        dayCell.addEventListener('click', () => {
+          openDayModal(day);
+        });
+
+        calendarGrid.appendChild(dayCell);
+      }
+    }
+
+    // Modal
+    function openDayModal(day) {
+      activeDayForModal = day;
+      modalDayNum.innerText = day;
+      
+      const dayData = currentDaysData[day] || { A: false, T: false, H: false };
+      modalCheckA.checked = dayData.A;
+      modalCheckT.checked = dayData.T;
+      modalCheckH.checked = dayData.H;
+
+      dayModal.classList.remove('hidden');
+      setTimeout(() => {
+        dayModal.classList.add('opacity-100');
+        dayModal.querySelector('.transform').classList.remove('scale-95');
+        dayModal.querySelector('.transform').classList.add('scale-100');
+      }, 10);
+    }
+
+    function closeDayModal() {
+      dayModal.classList.remove('opacity-100');
+      dayModal.querySelector('.transform').classList.remove('scale-100');
+      dayModal.querySelector('.transform').classList.add('scale-95');
+      setTimeout(() => {
+        dayModal.classList.add('hidden');
+      }, 300);
+      activeDayForModal = null;
+    }
+
+    modalCancelBtn.addEventListener('click', closeDayModal);
+
+    modalConfirmBtn.addEventListener('click', () => {
+      if (activeDayForModal !== null) {
+        currentDaysData[activeDayForModal] = {
+          A: modalCheckA.checked,
+          T: modalCheckT.checked,
+          H: modalCheckH.checked
+        };
+        renderCalendar();
+        updateStats();
+        closeDayModal();
+      }
+    });
+
+    // Estatísticas
+    function updateStats() {
+      let countA = 0;
+      let countT = 0;
+      let countH = 0;
+
+      Object.values(currentDaysData).forEach(day => {
+        if (day.A) countA++;
+        if (day.T) countT++;
+        if (day.H) countH++;
+      });
+
+      statsA.innerText = `${countA} ${countA === 1 ? 'dia' : 'dias'}`;
+      statsT.innerText = `${countT} ${countT === 1 ? 'dia' : 'dias'}`;
+      statsH.innerText = `${countH} ${countH === 1 ? 'dia' : 'dias'}`;
+    }
+
+    // Salvar
+    saveCalendarBtn.addEventListener('click', () => {
+      db.saveCalendarData(targetEmail, selectedYear, selectedMonth, currentDaysData, monthlyNotes.value);
+      alert('Informações salvas com sucesso!');
+    });
+
+    // Voltar para Admin
+    if (backToAdminBtn) {
+      backToAdminBtn.addEventListener('click', () => {
+        window.location.href = '/admin.html';
+      });
+    }
+
+    // Sair
+    logoutBtn.addEventListener('click', () => {
+      db.logout();
+      window.location.href = '/login.html';
+    });
+
+    // Executar carga inicial do Calendário
+    titleHeader.innerText = monthNames[selectedMonth];
+    loadCalendarData();
+  </script>
+</body>
+
+</html>

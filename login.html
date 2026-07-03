@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Portal Jessica Melo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#a88b36",
+            secondary: "#d4b76a",
+            accent: "#f5e6c8",
+            dark: "#3d3226",
+            light: "#faf8f3",
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col justify-between">
+  <!-- Nav header -->
+  <nav class="bg-white/60 backdrop-blur-md border-b border-white/40 fixed w-full top-0 z-50 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
+        <img src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
+      </a>
+      <a href="/index.html" class="text-dark font-medium text-sm hover:text-primary transition-colors">Voltar ao site</a>
+    </div>
+  </nav>
+
+  <!-- Login Form Container -->
+  <div class="flex-grow flex items-center justify-center pt-24 pb-12 px-4">
+    <div class="bg-white/80 backdrop-blur-lg rounded-3xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/50 w-full max-w-md">
+      <div class="text-center mb-8">
+        <div class="relative inline-block mb-3">
+          <div class="absolute inset-0 bg-primary/20 rounded-full blur-md"></div>
+          <img src="/assets/images/Jessica-site2.jpg" alt="Jessica Melo" class="relative w-20 h-20 rounded-full mx-auto object-cover border-2 border-white shadow-md" />
+        </div>
+        <h2 class="text-2xl font-bold text-dark">Portal de Acompanhamento</h2>
+        <p class="text-gray-500 text-sm mt-1">Acesse seu calendário de automonitoramento</p>
+      </div>
+
+      <div id="alert-box" class="hidden mb-4 p-4 rounded-xl text-sm font-medium"></div>
+
+      <form id="login-form" class="space-y-5">
+        <div>
+          <label for="email" class="block text-sm font-semibold text-dark mb-1">E-mail</label>
+          <input type="email" id="email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white/70" />
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="password" class="block text-sm font-semibold text-dark">Senha</label>
+          </div>
+          <input type="password" id="password" required placeholder="Digite sua senha" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white/70" />
+        </div>
+
+        <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-base hover:bg-dark transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 mt-2">
+          Entrar no Portal
+        </button>
+      </form>
+
+      <div class="mt-8 text-center bg-accent/20 border border-primary/10 rounded-2xl p-4 text-xs text-gray-600 space-y-1">
+        <p class="font-bold text-dark">Acesso de Demonstração:</p>
+        <p><span class="font-semibold">Paciente:</span> paciente@exemplo.com | <span class="font-semibold">Senha:</span> 123</p>
+        <p><span class="font-semibold">Nutricionista:</span> admin@jessicamelo.com.br | <span class="font-semibold">Senha:</span> admin</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-6 px-4 text-center text-xs border-t border-white/10">
+    <p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+  </footer>
+
+  <script type="module">
+    import { db } from '/assets/js/db.js';
+
+    // Se já estiver logado, redireciona
+    const currentSession = db.getCurrentSession();
+    if (currentSession) {
+      if (currentSession.role === 'admin') {
+        window.location.href = '/admin.html';
+      } else {
+        window.location.href = '/calendario.html';
+      }
+    }
+
+    const form = document.getElementById('login-form');
+    const alertBox = document.getElementById('alert-box');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const result = db.login(email, password);
+
+      if (result.success) {
+        alertBox.classList.remove('hidden', 'bg-red-50', 'text-red-700');
+        alertBox.classList.add('bg-green-50', 'text-green-700');
+        alertBox.innerText = 'Login realizado com sucesso! Redirecionando...';
+        
+        setTimeout(() => {
+          if (result.user.role === 'admin') {
+            window.location.href = '/admin.html';
+          } else {
+            window.location.href = '/calendario.html';
+          }
+        }, 1000);
+      } else {
+        alertBox.classList.remove('hidden', 'bg-green-50', 'text-green-700');
+        alertBox.classList.add('bg-red-50', 'text-red-700');
+        alertBox.innerText = result.message;
+      }
+    });
+  </script>
+</body>
+
+</html>

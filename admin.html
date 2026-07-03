@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin - Jessica Melo Nutri</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#a88b36",
+            secondary: "#d4b76a",
+            accent: "#f5e6c8",
+            dark: "#3d3226",
+            light: "#faf8f3",
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col justify-between">
+  <!-- Nav header -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-white/40 fixed w-full top-0 z-50 py-3 shadow-sm">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
+        <img src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
+      </a>
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-semibold text-dark">Dra. Jessica Melo</span>
+        <button id="logout-btn" class="bg-dark/10 hover:bg-dark hover:text-white text-dark px-4 py-2 rounded-xl text-sm font-medium transition-all">
+          Sair
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Admin Panel Container -->
+  <div class="flex-grow pt-24 pb-12 px-4">
+    <div class="container mx-auto max-w-5xl">
+      <!-- Title -->
+      <header class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-dark">Painel Administrativo</h1>
+          <p class="text-gray-500 text-sm">Gerencie os cadastros e acompanhe o automonitoramento dos pacientes</p>
+        </div>
+        
+        <button id="btn-add-patient" class="bg-primary text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:bg-dark transition-all shadow-md flex items-center gap-2 w-fit">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Cadastrar Paciente
+        </button>
+      </header>
+
+      <!-- Grade de Pacientes -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+        <h2 class="text-lg font-bold text-dark mb-6">Lista de Pacientes Ativos</h2>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                <th class="py-4 px-2">Nome</th>
+                <th class="py-4 px-2">E-mail</th>
+                <th class="py-4 px-2">Senha do Portal</th>
+                <th class="py-4 px-2 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="patients-list" class="divide-y divide-gray-50 text-sm text-gray-700">
+              <!-- Renderizado dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="no-patients" class="hidden text-center py-10 text-gray-400">
+          Nenhum paciente cadastrado ainda.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-6 px-4 text-center text-xs">
+    <p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Modal Cadastrar Paciente -->
+  <div id="add-patient-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+      <h3 class="text-xl font-bold text-dark mb-2">Cadastrar Novo Paciente</h3>
+      <p class="text-xs text-gray-500 mb-6">Insira os dados cadastrais para acesso ao portal do paciente.</p>
+
+      <form id="add-patient-form" class="space-y-4">
+        <div>
+          <label for="new-name" class="block text-sm font-semibold text-dark mb-1">Nome Completo</label>
+          <input type="text" id="new-name" required placeholder="Ex: Lucas Silva" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+        </div>
+
+        <div>
+          <label for="new-email" class="block text-sm font-semibold text-dark mb-1">E-mail</label>
+          <input type="email" id="new-email" required placeholder="paciente@email.com" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+        </div>
+
+        <div>
+          <label for="new-password" class="block text-sm font-semibold text-dark mb-1">Senha Provisória</label>
+          <input type="text" id="new-password" required placeholder="Senha simples ou gerada" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+        </div>
+
+        <div class="flex gap-2 pt-4">
+          <button type="button" id="modal-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Resetar Senha Paciente -->
+  <div id="reset-password-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+      <h3 class="text-xl font-bold text-dark mb-2">Resetar Senha do Paciente</h3>
+      <p class="text-xs text-gray-500 mb-6">Defina uma nova senha provisória para o paciente.</p>
+
+      <form id="reset-password-form" class="space-y-4">
+        <input type="hidden" id="reset-email" />
+        <div>
+          <label for="reset-pass-input" class="block text-sm font-semibold text-dark mb-1">Nova Senha Provisória</label>
+          <input type="text" id="reset-pass-input" required minlength="4" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+        </div>
+
+        <div class="flex gap-2 pt-4">
+          <button type="button" id="reset-modal-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Confirmar Reset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from '/assets/js/db.js';
+
+    // Verificar sessão admin
+    const session = db.getCurrentSession();
+    if (!session || session.role !== 'admin') {
+      window.location.href = '/login.html';
+    }
+
+    // Elementos DOM
+    const patientsList = document.getElementById('patients-list');
+    const noPatients = document.getElementById('no-patients');
+    const logoutBtn = document.getElementById('logout-btn');
+    const btnAddPatient = document.getElementById('btn-add-patient');
+    const addPatientModal = document.getElementById('add-patient-modal');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const addPatientForm = document.getElementById('add-patient-form');
+
+    // Elementos do Reset de Senha
+    const resetPasswordModal = document.getElementById('reset-password-modal');
+    const resetPasswordForm = document.getElementById('reset-password-form');
+    const resetEmail = document.getElementById('reset-email');
+    const resetPassInput = document.getElementById('reset-pass-input');
+    const resetModalCancelBtn = document.getElementById('reset-modal-cancel-btn');
+
+    // Carregar pacientes
+    function renderPatients() {
+      patientsList.innerHTML = '';
+      const patients = db.getPatients();
+
+      if (patients.length === 0) {
+        noPatients.classList.remove('hidden');
+        return;
+      }
+      noPatients.classList.add('hidden');
+
+      patients.forEach(patient => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-light/40 transition-colors';
+
+        tr.innerHTML = `
+          <td class="py-4 px-2 font-semibold text-dark">${patient.name}</td>
+          <td class="py-4 px-2 text-gray-500 font-medium">${patient.email}</td>
+          <td class="py-4 px-2"><code class="bg-light px-2.5 py-1 rounded text-xs font-mono border border-gray-100 text-primary font-bold">${patient.password}</code></td>
+          <td class="py-4 px-2 text-right">
+            <div class="flex gap-2 justify-end">
+              <button class="view-calendar-btn bg-primary/10 text-primary hover:bg-primary hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all" data-email="${patient.email}">
+                Ver Calendário
+              </button>
+              <button class="reset-pass-btn bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500 hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all" data-email="${patient.email}">
+                Resetar Senha
+              </button>
+              <button class="delete-patient-btn text-red-500 hover:bg-red-50 p-2 rounded-xl transition-all" data-email="${patient.email}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        patientsList.appendChild(tr);
+      });
+
+      // Eventos dos botões
+      document.querySelectorAll('.view-calendar-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const email = e.target.getAttribute('data-email');
+          window.location.href = `/calendario.html?email=${encodeURIComponent(email)}`;
+        });
+      });
+
+      document.querySelectorAll('.reset-pass-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const email = e.target.getAttribute('data-email');
+          openResetModal(email);
+        });
+      });
+
+      document.querySelectorAll('.delete-patient-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const btnElem = e.currentTarget;
+          const email = btnElem.getAttribute('data-email');
+          if (confirm(`Tem certeza que deseja excluir o paciente ${email} e todo seu histórico de calendário?`)) {
+            db.deletePatient(email);
+            renderPatients();
+          }
+        });
+      });
+    }
+
+    // Modal Reset de Senha
+    function openResetModal(email) {
+      resetEmail.value = email;
+      resetPassInput.value = Math.random().toString(36).substring(2, 8); // Gera senha aleatória
+      resetPasswordModal.classList.remove('hidden');
+      setTimeout(() => {
+        resetPasswordModal.classList.add('opacity-100');
+        resetPasswordModal.querySelector('.transform').classList.remove('scale-95');
+        resetPasswordModal.querySelector('.transform').classList.add('scale-100');
+      }, 10);
+    }
+
+    function closeResetModal() {
+      resetPasswordModal.classList.remove('opacity-100');
+      resetPasswordModal.querySelector('.transform').classList.remove('scale-100');
+      resetPasswordModal.querySelector('.transform').classList.add('scale-95');
+      setTimeout(() => {
+        resetPasswordModal.classList.add('hidden');
+      }, 300);
+      resetPasswordForm.reset();
+    }
+
+    resetModalCancelBtn.addEventListener('click', closeResetModal);
+
+    resetPasswordForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = resetEmail.value;
+      const newPass = resetPassInput.value;
+
+      const result = db.resetPatientPassword(email, newPass);
+      if (result.success) {
+        alert(`Senha do paciente ${email} resetada com sucesso! Nova senha: ${newPass}`);
+        closeResetModal();
+        renderPatients();
+      } else {
+        alert(result.message);
+      }
+    });
+
+    // Modal Cadastrar Paciente
+    btnAddPatient.addEventListener('click', () => {
+      // Pré-popular com senha sugerida
+      document.getElementById('new-password').value = Math.random().toString(36).substring(2, 8);
+      
+      addPatientModal.classList.remove('hidden');
+      setTimeout(() => {
+        addPatientModal.classList.add('opacity-100');
+        addPatientModal.querySelector('.transform').classList.remove('scale-95');
+        addPatientModal.querySelector('.transform').classList.add('scale-100');
+      }, 10);
+    });
+
+    function closeModal() {
+      addPatientModal.classList.remove('opacity-100');
+      addPatientModal.querySelector('.transform').classList.remove('scale-100');
+      addPatientModal.querySelector('.transform').classList.add('scale-95');
+      setTimeout(() => {
+        addPatientModal.classList.add('hidden');
+      }, 300);
+      addPatientForm.reset();
+    }
+
+    modalCancelBtn.addEventListener('click', closeModal);
+
+    addPatientForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('new-name').value.trim();
+      const email = document.getElementById('new-email').value.trim();
+      const password = document.getElementById('new-password').value;
+
+      const result = db.addPatient(name, email, password);
+      if (result.success) {
+        alert('Paciente cadastrado com sucesso!');
+        closeModal();
+        renderPatients();
+      } else {
+        alert(result.message);
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      db.logout();
+      window.location.href = '/login.html';
+    });
+
+    renderPatients();
+  </script>
+</body>
+
+</html>
