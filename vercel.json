@@ -4,6 +4,9 @@
   "rewrites": [
     { "source": "/agendar-consulta", "destination": "/agendar-consulta.html" },
     { "source": "/blog", "destination": "/blog.html" },
-    { "source": "/sobre", "destination": "/sobre.html" }
+    { "source": "/sobre", "destination": "/sobre.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/calendario", "destination": "/calendario.html" }
   ]
 }
