@@ -121,6 +121,14 @@
               <span class="w-8 h-8 rounded-lg bg-blue-500 text-white font-bold flex items-center justify-center shadow-sm">H</span>
               <span class="text-gray-700 font-medium">Hidratei-me adequadamente</span>
             </div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-amber-500 text-white font-bold flex items-center justify-center shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </span>
+              <span class="text-gray-700 font-medium">Observações</span>
+            </div>
           </div>
         </div>
 
@@ -142,6 +150,27 @@
             <div id="calendar-grid" class="grid grid-cols-7 gap-2">
               <!-- Renderizado dinamicamente pelo JS -->
             </div>
+          </div>
+        </div>
+
+        <!-- Seção de Resumo Detalhado para Admin -->
+        <div id="admin-summary-section" class="hidden mt-8 pt-8 border-t border-gray-100">
+          <h2 class="text-2xl font-bold text-dark mb-6">Resumo Detalhado do Mês</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-light border-b-2 border-gray-200">
+                  <th class="px-4 py-3 text-left font-bold text-dark">Dia</th>
+                  <th class="px-4 py-3 text-center font-bold text-green-600">A</th>
+                  <th class="px-4 py-3 text-center font-bold text-purple-700">T</th>
+                  <th class="px-4 py-3 text-center font-bold text-blue-600">H</th>
+                  <th class="px-4 py-3 text-left font-bold text-amber-600">Observações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-summary-table-body">
+                <!-- Renderizado dinamicamente pelo JS -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -283,6 +312,8 @@
     const statsT = document.getElementById('stats-t');
     const statsH = document.getElementById('stats-h');
     const titleHeader = document.querySelector('h1.text-3xl');
+    const adminSummarySection = document.getElementById('admin-summary-section');
+    const adminSummaryTableBody = document.getElementById('admin-summary-table-body');
 
     // Elementos do Modal
     const dayModal = document.getElementById('day-modal');
@@ -384,6 +415,7 @@
         isAdminViewing = true;
         adminViewAlert.classList.remove('hidden');
         userDisplayName.innerText = `Nutricionista (Vendo: ${targetEmail})`;
+        adminSummarySection.classList.remove('hidden');
       } else {
         // Redireciona admin se tentar entrar sem paciente selecionado
         window.location.href = '/admin.html';
@@ -414,6 +446,65 @@
       monthlyNotes.value = data.notes || '';
       renderCalendar();
       updateStats();
+      if (isAdminViewing) {
+        renderAdminSummary();
+      }
+    }
+
+    // Renderizar tabela de resumo para admin
+    function renderAdminSummary() {
+      adminSummaryTableBody.innerHTML = '';
+      
+      const firstDayIndex = new Date(selectedYear, selectedMonth, 1).getDay();
+      const totalDays = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+      
+      for (let day = 1; day <= totalDays; day++) {
+        const dayData = currentDaysData[day] || { A: false, T: false, H: false };
+        const observation = db.getDayObservation(targetEmail, selectedYear, selectedMonth, day);
+        
+        const row = document.createElement('tr');
+        row.className = 'border-b border-gray-100 hover:bg-gray-50/50 transition-colors';
+        
+        // Dia
+        const dayCell = document.createElement('td');
+        dayCell.className = 'px-4 py-3 font-semibold text-gray-700';
+        dayCell.innerText = day;
+        row.appendChild(dayCell);
+        
+        // Alimentação (A)
+        const cellA = document.createElement('td');
+        cellA.className = 'px-4 py-3 text-center';
+        if (dayData.A) {
+          cellA.innerHTML = '<span class="inline-block w-6 h-6 rounded bg-green-500 text-white font-bold flex items-center justify-center text-xs">✓</span>';
+        }
+        row.appendChild(cellA);
+        
+        // Treino (T)
+        const cellT = document.createElement('td');
+        cellT.className = 'px-4 py-3 text-center';
+        if (dayData.T) {
+          cellT.innerHTML = '<span class="inline-block w-6 h-6 rounded bg-purple-600 text-white font-bold flex items-center justify-center text-xs">✓</span>';
+        }
+        row.appendChild(cellT);
+        
+        // Hidratação (H)
+        const cellH = document.createElement('td');
+        cellH.className = 'px-4 py-3 text-center';
+        if (dayData.H) {
+          cellH.innerHTML = '<span class="inline-block w-6 h-6 rounded bg-blue-500 text-white font-bold flex items-center justify-center text-xs">✓</span>';
+        }
+        row.appendChild(cellH);
+        
+        // Observações
+        const cellObs = document.createElement('td');
+        cellObs.className = 'px-4 py-3 text-gray-700';
+        if (observation && observation.trim() !== '') {
+          cellObs.innerHTML = `<span class="text-amber-600 font-medium">📝</span> <span class="italic text-gray-600">${observation}</span>`;
+        }
+        row.appendChild(cellObs);
+        
+        adminSummaryTableBody.appendChild(row);
+      }
     }
 
     // Renderizar a grade do calendário
@@ -467,6 +558,19 @@
           badge.className = 'w-5 h-5 rounded-md bg-blue-500 text-white font-bold flex items-center justify-center text-[10px] shadow-sm';
           badge.innerText = 'H';
           badgesContainer.appendChild(badge);
+        }
+
+        // Ícone de Observação
+        const observation = db.getDayObservation(targetEmail, selectedYear, selectedMonth, day);
+        if (observation && observation.trim() !== '') {
+          const obsBadge = document.createElement('span');
+          obsBadge.className = 'w-5 h-5 rounded-md bg-amber-500 text-white font-bold flex items-center justify-center shadow-sm';
+          obsBadge.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          `;
+          badgesContainer.appendChild(obsBadge);
         }
 
         dayCell.appendChild(badgesContainer);
@@ -527,6 +631,9 @@
         
         renderCalendar();
         updateStats();
+        if (isAdminViewing) {
+          renderAdminSummary();
+        }
         closeDayModal();
       }
     });
@@ -551,6 +658,9 @@
     // Salvar
     saveCalendarBtn.addEventListener('click', () => {
       db.saveCalendarData(targetEmail, selectedYear, selectedMonth, currentDaysData, monthlyNotes.value);
+      if (isAdminViewing) {
+        renderAdminSummary();
+      }
       alert('Informações salvas com sucesso!');
     });
 
