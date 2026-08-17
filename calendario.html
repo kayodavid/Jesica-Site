@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calendário de Automonitoramento - Jessica Melo Nutri</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script>
@@ -162,7 +164,15 @@
 
         <!-- Seção de Resumo Detalhado para Admin -->
         <div id="admin-summary-section" class="hidden mt-8 pt-8 border-t border-gray-100">
-          <h2 class="text-2xl font-bold text-dark mb-6">Resumo Detalhado do Mês</h2>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-dark">Resumo Detalhado do Mês</h2>
+              <p class="text-sm text-gray-500 mt-1">Acompanhe a evolução semanal e gere um relatório para a consulta.</p>
+            </div>
+            <button id="generate-report-btn" type="button" class="bg-primary text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-dark transition-all shadow-md whitespace-nowrap">
+              Gerar relatório PDF
+            </button>
+          </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm border-collapse">
               <thead>
@@ -302,6 +312,7 @@
     const titleHeader = document.querySelector('h1.text-3xl');
     const adminSummarySection = document.getElementById('admin-summary-section');
     const adminSummaryTableBody = document.getElementById('admin-summary-table-body');
+    const generateReportBtn = document.getElementById('generate-report-btn');
 
     // Elementos do Modal
     const dayModal = document.getElementById('day-modal');
@@ -592,6 +603,74 @@
 
     saveCalendarBtn.addEventListener('click', saveCalendar);
     saveCalendarTopBtn.addEventListener('click', saveCalendar);
+
+    function escapeReportText(value) {
+      return String(value ?? '').replace(/[&<>\"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function buildWeeklyReportData() {
+      const totalDays = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+      const weeks = [];
+      for (let start = 1; start <= totalDays; start += 7) {
+        const end = Math.min(start + 6, totalDays);
+        const counts = { A: 0, T: 0, H: 0 };
+        for (let day = start; day <= end; day++) {
+          const dayData = currentDaysData[day] || {};
+          if (dayData.A) counts.A++;
+          if (dayData.T) counts.T++;
+          if (dayData.H) counts.H++;
+        }
+        weeks.push({ label: `Semana ${weeks.length + 1}`, range: `Dias ${start}–${end}`, ...counts });
+      }
+      return weeks;
+    }
+
+    async function generateCalendarReport() {
+      if (!window.jspdf?.jsPDF || !window.html2canvas) {
+        alert('Não foi possível carregar o gerador de PDF. Atualize a página e tente novamente.');
+        return;
+      }
+      const weeks = buildWeeklyReportData();
+      const totals = weeks.reduce((acc, week) => ({ A: acc.A + week.A, T: acc.T + week.T, H: acc.H + week.H }), { A: 0, T: 0, H: 0 });
+      const maxValue = Math.max(1, ...weeks.flatMap(week => [week.A, week.T, week.H]));
+      const monthLabel = monthNames[selectedMonth].charAt(0) + monthNames[selectedMonth].slice(1).toLowerCase();
+      const notesCount = Object.values(currentDayObservations).filter(value => String(value || '').trim()).length;
+      const chartRows = weeks.map(week => {
+        const columns = [
+          ['A', week.A, '#16a34a'],
+          ['T', week.T, '#9333ea'],
+          ['H', week.H, '#2563eb']
+        ].map(([label, value, color]) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:132px;gap:5px"><strong style="font-size:12px;color:#172033">${value}</strong><div style="width:20px;height:${Math.max(4, Math.round((value / maxValue) * 92))}px;background:${color};border-radius:5px 5px 2px 2px"></div><span style="font-size:11px;font-weight:700;color:${color}">${label}</span></div>`).join('');
+        return `<div style="flex:1;min-width:105px;padding:10px 8px;border-right:1px solid #e5e7eb;text-align:center"><strong style="display:block;font-size:12px;color:#172033">${week.label}</strong><span style="display:block;font-size:10px;color:#64748b;margin:3px 0 7px">${week.range}</span><div style="display:flex;align-items:flex-end;justify-content:center;gap:7px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">${columns}</div></div>`;
+      }).join('');
+      const report = document.createElement('div');
+      report.id = 'calendar-pdf-report';
+      report.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;background:#fff;color:#172033;font-family:Arial,sans-serif;padding:42px 48px;box-sizing:border-box;z-index:-1;';
+      report.innerHTML = `<div style="border-bottom:5px solid #d4b76a;padding-bottom:20px;margin-bottom:24px"><div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#a88b36;font-weight:700">Jessica Melo Nutricionista</div><h1 style="font-size:28px;margin:10px 0 4px;color:#172033">Relatório de Automonitoramento</h1><p style="font-size:14px;color:#64748b;margin:0">${monthLabel} de ${selectedYear} · ${escapeReportText(targetEmail)}</p></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:26px"><div style="background:#ecfdf5;border-radius:12px;padding:14px"><div style="font-size:11px;color:#15803d;font-weight:700">ALIMENTAÇÃO (A)</div><strong style="display:block;font-size:24px;color:#166534;margin-top:6px">${totals.A}</strong><span style="font-size:11px;color:#64748b">marcações no mês</span></div><div style="background:#faf5ff;border-radius:12px;padding:14px"><div style="font-size:11px;color:#7e22ce;font-weight:700">TREINO (T)</div><strong style="display:block;font-size:24px;color:#6b21a8;margin-top:6px">${totals.T}</strong><span style="font-size:11px;color:#64748b">marcações no mês</span></div><div style="background:#eff6ff;border-radius:12px;padding:14px"><div style="font-size:11px;color:#1d4ed8;font-weight:700">HIDRATAÇÃO (H)</div><strong style="display:block;font-size:24px;color:#1e40af;margin-top:6px">${totals.H}</strong><span style="font-size:11px;color:#64748b">marcações no mês</span></div><div style="background:#fff7ed;border-radius:12px;padding:14px"><div style="font-size:11px;color:#c2410c;font-weight:700">OBSERVAÇÕES</div><strong style="display:block;font-size:24px;color:#9a3412;margin-top:6px">${notesCount}</strong><span style="font-size:11px;color:#64748b">dias com registro</span></div></div><div style="border:1px solid #e5e7eb;border-radius:16px;padding:20px"><h2 style="font-size:18px;margin:0 0 6px;color:#172033">Resultados semanais</h2><p style="font-size:12px;color:#64748b;margin:0 0 10px">Quantidade de dias em que o paciente marcou cada indicador.</p>${chartRows}</div><div style="margin-top:24px;padding:16px;background:#f8fafc;border-radius:12px;font-size:11px;color:#64748b;line-height:1.5"><strong style="color:#334155">Legenda:</strong> A = alimentação adequada · T = treino realizado · H = hidratação adequada.<br>Este relatório é um apoio visual para a consulta de acompanhamento e deve ser interpretado junto à avaliação clínica.</div><div style="margin-top:24px;border-top:1px solid #e5e7eb;padding-top:12px;font-size:10px;color:#94a3b8">Gerado em ${new Date().toLocaleDateString('pt-BR')} · Portal de Acompanhamento Jessica Melo</div>`;
+      document.body.appendChild(report);
+      generateReportBtn.disabled = true;
+      generateReportBtn.textContent = 'Gerando PDF...';
+      try {
+        const canvas = await html2canvas(report, { scale: 2, backgroundColor: '#ffffff', logging: false });
+        const pdf = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const scale = Math.min((pageWidth - 36) / canvas.width, (pageHeight - 36) / canvas.height);
+        const imageWidth = canvas.width * scale;
+        const imageHeight = canvas.height * scale;
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pageWidth - imageWidth) / 2, 18, imageWidth, imageHeight);
+        const safeEmail = targetEmail.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+        pdf.save(`relatorio-automonitoramento-${safeEmail}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}.pdf`);
+      } finally {
+        report.remove();
+        generateReportBtn.disabled = false;
+        generateReportBtn.textContent = 'Gerar relatório PDF';
+      }
+    }
+
+    if (generateReportBtn) {
+      generateReportBtn.addEventListener('click', generateCalendarReport);
+    }
 
     // Voltar para Admin
     if (backToAdminBtn) {
