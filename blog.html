@@ -378,7 +378,7 @@
     const managedSection = document.getElementById('managed-blog-section');
     const managedList = document.getElementById('managed-blog-list');
     const escapeHtml = value => String(value ?? '').replace(/[&<>\"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[c]));
-    const safeImageUrl = value => /^https:\/\//i.test(String(value || '').trim()) ? String(value).trim() : '';
+    const safeImageUrl = value => { const source = String(value || '').trim(); return /^https:\/\//i.test(source) || /^data:image\/(jpeg|png|webp|gif);base64,/i.test(source) ? source : ''; };
     function renderManagedBlogs(posts) {
       if (!posts.length) return;
       managedSection.classList.remove('hidden');
