@@ -6,7 +6,7 @@ const allowed = new Set([
   'app_list_patients', 'app_add_patient', 'app_reset_patient_password',
   'app_delete_patient', 'app_list_videos', 'app_add_video', 'app_update_video',
   'app_delete_video', 'app_list_ebooks', 'app_add_ebook', 'app_update_ebook',
-  'app_delete_ebook', 'app_get_calendar', 'app_save_calendar'
+  'app_delete_ebook', 'app_list_blogs', 'app_add_blog', 'app_update_blog', 'app_delete_blog', 'app_get_calendar', 'app_save_calendar'
 ]);
 
 export default async function handler(req, res) {

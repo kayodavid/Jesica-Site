@@ -321,6 +321,14 @@
     </div>
   </section>
 
+  <!-- Blogs publicados pelo administrador -->
+  <section id="managed-blog-section" class="py-16 sm:py-24 md:py-28 px-4 bg-light relative hidden">
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <div class="flex items-center gap-3 mb-10"><span class="h-px flex-1 bg-primary/20"></span><h2 class="text-2xl sm:text-3xl font-bold text-dark">Novos artigos</h2><span class="h-px flex-1 bg-primary/20"></span></div>
+      <div id="managed-blog-list" class="space-y-12"></div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
   <section class="relative py-20 sm:py-28 px-4 overflow-hidden">
     <!-- Premium Background -->
@@ -364,6 +372,28 @@
     mobileMenuBtn.addEventListener('click', () => {
       mobileMenu.classList.toggle('active');
     });
+  </script>
+  <script type="module">
+    import { db } from '/assets/js/db.js';
+    const managedSection = document.getElementById('managed-blog-section');
+    const managedList = document.getElementById('managed-blog-list');
+    const escapeHtml = value => String(value ?? '').replace(/[&<>\"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[c]));
+    const safeImageUrl = value => /^https:\/\//i.test(String(value || '').trim()) ? String(value).trim() : '';
+    function renderManagedBlogs(posts) {
+      if (!posts.length) return;
+      managedSection.classList.remove('hidden');
+      managedList.innerHTML = posts.map(post => {
+        const blocks = (post.content || []).map(block => {
+          if (block.type === 'image') {
+            const url = safeImageUrl(block.url); if (!url) return '';
+            return `<figure class="my-8"><img src="${escapeHtml(url)}" alt="${escapeHtml(block.alt || post.title)}" class="rounded-2xl shadow-md h-auto object-cover block mx-auto max-w-full" loading="lazy"><figcaption class="text-center text-sm text-gray-500 mt-2 italic">${escapeHtml(block.alt || '')}</figcaption></figure>`;
+          }
+          return String(block.text || '').split(/\n\s*\n|\n/).filter(Boolean).map(paragraph => `<p>${escapeHtml(paragraph)}</p>`).join('');
+        }).join('');
+        return `<article class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden relative group"><div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div><div class="p-8 sm:p-12 md:p-16"><h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-10 leading-tight">${escapeHtml(post.title)}</h2><div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 text-justify">${post.excerpt ? `<p class="text-lg font-medium text-gray-500">${escapeHtml(post.excerpt)}</p>` : ''}${blocks}<div class="flex flex-col items-center pt-6 border-t border-gray-100 mt-6"><p class="font-bold text-dark">Jessica Melo</p><p class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p></div></div></div></article>`;
+      }).join('');
+    }
+    db.getPublishedBlogs().then(renderManagedBlogs).catch(() => {});
   </script>
 </body>
 
