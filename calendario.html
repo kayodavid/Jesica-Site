@@ -45,6 +45,41 @@
     body[data-patient-theme='black'] #calendar-grid > div button { color: #f8fafc !important; }
     body[data-patient-theme='black'] #day-modal > div { background: #20242c !important; color: #f8fafc !important; border-color: rgba(255,255,255,.12); }
     body[data-patient-theme='black'] #day-modal .text-gray-700 { color: #d5dae2 !important; }
+
+    /* Ajustes de enquadramento para smartphones */
+    @media (max-width: 640px) {
+      html, body { max-width: 100%; overflow-x: hidden; }
+      nav { padding-top: .55rem !important; padding-bottom: .55rem !important; }
+      nav .container { padding-left: .75rem !important; padding-right: .75rem !important; gap: .5rem; }
+      nav img { width: 6.5rem !important; }
+      nav > .container > div:last-child { gap: .25rem !important; flex-wrap: wrap; justify-content: flex-end; }
+      nav > .container > div:last-child a,
+      nav > .container > div:last-child button:not([data-theme-toggle]) { padding: .45rem .55rem !important; font-size: .65rem !important; }
+      nav > .container > div:last-child [data-theme-toggle] { width: 2rem !important; height: 2rem !important; }
+      .calendar-shell { padding: 1rem !important; border-radius: 1.25rem !important; }
+      .calendar-topbar { gap: 1rem !important; margin-bottom: 1.25rem !important; padding-bottom: 1rem !important; }
+      .calendar-topbar h1 { font-size: 1.65rem !important; }
+      .calendar-filters { width: 100%; display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) auto; gap: .4rem !important; }
+      .calendar-filters select, .calendar-filters button { min-width: 0; width: 100%; padding-left: .55rem !important; padding-right: .55rem !important; font-size: .72rem !important; }
+      .calendar-grid-wrapper { overflow: visible !important; }
+      .calendar-grid-inner { min-width: 0 !important; width: 100%; }
+      .calendar-grid-inner > .grid, #calendar-grid { gap: .3rem !important; }
+      .calendar-grid-inner > .grid > div { min-width: 0; }
+      #calendar-grid > div { padding: .35rem !important; border-radius: .7rem !important; }
+      #calendar-grid > div > span { font-size: .65rem !important; }
+      #calendar-grid > div > div { gap: .15rem !important; }
+      #calendar-grid > div > div > span { width: 1.05rem !important; height: 1.05rem !important; font-size: .55rem !important; border-radius: .35rem !important; }
+      .calendar-legend { padding: .8rem !important; margin-bottom: 1rem !important; }
+      .calendar-legend > div { gap: .55rem !important; }
+      .calendar-legend > div > div { gap: .35rem !important; font-size: .68rem !important; }
+      .calendar-legend > div > div > span { width: 1.65rem !important; height: 1.65rem !important; }
+      #admin-summary-section { margin-top: 1.5rem !important; padding-top: 1.5rem !important; }
+      #admin-summary-section h2 { font-size: 1.25rem !important; }
+      #admin-summary-section table { font-size: .7rem !important; }
+      #admin-summary-section th, #admin-summary-section td { padding: .45rem .35rem !important; }
+      #admin-summary-section .overflow-x-auto { margin-left: -.25rem; margin-right: -.25rem; }
+      .monthly-notes-grid { gap: 1rem !important; margin-top: 1.5rem !important; padding-top: 1.5rem !important; }
+    }
   </style>
 </head>
 
@@ -78,17 +113,17 @@
       </div>
 
       <!-- Main Box -->
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+      <div class="calendar-shell bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
         
         <!-- Top bar (Title, Month selector, Notes title) -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-gray-100">
+        <div class="calendar-topbar flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-gray-100">
           <div>
             <h1 class="text-3xl font-extrabold text-primary tracking-wide">JULHO</h1>
             <p class="text-xs sm:text-sm font-bold text-dark tracking-widest uppercase">CALENDÁRIO DE AUTOMONITORAMENTO</p>
           </div>
 
           <!-- Mês e Ano Seletores -->
-          <div class="flex items-center gap-2">
+          <div class="calendar-filters flex items-center gap-2">
             <select id="select-month" class="bg-light text-dark px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40 font-semibold text-sm">
               <option value="0">Janeiro</option>
               <option value="1">Fevereiro</option>
@@ -115,7 +150,7 @@
         </div>
 
         <!-- Legenda Interactiva -->
-        <div class="bg-light/60 border border-primary/10 rounded-2xl p-4 sm:p-5 mb-8">
+        <div class="calendar-legend bg-light/60 border border-primary/10 rounded-2xl p-4 sm:p-5 mb-8">
           <h3 class="text-xs font-bold text-dark uppercase mb-3 tracking-widest">Legenda dos Marcadores (Toque em cada dia para preencher)</h3>
           <div class="flex flex-wrap gap-4 text-sm">
             <div class="flex items-center gap-2">
@@ -142,8 +177,8 @@
         </div>
 
         <!-- Grade do Calendário -->
-        <div class="overflow-x-auto">
-          <div class="min-w-[640px]">
+        <div class="calendar-grid-wrapper overflow-x-auto">
+          <div class="calendar-grid-inner min-w-[640px]">
             <!-- Dias da Semana Header -->
             <div class="grid grid-cols-7 gap-2 mb-2">
               <div class="py-3 text-center bg-pink-100 rounded-xl font-bold text-pink-700 text-sm">DOM</div>
@@ -192,7 +227,7 @@
         </div>
 
         <!-- Notas e Progresso do Mês -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-100">
+        <div class="monthly-notes-grid grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-100">
           <!-- Campo de Notas -->
           <div class="md:col-span-2">
             <label for="monthly-notes" class="block text-sm font-bold text-dark uppercase tracking-wider mb-2">Anotações da semana/mês:</label>
