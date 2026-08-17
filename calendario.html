@@ -106,6 +106,9 @@
               <option value="2026" selected>2026</option>
               <option value="2027">2027</option>
             </select>
+            <button id="save-calendar-top-btn" type="button" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all duration-300 shadow-md whitespace-nowrap">
+              Salvar
+            </button>
           </div>
         </div>
 
@@ -291,6 +294,7 @@
     const calendarGrid = document.getElementById('calendar-grid');
     const monthlyNotes = document.getElementById('monthly-notes');
     const saveCalendarBtn = document.getElementById('save-calendar-btn');
+    const saveCalendarTopBtn = document.getElementById('save-calendar-top-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const statsA = document.getElementById('stats-a');
     const statsT = document.getElementById('stats-t');
@@ -577,14 +581,17 @@
     }
 
     // Salvar
-    saveCalendarBtn.addEventListener('click', async () => {
+    async function saveCalendar() {
       const result = await db.saveCalendarData(targetEmail, selectedYear, selectedMonth, currentDaysData, monthlyNotes.value, currentDayObservations);
       if (!result?.success) { alert(result?.message || 'Não foi possível salvar as informações.'); return; }
       if (isAdminViewing) {
         renderAdminSummary();
       }
       alert('Informações salvas com sucesso!');
-    });
+    }
+
+    saveCalendarBtn.addEventListener('click', saveCalendar);
+    saveCalendarTopBtn.addEventListener('click', saveCalendar);
 
     // Voltar para Admin
     if (backToAdminBtn) {
