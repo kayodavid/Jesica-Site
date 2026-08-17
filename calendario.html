@@ -66,10 +66,10 @@
       .calendar-grid-inner { min-width: 0 !important; width: 100%; }
       .calendar-grid-inner > .grid, #calendar-grid { gap: .3rem !important; }
       .calendar-grid-inner > .grid > div { min-width: 0; }
-      #calendar-grid > div { padding: .35rem !important; border-radius: .7rem !important; }
-      #calendar-grid > div > span { font-size: .65rem !important; }
-      #calendar-grid > div > div { gap: .15rem !important; }
-      #calendar-grid > div > div > span { width: 1.05rem !important; height: 1.05rem !important; font-size: .55rem !important; border-radius: .35rem !important; }
+      #calendar-grid > div { padding: .3rem !important; border-radius: .7rem !important; aspect-ratio: 1 / 1 !important; min-height: 2.9rem; }
+      #calendar-grid > div > span { font-size: .68rem !important; }
+      #calendar-grid > div > .calendar-badges { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: end; align-content: end; gap: .12rem !important; width: 100%; }
+      #calendar-grid > div > .calendar-badges > span { width: 1.18rem !important; height: 1.18rem !important; font-size: .68rem !important; border-radius: .35rem !important; flex: none !important; }
       .calendar-legend { padding: .8rem !important; margin-bottom: 1rem !important; }
       .calendar-legend > div { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem !important; }
       .calendar-legend > div > div { min-width: 0; align-items: flex-start !important; gap: .35rem !important; font-size: .62rem !important; line-height: 1.2 !important; }
@@ -510,7 +510,7 @@
 
         // Grid interno para os marcadores A, T, H
         const badgesContainer = document.createElement('div');
-        badgesContainer.className = 'flex gap-1 flex-wrap mt-1 justify-end';
+        badgesContainer.className = 'calendar-badges flex gap-1 flex-wrap mt-1 justify-end';
 
         const dayData = currentDaysData[day] || { A: false, T: false, H: false };
 
@@ -538,6 +538,8 @@
         if (observation && observation.trim() !== '') {
           const obsBadge = document.createElement('span');
           obsBadge.className = 'w-5 h-5 rounded-md bg-amber-500 text-white font-bold flex items-center justify-center shadow-sm';
+          obsBadge.setAttribute('title', 'Há uma observação neste dia');
+          obsBadge.setAttribute('aria-label', 'Há uma observação neste dia');
           obsBadge.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
