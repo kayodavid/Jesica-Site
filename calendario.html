@@ -59,6 +59,7 @@
       .calendar-shell { padding: 1rem !important; border-radius: 1.25rem !important; }
       .calendar-topbar { gap: 1rem !important; margin-bottom: 1.25rem !important; padding-bottom: 1rem !important; }
       .calendar-topbar h1 { font-size: 1.65rem !important; }
+      .calendar-topbar p { font-size: .68rem !important; letter-spacing: .08em !important; line-height: 1.35 !important; }
       .calendar-filters { width: 100%; display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) auto; gap: .4rem !important; }
       .calendar-filters select, .calendar-filters button { min-width: 0; width: 100%; padding-left: .55rem !important; padding-right: .55rem !important; font-size: .72rem !important; }
       .calendar-grid-wrapper { overflow: visible !important; }
@@ -70,9 +71,10 @@
       #calendar-grid > div > div { gap: .15rem !important; }
       #calendar-grid > div > div > span { width: 1.05rem !important; height: 1.05rem !important; font-size: .55rem !important; border-radius: .35rem !important; }
       .calendar-legend { padding: .8rem !important; margin-bottom: 1rem !important; }
-      .calendar-legend > div { gap: .55rem !important; }
-      .calendar-legend > div > div { gap: .35rem !important; font-size: .68rem !important; }
-      .calendar-legend > div > div > span { width: 1.65rem !important; height: 1.65rem !important; }
+      .calendar-legend > div { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem !important; }
+      .calendar-legend > div > div { min-width: 0; align-items: flex-start !important; gap: .35rem !important; font-size: .62rem !important; line-height: 1.2 !important; }
+      .calendar-legend > div > div > span:first-child { flex: 0 0 auto; width: 1.65rem !important; height: 1.65rem !important; }
+      .calendar-legend > div > div > span:last-child { min-width: 0; overflow-wrap: anywhere; display: block; }
       #admin-summary-section { margin-top: 1.5rem !important; padding-top: 1.5rem !important; }
       #admin-summary-section h2 { font-size: 1.25rem !important; }
       #admin-summary-section table { font-size: .7rem !important; }
