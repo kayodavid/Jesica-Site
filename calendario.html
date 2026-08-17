@@ -66,10 +66,11 @@
       .calendar-grid-inner { min-width: 0 !important; width: 100%; }
       .calendar-grid-inner > .grid, #calendar-grid { gap: .3rem !important; }
       .calendar-grid-inner > .grid > div { min-width: 0; }
-      #calendar-grid > div { padding: .3rem !important; border-radius: .7rem !important; aspect-ratio: 1 / 1 !important; min-height: 2.9rem; }
+      #calendar-grid > div { padding: .3rem !important; border-radius: .7rem !important; aspect-ratio: auto !important; min-height: 4.2rem; }
       #calendar-grid > div > span { font-size: .68rem !important; }
       #calendar-grid > div > .calendar-badges { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: end; align-content: end; gap: .12rem !important; width: 100%; }
-      #calendar-grid > div > .calendar-badges > span { width: 1.18rem !important; height: 1.18rem !important; font-size: .68rem !important; border-radius: .35rem !important; flex: none !important; }
+      #calendar-grid > div > .calendar-badges { min-height: 2.35rem; }
+      #calendar-grid > div > .calendar-badges > span { width: 1.05rem !important; height: 1.05rem !important; font-size: .62rem !important; border-radius: .35rem !important; flex: none !important; }
       .calendar-legend { padding: .8rem !important; margin-bottom: 1rem !important; }
       .calendar-legend > div { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem !important; }
       .calendar-legend > div > div { min-width: 0; align-items: flex-start !important; gap: .35rem !important; font-size: .62rem !important; line-height: 1.2 !important; }
