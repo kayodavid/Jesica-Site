@@ -484,13 +484,14 @@
     const blogSubmit = document.getElementById('blog-submit');
     let blogCache = [];
 
-    function addBlogBlock(type = 'text', value = '', alt = '') {
+    function addBlogBlock(type = 'text', value = '', alt = '', width = 'auto') {
       const block = document.createElement('div');
       block.className = 'blog-editor-block border border-gray-200 rounded-2xl p-4 bg-light/40';
       block.dataset.type = type;
       const controls = `<div class="flex items-center gap-2"><button type="button" class="blog-move-up bg-white border border-gray-200 text-dark px-2 py-1 rounded-lg text-xs font-bold" title="Mover para cima" aria-label="Mover para cima">↑</button><button type="button" class="blog-move-down bg-white border border-gray-200 text-dark px-2 py-1 rounded-lg text-xs font-bold" title="Mover para baixo" aria-label="Mover para baixo">↓</button><button type="button" class="blog-remove-block text-red-500 text-xs font-bold ml-1">Remover</button></div>`;
       if (type === 'image') {
-        block.innerHTML = `<div class="flex items-center justify-between mb-2"><strong class="text-sm text-dark">Imagem entre parágrafos</strong>${controls}</div><div class="flex flex-col sm:flex-row gap-2"><input type="url" class="blog-image-url flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm" placeholder="https://.../imagem.jpg" value="${String(value).replace(/"/g, '&quot;')}" /><label class="bg-primary/10 text-primary hover:bg-primary hover:text-white px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer text-center">Escolher imagem do computador<input type="file" class="blog-image-file hidden" accept="image/jpeg,image/png,image/webp,image/gif" /></label></div><p class="blog-image-status text-xs text-gray-400 mt-2">Você pode usar um link HTTPS ou escolher uma imagem do computador.</p><input type="text" class="blog-image-alt w-full mt-2 px-3 py-2.5 rounded-xl border border-gray-200 text-sm" placeholder="Descrição da imagem" value="${String(alt).replace(/"/g, '&quot;')}" />`;
+        const selectedWidth = ['auto', '40', '60', '80', '100'].includes(String(width)) ? String(width) : 'auto';
+        block.innerHTML = `<div class="flex items-center justify-between mb-2"><strong class="text-sm text-dark">Imagem entre parágrafos</strong>${controls}</div><div class="flex flex-col sm:flex-row gap-2"><input type="url" class="blog-image-url flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm" placeholder="https://.../imagem.jpg" value="${String(value).replace(/"/g, '&quot;')}" /><label class="bg-primary/10 text-primary hover:bg-primary hover:text-white px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer text-center">Escolher imagem do computador<input type="file" class="blog-image-file hidden" accept="image/jpeg,image/png,image/webp,image/gif" /></label></div><p class="blog-image-status text-xs text-gray-400 mt-2">Você pode usar um link HTTPS ou escolher uma imagem do computador.</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2"><input type="text" class="blog-image-alt px-3 py-2.5 rounded-xl border border-gray-200 text-sm" placeholder="Descrição da imagem" value="${String(alt).replace(/"/g, '&quot;')}" /><label class="flex items-center gap-2 text-sm text-dark">Tamanho<select class="blog-image-width flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm"><option value="auto" ${selectedWidth === 'auto' ? 'selected' : ''}>Automático</option><option value="40" ${selectedWidth === '40' ? 'selected' : ''}>Pequeno · 40%</option><option value="60" ${selectedWidth === '60' ? 'selected' : ''}>Médio · 60%</option><option value="80" ${selectedWidth === '80' ? 'selected' : ''}>Grande · 80%</option><option value="100" ${selectedWidth === '100' ? 'selected' : ''}>Largura total · 100%</option></select></label></div>`;
         block.querySelector('.blog-image-file').addEventListener('change', async e => {
           const file = e.target.files?.[0]; if (!file) return;
           const status = block.querySelector('.blog-image-status'); status.textContent = 'Processando imagem...';
@@ -524,7 +525,7 @@
 
     function collectBlogBlocks() {
       return [...blogBlocks.querySelectorAll('.blog-editor-block')].map(block => {
-        if (block.dataset.type === 'image') return { type: 'image', url: block.querySelector('.blog-image-url').value.trim(), alt: block.querySelector('.blog-image-alt').value.trim() };
+        if (block.dataset.type === 'image') return { type: 'image', url: block.querySelector('.blog-image-url').value.trim(), alt: block.querySelector('.blog-image-alt').value.trim(), width: block.querySelector('.blog-image-width')?.value || 'auto' };
         return { type: 'text', text: block.querySelector('.blog-text-value').value.trim() };
       }).filter(block => block.type === 'image' ? block.url : block.text);
     }
@@ -545,7 +546,7 @@
         document.getElementById('blog-excerpt').value = post.excerpt || '';
         document.getElementById('blog-published').checked = post.published !== false;
         blogBlocks.innerHTML = '';
-        (post.content || []).forEach(block => addBlogBlock(block.type, block.type === 'image' ? block.url : block.text, block.alt || ''));
+        (post.content || []).forEach(block => addBlogBlock(block.type, block.type === 'image' ? block.url : block.text, block.alt || '', block.width || 'auto'));
         if (!blogBlocks.children.length) addBlogBlock('text');
         blogSubmit.textContent = 'Salvar alterações';
         window.scrollTo({ top: blogEditorForm.offsetTop - 100, behavior: 'smooth' });
