@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área do Paciente - Jessica Melo Nutri</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: '#a88b36', secondary: '#d4b76a', accent: '#f5e6c8', dark: '#3d3226', light: '#faf8f3' } } } };
+  </script>
+  <style>
+    body { font-family: 'Poppins', sans-serif; transition: background .2s, color .2s; }
+    body[data-patient-theme='black'] { background: #17181d !important; color: #f5f5f5; }
+    body[data-patient-theme='black'] nav { background: #1d1e24 !important; border-color: rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] main h1, body[data-patient-theme='black'] main h2 { color: #fff !important; }
+    body[data-patient-theme='black'] main p { color: #a9abb3 !important; }
+    body[data-patient-theme='black'] section a { background: #22242b !important; border-color: rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] footer { background: #101114; }
+    body[data-patient-theme='black'] nav #user-display-name, body[data-patient-theme='black'] nav #change-pass-nav-btn, body[data-patient-theme='black'] nav #logout-btn { color: #d4b76a !important; }
+    body[data-patient-theme='black'] nav [data-theme-toggle] { color: #d4b76a !important; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col">
+  <nav class="bg-white/80 backdrop-blur-md border-b border-white/40 py-3 shadow-sm">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <a href="/index.html"><img data-patient-logo src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista"></a>
+      <div class="flex items-center gap-3">
+        <span id="user-display-name" class="text-sm font-semibold text-primary hidden sm:inline">Paciente</span>
+        <button data-theme-toggle id="theme-toggle" type="button" class="bg-primary/10 hover:bg-primary hover:text-white text-primary w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema"></button>
+        <button id="change-pass-nav-btn" type="button" class="bg-primary/10 hover:bg-primary hover:text-white text-primary px-3.5 py-2 rounded-full text-xs font-semibold transition-all">Alterar Senha</button>
+        <button id="logout-btn" class="bg-primary/10 hover:bg-primary hover:text-white text-primary px-3.5 py-2 rounded-full text-xs font-semibold transition-all">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow px-4 py-12 sm:py-16">
+    <div class="container mx-auto max-w-5xl">
+      <header class="mb-10">
+        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-2">Área do paciente</p>
+        <h1 class="text-3xl sm:text-4xl font-bold text-dark">Olá, <span id="patient-name">Paciente</span></h1>
+        <p class="text-gray-500 mt-2">Escolha uma opção para continuar seu acompanhamento.</p>
+      </header>
+
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <a href="/calendario.html" class="group bg-white rounded-3xl p-7 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 hover:shadow-xl transition-all">
+          <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
+          </div>
+          <h2 class="text-xl font-bold text-dark">Calendário de automonitoramento</h2>
+          <p class="text-sm text-gray-500 mt-2">Registre alimentação, treinos, hidratação e suas observações.</p>
+          <span class="inline-block mt-6 text-sm font-bold text-primary group-hover:text-dark">Acessar calendário →</span>
+        </a>
+
+        <a href="/videos.html" class="group bg-white rounded-3xl p-7 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 hover:shadow-xl transition-all">
+          <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </div>
+          <h2 class="text-xl font-bold text-dark">Vídeos educativos</h2>
+          <p class="text-sm text-gray-500 mt-2">Assista aos conteúdos educativos disponibilizados para você.</p>
+          <span class="inline-block mt-6 text-sm font-bold text-primary group-hover:text-dark">Assistir vídeos →</span>
+        </a>
+        <a href="/ebooks.html" class="group bg-white rounded-3xl p-7 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 hover:shadow-xl transition-all">
+          <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 014 16.5v-11zM4 5.5v11M8 7h8m-8 4h8m-8 4h5"/></svg>
+          </div>
+          <h2 class="text-xl font-bold text-dark">eBooks</h2>
+          <p class="text-sm text-gray-500 mt-2">Acesse materiais de apoio e guias preparados para você.</p>
+          <span class="inline-block mt-6 text-sm font-bold text-primary group-hover:text-dark">Abrir eBooks →</span>
+        </a>
+      </section>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-white py-6 px-4 text-center text-xs"><p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p></footer>
+
+  <div id="password-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm shadow-2xl">
+      <div class="flex items-start justify-between gap-4 mb-2"><h2 class="text-xl font-bold text-dark">Alterar minha senha</h2><button id="password-cancel-btn" type="button" class="text-gray-400 hover:text-dark text-2xl leading-none" aria-label="Fechar">×</button></div>
+      <p class="text-xs text-gray-500 mb-5">Por segurança, troque sua senha de acesso ao portal.</p>
+      <form id="password-form" class="space-y-4">
+        <input id="new-pass-input" type="password" required minlength="4" placeholder="Nova senha" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" />
+        <input id="confirm-pass-input" type="password" required minlength="4" placeholder="Confirmar nova senha" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" />
+        <p id="password-error" class="hidden text-xs text-red-600"></p>
+        <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-all">Atualizar senha</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, applyPatientTheme, togglePatientTheme } from '/assets/js/db.js';
+    (async () => {
+    applyPatientTheme();
+    document.getElementById('theme-toggle').addEventListener('click', togglePatientTheme);
+    const session = await db.ready();
+    const changePassNavBtn = document.getElementById('change-pass-nav-btn');
+    const passwordModal = document.getElementById('password-modal');
+    const openPasswordModal = () => passwordModal.classList.remove('hidden');
+    const closePasswordModal = () => { passwordModal.classList.add('hidden'); document.getElementById('password-form').reset(); };
+    changePassNavBtn.addEventListener('click', openPasswordModal);
+    document.getElementById('password-modal').addEventListener('click', event => { if (event.target === passwordModal) closePasswordModal(); });
+    document.getElementById('password-cancel-btn').addEventListener('click', closePasswordModal);
+    if (!session || session.role !== 'patient') {
+      window.location.href = session && session.role === 'admin' ? '/admin.html' : '/login.html';
+    } else {
+      document.getElementById('user-display-name').innerText = session.name;
+      document.getElementById('patient-name').innerText = session.name.split(' ')[0];
+      if (session.isFirstAccess) document.getElementById('password-modal').classList.remove('hidden');
+      const passwordForm = document.getElementById('password-form');
+      passwordForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const next = document.getElementById('new-pass-input').value;
+        const confirm = document.getElementById('confirm-pass-input').value;
+        const error = document.getElementById('password-error');
+        if (next !== confirm) { error.textContent = 'As senhas não coincidem.'; error.classList.remove('hidden'); return; }
+        const result = await db.changePassword(session.email, next);
+        if (!result.success) { error.textContent = result.message || 'Não foi possível atualizar a senha.'; error.classList.remove('hidden'); return; }
+        closePasswordModal();
+        const refreshed = await db.ready();
+        if (refreshed) { refreshed.isFirstAccess = false; localStorage.setItem('jessicamelo_session', JSON.stringify(refreshed)); }
+      });
+    }
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await db.logout();
+      window.location.href = '/login.html';
+    });
+    })();
+  </script>
+</body>
+</html>

@@ -86,6 +86,42 @@
           Nenhum paciente cadastrado ainda.
         </div>
       </div>
+
+      <section class="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Conteúdos</p>
+            <h2 class="text-xl font-bold text-dark">Vídeos educativos</h2>
+            <p class="text-sm text-gray-500 mt-1">Cadastre links do YouTube, Vimeo ou Google Drive para exibir aos pacientes.</p>
+          </div>
+          <span class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-semibold">Publicação imediata</span>
+        </div>
+        <form id="add-video-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div><label for="video-title" class="block text-sm font-semibold text-dark mb-1">Título</label><input type="text" id="video-title" required placeholder="Ex.: Como montar um prato equilibrado" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div><label for="video-theme" class="block text-sm font-semibold text-dark mb-1">Tema</label><input type="text" id="video-theme" required placeholder="Ex.: Alimentação" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div><label for="video-url" class="block text-sm font-semibold text-dark mb-1">Link do vídeo</label><input type="url" id="video-url" required placeholder="https://youtube.com/..., https://vimeo.com/... ou link do Google Drive" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div class="md:col-span-2"><label for="video-description" class="block text-sm font-semibold text-dark mb-1">Descrição (opcional)</label><textarea id="video-description" rows="2" placeholder="Explique brevemente o conteúdo para os pacientes." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"></textarea></div>
+          <div class="md:col-span-2 flex justify-end"><button type="submit" class="bg-primary text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:bg-dark transition-all shadow-md">Adicionar vídeo</button></div>
+        </form>
+        <div id="videos-list" class="space-y-3"></div>
+        <p id="no-videos" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum vídeo cadastrado.</p>
+      </section>
+
+      <section class="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Conteúdos</p><h2 class="text-xl font-bold text-dark">eBooks educativos</h2><p class="text-sm text-gray-500 mt-1">Disponibilize materiais em PDF ou outros arquivos hospedados no Google Drive.</p></div>
+          <span class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-semibold">Google Drive</span>
+        </div>
+        <form id="add-ebook-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div><label for="ebook-title" class="block text-sm font-semibold text-dark mb-1">Título</label><input type="text" id="ebook-title" required placeholder="Ex.: Guia de refeições" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div><label for="ebook-theme" class="block text-sm font-semibold text-dark mb-1">Tema</label><input type="text" id="ebook-theme" required placeholder="Ex.: Alimentação" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div class="md:col-span-2"><label for="ebook-url" class="block text-sm font-semibold text-dark mb-1">Link do Google Drive</label><input type="url" id="ebook-url" required placeholder="https://drive.google.com/file/d/.../view" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /><p class="text-xs text-gray-500 mt-2">Use o link de compartilhamento do arquivo, por exemplo: <span class="font-medium">drive.google.com/file/d/ID/view</span>. O arquivo precisa estar acessível aos pacientes.</p></div>
+          <div class="md:col-span-2"><label for="ebook-description" class="block text-sm font-semibold text-dark mb-1">Descrição (opcional)</label><textarea id="ebook-description" rows="2" placeholder="Explique brevemente o material para os pacientes." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"></textarea></div>
+          <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3"><p id="ebook-form-status" class="text-sm hidden" role="status" aria-live="polite"></p><button id="ebook-submit-btn" type="submit" class="bg-primary text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:bg-dark transition-all shadow-md">Adicionar eBook</button></div>
+        </form>
+        <div id="ebooks-list" class="space-y-3"></div>
+        <p id="no-ebooks" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum eBook cadastrado.</p>
+      </section>
     </div>
   </div>
 
@@ -123,6 +159,22 @@
     </div>
   </div>
 
+  <!-- Modal Editar Vídeo -->
+  <div id="edit-video-modal" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+      <h3 class="text-xl font-bold text-dark mb-2">Editar vídeo educativo</h3>
+      <p class="text-xs text-gray-500 mb-6">Atualize as informações. O player será recalculado automaticamente para YouTube, Vimeo ou Google Drive.</p>
+      <form id="edit-video-form" class="space-y-4">
+        <input type="hidden" id="edit-video-id" />
+        <div><label for="edit-video-title" class="block text-sm font-semibold text-dark mb-1">Título</label><input type="text" id="edit-video-title" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+        <div><label for="edit-video-theme" class="block text-sm font-semibold text-dark mb-1">Tema</label><input type="text" id="edit-video-theme" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+        <div><label for="edit-video-url" class="block text-sm font-semibold text-dark mb-1">Link do vídeo</label><input type="url" id="edit-video-url" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+        <div><label for="edit-video-description" class="block text-sm font-semibold text-dark mb-1">Descrição</label><textarea id="edit-video-description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"></textarea></div>
+        <div class="flex gap-2 pt-4"><button type="button" id="edit-video-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">Cancelar</button><button type="submit" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Salvar alterações</button></div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal Resetar Senha Paciente -->
   <div id="reset-password-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
@@ -146,9 +198,10 @@
 
   <script type="module">
     import { db } from '/assets/js/db.js';
+    (async () => {
 
     // Verificar sessão admin
-    const session = db.getCurrentSession();
+    const session = await db.ready();
     if (!session || session.role !== 'admin') {
       window.location.href = '/login.html';
     }
@@ -168,11 +221,18 @@
     const resetEmail = document.getElementById('reset-email');
     const resetPassInput = document.getElementById('reset-pass-input');
     const resetModalCancelBtn = document.getElementById('reset-modal-cancel-btn');
+    const addVideoForm = document.getElementById('add-video-form');
+    const videosList = document.getElementById('videos-list');
+    const noVideos = document.getElementById('no-videos');
+    let videoCache = [];
+    const editVideoModal = document.getElementById('edit-video-modal');
+    const editVideoForm = document.getElementById('edit-video-form');
+    const editVideoCancelBtn = document.getElementById('edit-video-cancel-btn');
 
     // Carregar pacientes
-    function renderPatients() {
+    async function renderPatients() {
       patientsList.innerHTML = '';
-      const patients = db.getPatients();
+      const patients = await db.getPatients();
 
       if (patients.length === 0) {
         noPatients.classList.remove('hidden');
@@ -221,16 +281,157 @@
       });
 
       document.querySelectorAll('.delete-patient-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
           const btnElem = e.currentTarget;
           const email = btnElem.getAttribute('data-email');
           if (confirm(`Tem certeza que deseja excluir o paciente ${email} e todo seu histórico de calendário?`)) {
-            db.deletePatient(email);
-            renderPatients();
+            const result = await db.deletePatient(email);
+            if (!result.success) alert(result.message || 'Não foi possível excluir o paciente.');
+            await renderPatients();
           }
         });
       });
     }
+
+    async function renderVideos() {
+      const videos = await db.getVideos();
+      videoCache = videos;
+      videosList.innerHTML = '';
+      noVideos.classList.toggle('hidden', videos.length > 0);
+      videos.forEach(video => {
+        const item = document.createElement('div');
+        item.className = 'grid grid-cols-1 md:grid-cols-[180px_1fr_auto] gap-4 items-center border border-gray-100 rounded-2xl p-4 bg-light/40';
+        item.innerHTML = `<div class="aspect-video rounded-xl overflow-hidden bg-dark"><iframe class="w-full h-full" src="${video.embedUrl}" title="Prévia: ${video.title}" loading="lazy" allow="fullscreen"></iframe></div><div><div class="flex flex-wrap items-center gap-2"><strong class="text-base text-dark">${video.title}</strong><span class="text-[10px] uppercase font-bold text-primary bg-primary/10 px-2 py-1 rounded">${video.provider}</span><span class="text-[10px] uppercase font-bold text-dark bg-accent px-2 py-1 rounded">${video.theme || 'Geral'}</span></div><p class="text-sm text-gray-600 mt-2">${video.description || 'Sem descrição'}</p><p class="text-xs text-gray-400 mt-2 break-all">${video.url}</p></div><div class="flex md:flex-col gap-2"><button type="button" class="edit-video-btn text-primary bg-primary/10 hover:bg-primary hover:text-white px-3 py-2 rounded-xl text-xs font-bold" data-id="${video.id}">Editar</button><button class="delete-video-btn text-red-500 hover:bg-red-50 px-3 py-2 rounded-xl text-xs font-bold" data-id="${video.id}">Excluir</button></div>`;
+        videosList.appendChild(item);
+      });
+      document.querySelectorAll('.edit-video-btn').forEach(btn => btn.addEventListener('click', (e) => {
+        const video = videoCache.find(item => item.id === e.currentTarget.dataset.id);
+        if (!video) return;
+        document.getElementById('edit-video-id').value = video.id;
+        document.getElementById('edit-video-title').value = video.title;
+        document.getElementById('edit-video-theme').value = video.theme || 'Geral';
+        document.getElementById('edit-video-url').value = video.url;
+        document.getElementById('edit-video-description').value = video.description || '';
+        editVideoModal.style.display = 'flex';
+        requestAnimationFrame(() => editVideoModal.classList.add('opacity-100'));
+      }));
+
+      document.querySelectorAll('.delete-video-btn').forEach(btn => btn.addEventListener('click', async (e) => {
+        if (confirm('Excluir este vídeo da área dos pacientes?')) {
+          const result = await db.deleteVideo(e.currentTarget.dataset.id);
+          if (!result.success) alert(result.message || 'Não foi possível excluir o vídeo.');
+          await renderVideos();
+        }
+      }));
+    }
+
+    addVideoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const result = await db.addVideo(document.getElementById('video-title').value, document.getElementById('video-theme').value, document.getElementById('video-description').value, document.getElementById('video-url').value);
+      if (!result.success) {
+        alert(result.message);
+        return;
+      }
+      alert('Vídeo adicionado e publicado para os pacientes.');
+      addVideoForm.reset();
+      await renderVideos();
+    });
+
+    function closeEditVideoModal() {
+      editVideoModal.classList.remove('opacity-100');
+      setTimeout(() => { editVideoModal.style.display = 'none'; }, 200);
+      editVideoForm.reset();
+    }
+
+    editVideoCancelBtn.addEventListener('click', closeEditVideoModal);
+
+    editVideoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const result = await db.updateVideo(
+        document.getElementById('edit-video-id').value,
+        document.getElementById('edit-video-title').value,
+        document.getElementById('edit-video-theme').value,
+        document.getElementById('edit-video-description').value,
+        document.getElementById('edit-video-url').value
+      );
+      if (!result.success) {
+        alert(result.message);
+        return;
+      }
+      alert('Vídeo atualizado com sucesso.');
+      closeEditVideoModal();
+      await renderVideos();
+    });
+
+    const addEbookForm = document.getElementById('add-ebook-form');
+    const ebooksList = document.getElementById('ebooks-list');
+    const noEbooks = document.getElementById('no-ebooks');
+    let ebookCache = [];
+    const ebookFormStatus = document.getElementById('ebook-form-status');
+    const ebookSubmitBtn = document.getElementById('ebook-submit-btn');
+    function setEbookFormStatus(message, type = 'info') {
+      ebookFormStatus.textContent = message;
+      ebookFormStatus.className = `text-sm ${type === 'success' ? 'text-green-600' : type === 'error' ? 'text-red-600' : 'text-gray-500'}`;
+      ebookFormStatus.classList.remove('hidden');
+    }
+    function operationFailed(result) { return !result || result.success === false; }
+
+    async function renderEbooks() {
+      ebookCache = await db.getEbooks();
+      ebooksList.innerHTML = '';
+      noEbooks.classList.toggle('hidden', ebookCache.length > 0);
+      ebookCache.forEach(book => {
+        const item = document.createElement('div');
+        item.className = 'grid grid-cols-1 md:grid-cols-[140px_1fr_auto] gap-4 items-center border border-gray-100 rounded-2xl p-4 bg-light/40';
+        item.innerHTML = `<div class="aspect-[4/3] rounded-xl overflow-hidden bg-dark">${book.thumbnailUrl ? `<img class="w-full h-full object-cover" src="${book.thumbnailUrl}" alt="${book.title}" onerror="this.style.display='none'" />` : '<div class="w-full h-full flex items-center justify-center text-3xl text-secondary">▤</div>'}</div><div><div class="flex flex-wrap items-center gap-2"><strong class="text-base text-dark">${book.title}</strong><span class="text-[10px] uppercase font-bold text-primary bg-primary/10 px-2 py-1 rounded">Google Drive</span><span class="text-[10px] uppercase font-bold text-dark bg-accent px-2 py-1 rounded">${book.theme || 'Geral'}</span></div><p class="text-sm text-gray-600 mt-2">${book.description || 'Sem descrição'}</p><p class="text-xs text-gray-400 mt-2 break-all">${book.url}</p></div><div class="flex md:flex-col gap-2"><button type="button" class="edit-ebook-btn text-primary bg-primary/10 hover:bg-primary hover:text-white px-3 py-2 rounded-xl text-xs font-bold" data-id="${book.id}">Editar</button><button type="button" class="delete-ebook-btn text-red-500 hover:bg-red-50 px-3 py-2 rounded-xl text-xs font-bold" data-id="${book.id}">Excluir</button></div>`;
+        ebooksList.appendChild(item);
+      });
+      document.querySelectorAll('.edit-ebook-btn').forEach(btn => btn.addEventListener('click', async e => {
+        const book = ebookCache.find(item => item.id === e.currentTarget.dataset.id); if (!book) return;
+        const title = prompt('Título do eBook:', book.title); if (title === null) return;
+        const theme = prompt('Tema do eBook:', book.theme || 'Geral'); if (theme === null) return;
+        const description = prompt('Descrição:', book.description || ''); if (description === null) return;
+        const url = prompt('Link do Google Drive:', book.url); if (url === null) return;
+        const result = await db.updateEbook(book.id, title, theme, description, url); if (operationFailed(result)) alert(result?.message || 'Não foi possível atualizar o eBook.'); else await renderEbooks();
+      }));
+      document.querySelectorAll('.delete-ebook-btn').forEach(btn => btn.addEventListener('click', async e => {
+        if (!confirm('Excluir este eBook da área dos pacientes?')) return;
+        const result = await db.deleteEbook(e.currentTarget.dataset.id); if (operationFailed(result)) alert(result?.message || 'Não foi possível excluir o eBook.'); else await renderEbooks();
+      }));
+    }
+
+    addEbookForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (ebookSubmitBtn.disabled) return;
+      const title = document.getElementById('ebook-title').value.trim();
+      const theme = document.getElementById('ebook-theme').value.trim();
+      const description = document.getElementById('ebook-description').value.trim();
+      const url = document.getElementById('ebook-url').value.trim();
+      if (!title || !theme || !url) {
+        setEbookFormStatus('Preencha o título, o tema e o link do Google Drive.', 'error');
+        return;
+      }
+      ebookSubmitBtn.disabled = true;
+      ebookSubmitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+      ebookSubmitBtn.textContent = 'Salvando eBook...';
+      setEbookFormStatus('Validando o link e salvando o material...', 'info');
+      try {
+        const result = await db.addEbook(title, theme, description, url);
+        if (operationFailed(result)) {
+          setEbookFormStatus(result?.message || 'Não foi possível adicionar o eBook. Verifique o link do Google Drive e tente novamente.', 'error');
+          return;
+        }
+        addEbookForm.reset();
+        await renderEbooks();
+        setEbookFormStatus('eBook adicionado e publicado para os pacientes.', 'success');
+      } catch (error) {
+        setEbookFormStatus('Não foi possível adicionar o eBook. Tente novamente.', 'error');
+      } finally {
+        ebookSubmitBtn.disabled = false;
+        ebookSubmitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        ebookSubmitBtn.textContent = 'Adicionar eBook';
+      }
+    });
 
     // Modal Reset de Senha
     function openResetModal(email) {
@@ -256,16 +457,16 @@
 
     resetModalCancelBtn.addEventListener('click', closeResetModal);
 
-    resetPasswordForm.addEventListener('submit', (e) => {
+    resetPasswordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = resetEmail.value;
       const newPass = resetPassInput.value;
 
-      const result = db.resetPatientPassword(email, newPass);
+      const result = await db.resetPatientPassword(email, newPass);
       if (result.success) {
         alert(`Senha do paciente ${email} resetada com sucesso! Nova senha: ${newPass}`);
         closeResetModal();
-        renderPatients();
+        await renderPatients();
       } else {
         alert(result.message);
       }
@@ -296,29 +497,32 @@
 
     modalCancelBtn.addEventListener('click', closeModal);
 
-    addPatientForm.addEventListener('submit', (e) => {
+    addPatientForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('new-name').value.trim();
       const email = document.getElementById('new-email').value.trim();
       const password = document.getElementById('new-password').value;
 
-      const result = db.addPatient(name, email, password);
+      const result = await db.addPatient(name, email, password);
       if (result.success) {
         alert('Paciente cadastrado com sucesso!');
         closeModal();
-        renderPatients();
+        await renderPatients();
       } else {
         alert(result.message);
       }
     });
 
     // Logout
-    logoutBtn.addEventListener('click', () => {
-      db.logout();
+    logoutBtn.addEventListener('click', async () => {
+      await db.logout();
       window.location.href = '/login.html';
     });
 
-    renderPatients();
+    await renderPatients();
+    await renderVideos();
+    await renderEbooks();
+    })();
   </script>
 </body>
 

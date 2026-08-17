@@ -4,6 +4,7 @@ import { resolve } from 'path'
 export default defineConfig({
   server: {
     host: true, // Listen on all local IPs (fixes some browser connection issues)
+    allowedHosts: true,
     port: 5173
   },
   build: {
@@ -11,11 +12,16 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         sobre: resolve(__dirname, 'sobre.html'),
-        'agendar-consulta': resolve(__dirname, 'agendar-consulta.html'),
         blog: resolve(__dirname, 'blog.html'),
+        agendarConsulta: resolve(__dirname, 'agendar-consulta.html'),
+        areaPaciente: resolve(__dirname, 'area-do-paciente.html'),
         login: resolve(__dirname, 'login.html'),
+        redefinirSenha: resolve(__dirname, 'redefinir-senha.html'),
         admin: resolve(__dirname, 'admin.html'),
-        calendario: resolve(__dirname, 'calendario.html')
+        calendario: resolve(__dirname, 'calendario.html'),
+        paciente: resolve(__dirname, 'paciente.html'),
+        ebooks: resolve(__dirname, 'ebooks.html'),
+        videos: resolve(__dirname, 'videos.html')
       },
       output: {
         // Gera arquivos em pastas separadas para URLs limpas

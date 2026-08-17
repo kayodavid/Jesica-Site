@@ -81,12 +81,12 @@
 
       <div id="recovery-panel" class="hidden mt-5 rounded-2xl border border-primary/20 bg-[#fffaf0] p-5">
         <h3 class="font-bold text-dark text-base">Recuperar acesso</h3>
-        <p class="text-gray-600 text-sm mt-1 leading-relaxed">Informe o e-mail cadastrado. Por segurança, a senha nunca é exibida nem enviada por esta página. Se o e-mail estiver cadastrado, enviaremos um link temporário para criar uma nova senha.</p>
+        <p class="text-gray-600 text-sm mt-1 leading-relaxed">Informe o e-mail cadastrado. Por segurança, a senha nunca é exibida nem enviada por esta página. A solicitação será encaminhada pelo WhatsApp para confirmação e redefinição do acesso.</p>
         <label for="recovery-email" class="block text-sm font-semibold text-dark mt-4 mb-1">E-mail do paciente</label>
         <input type="email" id="recovery-email" placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white" />
         <div id="recovery-alert" class="hidden mt-3 rounded-xl p-3 text-sm font-medium"></div>
         <div class="flex gap-3 mt-4">
-          <button type="button" id="recovery-whatsapp-btn" class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Enviar link por e-mail</button>
+          <button type="button" id="recovery-whatsapp-btn" class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Solicitar recuperação</button>
           <button type="button" id="recovery-cancel-btn" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-white transition-colors">Cancelar</button>
         </div>
       </div>
@@ -127,28 +127,17 @@
       recoveryAlert.className = 'hidden mt-3 rounded-xl p-3 text-sm font-medium';
       recoveryAlert.textContent = '';
     });
-    recoveryWhatsappBtn.addEventListener('click', async () => {
+    recoveryWhatsappBtn.addEventListener('click', () => {
       const email = recoveryEmail.value.trim().toLowerCase();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-red-50 text-red-700';
         recoveryAlert.textContent = 'Informe um e-mail válido para solicitar a recuperação.';
         return;
       }
-      recoveryWhatsappBtn.disabled = true;
-      recoveryWhatsappBtn.textContent = 'Enviando...';
-      try {
-        const response = await fetch('/api/password-recovery', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'request', email }) });
-        const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || 'Não foi possível enviar o e-mail agora.');
-        recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-green-50 text-green-700';
-        recoveryAlert.textContent = 'Se o e-mail estiver cadastrado, você receberá um link de recuperação em alguns instantes. Verifique também a pasta de spam.';
-      } catch (error) {
-        recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-red-50 text-red-700';
-        recoveryAlert.textContent = error.message || 'Não foi possível enviar o e-mail agora. Tente novamente em alguns minutos.';
-      } finally {
-        recoveryWhatsappBtn.disabled = false;
-        recoveryWhatsappBtn.textContent = 'Enviar link por e-mail';
-      }
+      const message = `Olá, preciso recuperar o acesso ao Portal de Acompanhamento. Meu e-mail cadastrado é: ${email}`;
+      window.open(`https://wa.me/5561993349412?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+      recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-green-50 text-green-700';
+      recoveryAlert.textContent = 'Solicitação preparada. Envie a mensagem no WhatsApp para que o acesso seja redefinido com segurança.';
     });
 
     form.addEventListener('submit', async (e) => {

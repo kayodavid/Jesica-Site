@@ -24,9 +24,25 @@
     };
   </script>
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-    }
+    body { font-family: "Poppins", sans-serif; transition: background .2s, color .2s; }
+    body[data-patient-theme='black'] { background: #111318 !important; color: #f5f7fa; }
+    body[data-patient-theme='black'] nav { background: #191c23 !important; border-color: rgba(255,255,255,.12); }
+    body[data-patient-theme='black'] main, body[data-patient-theme='black'] .bg-white { background: #20242c !important; color: #f5f7fa; border-color: rgba(255,255,255,.12); }
+    body[data-patient-theme='black'] .text-dark, body[data-patient-theme='black'] h1, body[data-patient-theme='black'] h2, body[data-patient-theme='black'] h3, body[data-patient-theme='black'] label { color: #f8fafc !important; }
+    body[data-patient-theme='black'] .text-gray-500, body[data-patient-theme='black'] .text-gray-600, body[data-patient-theme='black'] .text-gray-700 { color: #c0c7d2 !important; }
+    body[data-patient-theme='black'] .border-gray-100, body[data-patient-theme='black'] .border-gray-200 { border-color: rgba(255,255,255,.12) !important; }
+    body[data-patient-theme='black'] .bg-light, body[data-patient-theme='black'] .bg-light\/30, body[data-patient-theme='black'] .bg-light\/40, body[data-patient-theme='black'] .bg-light\/60 { background: #292e38 !important; color: #f8fafc !important; }
+    body[data-patient-theme='black'] input, body[data-patient-theme='black'] textarea, body[data-patient-theme='black'] select { background: #171a20 !important; color: #f8fafc !important; border-color: rgba(255,255,255,.18); }
+    body[data-patient-theme='black'] input::placeholder, body[data-patient-theme='black'] textarea::placeholder { color: #8f99a8 !important; }
+    body[data-patient-theme='black'] .bg-pink-100 { background: #4b243b !important; color: #ffd4e7 !important; }
+    body[data-patient-theme='black'] .text-pink-700 { color: #ffd4e7 !important; }
+    body[data-patient-theme='black'] footer { background: #0b0d10; }
+    body[data-patient-theme='black'] nav #user-display-name, body[data-patient-theme='black'] nav #logout-btn { color: #d4b76a !important; }
+    body[data-patient-theme='black'] nav [data-theme-toggle], body[data-patient-theme='black'] nav a[href='/paciente.html'] { color: #d4b76a !important; }
+    body[data-patient-theme='black'] #calendar-grid > div { background: #292e38 !important; border-color: rgba(255,255,255,.12) !important; color: #f8fafc !important; }
+    body[data-patient-theme='black'] #calendar-grid > div button { color: #f8fafc !important; }
+    body[data-patient-theme='black'] #day-modal > div { background: #20242c !important; color: #f8fafc !important; border-color: rgba(255,255,255,.12); }
+    body[data-patient-theme='black'] #day-modal .text-gray-700 { color: #d5dae2 !important; }
   </style>
 </head>
 
@@ -35,14 +51,13 @@
   <nav class="bg-white/80 backdrop-blur-md border-b border-white/40 fixed w-full top-0 z-50 py-3 shadow-sm">
     <div class="container mx-auto px-4 flex justify-between items-center">
       <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
-        <img src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
+        <img data-patient-logo src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
       </a>
       <div class="flex items-center gap-3">
-        <span id="user-display-name" class="text-sm font-semibold text-dark hidden md:inline">Paciente</span>
-        <button id="change-pass-nav-btn" class="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all hidden">
-          Alterar Senha
-        </button>
-        <button id="logout-btn" class="bg-dark/10 hover:bg-dark hover:text-white text-dark px-4 py-2 rounded-xl text-sm font-medium transition-all">
+        <span id="user-display-name" class="text-sm font-semibold text-primary hidden md:inline">Paciente</span>
+        <a href="/paciente.html" class="bg-primary/10 hover:bg-primary hover:text-white text-primary px-3.5 py-2 rounded-full text-xs font-semibold transition-all">Menu principal</a>
+        <button data-theme-toggle type="button" class="bg-primary/10 hover:bg-primary hover:text-white text-primary w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema"></button>
+        <button id="logout-btn" class="bg-primary/10 hover:bg-primary hover:text-white text-primary px-3.5 py-2 rounded-full text-xs font-semibold transition-all">
           Sair
         </button>
       </div>
@@ -52,17 +67,6 @@
   <!-- Calendario Container -->
   <div class="flex-grow pt-24 pb-12 px-4">
     <div class="container mx-auto max-w-5xl">
-      <!-- Alerta de primeiro acesso -->
-      <div id="first-access-alert" class="hidden mb-6 bg-red-100 border border-red-300 text-red-800 px-6 py-4 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-pulse">
-        <div>
-          <h4 class="font-bold text-sm">🔒 Atenção: Altere sua senha provisória!</h4>
-          <p class="text-xs text-red-700 mt-0.5">Por motivos de segurança, você deve definir uma senha pessoal no seu primeiro acesso.</p>
-        </div>
-        <button id="first-access-change-btn" class="bg-red-800 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-red-900 transition-all shrink-0">
-          Alterar Senha Agora
-        </button>
-      </div>
-
       <!-- Back button for Admin viewing mode -->
       <div id="admin-view-alert" class="hidden mb-4 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-2xl flex justify-between items-center">
         <span class="font-medium text-sm">Visualizando como Nutricionista (Modo Leitura / Edição)</span>
@@ -210,6 +214,7 @@
         </div>
 
       </div>
+
     </div>
   </div>
 
@@ -264,40 +269,19 @@
     </div>
   </div>
 
-  <!-- Modal Alterar Senha Paciente -->
-  <div id="password-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
-      <h3 class="text-xl font-bold text-dark mb-2">Alterar Minha Senha</h3>
-      <p class="text-xs text-gray-500 mb-5">Escolha uma nova senha para acessar o portal do paciente.</p>
-
-      <form id="password-form" class="space-y-4">
-        <div>
-          <label for="new-pass-input" class="block text-sm font-semibold text-dark mb-1">Nova Senha</label>
-          <input type="password" id="new-pass-input" required minlength="4" placeholder="Mínimo 4 caracteres" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
-        </div>
-
-        <div>
-          <label for="confirm-pass-input" class="block text-sm font-semibold text-dark mb-1">Confirmar Nova Senha</label>
-          <input type="password" id="confirm-pass-input" required minlength="4" placeholder="Repita a nova senha" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
-        </div>
-
-        <div class="flex gap-2 pt-4">
-          <button type="button" id="pass-modal-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">Cancelar</button>
-          <button type="submit" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Atualizar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <script type="module">
-    import { db } from '/assets/js/db.js';
+    import { db, applyPatientTheme, togglePatientTheme } from '/assets/js/db.js';
+    (async () => {
 
     // Estado da página
+    applyPatientTheme();
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => button.addEventListener('click', togglePatientTheme));
     let targetEmail = '';
     let isAdminViewing = false;
     let selectedYear = new Date().getFullYear();
     let selectedMonth = new Date().getMonth();
     let currentDaysData = {}; // Guarda estado dos dias selecionados no calendário atual
+    let currentDayObservations = {};
     let activeDayForModal = null;
 
     // Elementos do DOM
@@ -329,16 +313,6 @@
     const adminViewAlert = document.getElementById('admin-view-alert');
     const backToAdminBtn = document.getElementById('back-to-admin-btn');
 
-    // Elementos de Troca de Senha
-    const firstAccessAlert = document.getElementById('first-access-alert');
-    const firstAccessChangeBtn = document.getElementById('first-access-change-btn');
-    const changePassNavBtn = document.getElementById('change-pass-nav-btn');
-    const passwordModal = document.getElementById('password-modal');
-    const passwordForm = document.getElementById('password-form');
-    const passModalCancelBtn = document.getElementById('pass-modal-cancel-btn');
-    const newPassInput = document.getElementById('new-pass-input');
-    const confirmPassInput = document.getElementById('confirm-pass-input');
-
     // Mapeamento de nomes de meses em PT-BR
     const monthNames = [
       'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
@@ -346,64 +320,10 @@
     ];
 
     // Verificar login
-    const session = db.getCurrentSession();
+    const session = await db.ready();
     if (!session) {
       window.location.href = '/login.html';
     }
-
-    // Gerenciar primeiro acesso e troca de senha do paciente
-    if (session.role === 'patient') {
-      changePassNavBtn.classList.remove('hidden'); // Pacientes podem mudar senha na nav
-      
-      if (session.isFirstAccess) {
-        firstAccessAlert.classList.remove('hidden');
-      }
-    }
-
-    // Abrir modal de senha
-    function openPasswordModal() {
-      passwordModal.classList.remove('hidden');
-      setTimeout(() => {
-        passwordModal.classList.add('opacity-100');
-        passwordModal.querySelector('.transform').classList.remove('scale-95');
-        passwordModal.querySelector('.transform').classList.add('scale-100');
-      }, 10);
-    }
-
-    // Fechar modal de senha
-    function closePasswordModal() {
-      passwordModal.classList.remove('opacity-100');
-      passwordModal.querySelector('.transform').classList.remove('scale-100');
-      passwordModal.querySelector('.transform').classList.add('scale-95');
-      setTimeout(() => {
-        passwordModal.classList.add('hidden');
-      }, 300);
-      passwordForm.reset();
-    }
-
-    if (changePassNavBtn) changePassNavBtn.addEventListener('click', openPasswordModal);
-    if (firstAccessChangeBtn) firstAccessChangeBtn.addEventListener('click', openPasswordModal);
-    if (passModalCancelBtn) passModalCancelBtn.addEventListener('click', closePasswordModal);
-
-    passwordForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nPass = newPassInput.value;
-      const cPass = confirmPassInput.value;
-
-      if (nPass !== cPass) {
-        alert('As senhas não coincidem!');
-        return;
-      }
-
-      const res = db.changePassword(session.email, nPass);
-      if (res.success) {
-        alert('Senha atualizada com sucesso!');
-        firstAccessAlert.classList.add('hidden'); // Oculta aviso de primeiro acesso caso estivesse visível
-        closePasswordModal();
-      } else {
-        alert(res.message);
-      }
-    });
 
     // Configurar o público/alvo do calendário
     const urlParams = new URLSearchParams(window.location.search);
@@ -429,20 +349,21 @@
     selectMonth.value = selectedMonth;
     selectYear.value = selectedYear;
 
-    function handleFilterChange() {
+    async function handleFilterChange() {
       selectedMonth = parseInt(selectMonth.value);
       selectedYear = parseInt(selectYear.value);
       titleHeader.innerText = monthNames[selectedMonth];
-      loadCalendarData();
+      await loadCalendarData();
     }
 
     selectMonth.addEventListener('change', handleFilterChange);
     selectYear.addEventListener('change', handleFilterChange);
 
     // Carregar dados
-    function loadCalendarData() {
-      const data = db.getCalendarData(targetEmail, selectedYear, selectedMonth);
+    async function loadCalendarData() {
+      const data = await db.getCalendarData(targetEmail, selectedYear, selectedMonth);
       currentDaysData = data.days || {};
+      currentDayObservations = data.dayObservations || {};
       monthlyNotes.value = data.notes || '';
       renderCalendar();
       updateStats();
@@ -460,7 +381,7 @@
       
       for (let day = 1; day <= totalDays; day++) {
         const dayData = currentDaysData[day] || { A: false, T: false, H: false };
-        const observation = db.getDayObservation(targetEmail, selectedYear, selectedMonth, day);
+        const observation = currentDayObservations[day] || '';
         
         const row = document.createElement('tr');
         row.className = 'border-b border-gray-100 hover:bg-gray-50/50 transition-colors';
@@ -561,7 +482,7 @@
         }
 
         // Ícone de Observação
-        const observation = db.getDayObservation(targetEmail, selectedYear, selectedMonth, day);
+        const observation = currentDayObservations[day] || '';
         if (observation && observation.trim() !== '') {
           const obsBadge = document.createElement('span');
           obsBadge.className = 'w-5 h-5 rounded-md bg-amber-500 text-white font-bold flex items-center justify-center shadow-sm';
@@ -595,7 +516,7 @@
       modalCheckH.checked = dayData.H;
       
       // Carregar observação do dia
-      const observation = db.getDayObservation(targetEmail, selectedYear, selectedMonth, day);
+      const observation = currentDayObservations[day] || '';
       modalObservations.value = observation;
 
       dayModal.classList.remove('hidden');
@@ -618,7 +539,7 @@
 
     modalCancelBtn.addEventListener('click', closeDayModal);
 
-    modalConfirmBtn.addEventListener('click', () => {
+    modalConfirmBtn.addEventListener('click', async () => {
       if (activeDayForModal !== null) {
         currentDaysData[activeDayForModal] = {
           A: modalCheckA.checked,
@@ -626,8 +547,8 @@
           H: modalCheckH.checked
         };
         
-        // Salvar observação do dia
-        db.saveDayObservation(targetEmail, selectedYear, selectedMonth, activeDayForModal, modalObservations.value);
+        // Atualizar observação do dia no estado do mês; o botão Salvar persistirá tudo
+        currentDayObservations[activeDayForModal] = modalObservations.value;
         
         renderCalendar();
         updateStats();
@@ -656,8 +577,9 @@
     }
 
     // Salvar
-    saveCalendarBtn.addEventListener('click', () => {
-      db.saveCalendarData(targetEmail, selectedYear, selectedMonth, currentDaysData, monthlyNotes.value);
+    saveCalendarBtn.addEventListener('click', async () => {
+      const result = await db.saveCalendarData(targetEmail, selectedYear, selectedMonth, currentDaysData, monthlyNotes.value, currentDayObservations);
+      if (!result?.success) { alert(result?.message || 'Não foi possível salvar as informações.'); return; }
       if (isAdminViewing) {
         renderAdminSummary();
       }
@@ -672,14 +594,15 @@
     }
 
     // Sair
-    logoutBtn.addEventListener('click', () => {
-      db.logout();
+    logoutBtn.addEventListener('click', async () => {
+      await db.logout();
       window.location.href = '/login.html';
     });
 
     // Executar carga inicial do Calendário
     titleHeader.innerText = monthNames[selectedMonth];
-    loadCalendarData();
+    await loadCalendarData();
+    })();
   </script>
 </body>
 

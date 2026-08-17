@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redefinir senha - Portal Jessica Melo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="/assets/images/favicon-16x16.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#a88b36',dark:'#3d3226'}}}};</script>
+  <style>body{font-family:Poppins,sans-serif}</style>
+</head>
+<body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col justify-between">
+  <nav class="bg-white/60 backdrop-blur-md border-b border-white/40 fixed w-full top-0 z-50 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <a href="/index.html"><img src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista"></a>
+      <a href="/login.html" class="text-dark font-medium text-sm hover:text-primary transition-colors">Voltar ao login</a>
+    </div>
+  </nav>
+  <main class="flex-grow flex items-center justify-center pt-24 pb-12 px-4">
+    <section class="bg-white/80 backdrop-blur-lg rounded-3xl p-8 sm:p-10 shadow-lg border border-white/50 w-full max-w-md">
+      <div class="text-center mb-7">
+        <img src="/assets/images/Jessica-site2.jpg" alt="Jessica Melo" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-white shadow-md mb-3" />
+        <h1 class="text-2xl font-bold text-dark">Criar nova senha</h1>
+        <p class="text-gray-500 text-sm mt-1">Defina uma nova senha para acessar seu portal.</p>
+      </div>
+      <div id="reset-alert" class="hidden mb-4 p-4 rounded-xl text-sm font-medium"></div>
+      <form id="reset-form" class="space-y-5">
+        <div>
+          <label for="new-password" class="block text-sm font-semibold text-dark mb-1">Nova senha</label>
+          <input id="new-password" type="password" minlength="8" required placeholder="Mínimo de 8 caracteres" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/70" />
+        </div>
+        <div>
+          <label for="confirm-password" class="block text-sm font-semibold text-dark mb-1">Confirme a nova senha</label>
+          <input id="confirm-password" type="password" minlength="8" required placeholder="Digite novamente" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/70" />
+        </div>
+        <button id="reset-submit" type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-dark transition-all shadow-md">Salvar nova senha</button>
+      </form>
+    </section>
+  </main>
+  <footer class="bg-dark text-white py-6 px-4 text-center text-xs border-t border-white/10"><p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p></footer>
+  <script>
+    const token = new URLSearchParams(window.location.search).get('token');
+    const form = document.getElementById('reset-form');
+    const alertBox = document.getElementById('reset-alert');
+    const submit = document.getElementById('reset-submit');
+    function show(message, ok=false) { alertBox.className = `mb-4 p-4 rounded-xl text-sm font-medium ${ok ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`; alertBox.textContent = message; }
+    if (!token) { form.classList.add('hidden'); show('O link de recuperação está incompleto. Solicite um novo e-mail.'); }
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const password = document.getElementById('new-password').value;
+      const confirmation = document.getElementById('confirm-password').value;
+      if (password.length < 8) return show('A nova senha precisa ter pelo menos 8 caracteres.');
+      if (password !== confirmation) return show('As senhas não coincidem.');
+      submit.disabled = true; submit.textContent = 'Salvando...';
+      try {
+        const response = await fetch('/api/password-recovery', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'reset', token, password }) });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || 'Não foi possível redefinir a senha.');
+        form.classList.add('hidden'); show('Senha redefinida com sucesso. Você já pode entrar no portal.', true);
+        setTimeout(() => { window.location.href = '/login.html'; }, 1800);
+      } catch (error) { show(error.message); submit.disabled = false; submit.textContent = 'Salvar nova senha'; }
+    });
+  </script>
+</body>
+</html>
