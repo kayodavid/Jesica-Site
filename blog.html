@@ -118,9 +118,19 @@
     <!-- Decorative background element -->
     <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl"></div>
 
-    <div class="container mx-auto text-center text-white relative z-10 animate-fade-in-up">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">Blog</h1>
+    <div class="container mx-auto w-full flex justify-center text-center text-white relative z-10 animate-fade-in-up">
+      <h1 class="mx-auto w-full text-center text-4xl sm:text-5xl md:text-6xl font-bold mb-4">Blog</h1>
 
+    </div>
+  </section>
+
+  <!-- Índice de artigos: logo abaixo do título do Blog -->
+  <section class="py-8 sm:py-10 px-4 bg-light relative">
+    <div class="container mx-auto max-w-4xl relative z-10">
+      <nav id="blog-index" class="bg-white/80 backdrop-blur-sm rounded-3xl border border-primary/10 shadow-sm p-5 sm:p-7" aria-label="Índice de artigos">
+        <div class="flex items-center justify-between gap-4 mb-4"><div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Navegação rápida</p><h2 class="text-xl sm:text-2xl font-bold text-dark">Encontre um artigo</h2></div><span class="text-primary text-2xl" aria-hidden="true">☰</span></div>
+        <div id="blog-index-list" class="grid sm:grid-cols-2 gap-2"></div>
+      </nav>
     </div>
   </section>
 
@@ -134,12 +144,6 @@
         <div class="flex items-center gap-3 mb-10"><span class="h-px flex-1 bg-primary/20"></span><h2 class="text-2xl sm:text-3xl font-bold text-dark">Novos artigos</h2><span class="h-px flex-1 bg-primary/20"></span></div>
         <div id="managed-blog-list" class="space-y-12"></div>
       </section>
-
-      <!-- Índice de artigos: acesso direto aos textos -->
-      <nav id="blog-index" class="bg-white/80 backdrop-blur-sm rounded-3xl border border-primary/10 shadow-sm p-5 sm:p-7 mb-12" aria-label="Índice de artigos">
-        <div class="flex items-center justify-between gap-4 mb-4"><div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Navegação rápida</p><h2 class="text-xl sm:text-2xl font-bold text-dark">Encontre um artigo</h2></div><span class="text-primary text-2xl" aria-hidden="true">☰</span></div>
-        <div id="blog-index-list" class="grid sm:grid-cols-2 gap-2"></div>
-      </nav>
 
       <!-- RASCUNHO - Artigo: Densidade Energética (apenas local, não publicado) -->
       <article
