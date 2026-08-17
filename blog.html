@@ -129,6 +129,12 @@
     <!-- Decorative element -->
     <div class="absolute top-20 left-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
     <div class="container mx-auto max-w-4xl relative z-10">
+      <!-- Blogs publicados pelo administrador: aparecem antes dos artigos antigos -->
+      <section id="managed-blog-section" class="mb-16 sm:mb-24 hidden">
+        <div class="flex items-center gap-3 mb-10"><span class="h-px flex-1 bg-primary/20"></span><h2 class="text-2xl sm:text-3xl font-bold text-dark">Novos artigos</h2><span class="h-px flex-1 bg-primary/20"></span></div>
+        <div id="managed-blog-list" class="space-y-12"></div>
+      </section>
+
       <!-- RASCUNHO - Artigo: Densidade Energética (apenas local, não publicado) -->
       <article
         class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden relative group opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards] mb-12">
@@ -318,14 +324,6 @@
           </div>
         </div>
       </article>
-    </div>
-  </section>
-
-  <!-- Blogs publicados pelo administrador -->
-  <section id="managed-blog-section" class="py-16 sm:py-24 md:py-28 px-4 bg-light relative hidden">
-    <div class="container mx-auto max-w-4xl relative z-10">
-      <div class="flex items-center gap-3 mb-10"><span class="h-px flex-1 bg-primary/20"></span><h2 class="text-2xl sm:text-3xl font-bold text-dark">Novos artigos</h2><span class="h-px flex-1 bg-primary/20"></span></div>
-      <div id="managed-blog-list" class="space-y-12"></div>
     </div>
   </section>
 
