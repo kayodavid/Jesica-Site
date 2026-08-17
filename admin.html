@@ -62,8 +62,19 @@
         </button>
       </header>
 
+      <!-- Menu principal administrativo -->
+      <section aria-label="Funções administrativas" class="mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+          <button type="button" class="admin-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-2 border-primary shadow-md transition-all hover:-translate-y-1 hover:shadow-lg" data-admin-target="patients-section" aria-pressed="true"><span class="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center mb-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2m7-8a4 4 0 100-8 4 4 0 000 8m7-4a3 3 0 110 6m4 6v-2a4 4 0 00-3-3.87"/></svg></span><span class="block text-sm font-bold text-dark">Lista de pacientes</span><span class="block text-xs text-gray-500 mt-1">Cadastros e acessos</span></button>
+          <button type="button" class="admin-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-2 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg" data-admin-target="videos-section" aria-pressed="false"><span class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M15 10l4.55-2.28A1 1 0 0121 8.62v6.76a1 1 0 01-1.45.9L15 14M5 19h8a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span><span class="block text-sm font-bold text-dark">Vídeos educativos</span><span class="block text-xs text-gray-500 mt-1">Conteúdos para pacientes</span></button>
+          <button type="button" class="admin-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-2 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg" data-admin-target="ebooks-section" aria-pressed="false"><span class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2zM8 6h8m-8 4h8"/></svg></span><span class="block text-sm font-bold text-dark">eBooks</span><span class="block text-xs text-gray-500 mt-1">Materiais educativos</span></button>
+          <button type="button" class="admin-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-2 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg" data-admin-target="blogs-section" aria-pressed="false"><span class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M4 5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm4 3h8M8 12h8m-8 4h5"/></svg></span><span class="block text-sm font-bold text-dark">Publicação de blogs</span><span class="block text-xs text-gray-500 mt-1">Artigos do site público</span></button>
+          <button type="button" class="admin-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-2 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg" data-admin-target="patients-section" data-calendar-module="true" aria-pressed="false"><span class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2" stroke-width="1.8"/><path stroke="currentColor" stroke-width="1.8" d="M8 2v4m8-4v4M3 9h18m-9 4v4m-2-2h4"/></svg></span><span class="block text-sm font-bold text-dark">Calendário de automonitoramento</span><span class="block text-xs text-gray-500 mt-1">Acompanhamento semanal</span></button>
+        </div>
+      </section>
+
       <!-- Grade de Pacientes -->
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+      <div id="patients-section" class="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
         <h2 class="text-lg font-bold text-dark mb-6">Lista de Pacientes Ativos</h2>
         
         <div class="overflow-x-auto">
@@ -87,7 +98,7 @@
         </div>
       </div>
 
-      <section class="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+      <section id="videos-section" class="admin-module-section hidden mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Conteúdos</p>
@@ -107,7 +118,7 @@
         <p id="no-videos" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum vídeo cadastrado.</p>
       </section>
 
-      <section class="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+      <section id="ebooks-section" class="admin-module-section hidden mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Conteúdos</p><h2 class="text-xl font-bold text-dark">eBooks educativos</h2><p class="text-sm text-gray-500 mt-1">Disponibilize materiais em PDF ou outros arquivos hospedados no Google Drive.</p></div>
           <span class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-semibold">Google Drive</span>
@@ -123,7 +134,7 @@
         <p id="no-ebooks" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum eBook cadastrado.</p>
       </section>
 
-      <section class="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
+      <section id="blogs-section" class="admin-module-section hidden mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Publicação</p><h2 class="text-xl font-bold text-dark">Editor de blogs</h2><p class="text-sm text-gray-500 mt-1">Crie artigos com título, parágrafos e imagens entre os textos. O visual público seguirá o padrão atual do Blog.</p></div>
           <span class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-semibold">Blog público</span>
@@ -229,6 +240,23 @@
     const addPatientModal = document.getElementById('add-patient-modal');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const addPatientForm = document.getElementById('add-patient-form');
+
+    // Navegação do menu administrativo
+    const adminCards = [...document.querySelectorAll('.admin-module-card')];
+    const adminSections = [...document.querySelectorAll('.admin-module-section')];
+    function showAdminModule(targetId, card) {
+      adminSections.forEach(section => section.classList.toggle('hidden', section.id !== targetId));
+      adminCards.forEach(item => {
+        const active = item === card;
+        item.setAttribute('aria-pressed', String(active));
+        item.classList.toggle('border-primary', active);
+        item.classList.toggle('shadow-md', active);
+        item.classList.toggle('border-transparent', !active);
+        item.classList.toggle('shadow-sm', !active);
+      });
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    adminCards.forEach(card => card.addEventListener('click', () => showAdminModule(card.dataset.adminTarget, card)));
 
     // Elementos do Reset de Senha
     const resetPasswordModal = document.getElementById('reset-password-modal');
