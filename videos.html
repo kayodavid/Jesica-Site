@@ -10,20 +10,23 @@
   <script>tailwind.config={theme:{extend:{colors:{primary:'#f47a3c',orange:'#ff8b47',dark:'#17181d',panel:'#22242b',muted:'#a9abb3'}}}};</script>
   <style>
     body { font-family: 'Poppins', sans-serif; transition: background .2s, color .2s; letter-spacing: -.01em; }
-    header { backdrop-filter: blur(14px); }
-    .patient-shell { max-width: 1480px; margin: 0 auto; }
-    .section-nav-card { background:rgba(255,255,255,.035); }
-    .section-nav-card:hover { background:rgba(255,255,255,.08); transform:translateX(2px); }
-    .section-nav-card.active { background:linear-gradient(135deg, rgba(244,122,60,.27), rgba(244,122,60,.10)); }
-    .library-heading { border-bottom:1px solid rgba(255,255,255,.08); padding-bottom:1.25rem; }
-    .video-card { box-shadow:0 12px 28px rgba(0,0,0,.18); border-radius:1rem; }
-    .video-card .video-copy { background:rgba(34,36,43,.94); }
-    .video-card:hover { transform:translateY(-4px); box-shadow:0 18px 34px rgba(0,0,0,.28); }
-    body[data-patient-theme='traditional'] .section-nav-card { background:#fff; border-color:rgba(61,50,38,.12); }
-    body[data-patient-theme='traditional'] .section-nav-card:hover { background:#fffaf2; }
-    body[data-patient-theme='traditional'] .section-nav-card.active { background:linear-gradient(135deg,#f8ead8,#fffaf2); box-shadow:inset 3px 0 #d98045; }
-    body[data-patient-theme='traditional'] .library-heading { border-color:rgba(61,50,38,.12); }
+    header { backdrop-filter: blur(18px); height:76px; }
+    .patient-shell { max-width: 1540px; margin: 0 auto; }
+    .patient-sidebar { padding:1.25rem; }
+    .library-frame { border-radius:1.75rem; overflow:hidden; margin:1.25rem; box-shadow:0 22px 60px rgba(0,0,0,.20); }
+    .library-hero { position:relative; overflow:hidden; border-radius:1.5rem; padding:1.6rem 1.8rem; background:linear-gradient(115deg,#e7793e 0%,#a9483b 58%,#343044 100%); box-shadow:0 14px 34px rgba(0,0,0,.18); }
+    .library-hero:after { content:''; position:absolute; width:260px; height:260px; right:-70px; top:-110px; border:1px solid rgba(255,255,255,.25); border-radius:50%; box-shadow:0 0 0 28px rgba(255,255,255,.05),0 0 0 56px rgba(255,255,255,.035); }
+    .library-hero > * { position:relative; z-index:1; }
+    .section-nav-card { background:rgba(255,255,255,.055); border-radius:1rem; }
+    .section-nav-card:hover { background:rgba(255,255,255,.12); transform:translateX(3px); }
+    .section-nav-card.active { background:linear-gradient(135deg,#f0a046,#bd5a3b); box-shadow:0 10px 24px rgba(244,122,60,.22); }
+    .video-card { box-shadow:0 14px 30px rgba(0,0,0,.20); border-radius:1.25rem; border-color:rgba(255,255,255,.09)!important; }
+    .video-card .video-copy { background:rgba(34,36,43,.98); }
+    .video-card:hover { transform:translateY(-5px); box-shadow:0 20px 38px rgba(0,0,0,.30); }
+    body[data-patient-theme='traditional'] .library-frame { box-shadow:0 18px 45px rgba(100,73,42,.13); }
+    body[data-patient-theme='traditional'] .library-hero { background:linear-gradient(115deg,#d8864b,#a65c4b 58%,#77634d); }
     body[data-patient-theme='traditional'] .video-card .video-copy { background:#fff; }
+    body[data-patient-theme='traditional'] .video-card { border-color:rgba(61,50,38,.13)!important; }
     body[data-patient-theme='traditional'] { background:#faf8f3; color:#3d3226; }
     body[data-patient-theme='traditional'] header { background:rgba(255,255,255,.94); border-color:rgba(61,50,38,.12); }
     body[data-patient-theme='traditional'] main { background:#faf8f3; color:#3d3226; }
@@ -43,13 +46,13 @@
     <div class="flex items-center gap-4 sm:gap-5"><button id="mobile-sidebar-btn" class="lg:hidden text-white text-2xl" aria-label="Abrir seções">☰</button><a href="/paciente.html" class="block"><img data-patient-logo src="/assets/images/Logomarca_nobg_branco.png" class="w-32 sm:w-40 h-auto max-h-10 object-contain" alt="Jessica Melo Nutricionista"></a><span class="hidden sm:inline text-xs text-muted border-l border-white/10 pl-5">Vídeos educativos</span></div>
     <div class="flex items-center gap-2 sm:gap-4"><a href="/paciente.html" class="bg-white/10 hover:bg-orange hover:text-dark px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all">Menu principal</a><button data-theme-toggle type="button" class="bg-white/10 hover:bg-orange hover:text-dark w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema"></button><button id="logout-btn" class="bg-white/10 hover:bg-white/20 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all">Sair</button></div>
   </header>
-  <div class="flex min-h-[calc(100vh-4rem)] patient-shell">
-    <aside id="sidebar" class="fixed lg:sticky top-16 left-0 z-30 w-72 h-[calc(100vh-4rem)] bg-[#202126] border-r border-white/5 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto scrollbar">
-      <div class="p-4 sm:p-5"><p class="text-[11px] font-bold text-muted uppercase tracking-[0.22em] mb-5">Seções</p><nav id="theme-nav" class="space-y-2"></nav></div>
+  <div class="flex min-h-[calc(100vh-4.75rem)] patient-shell library-frame">
+    <aside id="sidebar" class="fixed lg:sticky top-[76px] left-0 z-30 w-72 h-[calc(100vh-4.75rem)] bg-[#202126] border-r border-white/5 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto scrollbar">
+      <div class="patient-sidebar"><p class="text-[11px] font-bold text-muted uppercase tracking-[0.22em] mb-2">Minha biblioteca</p><p class="text-xs text-muted mb-5">Escolha um tema para começar</p><nav id="theme-nav" class="space-y-2"></nav></div>
     </aside>
     <main class="flex-1 min-w-0 bg-[#17181d]">
       <div class="px-4 sm:px-8 lg:px-10 py-6 sm:py-9 max-w-[1480px] mx-auto">
-        <div class="library-heading flex items-end justify-between gap-4 mb-6"><div><p class="text-xs uppercase tracking-[0.2em] text-orange font-bold mb-2">Biblioteca de saúde</p><h1 id="section-title" class="text-2xl sm:text-3xl font-bold">Vídeos educativos</h1><p id="section-description" class="text-sm text-muted mt-2">Escolha uma seção para acessar os conteúdos preparados para você.</p></div><span id="video-count" class="shrink-0 rounded-full bg-white/5 px-3 py-1.5 text-xs text-muted"></span></div>
+        <div class="library-hero flex items-end justify-between gap-4 mb-7"><div><p class="text-[11px] uppercase tracking-[0.24em] text-white/75 font-bold mb-2">Área exclusiva do paciente</p><h1 id="section-title" class="text-2xl sm:text-3xl font-bold text-white">Vídeos educativos</h1><p id="section-description" class="text-sm text-white/80 mt-2">Escolha uma seção para acessar os conteúdos preparados para você.</p></div><span id="video-count" class="shrink-0 rounded-full bg-black/20 border border-white/20 px-3 py-1.5 text-xs text-white"></span></div>
         <div id="videos-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
         <div id="no-videos" class="hidden border border-white/10 bg-panel rounded-2xl p-10 text-center text-muted">Nenhum conteúdo publicado nesta seção.</div>
       </div>
