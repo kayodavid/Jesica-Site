@@ -39,6 +39,7 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
   document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
   document.getElementById('logout-btn').addEventListener('click', async () => { await db.logout(); window.location.href = '/login.html'; });
   document.getElementById('mobile-sidebar-btn').addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
+  document.getElementById('initial-menu-btn')?.addEventListener('click', renderLanding);
 
   function sectionCover(section) { return section.cover_image || groups[section.name]?.[0]?.thumbnailUrl || groups[section.name]?.[0]?.thumbnail_url || ''; }
   function renderLanding() {
@@ -46,7 +47,7 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
     landing.classList.remove('hidden'); libraryHero.classList.add('hidden'); grid.classList.add('hidden'); document.getElementById('no-videos').classList.add('hidden');
     sections.forEach(section => {
       const current = groups[section.name] || []; const cover = sectionCover(section); const card = document.createElement('article'); card.className = 'section-landing-card';
-      card.innerHTML = `<div class="section-landing-cover">${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : '<div class="w-full h-full flex items-center justify-center text-orange text-4xl">▦</div>'}</div><div class="section-landing-copy"><div class="min-w-0"><h2 class="font-bold text-base truncate">${escapeHtml(section.name)}</h2><p class="text-xs text-muted mt-1">Conteúdos educativos</p></div><span class="shrink-0 rounded-full bg-orange/15 text-orange px-2.5 py-1 text-[11px] font-bold">${current.length} ${current.length === 1 ? 'vídeo' : 'vídeos'}</span></div>`;
+      card.innerHTML = `<div class="section-landing-cover">${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : '<div class="w-full h-full flex items-center justify-center text-orange text-4xl">▦</div>'}</div><div class="section-landing-copy"><div class="min-w-0"><h2 class="font-bold text-[0.8rem] truncate">${escapeHtml(section.name)}</h2><p class="text-xs text-muted mt-1">Conteúdos educativos</p></div><span class="shrink-0 rounded-full bg-orange/15 text-orange px-2.5 py-1 text-[11px] font-bold">${current.length} ${current.length === 1 ? 'vídeo' : 'vídeos'}</span></div>`;
       card.addEventListener('click', () => render(section.name)); landing.appendChild(card);
     });
     nav.querySelectorAll('.section-nav-card').forEach(button => button.classList.remove('active'));

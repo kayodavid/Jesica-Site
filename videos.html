@@ -23,7 +23,7 @@
     .section-landing-copy { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.85rem 1rem; flex:1; }
     body[data-patient-theme='traditional'] .section-landing-card { background:#fff; border-color:rgba(61,50,38,.13); box-shadow:0 12px 28px rgba(100,73,42,.10); }
     body[data-patient-theme='traditional'] .section-landing-card:hover { border-color:#d98045; }
-    .library-hero { position:relative; overflow:hidden; border-radius:1.5rem; padding:0.8rem 1.2rem; min-height:94px; background:linear-gradient(115deg,#e7793e 0%,#a9483b 58%,#343044 100%); box-shadow:0 14px 34px rgba(0,0,0,.18); }
+    .library-hero { position:relative; overflow:hidden; border-radius:1.25rem; padding:0.45rem 1.2rem; min-height:62px; background:linear-gradient(115deg,#e7793e 0%,#a9483b 58%,#343044 100%); box-shadow:0 14px 34px rgba(0,0,0,.18); }
     .library-hero:after { content:''; position:absolute; width:260px; height:260px; right:-70px; top:-110px; border:1px solid rgba(255,255,255,.25); border-radius:50%; box-shadow:0 0 0 28px rgba(255,255,255,.05),0 0 0 56px rgba(255,255,255,.035); }
     .library-hero > * { position:relative; z-index:1; }
     .section-nav-card { background:rgba(255,255,255,.055); border-radius:1rem; }
@@ -57,12 +57,12 @@
   </header>
   <div class="flex min-h-[calc(100vh-4.75rem)] patient-shell library-frame">
     <aside id="sidebar" class="fixed lg:sticky top-[76px] left-0 z-30 w-72 h-[calc(100vh-4.75rem)] bg-[#202126] border-r border-white/5 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto scrollbar">
-      <div class="patient-sidebar"><p class="text-[11px] font-bold text-muted uppercase tracking-[0.22em] mb-2">Minha biblioteca</p><p class="text-xs text-muted mb-5">Escolha um tema para começar</p><nav id="theme-nav" class="space-y-2"></nav></div>
+      <div class="patient-sidebar"><p class="text-[11px] font-bold text-muted uppercase tracking-[0.22em] mb-2">Minha biblioteca</p><button id="initial-menu-btn" type="button" class="w-full mb-4 rounded-xl border border-orange/40 bg-orange/10 px-3 py-2 text-left text-xs font-bold text-orange hover:bg-orange hover:text-dark transition-all">Menu Inicial</button><p class="text-xs text-muted mb-5">Escolha um tema para começar</p><nav id="theme-nav" class="space-y-2"></nav></div>
     </aside>
     <main class="flex-1 min-w-0 bg-[#17181d]">
       <div class="px-4 sm:px-8 lg:px-10 py-6 sm:py-9 max-w-[1480px] mx-auto">
         <div id="section-landing" class="section-landing mb-7"></div>
-        <div id="library-hero" class="library-hero flex items-end justify-between gap-4 mb-7"><div><p class="text-[11px] uppercase tracking-[0.24em] text-white/75 font-bold mb-2">Área exclusiva do paciente</p><h1 id="section-title" class="text-2xl sm:text-3xl font-bold text-white">Vídeos educativos</h1><p id="section-description" class="text-sm text-white/80 mt-2">Escolha uma seção para acessar os conteúdos preparados para você.</p></div><span id="video-count" class="shrink-0 rounded-full bg-black/20 border border-white/20 px-3 py-1.5 text-xs text-white"></span></div>
+        <div id="library-hero" class="library-hero flex items-end justify-between gap-4 mb-7"><div><p class="text-[9px] uppercase tracking-[0.24em] text-white/75 font-bold mb-1">Área exclusiva do paciente</p><h1 id="section-title" class="text-xl sm:text-2xl font-bold text-white">Vídeos educativos</h1><p id="section-description" class="text-xs sm:text-sm text-white/80 mt-1">Escolha uma seção para acessar os conteúdos preparados para você.</p></div><span id="video-count" class="shrink-0 rounded-full bg-black/20 border border-white/20 px-3 py-1.5 text-xs text-white"></span></div>
         <div id="videos-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
         <div id="no-videos" class="hidden border border-white/10 bg-panel rounded-2xl p-10 text-center text-muted">Nenhum conteúdo publicado nesta seção.</div>
       </div>
