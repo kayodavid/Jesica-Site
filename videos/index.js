@@ -61,7 +61,7 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
     if (!section) { document.getElementById('no-videos').classList.remove('hidden'); return; }
     const current = groups[section.name] || [];
     title.textContent = section.name;
-    description.textContent = `${current.length} conteúdo${current.length === 1 ? '' : 's'} educativo${current.length === 1 ? '' : 's'} disponível${current.length === 1 ? '' : 's'} nesta seção.`;
+    description.textContent = current.length === 1 ? '1 conteúdo educativo disponível nesta seção.' : `${current.length} conteúdos educativos disponíveis nesta seção.`;
     count.textContent = `${current.length} vídeo${current.length === 1 ? '' : 's'}`;
     grid.innerHTML = '';
     document.getElementById('no-videos').classList.toggle('hidden', current.length > 0);
