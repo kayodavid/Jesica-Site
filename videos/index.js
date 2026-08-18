@@ -30,6 +30,8 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
   const title = document.getElementById('section-title');
   const description = document.getElementById('section-description');
   const count = document.getElementById('video-count');
+  const landing = document.getElementById('section-landing');
+  const libraryHero = document.getElementById('library-hero');
 
   const close = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); frame.src = ''; };
   document.getElementById('close-player').addEventListener('click', close);
@@ -39,7 +41,18 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
   document.getElementById('mobile-sidebar-btn').addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
 
   function sectionCover(section) { return section.cover_image || groups[section.name]?.[0]?.thumbnailUrl || groups[section.name]?.[0]?.thumbnail_url || ''; }
+  function renderLanding() {
+    landing.innerHTML = '';
+    landing.classList.remove('hidden'); libraryHero.classList.add('hidden'); grid.classList.add('hidden'); document.getElementById('no-videos').classList.add('hidden');
+    sections.forEach(section => {
+      const current = groups[section.name] || []; const cover = sectionCover(section); const card = document.createElement('article'); card.className = 'section-landing-card';
+      card.innerHTML = `<div class="section-landing-cover">${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : '<div class="w-full h-full flex items-center justify-center text-orange text-4xl">▦</div>'}</div><div class="section-landing-copy"><div class="min-w-0"><h2 class="font-bold text-base truncate">${escapeHtml(section.name)}</h2><p class="text-xs text-muted mt-1">Conteúdos educativos</p></div><span class="shrink-0 rounded-full bg-orange/15 text-orange px-2.5 py-1 text-[11px] font-bold">${current.length} ${current.length === 1 ? 'vídeo' : 'vídeos'}</span></div>`;
+      card.addEventListener('click', () => render(section.name)); landing.appendChild(card);
+    });
+    nav.querySelectorAll('.section-nav-card').forEach(button => button.classList.remove('active'));
+  }
   function render(name) {
+    landing.classList.add('hidden'); libraryHero.classList.remove('hidden'); grid.classList.remove('hidden');
     const section = sections.find(item => item.name === name) || sections[0];
     if (!section) { document.getElementById('no-videos').classList.remove('hidden'); return; }
     const current = groups[section.name] || [];
@@ -69,5 +82,5 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
   });
 
   count.textContent = `${videos.length} vídeo${videos.length === 1 ? '' : 's'}`;
-  if (sections.length) render(sections[0].name); else document.getElementById('no-videos').classList.remove('hidden');
+  if (sections.length) renderLanding(); else { landing.classList.remove('hidden'); landing.innerHTML = '<div class="col-span-full border border-white/10 bg-panel rounded-2xl p-10 text-center text-muted">Nenhum conteúdo publicado ainda.</div>'; libraryHero.classList.add('hidden'); }
 })();
