@@ -49,6 +49,21 @@
     body[data-patient-theme='black'] .admin-action-edit { background: rgba(168,139,54,.14) !important; color: #d4b76a !important; border-color: rgba(212,183,106,.32) !important; }
     body[data-patient-theme='black'] .admin-action-delete { background: rgba(245,230,200,.07) !important; color: #d8c99c !important; border-color: rgba(216,201,156,.24) !important; }
     body[data-patient-theme='black'] .admin-action-edit:hover, body[data-patient-theme='black'] .admin-action-delete:hover { background: #a88b36 !important; color: #fff !important; border-color: #d4b76a !important; }
+    .video-folder-shell { display:grid; grid-template-columns: minmax(190px, 230px) 1fr; gap: 1.25rem; }
+    .video-folder-nav { background: linear-gradient(180deg, rgba(245,230,200,.5), rgba(250,248,243,.7)); border:1px solid rgba(168,139,54,.18); border-radius:1.25rem; padding:.65rem; }
+    .video-folder-btn { display:flex; align-items:center; gap:.7rem; width:100%; text-align:left; padding:.7rem .75rem; border-radius:.9rem; color:#5d4a22; transition:all .18s ease; }
+    .video-folder-btn:hover { background:rgba(168,139,54,.1); transform:translateX(2px); }
+    .video-folder-btn.is-active { background:#a88b36; color:#fff; box-shadow:0 8px 18px rgba(168,139,54,.22); }
+    .video-folder-icon { width:2rem; height:1.55rem; border-radius:.38rem; background:currentColor; opacity:.2; position:relative; flex:none; }
+    .video-folder-icon:before { content:''; position:absolute; width:.8rem; height:.28rem; top:-.18rem; left:.2rem; border-radius:.2rem .2rem 0 0; background:currentColor; }
+    .video-folder-btn.is-active .video-folder-icon { opacity:.45; }
+    .compact-video-card { border:1px solid rgba(168,139,54,.16); border-radius:1rem; padding:.7rem; background:rgba(250,248,243,.68); transition:transform .18s ease, box-shadow .18s ease; }
+    .compact-video-card:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(61,50,38,.08); }
+    body[data-patient-theme='black'] .video-folder-nav { background:rgba(29,30,36,.92); border-color:rgba(212,183,106,.16); }
+    body[data-patient-theme='black'] .video-folder-btn { color:#d8c99c; }
+    body[data-patient-theme='black'] .video-folder-btn.is-active { color:#fff; }
+    body[data-patient-theme='black'] .compact-video-card { background:rgba(34,36,43,.92); border-color:rgba(212,183,106,.16); }
+    @media (max-width: 767px) { .video-folder-shell { grid-template-columns:1fr; } .video-folder-nav { display:flex; overflow-x:auto; gap:.35rem; padding:.5rem; } .video-folder-btn { min-width:150px; } }
   </style>
 </head>
 
@@ -132,10 +147,10 @@
         </div>
         <div class="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <div class="flex flex-col lg:flex-row lg:items-end gap-3">
-            <div class="flex-1"><label for="new-section-name" class="block text-sm font-semibold text-dark mb-1">Seções cadastradas</label><p class="text-xs text-gray-500 mb-2">Cadastre cada seção uma vez e use-a nos vídeos e eBooks.</p><input id="new-section-name" type="text" maxlength="60" placeholder="Ex.: Hematologia" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
-            <div class="flex items-center gap-2"><input id="new-section-cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" /><button type="button" id="choose-section-cover-btn" class="bg-white text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/10 transition-all">Escolher capa</button><button type="button" id="add-section-btn" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all">Salvar seção</button></div>
+            <div class="flex-1"><label for="new-section-name" class="block text-sm font-semibold text-dark mb-1">Nova pasta de conteúdo</label><p class="text-xs text-gray-500 mb-2">Cada Seção funciona como uma pasta para organizar vídeos e eBooks.</p><input id="new-section-name" type="text" maxlength="60" placeholder="Ex.: Hematologia" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+            <div class="flex items-center gap-2"><input id="new-section-cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" /><button type="button" id="choose-section-cover-btn" class="bg-white text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/10 transition-all">Escolher capa</button><button type="button" id="add-section-btn" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all">Criar pasta</button></div>
           </div>
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5"><div><p class="text-xs font-bold text-primary uppercase tracking-widest">Gerenciar seções</p><p class="text-xs text-gray-500 mt-1">Renomeie, troque a capa ou exclua uma seção sem apagar os conteúdos.</p></div><input id="section-search" type="search" placeholder="Buscar seção..." class="w-full sm:w-64 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5"><div><p class="text-xs font-bold text-primary uppercase tracking-widest">Pastas de conteúdo</p><p class="text-xs text-gray-500 mt-1">Escolha uma pasta para visualizar seus vídeos. Edite ou exclua sem apagar o conteúdo.</p></div><input id="section-search" type="search" placeholder="Buscar pasta..." class="w-full sm:w-64 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
           <div id="sections-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-3"></div>
         </div>
         <form id="add-video-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -145,8 +160,17 @@
           <div class="md:col-span-2"><label for="video-description" class="block text-sm font-semibold text-dark mb-1">Descrição (opcional)</label><textarea id="video-description" rows="2" placeholder="Explique brevemente o conteúdo para os pacientes." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"></textarea></div>
           <div class="md:col-span-2 flex justify-end"><button type="submit" class="bg-primary text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:bg-dark transition-all shadow-md">Adicionar vídeo</button></div>
         </form>
-        <div id="videos-list" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
-        <p id="no-videos" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum vídeo cadastrado.</p>
+        <div class="video-folder-shell">
+          <aside class="video-folder-nav" aria-label="Pastas de vídeos">
+            <div class="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-primary">Pastas</div>
+            <div id="video-folder-list" class="flex flex-col gap-1"></div>
+          </aside>
+          <div class="min-w-0">
+            <div class="flex items-center justify-between gap-3 mb-3"><div><p class="text-xs font-bold uppercase tracking-widest text-primary">Pasta selecionada</p><h3 id="selected-video-folder" class="text-lg font-bold text-dark">Todos os vídeos</h3></div><span id="video-count-label" class="text-xs font-semibold text-gray-500"></span></div>
+            <div id="videos-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            <p id="no-videos" class="hidden text-center py-8 text-gray-400 text-sm">Nenhum vídeo cadastrado nesta pasta.</p>
+          </div>
+        </div>
       </section>
 
       <section id="ebooks-section" class="admin-module-section hidden mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
@@ -327,6 +351,8 @@
     let videoCache = [];
     let sectionCache = [];
     let selectedSectionCover = '';
+    let selectedVideoFolder = '';
+
     function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '', id: '' } : { id: section.id || section.section_id || section.uuid || '', name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
     function renderSectionControls() {
       ['video-section', 'ebook-section', 'edit-video-theme'].forEach(id => {
@@ -339,17 +365,22 @@
       renderSectionsList();
     }
     function renderSectionsList() {
-      const list = document.getElementById('sections-list'); if (!list) return;
+      const list = document.getElementById('sections-list'); const folderList = document.getElementById('video-folder-list'); if (!list) return;
       const query = (document.getElementById('section-search')?.value || '').trim().toLocaleLowerCase();
-      list.innerHTML = '';
       const visible = sectionCache.filter(section => section.name.toLocaleLowerCase().includes(query));
-      if (!visible.length) { list.innerHTML = '<p class="md:col-span-2 xl:col-span-3 text-sm text-gray-500 py-4">Nenhuma seção encontrada.</p>'; return; }
+      list.innerHTML = '';
+      if (!visible.length) list.innerHTML = '<p class="md:col-span-2 xl:col-span-3 text-sm text-gray-500 py-4">Nenhuma pasta encontrada.</p>';
       visible.forEach(section => {
         const card = document.createElement('article'); card.className = 'rounded-2xl border border-gray-100 bg-white p-3 shadow-sm flex flex-col gap-3';
         const cover = section.cover_image ? `<img src="${section.cover_image}" alt="Capa da seção ${section.name}" class="w-full aspect-[16/7] rounded-xl object-cover bg-light" />` : '<div class="w-full aspect-[16/7] rounded-xl bg-light flex items-center justify-center text-primary text-3xl">▦</div>';
-        card.innerHTML = `${cover}<div class="flex items-center justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-dark truncate">${section.name}</h3><p class="text-xs text-gray-500 mt-1">Seção de vídeos e eBooks</p></div><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${section.name === 'Geral' ? 'Padrão' : 'Ativa'}</span></div><div class="flex gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-section-btn flex-1 admin-action-edit px-3 py-2 rounded-xl text-xs font-bold" data-id="${section.id || ''}">Editar</button><button type="button" class="delete-section-btn flex-1 admin-action-delete px-3 py-2 rounded-xl text-xs font-bold ${section.name === 'Geral' ? 'opacity-40 cursor-not-allowed' : ''}" data-id="${section.id || ''}" data-name="${section.name}" ${section.name === 'Geral' ? 'disabled' : ''}>Excluir</button></div>`;
+        card.innerHTML = `${cover}<div class="flex items-center justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-dark truncate">${section.name}</h3><p class="text-xs text-gray-500 mt-1">Pasta de vídeos e eBooks</p></div><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${section.name === 'Geral' ? 'Padrão' : 'Ativa'}</span></div><div class="flex gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-section-btn flex-1 admin-action-edit px-3 py-2 rounded-xl text-xs font-bold" data-id="${section.id || ''}">Editar</button><button type="button" class="delete-section-btn flex-1 admin-action-delete px-3 py-2 rounded-xl text-xs font-bold ${section.name === 'Geral' ? 'opacity-40 cursor-not-allowed' : ''}" data-id="${section.id || ''}" data-name="${section.name}" ${section.name === 'Geral' ? 'disabled' : ''}>Excluir</button></div>`;
         list.appendChild(card);
       });
+      if (folderList) {
+        folderList.innerHTML = `<button type="button" class="video-folder-btn ${selectedVideoFolder === '' ? 'is-active' : ''}" data-folder=""><span class="video-folder-icon"></span><span class="min-w-0 flex-1"><strong class="block text-sm">Todos os vídeos</strong><small class="opacity-70">Visão geral</small></span></button>`;
+        sectionCache.forEach(section => { folderList.insertAdjacentHTML('beforeend', `<button type="button" class="video-folder-btn ${selectedVideoFolder === section.name ? 'is-active' : ''}" data-folder="${section.name}"><span class="video-folder-icon"></span><span class="min-w-0 flex-1"><strong class="block text-sm truncate">${section.name}</strong><small class="opacity-70">Abrir pasta</small></span></button>`); });
+        folderList.querySelectorAll('.video-folder-btn').forEach(button => button.addEventListener('click', () => { selectedVideoFolder = button.dataset.folder || ''; renderSectionsList(); renderVideoCards(); }));
+      }
       list.querySelectorAll('.edit-section-btn').forEach(button => button.addEventListener('click', () => openEditSection(button.dataset.id)));
       list.querySelectorAll('.delete-section-btn').forEach(button => button.addEventListener('click', () => openDeleteSection(button.dataset.id, button.dataset.name)));
     }
@@ -446,36 +477,28 @@
       });
     }
 
-    async function renderVideos() {
-      const videos = await db.getVideos();
-      videoCache = videos;
+    function renderVideoCards() {
+      const filtered = selectedVideoFolder ? videoCache.filter(video => (video.theme || 'Geral') === selectedVideoFolder) : videoCache;
+      const title = document.getElementById('selected-video-folder'); const count = document.getElementById('video-count-label');
+      if (title) title.textContent = selectedVideoFolder || 'Todos os vídeos';
+      if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? 'vídeo' : 'vídeos'}`;
       videosList.innerHTML = '';
-      noVideos.classList.toggle('hidden', videos.length > 0);
-      videos.forEach(video => {
-        const item = document.createElement('div');
-        item.className = 'flex flex-col gap-4 border border-gray-100 rounded-2xl p-4 bg-light/40 h-full';
-        item.innerHTML = `<div class="aspect-video rounded-xl overflow-hidden bg-dark"><iframe class="w-full h-full" src="${video.embedUrl}" title="Prévia: ${video.title}" loading="lazy" allow="fullscreen"></iframe></div><div><div class="flex flex-wrap items-center gap-2"><strong class="text-base text-dark">${video.title}</strong><span class="admin-provider-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${video.provider}</span><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${video.theme || 'Geral'}</span></div><p class="text-sm text-gray-600 mt-2">${video.description || 'Sem descrição'}</p><p class="text-xs text-gray-400 mt-2 break-all">${video.url}</p></div><div class="flex justify-end gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-video-btn admin-action-edit hover:bg-primary hover:text-white px-3 py-2 rounded-xl text-xs font-bold" data-id="${video.id}">Editar</button><button class="delete-video-btn admin-action-delete hover:bg-red-50 px-3 py-2 rounded-xl text-xs font-bold" data-id="${video.id}">Excluir</button></div>`;
+      noVideos.classList.toggle('hidden', filtered.length > 0);
+      filtered.forEach(video => {
+        const item = document.createElement('div'); item.className = 'compact-video-card flex flex-col gap-2.5';
+        item.innerHTML = `<div class="aspect-video rounded-lg overflow-hidden bg-dark"><iframe class="w-full h-full" src="${video.embedUrl}" title="Prévia: ${video.title}" loading="lazy" allow="fullscreen"></iframe></div><div class="min-w-0"><strong class="block text-sm text-dark truncate" title="${video.title}">${video.title}</strong><div class="flex flex-wrap items-center gap-1.5 mt-1.5"><span class="admin-provider-tag text-[9px] uppercase font-bold px-1.5 py-0.5 rounded">${video.provider}</span><span class="admin-theme-tag text-[9px] uppercase font-bold px-1.5 py-0.5 rounded">${video.theme || 'Geral'}</span></div><p class="text-xs text-gray-600 mt-1.5 line-clamp-2">${video.description || 'Sem descrição'}</p></div><div class="flex justify-end gap-1.5 border-t border-gray-100 pt-2"><button type="button" class="edit-video-btn admin-action-edit px-2.5 py-1.5 rounded-lg text-[11px] font-bold" data-id="${video.id}">Editar</button><button class="delete-video-btn admin-action-delete px-2.5 py-1.5 rounded-lg text-[11px] font-bold" data-id="${video.id}">Excluir</button></div>`;
         videosList.appendChild(item);
       });
       document.querySelectorAll('.edit-video-btn').forEach(btn => btn.addEventListener('click', (e) => {
-        const video = videoCache.find(item => item.id === e.currentTarget.dataset.id);
-        if (!video) return;
-        document.getElementById('edit-video-id').value = video.id;
-        document.getElementById('edit-video-title').value = video.title;
-        document.getElementById('edit-video-theme').value = video.theme || 'Geral';
-        document.getElementById('edit-video-url').value = video.url;
-        document.getElementById('edit-video-description').value = video.description || '';
-        editVideoModal.style.display = 'flex';
-        requestAnimationFrame(() => editVideoModal.classList.add('opacity-100'));
+        const video = videoCache.find(item => item.id === e.currentTarget.dataset.id); if (!video) return;
+        document.getElementById('edit-video-id').value = video.id; document.getElementById('edit-video-title').value = video.title; document.getElementById('edit-video-theme').value = video.theme || 'Geral'; document.getElementById('edit-video-url').value = video.url; document.getElementById('edit-video-description').value = video.description || ''; editVideoModal.style.display = 'flex'; requestAnimationFrame(() => editVideoModal.classList.add('opacity-100'));
       }));
-
-      document.querySelectorAll('.delete-video-btn').forEach(btn => btn.addEventListener('click', async (e) => {
-        if (confirm('Excluir este vídeo da área dos pacientes?')) {
-          const result = await db.deleteVideo(e.currentTarget.dataset.id);
-          if (!result.success) alert(result.message || 'Não foi possível excluir o vídeo.');
-          await renderVideos();
-        }
-      }));
+      document.querySelectorAll('.delete-video-btn').forEach(btn => btn.addEventListener('click', async (e) => { if (confirm('Excluir este vídeo da área dos pacientes?')) { const result = await db.deleteVideo(e.currentTarget.dataset.id); if (!result.success) alert(result.message || 'Não foi possível excluir o vídeo.'); await renderVideos(); } }));
+    }
+    async function renderVideos() {
+      videoCache = await db.getVideos();
+      renderSectionsList();
+      renderVideoCards();
     }
 
     addVideoForm.addEventListener('submit', async (e) => {
