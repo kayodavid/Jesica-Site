@@ -55,6 +55,7 @@
     .scrollbar::-webkit-scrollbar { width:7px; height:7px; }
     .scrollbar::-webkit-scrollbar-thumb { background:#4b4d56; border-radius:999px; }
     .section-nav-card.active { background:linear-gradient(135deg, rgba(244,122,60,.27), rgba(244,122,60,.10)); box-shadow:inset 3px 0 #ff8b47; }
+    #player-frame { border:0; }
   </style>
   <script type="module" crossorigin src="/videos/index.js"></script>
   <link rel="modulepreload" crossorigin href="/db/f20655b6.js">
@@ -77,6 +78,6 @@
       </div>
     </main>
   </div>
-  <div id="player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 p-3 sm:p-6"><div class="w-full max-w-6xl bg-panel rounded-2xl overflow-hidden shadow-2xl"><div class="flex items-center justify-between px-5 py-4 border-b border-white/10"><div><p id="modal-theme" class="text-xs text-orange uppercase font-bold"></p><h2 id="modal-title" class="font-bold text-base sm:text-lg"></h2></div><button id="close-player" class="text-2xl text-muted hover:text-white" aria-label="Fechar">×</button></div><div class="aspect-video bg-black"><iframe id="player-frame" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div></div>
+  <div id="player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 p-3 sm:p-6"><div class="w-full max-w-6xl bg-panel rounded-2xl overflow-hidden shadow-2xl"><div class="flex items-center justify-between px-5 py-4 border-b border-white/10"><div><p id="modal-theme" class="text-xs text-orange uppercase font-bold"></p><h2 id="modal-title" class="font-bold text-base sm:text-lg"></h2></div><button id="close-player" class="text-2xl text-muted hover:text-white" aria-label="Fechar">×</button></div><div class="aspect-video bg-black"><iframe id="player-frame" class="w-full h-full" title="Conteúdo educativo" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div></div>
 </body>
 </html>
