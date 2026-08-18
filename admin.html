@@ -186,13 +186,15 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5"><div><p class="text-xs font-bold text-primary uppercase tracking-widest">Seções</p><p class="text-xs text-gray-500 mt-1">Escolha uma seção para editar ou excluir.</p></div><input id="ebook-section-search" type="search" placeholder="Buscar seção..." class="w-full sm:w-64 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
           <div id="ebook-sections-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-3"></div>
         </div>
-        <form id="add-ebook-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+        <form id="add-ebook-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div><label for="ebook-title" class="block text-sm font-semibold text-dark mb-1">Título</label><input type="text" id="ebook-title" required placeholder="Ex.: Guia de refeições" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
           <div><label for="ebook-section" class="block text-sm font-semibold text-dark mb-1">Seção</label><select id="ebook-section" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"><option value="">Selecione uma seção</option></select></div>
           <div class="md:col-span-2"><label for="ebook-url" class="block text-sm font-semibold text-dark mb-1">Link do Google Drive</label><input type="url" id="ebook-url" required placeholder="https://drive.google.com/file/d/.../view" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /><p class="text-xs text-gray-500 mt-2">Use o link de compartilhamento do arquivo, por exemplo: <span class="font-medium">drive.google.com/file/d/ID/view</span>. O arquivo precisa estar acessível aos pacientes.</p></div>
           <div class="md:col-span-2"><label for="ebook-description" class="block text-sm font-semibold text-dark mb-1">Descrição (opcional)</label><textarea id="ebook-description" rows="2" placeholder="Explique brevemente o material para os pacientes." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"></textarea></div>
           <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3"><p id="ebook-form-status" class="text-sm hidden" role="status" aria-live="polite"></p><button id="ebook-submit-btn" type="submit" class="bg-primary text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:bg-dark transition-all shadow-md">Adicionar eBook</button></div>
         </form>
+        </div>
         <div id="ebooks-list" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         <p id="no-ebooks" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum eBook cadastrado.</p>
       </section>
