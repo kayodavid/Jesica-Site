@@ -3,7 +3,7 @@ export const CUSTOM_CALCULATOR_PREFIX = 'custom_';
 
 const FUNCTION_NAMES = ['sqrt', 'pow', 'abs', 'round', 'floor', 'ceil', 'min', 'max', 'log', 'exp', 'sin', 'cos', 'tan'];
 const CONSTANT_NAMES = ['PI', 'E'];
-const SAFE_EXPRESSION = /^[0-9A-Za-z_+\-*/%^().,\s]+$/;
+const SAFE_EXPRESSION = /^[0-9A-Za-z_+\-*/%^().,;\s]+$/;
 
 function cleanText(value, maxLength = 180) { return String(value || '').trim().slice(0, maxLength); }
 
@@ -35,7 +35,7 @@ export function validateCustomDefinition(rawDefinition) {
   const formula = cleanText(definition.formula, 500).replace(/\s+/g, ' ');
   if (!formula) throw new Error('Informe a fórmula matemática.');
   if (!SAFE_EXPRESSION.test(formula)) throw new Error('A fórmula contém caracteres não permitidos. Use números, campos, parênteses e operadores matemáticos.');
-  const normalizedFormula = formula.replace(/\^/g, '**').replace(/,/g, '.');
+  const normalizedFormula = formula.replace(/\^/g, '**').replace(/,/g, '.').replace(/;/g, ',');
   const identifiersInFormula = normalizedFormula.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
   const allowedNames = new Set([...identifiers, ...FUNCTION_NAMES, ...CONSTANT_NAMES]);
   identifiersInFormula.forEach(name => { if (!allowedNames.has(name)) throw new Error(`O termo “${name}” não corresponde a um campo ou função permitida.`); });
@@ -55,7 +55,7 @@ export function evaluateCustomFormula(definition, values) {
   const argumentNames = valid.fields.map(field => field.id);
   const argumentsValues = argumentNames.map(name => Number(values[name]));
   if (argumentsValues.some(value => !Number.isFinite(value))) throw new Error('Preencha todos os campos com números válidos.');
-  const executable = valid.formula.replace(/\^/g, '**').replace(/,/g, '.').replace(/\b(sqrt|pow|abs|round|floor|ceil|min|max|log|exp|sin|cos|tan)\b/g, 'Math.$1').replace(/\b(PI|E)\b/g, 'Math.$1');
+  const executable = valid.formula.replace(/\^/g, '**').replace(/,/g, '.').replace(/;/g, ',').replace(/\b(sqrt|pow|abs|round|floor|ceil|min|max|log|exp|sin|cos|tan)\b/g, 'Math.$1').replace(/\b(PI|E)\b/g, 'Math.$1');
   const calculate = new Function(...argumentNames, `"use strict"; return (${executable});`);
   const result = Number(calculate(...argumentsValues));
   if (!Number.isFinite(result)) throw new Error('A fórmula não produziu um resultado numérico válido.');
