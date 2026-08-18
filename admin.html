@@ -150,7 +150,7 @@
             <div class="flex-1"><label for="new-section-name" class="block text-sm font-semibold text-dark mb-1">Inserir e editar seções</label><p class="text-xs text-gray-500 mb-2">Cada Seção funciona como uma pasta para organizar vídeos e eBooks.</p><input id="new-section-name" type="text" maxlength="60" placeholder="Ex.: Hematologia" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
             <div class="flex items-center gap-2"><input id="new-section-cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" /><button type="button" id="choose-section-cover-btn" class="bg-white text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/10 transition-all">Escolher capa</button><button type="button" id="add-section-btn" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all">Criar seção</button></div>
           </div>
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5"><div><p class="text-xs font-bold text-primary uppercase tracking-widest">Seções</p><p class="text-xs text-gray-500 mt-1">Escolha uma pasta para visualizar seus vídeos. Edite ou exclua sem apagar o conteúdo.</p></div><input id="section-search" type="search" placeholder="Buscar seção..." class="w-full sm:w-64 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5"><div><p class="text-xs font-bold text-primary uppercase tracking-widest">Seções</p><p class="text-xs text-gray-500 mt-1">Escolha uma seção para editar ou excluir</p></div><input id="section-search" type="search" placeholder="Buscar seção..." class="w-full sm:w-64 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
           <div id="sections-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-3"></div>
         </div>
         <form id="add-video-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -177,6 +177,14 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Conteúdos</p><h2 class="text-xl font-bold text-dark">eBooks educativos</h2><p class="text-sm text-gray-500 mt-1">Disponibilize materiais em PDF ou outros arquivos hospedados no Google Drive.</p></div>
           <span class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-semibold">Google Drive</span>
+        </div>
+        <div class="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div class="flex flex-col lg:flex-row lg:items-end gap-3">
+            <div class="flex-1"><label for="new-ebook-section-name" class="block text-sm font-semibold text-dark mb-1">Inserir e editar seções</label><p class="text-xs text-gray-500 mb-2">Estas Seções são exclusivas dos eBooks e não alteram as Seções dos vídeos.</p><input id="new-ebook-section-name" type="text" maxlength="60" placeholder="Ex.: Receitas saudáveis" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+            <div class="flex items-center gap-2"><input id="new-ebook-section-cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" /><button type="button" id="choose-ebook-section-cover-btn" class="bg-white text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/10 transition-all">Escolher capa</button><button type="button" id="add-ebook-section-btn" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all">Criar seção</button></div>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5"><div><p class="text-xs font-bold text-primary uppercase tracking-widest">Seções</p><p class="text-xs text-gray-500 mt-1">Escolha uma seção para editar ou excluir.</p></div><input id="ebook-section-search" type="search" placeholder="Buscar seção..." class="w-full sm:w-64 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+          <div id="ebook-sections-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-3"></div>
         </div>
         <form id="add-ebook-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div><label for="ebook-title" class="block text-sm font-semibold text-dark mb-1">Título</label><input type="text" id="ebook-title" required placeholder="Ex.: Guia de refeições" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
@@ -280,6 +288,12 @@
     </div>
   </div>
 
+  <!-- Modal Editar Seção de eBook -->
+  <div id="edit-ebook-section-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg border border-white/20 shadow-2xl mx-4"><h3 class="text-xl font-bold text-dark mb-2">Editar seção de eBook</h3><p class="text-xs text-gray-500 mb-6">A alteração será refletida nos eBooks vinculados.</p><form id="edit-ebook-section-form" class="space-y-4"><input type="hidden" id="edit-ebook-section-id" /><div><label for="edit-ebook-section-name" class="block text-sm font-semibold text-dark mb-1">Nome da seção</label><input id="edit-ebook-section-name" required maxlength="60" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm" /></div><div><label for="edit-ebook-section-cover" class="block text-sm font-semibold text-dark mb-1">Nova imagem de capa (opcional)</label><input type="file" id="edit-ebook-section-cover" accept="image/jpeg,image/png,image/webp,image/gif" class="w-full text-sm" /></div><div class="flex gap-2 pt-4"><button type="button" id="edit-ebook-section-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button type="submit" class="w-1/2 bg-primary text-white py-3 rounded-xl font-bold text-sm">Salvar alterações</button></div></form></div>
+  </div>
+  <div id="delete-ebook-section-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300"><div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md border border-white/20 shadow-2xl mx-4"><h3 class="text-xl font-bold text-dark mb-2">Excluir seção de eBook?</h3><p class="text-sm text-gray-600 mb-6">Os eBooks serão movidos para <strong>Geral</strong>. O conteúdo não será apagado.</p><input type="hidden" id="delete-ebook-section-id" /><div class="flex gap-2"><button type="button" id="delete-ebook-section-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button type="button" id="delete-ebook-section-confirm-btn" class="w-1/2 bg-[#6f3f35] text-white py-3 rounded-xl font-bold text-sm">Excluir seção</button></div></div></div>
+
   <!-- Modal Resetar Senha Paciente -->
   <div id="reset-password-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
@@ -352,10 +366,29 @@
     let sectionCache = [];
     let selectedSectionCover = '';
     let selectedVideoFolder = '';
+    let ebookSectionCache = [];
+    let selectedEbookSectionCover = '';
 
     function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '', id: '' } : { id: section.id || section.section_id || section.uuid || '', name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
+    function renderEbookSectionControls() {
+      const select = document.getElementById('ebook-section'); if (!select) return;
+      const current = select.value; select.innerHTML = '<option value="">Selecione uma seção</option>';
+      ebookSectionCache.forEach(section => { const option = document.createElement('option'); option.value = section.name; option.textContent = section.name; select.appendChild(option); });
+      if (current && ebookSectionCache.some(section => section.name === current)) select.value = current;
+    }
+    function showEbookSectionModal(id) { const modal = document.getElementById(id); modal.classList.remove('hidden'); modal.classList.add('flex'); requestAnimationFrame(() => modal.classList.add('opacity-100')); }
+    function hideEbookSectionModal(id) { const modal = document.getElementById(id); modal.classList.remove('opacity-100'); modal.classList.remove('flex'); modal.classList.add('hidden'); }
+    function renderEbookSectionsList() {
+      const list = document.getElementById('ebook-sections-list'); if (!list) return;
+      const query = (document.getElementById('ebook-section-search')?.value || '').trim().toLocaleLowerCase(); const visible = ebookSectionCache.filter(section => section.name.toLocaleLowerCase().includes(query)); list.innerHTML = '';
+      if (!visible.length) { list.innerHTML = '<p class="md:col-span-2 xl:col-span-3 text-sm text-gray-500 py-4">Nenhuma seção encontrada.</p>'; return; }
+      visible.forEach(section => { const card = document.createElement('article'); card.className = 'rounded-2xl border border-gray-100 bg-white p-3 shadow-sm flex flex-col gap-3'; const cover = section.cover_image ? `<img src="${section.cover_image}" alt="Capa da seção ${section.name}" class="w-full aspect-[16/7] rounded-xl object-cover bg-light" />` : '<div class="w-full aspect-[16/7] rounded-xl bg-light flex items-center justify-center text-primary text-3xl">▤</div>'; card.innerHTML = `${cover}<div class="flex items-center justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-dark truncate">${section.name}</h3><p class="text-xs text-gray-500 mt-1">Seção de eBooks</p></div><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${section.name === 'Geral' ? 'Padrão' : 'Ativa'}</span></div><div class="flex gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-ebook-section-btn flex-1 admin-action-edit px-3 py-2 rounded-xl text-xs font-bold" data-id="${section.id || ''}">Editar</button><button type="button" class="delete-ebook-section-btn flex-1 admin-action-delete px-3 py-2 rounded-xl text-xs font-bold ${section.name === 'Geral' ? 'opacity-40 cursor-not-allowed' : ''}" data-id="${section.id || ''}" data-name="${section.name}" ${section.name === 'Geral' ? 'disabled' : ''}>Excluir</button></div>`; list.appendChild(card); });
+      list.querySelectorAll('.edit-ebook-section-btn').forEach(button => button.addEventListener('click', () => { const section = ebookSectionCache.find(item => item.id === button.dataset.id); if (!section) return alert('Esta seção ainda não foi sincronizada pelo banco.'); document.getElementById('edit-ebook-section-id').value = section.id; document.getElementById('edit-ebook-section-name').value = section.name; document.getElementById('edit-ebook-section-cover').value = ''; showEbookSectionModal('edit-ebook-section-modal'); }));
+      list.querySelectorAll('.delete-ebook-section-btn').forEach(button => button.addEventListener('click', () => { if (!button.dataset.id) return alert('Esta seção ainda não foi sincronizada pelo banco.'); document.getElementById('delete-ebook-section-id').value = button.dataset.id; document.querySelector('#delete-ebook-section-modal p').innerHTML = `Os eBooks de <strong>${button.dataset.name}</strong> serão movidos para <strong>Geral</strong>. O conteúdo não será apagado.`; showEbookSectionModal('delete-ebook-section-modal'); }));
+    }
+    async function loadEbookSections() { try { ebookSectionCache = (await db.getEbookSections()).map(normalizeSection); } catch { ebookSectionCache = []; } const names = new Set(ebookSectionCache.map(section => section.name.toLowerCase())); if (!names.has('geral')) ebookSectionCache.push({ name: 'Geral', cover_image: '' }); ebookSectionCache.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')); renderEbookSectionControls(); renderEbookSectionsList(); }
     function renderSectionControls() {
-      ['video-section', 'ebook-section', 'edit-video-theme'].forEach(id => {
+      ['video-section', 'edit-video-theme'].forEach(id => {
         const select = document.getElementById(id); if (!select) return;
         const current = select.value;
         select.innerHTML = '<option value="">Selecione uma seção</option>';
@@ -363,17 +396,18 @@
         if (current && sectionCache.some(section => section.name === current)) select.value = current;
       });
       renderSectionsList();
+      renderEbookSectionControls();
     }
     function renderSectionsList() {
       const list = document.getElementById('sections-list'); const folderList = document.getElementById('video-folder-list'); if (!list) return;
       const query = (document.getElementById('section-search')?.value || '').trim().toLocaleLowerCase();
       const visible = sectionCache.filter(section => section.name.toLocaleLowerCase().includes(query));
       list.innerHTML = '';
-      if (!visible.length) list.innerHTML = '<p class="md:col-span-2 xl:col-span-3 text-sm text-gray-500 py-4">Nenhuma pasta encontrada.</p>';
+      if (!visible.length) list.innerHTML = '<p class="md:col-span-2 xl:col-span-3 text-sm text-gray-500 py-4">Nenhuma seção encontrada.</p>';
       visible.forEach(section => {
         const card = document.createElement('article'); card.className = 'rounded-2xl border border-gray-100 bg-white p-3 shadow-sm flex flex-col gap-3';
         const cover = section.cover_image ? `<img src="${section.cover_image}" alt="Capa da seção ${section.name}" class="w-full aspect-[16/7] rounded-xl object-cover bg-light" />` : '<div class="w-full aspect-[16/7] rounded-xl bg-light flex items-center justify-center text-primary text-3xl">▦</div>';
-        card.innerHTML = `${cover}<div class="flex items-center justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-dark truncate">${section.name}</h3><p class="text-xs text-gray-500 mt-1">Pasta de vídeos e eBooks</p></div><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${section.name === 'Geral' ? 'Padrão' : 'Ativa'}</span></div><div class="flex gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-section-btn flex-1 admin-action-edit px-3 py-2 rounded-xl text-xs font-bold" data-id="${section.id || ''}">Editar</button><button type="button" class="delete-section-btn flex-1 admin-action-delete px-3 py-2 rounded-xl text-xs font-bold ${section.name === 'Geral' ? 'opacity-40 cursor-not-allowed' : ''}" data-id="${section.id || ''}" data-name="${section.name}" ${section.name === 'Geral' ? 'disabled' : ''}>Excluir</button></div>`;
+        card.innerHTML = `${cover}<div class="flex items-center justify-between gap-3"><div class="min-w-0"><h3 class="font-bold text-dark truncate">${section.name}</h3><p class="text-xs text-gray-500 mt-1">Seção de vídeos</p></div><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${section.name === 'Geral' ? 'Padrão' : 'Ativa'}</span></div><div class="flex gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-section-btn flex-1 admin-action-edit px-3 py-2 rounded-xl text-xs font-bold" data-id="${section.id || ''}">Editar</button><button type="button" class="delete-section-btn flex-1 admin-action-delete px-3 py-2 rounded-xl text-xs font-bold ${section.name === 'Geral' ? 'opacity-40 cursor-not-allowed' : ''}" data-id="${section.id || ''}" data-name="${section.name}" ${section.name === 'Geral' ? 'disabled' : ''}>Excluir</button></div>`;
         list.appendChild(card);
       });
       if (folderList) {
@@ -407,8 +441,16 @@
       const existing = sectionCache.find(section => section.name.toLowerCase() === name.toLowerCase());
       const result = await db.upsertSection(existing?.name || name, selectedSectionCover || existing?.cover_image || '');
       if (!result?.success && result?.success !== undefined) return alert(result.message || 'Não foi possível salvar a seção.');
-      await loadSections(); document.getElementById('video-section').value = existing?.name || name; document.getElementById('ebook-section').value = existing?.name || name; input.value = ''; document.getElementById('new-section-cover').value = ''; selectedSectionCover = ''; document.getElementById('choose-section-cover-btn').textContent = 'Escolher capa';
+      await loadSections(); document.getElementById('video-section').value = existing?.name || name; input.value = ''; document.getElementById('new-section-cover').value = ''; selectedSectionCover = ''; document.getElementById('choose-section-cover-btn').textContent = 'Escolher capa';
     });
+    document.getElementById('ebook-section-search')?.addEventListener('input', renderEbookSectionsList);
+    document.getElementById('choose-ebook-section-cover-btn')?.addEventListener('click', () => document.getElementById('new-ebook-section-cover')?.click());
+    document.getElementById('new-ebook-section-cover')?.addEventListener('change', async event => { selectedEbookSectionCover = await readSectionCover(event.target.files?.[0]); document.getElementById('choose-ebook-section-cover-btn').textContent = selectedEbookSectionCover ? 'Capa selecionada' : 'Escolher capa'; });
+    document.getElementById('add-ebook-section-btn')?.addEventListener('click', async () => { const input = document.getElementById('new-ebook-section-name'); const name = input.value.trim(); if (!name) return alert('Informe o nome da seção.'); const existing = ebookSectionCache.find(section => section.name.toLowerCase() === name.toLowerCase()); const result = await db.upsertEbookSection(existing?.name || name, selectedEbookSectionCover || existing?.cover_image || ''); if (!result?.success && result?.success !== undefined) return alert(result.message || 'Não foi possível salvar a seção.'); await loadEbookSections(); document.getElementById('ebook-section').value = existing?.name || name; input.value = ''; document.getElementById('new-ebook-section-cover').value = ''; selectedEbookSectionCover = ''; document.getElementById('choose-ebook-section-cover-btn').textContent = 'Escolher capa'; });
+    document.getElementById('edit-ebook-section-cancel-btn')?.addEventListener('click', () => hideEbookSectionModal('edit-ebook-section-modal'));
+    document.getElementById('delete-ebook-section-cancel-btn')?.addEventListener('click', () => hideEbookSectionModal('delete-ebook-section-modal'));
+    document.getElementById('edit-ebook-section-form')?.addEventListener('submit', async event => { event.preventDefault(); const id = document.getElementById('edit-ebook-section-id').value; const name = document.getElementById('edit-ebook-section-name').value.trim(); const file = document.getElementById('edit-ebook-section-cover').files?.[0]; const section = ebookSectionCache.find(item => item.id === id); const cover = file ? await readSectionCover(file) : section?.cover_image || ''; const result = await db.updateEbookSection(id, name, cover); if (!result?.success && result?.success !== undefined) return alert(result.message || 'Não foi possível atualizar a seção do eBook.'); hideEbookSectionModal('edit-ebook-section-modal'); await loadEbookSections(); await renderEbooks(); });
+    document.getElementById('delete-ebook-section-confirm-btn')?.addEventListener('click', async () => { const id = document.getElementById('delete-ebook-section-id').value; const result = await db.deleteEbookSection(id); if (!result?.success && result?.success !== undefined) return alert(result.message || 'Não foi possível excluir a seção do eBook.'); hideEbookSectionModal('delete-ebook-section-modal'); await loadEbookSections(); await renderEbooks(); });
     const editVideoModal = document.getElementById('edit-video-modal');
     const editVideoForm = document.getElementById('edit-video-form');
     const editVideoCancelBtn = document.getElementById('edit-video-cancel-btn');
@@ -565,7 +607,7 @@
       document.querySelectorAll('.edit-ebook-btn').forEach(btn => btn.addEventListener('click', async e => {
         const book = ebookCache.find(item => item.id === e.currentTarget.dataset.id); if (!book) return;
         const title = prompt('Título do eBook:', book.title); if (title === null) return;
-        const theme = prompt('Seção do eBook:', book.theme || 'Geral'); if (theme === null) return;
+        const availableSections = ebookSectionCache.map(section => section.name).join(', '); const theme = prompt(`Seção do eBook (disponíveis: ${availableSections}):`, book.theme || 'Geral'); if (theme === null) return;
         const description = prompt('Descrição:', book.description || ''); if (description === null) return;
         const url = prompt('Link do Google Drive:', book.url); if (url === null) return;
         const result = await db.updateEbook(book.id, title, theme, description, url); if (operationFailed(result)) alert(result?.message || 'Não foi possível atualizar o eBook.'); else await renderEbooks();
@@ -800,6 +842,7 @@
     });
 
     await loadSections();
+    await loadEbookSections();
     await renderVideos();
     await renderEbooks();
     })();
