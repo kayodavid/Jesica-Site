@@ -327,7 +327,7 @@
     let videoCache = [];
     let sectionCache = [];
     let selectedSectionCover = '';
-    function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '' } : { name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
+    function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '', id: '' } : { id: section.id || section.section_id || section.uuid || '', name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
     function renderSectionControls() {
       ['video-section', 'ebook-section', 'edit-video-theme'].forEach(id => {
         const select = document.getElementById(id); if (!select) return;
