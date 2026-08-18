@@ -197,8 +197,17 @@
           <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3"><p id="ebook-form-status" class="text-sm hidden" role="status" aria-live="polite"></p><button id="ebook-submit-btn" type="submit" class="bg-primary text-white px-5 py-3 rounded-2xl font-semibold text-sm hover:bg-dark transition-all shadow-md">Adicionar eBook</button></div>
         </form>
         </div>
-        <div id="ebooks-list" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
-        <p id="no-ebooks" class="hidden text-center py-6 text-gray-400 text-sm">Nenhum eBook cadastrado.</p>
+        <div class="video-folder-shell">
+          <aside class="video-folder-nav" aria-label="Seções de eBooks">
+            <div class="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-primary">Seções</div>
+            <div id="ebook-folder-list" class="flex flex-col gap-1"></div>
+          </aside>
+          <div class="min-w-0">
+            <div class="flex items-center justify-between gap-3 mb-3"><div><p class="text-xs font-bold uppercase tracking-widest text-primary">Seção selecionada</p><h3 id="selected-ebook-folder" class="text-lg font-bold text-dark">Todos os eBooks</h3></div><span id="ebook-count-label" class="text-xs font-semibold text-gray-500"></span></div>
+            <div id="ebooks-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            <p id="no-ebooks" class="hidden text-center py-8 text-gray-400 text-sm">Nenhum eBook cadastrado nesta seção.</p>
+          </div>
+        </div>
       </section>
 
       <section id="blogs-section" class="admin-module-section hidden mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-gray-100">
@@ -372,6 +381,7 @@
     let selectedVideoFolder = '';
     let ebookSectionCache = [];
     let selectedEbookSectionCover = '';
+    let selectedEbookFolder = '';
 
     function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '', id: '' } : { id: section.id || section.section_id || section.uuid || '', name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
     function renderEbookSectionControls() {
@@ -598,29 +608,23 @@
     }
     function operationFailed(result) { return !result || result.success === false; }
 
-    async function renderEbooks() {
-      ebookCache = await db.getEbooks();
-      ebooksList.innerHTML = '';
-      noEbooks.classList.toggle('hidden', ebookCache.length > 0);
-      ebookCache.forEach(book => {
-        const item = document.createElement('div');
-        item.className = 'flex flex-col gap-4 border border-gray-100 rounded-2xl p-4 bg-light/40 h-full';
-        item.innerHTML = `<div class="aspect-[4/3] rounded-xl overflow-hidden bg-dark">${book.thumbnailUrl ? `<img class="w-full h-full object-cover" src="${book.thumbnailUrl}" alt="${book.title}" onerror="this.style.display='none'" />` : '<div class="w-full h-full flex items-center justify-center text-3xl text-secondary">▤</div>'}</div><div><div class="flex flex-wrap items-center gap-2"><strong class="text-base text-dark">${book.title}</strong><span class="admin-provider-tag text-[10px] uppercase font-bold px-2 py-1 rounded">Google Drive</span><span class="admin-theme-tag text-[10px] uppercase font-bold px-2 py-1 rounded">${book.theme || 'Geral'}</span></div><p class="text-sm text-gray-600 mt-2">${book.description || 'Sem descrição'}</p><p class="text-xs text-gray-400 mt-2 break-all">${book.url}</p></div><div class="flex justify-end gap-2 border-t border-gray-100 pt-3"><button type="button" class="edit-ebook-btn admin-action-edit hover:bg-primary hover:text-white px-3 py-2 rounded-xl text-xs font-bold" data-id="${book.id}">Editar</button><button type="button" class="delete-ebook-btn admin-action-delete hover:bg-red-50 px-3 py-2 rounded-xl text-xs font-bold" data-id="${book.id}">Excluir</button></div>`;
-        ebooksList.appendChild(item);
-      });
-      document.querySelectorAll('.edit-ebook-btn').forEach(btn => btn.addEventListener('click', async e => {
-        const book = ebookCache.find(item => item.id === e.currentTarget.dataset.id); if (!book) return;
-        const title = prompt('Título do eBook:', book.title); if (title === null) return;
-        const availableSections = ebookSectionCache.map(section => section.name).join(', '); const theme = prompt(`Seção do eBook (disponíveis: ${availableSections}):`, book.theme || 'Geral'); if (theme === null) return;
-        const description = prompt('Descrição:', book.description || ''); if (description === null) return;
-        const url = prompt('Link do Google Drive:', book.url); if (url === null) return;
-        const result = await db.updateEbook(book.id, title, theme, description, url); if (operationFailed(result)) alert(result?.message || 'Não foi possível atualizar o eBook.'); else await renderEbooks();
-      }));
-      document.querySelectorAll('.delete-ebook-btn').forEach(btn => btn.addEventListener('click', async e => {
-        if (!confirm('Excluir este eBook da área dos pacientes?')) return;
-        const result = await db.deleteEbook(e.currentTarget.dataset.id); if (operationFailed(result)) alert(result?.message || 'Não foi possível excluir o eBook.'); else await renderEbooks();
-      }));
+    function renderEbookCards() {
+      const filtered = selectedEbookFolder ? ebookCache.filter(book => (book.theme || 'Geral') === selectedEbookFolder) : ebookCache;
+      const title = document.getElementById('selected-ebook-folder'); const count = document.getElementById('ebook-count-label');
+      if (title) title.textContent = selectedEbookFolder || 'Todos os eBooks';
+      if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? 'eBook' : 'eBooks'}`;
+      const folderList = document.getElementById('ebook-folder-list');
+      if (folderList) {
+        folderList.innerHTML = `<button type="button" class="video-folder-btn ${selectedEbookFolder === '' ? 'is-active' : ''}" data-ebook-folder=""><span class="video-folder-icon"></span><span class="min-w-0 flex-1"><strong class="block text-sm">Todos os eBooks</strong><small class="opacity-70">Visão geral</small></span></button>`;
+        ebookSectionCache.forEach(section => folderList.insertAdjacentHTML('beforeend', `<button type="button" class="video-folder-btn ${selectedEbookFolder === section.name ? 'is-active' : ''}" data-ebook-folder="${section.name}"><span class="video-folder-icon"></span><span class="min-w-0 flex-1"><strong class="block text-sm truncate">${section.name}</strong><small class="opacity-70">Abrir seção</small></span></button>`));
+        folderList.querySelectorAll('.video-folder-btn').forEach(button => button.addEventListener('click', () => { selectedEbookFolder = button.dataset.ebookFolder || ''; renderEbookCards(); }));
+      }
+      ebooksList.innerHTML = ''; noEbooks.classList.toggle('hidden', filtered.length > 0);
+      filtered.forEach(book => { const item = document.createElement('div'); item.className = 'compact-video-card flex flex-col gap-2.5'; item.innerHTML = `<div class="aspect-[4/3] rounded-lg overflow-hidden bg-dark">${book.thumbnailUrl ? `<img class="w-full h-full object-cover" src="${book.thumbnailUrl}" alt="${book.title}" onerror="this.style.display='none'" />` : '<div class="w-full h-full flex items-center justify-center text-3xl text-secondary">▤</div>'}</div><div class="min-w-0"><strong class="block text-sm text-dark truncate" title="${book.title}">${book.title}</strong><div class="flex flex-wrap items-center gap-1.5 mt-1.5"><span class="admin-provider-tag text-[9px] uppercase font-bold px-1.5 py-0.5 rounded">Google Drive</span><span class="admin-theme-tag text-[9px] uppercase font-bold px-1.5 py-0.5 rounded">${book.theme || 'Geral'}</span></div><p class="text-xs text-gray-600 mt-1.5 line-clamp-2">${book.description || 'Sem descrição'}</p></div><div class="flex justify-end gap-1.5 border-t border-gray-100 pt-2"><button type="button" class="edit-ebook-btn admin-action-edit px-2.5 py-1.5 rounded-lg text-[11px] font-bold" data-id="${book.id}">Editar</button><button type="button" class="delete-ebook-btn admin-action-delete px-2.5 py-1.5 rounded-lg text-[11px] font-bold" data-id="${book.id}">Excluir</button></div>`; ebooksList.appendChild(item); });
+      document.querySelectorAll('.edit-ebook-btn').forEach(btn => btn.addEventListener('click', async e => { const book = ebookCache.find(item => item.id === e.currentTarget.dataset.id); if (!book) return; const title = prompt('Título do eBook:', book.title); if (title === null) return; const availableSections = ebookSectionCache.map(section => section.name).join(', '); const theme = prompt(`Seção do eBook (disponíveis: ${availableSections}):`, book.theme || 'Geral'); if (theme === null) return; const description = prompt('Descrição:', book.description || ''); if (description === null) return; const url = prompt('Link do Google Drive:', book.url); if (url === null) return; const result = await db.updateEbook(book.id, title, theme, description, url); if (operationFailed(result)) alert(result?.message || 'Não foi possível atualizar o eBook.'); else await renderEbooks(); }));
+      document.querySelectorAll('.delete-ebook-btn').forEach(btn => btn.addEventListener('click', async e => { if (!confirm('Excluir este eBook da área dos pacientes?')) return; const result = await db.deleteEbook(e.currentTarget.dataset.id); if (operationFailed(result)) alert(result?.message || 'Não foi possível excluir o eBook.'); else await renderEbooks(); }));
     }
+    async function renderEbooks() { ebookCache = await db.getEbooks(); renderEbookCards(); }
 
     addEbookForm.addEventListener('submit', async e => {
       e.preventDefault();
