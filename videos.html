@@ -27,6 +27,14 @@
     .library-hero:after { content:''; position:absolute; width:260px; height:260px; right:-70px; top:-110px; border:1px solid rgba(255,255,255,.25); border-radius:50%; box-shadow:0 0 0 28px rgba(255,255,255,.05),0 0 0 56px rgba(255,255,255,.035); }
     .library-hero > * { position:relative; z-index:1; }
     .section-nav-card { background:rgba(255,255,255,.055); border-radius:1rem; }
+    .section-nav-card .section-arrow { transition:transform .2s; }
+    .section-nav-card.is-expanded .section-arrow { transform:rotate(180deg); }
+    .section-video-list { border-top:1px solid rgba(255,255,255,.09); padding:.35rem .65rem .55rem; }
+    .section-video-link { display:block; padding:.4rem .45rem; border-radius:.55rem; color:#b9bbc2; font-size:.7rem; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:background .2s,color .2s; }
+    .section-video-link:hover { background:rgba(244,122,60,.16); color:#fff; }
+    body[data-patient-theme='traditional'] .section-video-list { border-color:rgba(61,50,38,.12); }
+    body[data-patient-theme='traditional'] .section-video-link { color:#6b6257; }
+    body[data-patient-theme='traditional'] .section-video-link:hover { color:#3d3226; background:#fff3e5; }
     .section-nav-card:hover { background:rgba(255,255,255,.12); transform:translateX(3px); }
     .section-nav-card.active { background:linear-gradient(135deg,#f0a046,#bd5a3b); box-shadow:0 10px 24px rgba(244,122,60,.22); }
     .video-card { box-shadow:0 14px 30px rgba(0,0,0,.20); border-radius:1.25rem; border-color:rgba(255,255,255,.09)!important; }
