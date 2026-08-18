@@ -8,7 +8,7 @@ const allowed = new Set([
   'app_list_ebook_sections', 'app_upsert_ebook_section', 'app_update_ebook_section', 'app_delete_ebook_section',
   'app_list_videos', 'app_add_video', 'app_update_video',
   'app_delete_video', 'app_list_ebooks', 'app_add_ebook', 'app_update_ebook',
-  'app_delete_ebook', 'app_list_blogs', 'app_add_blog', 'app_update_blog', 'app_delete_blog', 'app_get_calendar', 'app_save_calendar'
+  'app_delete_ebook', 'app_get_content_order_settings', 'app_update_content_order_settings', 'app_list_blogs', 'app_add_blog', 'app_update_blog', 'app_delete_blog', 'app_get_calendar', 'app_save_calendar'
 ]);
 
 export default async function handler(req, res) {

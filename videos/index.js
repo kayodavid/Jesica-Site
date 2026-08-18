@@ -12,16 +12,16 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
     return;
   }
 
+  const settings = await db.getContentOrderSettings();
   const videos = await db.getPublishedVideos();
   const rawSections = await db.getSections();
-  const groups = videos.reduce((result, video) => {
-    const name = video.theme || 'Geral';
-    (result[name] ||= []).push(video);
-    return result;
-  }, {});
+  const byName = (a, b) => String(a.title || a.name || '').localeCompare(String(b.title || b.name || ''), 'pt-BR', { sensitivity: 'base' });
+  const byRecent = (a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0);
+  const groups = videos.reduce((result, video) => { const name = video.theme || 'Geral'; (result[name] ||= []).push(video); return result; }, {});
+  Object.values(groups).forEach(list => list.sort(settings.video_content_order === 'alpha' ? byName : byRecent));
   const sectionMap = new Map((Array.isArray(rawSections) ? rawSections : []).map(section => [section.name || section, section]));
   Object.keys(groups).forEach(name => { if (!sectionMap.has(name)) sectionMap.set(name, { name, cover_image: '' }); });
-  const sections = [...sectionMap.values()].filter(section => groups[section.name]?.length).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  const sections = [...sectionMap.values()].filter(section => groups[section.name]?.length).sort((a, b) => settings.video_section_order === 'alpha' ? byName(a, b) : byRecent({ createdAt: Math.max(...(groups[a.name] || []).map(v => new Date(v.createdAt || v.created_at || 0).getTime()), 0) }, { createdAt: Math.max(...(groups[b.name] || []).map(v => new Date(v.createdAt || v.created_at || 0).getTime()), 0) }));
   const nav = document.getElementById('theme-nav');
   const grid = document.getElementById('videos-grid');
   const modal = document.getElementById('player-modal');

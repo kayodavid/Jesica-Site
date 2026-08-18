@@ -145,6 +145,11 @@
           </div>
           <span class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-semibold">Publicação imediata</span>
         </div>
+        <div id="content-order-settings" class="mb-6 rounded-2xl border border-gray-100 bg-light p-4 sm:p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4"><div><h3 class="font-bold text-dark">Ordem de exibição para os pacientes</h3><p class="text-xs text-gray-500 mt-1">A mesma regra será aplicada ao menu lateral e aos cards.</p></div><span id="content-order-status" class="text-xs text-gray-500"></span></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"><label class="text-xs font-semibold text-gray-600">Seções de vídeos<select id="video-section-order" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"><option value="recent">Mais recentes</option><option value="alpha">Ordem alfabética</option></select></label><label class="text-xs font-semibold text-gray-600">Vídeos<select id="video-content-order" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"><option value="recent">Mais recentes</option><option value="alpha">Ordem alfabética</option></select></label><label class="text-xs font-semibold text-gray-600">Seções de eBooks<select id="ebook-section-order" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"><option value="recent">Mais recentes</option><option value="alpha">Ordem alfabética</option></select></label><label class="text-xs font-semibold text-gray-600">eBooks<select id="ebook-content-order" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm"><option value="recent">Mais recentes</option><option value="alpha">Ordem alfabética</option></select></label></div>
+          <button id="save-content-order" type="button" class="mt-4 bg-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-dark transition-all">Salvar ordem</button>
+        </div>
         <div class="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <div class="flex flex-col lg:flex-row lg:items-end gap-3">
             <div class="flex-1"><label for="new-section-name" class="block text-sm font-semibold text-dark mb-1">Inserir e editar seções</label><p class="text-xs text-gray-500 mb-2">Cada Seção funciona como uma pasta para organizar vídeos e eBooks.</p><input id="new-section-name" type="text" maxlength="60" placeholder="Ex.: Hematologia" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
@@ -382,6 +387,9 @@
     let ebookSectionCache = [];
     let selectedEbookSectionCover = '';
     let selectedEbookFolder = '';
+    async function loadContentOrderSettings() { const settings = await db.getContentOrderSettings(); ['video-section-order','video-content-order','ebook-section-order','ebook-content-order'].forEach(id => { const key = id.replaceAll('-', '_'); if (settings[key]) document.getElementById(id).value = settings[key]; }); }
+    document.getElementById('save-content-order')?.addEventListener('click', async () => { const status = document.getElementById('content-order-status'); status.textContent = 'Salvando...'; const result = await db.updateContentOrderSettings({ video_section_order: document.getElementById('video-section-order').value, video_content_order: document.getElementById('video-content-order').value, ebook_section_order: document.getElementById('ebook-section-order').value, ebook_content_order: document.getElementById('ebook-content-order').value }); status.textContent = result?.success ? 'Ordem salva.' : (result?.message || 'Não foi possível salvar.'); status.className = `text-xs ${result?.success ? 'text-green-600' : 'text-red-600'}`; });
+    loadContentOrderSettings();
 
     function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '', id: '' } : { id: section.id || section.section_id || section.uuid || '', name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
     function renderEbookSectionControls() {
