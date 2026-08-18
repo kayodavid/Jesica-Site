@@ -8,6 +8,7 @@
     { "source": "/sobre", "destination": "/sobre.html" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/calendario", "destination": "/calendario.html" }
+    { "source": "/calendario", "destination": "/calendario.html" },
+    { "source": "/acompanhamento-nutricional", "destination": "/acompanhamento-nutricional.html" }
   ]
 }
