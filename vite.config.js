@@ -21,7 +21,9 @@ export default defineConfig({
         calendario: resolve(__dirname, 'calendario.html'),
         paciente: resolve(__dirname, 'paciente.html'),
         ebooks: resolve(__dirname, 'ebooks.html'),
-        videos: resolve(__dirname, 'videos.html')
+        videos: resolve(__dirname, 'videos.html'),
+        acompanhamentoNutricional: resolve(__dirname, 'acompanhamento-nutricional.html'),
+        calculadoras: resolve(__dirname, 'calculadoras.html')
       },
       output: {
         // Gera arquivos em pastas separadas para URLs limpas
