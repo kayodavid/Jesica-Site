@@ -3,44 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trilhas de Vídeos - Jessica Melo Nutri</title>
+  <title>Vídeos educativos - Jessica Melo Nutri</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script>tailwind.config={theme:{extend:{colors:{primary:'#f47a3c',orange:'#ff8b47',dark:'#17181d',panel:'#22242b',muted:'#a9abb3'}}}};</script>
   <style>
     body { font-family: 'Poppins', sans-serif; transition: background .2s, color .2s; }
-    body[data-patient-theme='traditional'] { background: #faf8f3; color: #3d3226; }
-    body[data-patient-theme='traditional'] header { background: rgba(255,255,255,.9); border-color: rgba(61,50,38,.12); }
-    body[data-patient-theme='traditional'] main { background: #faf8f3; color: #3d3226; }
-    body[data-patient-theme='traditional'] aside { background: #fff; border-color: rgba(61,50,38,.12); }
-    body[data-patient-theme='traditional'] .bg-panel { background: #fff; border-color: rgba(61,50,38,.12); }
-    body[data-patient-theme='traditional'] .text-white { color: #3d3226; }
-    body[data-patient-theme='traditional'] .text-gray-300, body[data-patient-theme='traditional'] .text-gray-400 { color: #6b6257; }
-    .scrollbar::-webkit-scrollbar { width: 7px; height: 7px; }
-    .scrollbar::-webkit-scrollbar-thumb { background: #4b4d56; border-radius: 999px; }
+    body[data-patient-theme='traditional'] { background:#faf8f3; color:#3d3226; }
+    body[data-patient-theme='traditional'] header { background:rgba(255,255,255,.94); border-color:rgba(61,50,38,.12); }
+    body[data-patient-theme='traditional'] main { background:#faf8f3; color:#3d3226; }
+    body[data-patient-theme='traditional'] aside { background:#fff; border-color:rgba(61,50,38,.12); }
+    body[data-patient-theme='traditional'] .bg-panel { background:#fff; border-color:rgba(61,50,38,.12); }
+    body[data-patient-theme='traditional'] .text-white { color:#3d3226; }
+    body[data-patient-theme='traditional'] .text-gray-300, body[data-patient-theme='traditional'] .text-gray-400 { color:#6b6257; }
+    .scrollbar::-webkit-scrollbar { width:7px; height:7px; }
+    .scrollbar::-webkit-scrollbar-thumb { background:#4b4d56; border-radius:999px; }
+    .section-nav-card.active { background:rgba(244,122,60,.16); box-shadow:inset 3px 0 #ff8b47; }
+    .video-card { box-shadow:0 8px 24px rgba(0,0,0,.18); }
+    .video-card:hover { transform:translateY(-3px); }
   </style>
   <script type="module" crossorigin src="/videos/index.js"></script>
   <link rel="modulepreload" crossorigin href="/db/f20655b6.js">
 </head>
 <body class="bg-dark text-white min-h-screen">
   <header class="h-16 bg-[#1d1e24] border-b border-white/5 flex items-center justify-between px-4 sm:px-7 sticky top-0 z-40">
-    <div class="flex items-center gap-5"><button id="mobile-sidebar-btn" class="lg:hidden text-white text-2xl">☰</button><a href="/paciente.html" class="block"><img data-patient-logo src="/assets/images/Logomarca_nobg_branco.png" class="w-32 sm:w-40 h-auto max-h-10 object-contain" alt="Jessica Melo Nutricionista"></a><span class="hidden sm:inline text-xs text-muted border-l border-white/10 pl-5">Área do paciente</span></div>
+    <div class="flex items-center gap-4 sm:gap-5"><button id="mobile-sidebar-btn" class="lg:hidden text-white text-2xl" aria-label="Abrir seções">☰</button><a href="/paciente.html" class="block"><img data-patient-logo src="/assets/images/Logomarca_nobg_branco.png" class="w-32 sm:w-40 h-auto max-h-10 object-contain" alt="Jessica Melo Nutricionista"></a><span class="hidden sm:inline text-xs text-muted border-l border-white/10 pl-5">Vídeos educativos</span></div>
     <div class="flex items-center gap-2 sm:gap-4"><a href="/paciente.html" class="bg-white/10 hover:bg-orange hover:text-dark px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all">Menu principal</a><button data-theme-toggle type="button" class="bg-white/10 hover:bg-orange hover:text-dark w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema"></button><button id="logout-btn" class="bg-white/10 hover:bg-white/20 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all">Sair</button></div>
   </header>
   <div class="flex min-h-[calc(100vh-4rem)]">
     <aside id="sidebar" class="fixed lg:sticky top-16 left-0 z-30 w-72 h-[calc(100vh-4rem)] bg-[#202126] border-r border-white/5 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto scrollbar">
-      <div class="p-5"><p class="text-xs font-bold text-muted uppercase tracking-widest mb-6">Trilhas</p><nav id="theme-nav" class="space-y-1"></nav></div>
+      <div class="p-4 sm:p-5"><p class="text-[11px] font-bold text-muted uppercase tracking-[0.22em] mb-5">Seções</p><nav id="theme-nav" class="space-y-2"></nav></div>
     </aside>
     <main class="flex-1 min-w-0 bg-[#17181d]">
-      <div class="px-4 sm:px-8 lg:px-10 py-7 sm:py-10 max-w-[1600px] mx-auto">
-        <div class="flex items-end justify-between gap-4 mb-7"><div><p class="text-xs uppercase tracking-[0.2em] text-orange font-bold mb-2">Biblioteca de saúde</p><h1 class="text-2xl sm:text-3xl font-bold">Trilhas educativas</h1><p class="text-sm text-muted mt-2">Escolha um tema para acessar os conteúdos preparados para você.</p></div><span id="video-count" class="hidden sm:inline text-xs text-muted"></span></div>
+      <div class="px-4 sm:px-8 lg:px-10 py-6 sm:py-9 max-w-[1700px] mx-auto">
+        <div class="flex items-end justify-between gap-4 mb-6"><div><p class="text-xs uppercase tracking-[0.2em] text-orange font-bold mb-2">Biblioteca de saúde</p><h1 id="section-title" class="text-2xl sm:text-3xl font-bold">Vídeos educativos</h1><p id="section-description" class="text-sm text-muted mt-2">Escolha uma seção para acessar os conteúdos preparados para você.</p></div><span id="video-count" class="text-xs text-muted"></span></div>
         <div id="videos-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5"></div>
-        <div id="no-videos" class="hidden border border-white/10 bg-panel rounded-2xl p-10 text-center text-muted">Nenhum conteúdo publicado no momento.</div>
+        <div id="no-videos" class="hidden border border-white/10 bg-panel rounded-2xl p-10 text-center text-muted">Nenhum conteúdo publicado nesta seção.</div>
       </div>
     </main>
   </div>
-  <div id="player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4"><div class="w-full max-w-4xl bg-panel rounded-2xl overflow-hidden shadow-2xl"><div class="flex items-center justify-between px-5 py-4 border-b border-white/10"><div><p id="modal-theme" class="text-xs text-orange uppercase font-bold"></p><h2 id="modal-title" class="font-bold"></h2></div><button id="close-player" class="text-2xl text-muted hover:text-white">×</button></div><div class="aspect-video bg-black"><iframe id="player-frame" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div></div>
-  
+  <div id="player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 p-3 sm:p-6"><div class="w-full max-w-6xl bg-panel rounded-2xl overflow-hidden shadow-2xl"><div class="flex items-center justify-between px-5 py-4 border-b border-white/10"><div><p id="modal-theme" class="text-xs text-orange uppercase font-bold"></p><h2 id="modal-title" class="font-bold text-base sm:text-lg"></h2></div><button id="close-player" class="text-2xl text-muted hover:text-white" aria-label="Fechar">×</button></div><div class="aspect-video bg-black"><iframe id="player-frame" class="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div></div>
 </body>
 </html>

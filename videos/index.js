@@ -1,5 +1,7 @@
 import { db, applyPatientTheme, togglePatientTheme } from '/assets/js/db.js';
 
+const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+
 (async () => {
   applyPatientTheme();
   document.querySelectorAll('[data-theme-toggle]').forEach(button => button.addEventListener('click', togglePatientTheme));
@@ -11,58 +13,61 @@ import { db, applyPatientTheme, togglePatientTheme } from '/assets/js/db.js';
   }
 
   const videos = await db.getPublishedVideos();
+  const rawSections = await db.getSections();
   const groups = videos.reduce((result, video) => {
-    const theme = video.theme || 'Geral';
-    (result[theme] ||= []).push(video);
+    const name = video.theme || 'Geral';
+    (result[name] ||= []).push(video);
     return result;
   }, {});
-  const themes = Object.keys(groups).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const sectionMap = new Map((Array.isArray(rawSections) ? rawSections : []).map(section => [section.name || section, section]));
+  Object.keys(groups).forEach(name => { if (!sectionMap.has(name)) sectionMap.set(name, { name, cover_image: '' }); });
+  const sections = [...sectionMap.values()].filter(section => groups[section.name]?.length).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
   const nav = document.getElementById('theme-nav');
   const grid = document.getElementById('videos-grid');
   const modal = document.getElementById('player-modal');
   const frame = document.getElementById('player-frame');
+  const sidebar = document.getElementById('sidebar');
+  const title = document.getElementById('section-title');
+  const description = document.getElementById('section-description');
+  const count = document.getElementById('video-count');
 
-  document.getElementById('video-count').textContent = `${videos.length} vídeo${videos.length === 1 ? '' : 's'}`;
-  document.getElementById('no-videos').classList.toggle('hidden', videos.length > 0);
-
-  const close = () => {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    frame.src = '';
-  };
+  const close = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); frame.src = ''; };
   document.getElementById('close-player').addEventListener('click', close);
   modal.addEventListener('click', event => { if (event.target === modal) close(); });
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    await db.logout();
-    window.location.href = '/login.html';
-  });
-  document.getElementById('mobile-sidebar-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('-translate-x-full'));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+  document.getElementById('logout-btn').addEventListener('click', async () => { await db.logout(); window.location.href = '/login.html'; });
+  document.getElementById('mobile-sidebar-btn').addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
 
-  function render(theme) {
+  function sectionCover(section) { return section.cover_image || groups[section.name]?.[0]?.thumbnailUrl || groups[section.name]?.[0]?.thumbnail_url || ''; }
+  function render(name) {
+    const section = sections.find(item => item.name === name) || sections[0];
+    if (!section) { document.getElementById('no-videos').classList.remove('hidden'); return; }
+    const current = groups[section.name] || [];
+    title.textContent = section.name;
+    description.textContent = `${current.length} conteúdo${current.length === 1 ? '' : 's'} educativo${current.length === 1 ? '' : 's'} disponível${current.length === 1 ? '' : 'eis'} nesta seção.`;
+    count.textContent = `${current.length} vídeo${current.length === 1 ? '' : 's'}`;
     grid.innerHTML = '';
-    groups[theme].forEach(video => {
+    document.getElementById('no-videos').classList.toggle('hidden', current.length > 0);
+    current.forEach(video => {
       const card = document.createElement('article');
-      card.className = 'group bg-panel rounded-xl overflow-hidden border border-white/5 hover:border-orange/50 transition-all cursor-pointer';
+      card.className = 'video-card group bg-panel rounded-xl overflow-hidden border border-white/5 hover:border-orange/50 transition-all cursor-pointer';
       const thumbnail = video.thumbnailUrl || video.thumbnail_url || '';
-      card.innerHTML = `<div class="relative aspect-video bg-[#30323a] overflow-hidden">${thumbnail ? `<img src="${thumbnail}" alt="${video.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'" />` : '<div class="w-full h-full flex items-center justify-center text-orange text-5xl">▶</div>'}<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div><span class="absolute inset-0 flex items-center justify-center"><span class="w-12 h-12 rounded-full bg-orange text-dark flex items-center justify-center text-lg shadow-lg group-hover:scale-110 transition-transform">▶</span></span></div><div class="p-4"><h2 class="font-bold text-sm sm:text-base leading-snug line-clamp-2">${video.title}</h2><p class="text-xs text-orange mt-3 italic">${theme}</p><p class="text-xs text-gray-400 mt-2 line-clamp-2">${video.description || 'Conteúdo educativo para apoiar sua jornada.'}</p></div>`;
-      card.addEventListener('click', () => {
-        document.getElementById('modal-theme').textContent = theme;
-        document.getElementById('modal-title').textContent = video.title;
-        frame.src = video.embedUrl || video.embed_url || '';
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      });
+      card.innerHTML = `<div class="relative aspect-video bg-[#30323a] overflow-hidden">${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(video.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'" />` : '<div class="w-full h-full flex items-center justify-center text-orange text-5xl">▶</div>'}<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div><span class="absolute inset-0 flex items-center justify-center"><span class="w-14 h-14 rounded-full bg-orange text-dark flex items-center justify-center text-xl shadow-lg group-hover:scale-110 transition-transform">▶</span></span></div><div class="p-4 min-h-[126px]"><h2 class="font-bold text-sm sm:text-base leading-snug line-clamp-2">${escapeHtml(video.title)}</h2><p class="text-xs text-orange mt-3 italic">${escapeHtml(section.name)}</p><p class="text-xs text-gray-400 mt-2 line-clamp-2">${escapeHtml(video.description || 'Conteúdo educativo para apoiar sua jornada.')}</p></div>`;
+      card.addEventListener('click', () => { document.getElementById('modal-theme').textContent = section.name; document.getElementById('modal-title').textContent = video.title; frame.src = video.embedUrl || video.embed_url || ''; modal.classList.remove('hidden'); modal.classList.add('flex'); });
       grid.appendChild(card);
     });
+    nav.querySelectorAll('.section-nav-card').forEach(button => button.classList.toggle('active', button.dataset.section === section.name));
+    if (window.innerWidth < 1024) sidebar.classList.add('-translate-x-full');
   }
 
-  themes.forEach((theme, index) => {
+  sections.forEach((section, index) => {
     const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `w-full text-left px-3 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold transition-all ${index === 0 ? 'bg-orange/20 text-orange' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`;
-    button.innerHTML = `<span class="w-8 h-8 rounded-full bg-orange/20 text-orange flex items-center justify-center text-xs font-bold">${String(index + 1).padStart(2, '0')}</span><span class="truncate">${theme}</span><span class="ml-auto text-xs text-muted">${groups[theme].length}</span>`;
-    button.addEventListener('click', () => render(theme));
-    nav.appendChild(button);
+    button.type = 'button'; button.dataset.section = section.name; button.className = `section-nav-card w-full text-left rounded-xl overflow-hidden border border-white/5 transition-all ${index === 0 ? 'active' : ''}`;
+    const cover = sectionCover(section);
+    button.innerHTML = `<div class="flex items-center gap-3 p-2.5"><div class="w-12 h-12 rounded-lg overflow-hidden bg-[#30323a] shrink-0">${cover ? `<img src="${escapeHtml(cover)}" alt="" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-orange">▦</div>'}</div><div class="min-w-0"><p class="truncate text-sm font-semibold text-gray-200">${escapeHtml(section.name)}</p><p class="text-[11px] text-muted mt-1">${groups[section.name].length} vídeo${groups[section.name].length === 1 ? '' : 's'}</p></div></div>`;
+    button.addEventListener('click', () => render(section.name)); nav.appendChild(button);
   });
-  if (themes.length) render(themes[0]);
+
+  count.textContent = `${videos.length} vídeo${videos.length === 1 ? '' : 's'}`;
+  if (sections.length) render(sections[0].name); else document.getElementById('no-videos').classList.remove('hidden');
 })();

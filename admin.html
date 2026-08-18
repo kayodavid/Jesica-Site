@@ -132,8 +132,8 @@
         </div>
         <div class="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <div class="flex flex-col lg:flex-row lg:items-end gap-3">
-            <div class="flex-1"><label for="new-section-name" class="block text-sm font-semibold text-dark mb-1">Seções cadastradas</label><p class="text-xs text-gray-500 mb-2">Cadastre as seções uma vez e use-as nos vídeos e eBooks.</p><input id="new-section-name" type="text" maxlength="60" placeholder="Ex.: Hematologia" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
-            <button type="button" id="add-section-btn" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all">Adicionar seção</button>
+            <div class="flex-1"><label for="new-section-name" class="block text-sm font-semibold text-dark mb-1">Seções cadastradas</label><p class="text-xs text-gray-500 mb-2">Cadastre cada seção uma vez e use-a nos vídeos e eBooks.</p><input id="new-section-name" type="text" maxlength="60" placeholder="Ex.: Hematologia" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" /></div>
+            <div class="flex items-center gap-2"><input id="new-section-cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" /><button type="button" id="choose-section-cover-btn" class="bg-white text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/10 transition-all">Escolher capa</button><button type="button" id="add-section-btn" class="bg-primary text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-dark transition-all">Salvar seção</button></div>
           </div>
           <div id="sections-list" class="flex flex-wrap gap-2 mt-3"></div>
         </div>
@@ -300,34 +300,40 @@
     const videosList = document.getElementById('videos-list');
     const noVideos = document.getElementById('no-videos');
     let videoCache = [];
-    const sectionsStorageKey = 'jessicamelo_content_sections';
     let sectionCache = [];
+    let selectedSectionCover = '';
+    function normalizeSection(section) { return typeof section === 'string' ? { name: section, cover_image: '' } : { name: section.name || 'Geral', cover_image: section.cover_image || section.coverImage || '' }; }
     function renderSectionControls() {
       ['video-section', 'ebook-section', 'edit-video-theme'].forEach(id => {
         const select = document.getElementById(id); if (!select) return;
         const current = select.value;
         select.innerHTML = '<option value="">Selecione uma seção</option>';
-        sectionCache.forEach(section => { const option = document.createElement('option'); option.value = section; option.textContent = section; select.appendChild(option); });
-        if (current && sectionCache.includes(current)) select.value = current;
+        sectionCache.forEach(section => { const option = document.createElement('option'); option.value = section.name; option.textContent = section.name; select.appendChild(option); });
+        if (current && sectionCache.some(section => section.name === current)) select.value = current;
       });
       const list = document.getElementById('sections-list'); if (!list) return;
       list.innerHTML = '';
-      sectionCache.forEach(section => { const tag = document.createElement('span'); tag.className = 'admin-theme-tag inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold'; tag.textContent = section; list.appendChild(tag); });
+      sectionCache.forEach(section => {
+        const tag = document.createElement('span'); tag.className = 'admin-theme-tag inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold';
+        tag.innerHTML = section.cover_image ? `<img src="${section.cover_image}" class="w-7 h-7 rounded-lg object-cover" alt="" />` : '<span class="w-7 h-7 rounded-lg bg-primary/10 inline-flex items-center justify-center">▦</span>';
+        const name = document.createElement('span'); name.textContent = section.name; tag.appendChild(name); list.appendChild(tag);
+      });
     }
     async function loadSections() {
-      let stored = []; try { stored = JSON.parse(localStorage.getItem(sectionsStorageKey) || '[]'); } catch {}
-      let legacy = [];
-      try { const [videos, ebooks] = await Promise.all([db.getVideos(), db.getEbooks()]); legacy = [...videos, ...ebooks].map(item => item.theme || '').filter(Boolean); } catch {}
-      sectionCache = [...new Set(['Geral', ...stored, ...legacy].map(value => String(value).trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-      localStorage.setItem(sectionsStorageKey, JSON.stringify(sectionCache));
-      renderSectionControls();
+      try { sectionCache = (await db.getSections()).map(normalizeSection); } catch { sectionCache = []; }
+      const names = new Set(sectionCache.map(section => section.name.toLowerCase()));
+      ['Geral'].forEach(name => { if (!names.has(name.toLowerCase())) sectionCache.push({ name, cover_image: '' }); });
+      sectionCache.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')); renderSectionControls();
     }
-    document.getElementById('add-section-btn')?.addEventListener('click', () => {
-      const input = document.getElementById('new-section-name'); const name = input.value.trim(); if (!name) return;
-      if (sectionCache.some(section => section.toLocaleLowerCase() === name.toLocaleLowerCase())) { alert('Essa seção já está cadastrada.'); return; }
-      sectionCache = [...sectionCache, name].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-      localStorage.setItem(sectionsStorageKey, JSON.stringify(sectionCache)); renderSectionControls();
-      document.getElementById('video-section').value = name; document.getElementById('ebook-section').value = name; input.value = '';
+    function readSectionCover(file) { return new Promise((resolve, reject) => { if (!file) return resolve(''); const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { const max = 1200, scale = Math.min(1, max / image.width); const canvas = document.createElement('canvas'); canvas.width = Math.round(image.width * scale); canvas.height = Math.round(image.height * scale); canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.82)); }; image.onerror = reject; image.src = reader.result; }; reader.onerror = reject; reader.readAsDataURL(file); }); }
+    document.getElementById('choose-section-cover-btn')?.addEventListener('click', () => document.getElementById('new-section-cover')?.click());
+    document.getElementById('new-section-cover')?.addEventListener('change', async event => { selectedSectionCover = await readSectionCover(event.target.files?.[0]); document.getElementById('choose-section-cover-btn').textContent = selectedSectionCover ? 'Capa selecionada' : 'Escolher capa'; });
+    document.getElementById('add-section-btn')?.addEventListener('click', async () => {
+      const input = document.getElementById('new-section-name'); const name = input.value.trim(); if (!name) return alert('Informe o nome da seção.');
+      const existing = sectionCache.find(section => section.name.toLowerCase() === name.toLowerCase());
+      const result = await db.upsertSection(existing?.name || name, selectedSectionCover || existing?.cover_image || '');
+      if (!result?.success && result?.success !== undefined) return alert(result.message || 'Não foi possível salvar a seção.');
+      await loadSections(); document.getElementById('video-section').value = existing?.name || name; document.getElementById('ebook-section').value = existing?.name || name; input.value = ''; document.getElementById('new-section-cover').value = ''; selectedSectionCover = ''; document.getElementById('choose-section-cover-btn').textContent = 'Escolher capa';
     });
     const editVideoModal = document.getElementById('edit-video-modal');
     const editVideoForm = document.getElementById('edit-video-form');
