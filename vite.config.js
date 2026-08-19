@@ -23,7 +23,8 @@ export default defineConfig({
         ebooks: resolve(__dirname, 'ebooks.html'),
         videos: resolve(__dirname, 'videos.html'),
         acompanhamentoNutricional: resolve(__dirname, 'acompanhamento-nutricional.html'),
-        calculadoras: resolve(__dirname, 'calculadoras.html')
+        calculadoras: resolve(__dirname, 'calculadoras.html'),
+        analiseRotulos: resolve(__dirname, 'analise-rotulos.html')
       },
       output: {
         // Gera arquivos em pastas separadas para URLs limpas

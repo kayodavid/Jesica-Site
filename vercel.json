@@ -9,6 +9,7 @@
     { "source": "/login", "destination": "/login.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/calendario", "destination": "/calendario.html" },
-    { "source": "/acompanhamento-nutricional", "destination": "/acompanhamento-nutricional.html" }
+    { "source": "/acompanhamento-nutricional", "destination": "/acompanhamento-nutricional.html" },
+    { "source": "/analise-rotulos", "destination": "/analise-rotulos.html" }
   ]
 }
