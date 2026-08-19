@@ -179,10 +179,12 @@
     .reminder-switch span { width:.92rem; height:.92rem; margin:.14rem; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.15); transition:transform .16s ease; }
     .reminder-switch:has(input:checked) { background:#2f71e5; }
     .reminder-switch:has(input:checked) span { transform:translateX(.9rem); }
-    .patient-registration-overlay { position:fixed; inset:0; z-index:79; display:grid; place-items:center; padding:1rem; background:rgba(23,24,29,.58); opacity:0; pointer-events:none; transition:opacity .2s ease; }
+    .patient-registration-overlay { position:fixed; inset:0; z-index:79; display:flex; justify-content:flex-end; background:rgba(23,24,29,.58); opacity:0; pointer-events:none; transition:opacity .2s ease; }
     .patient-registration-overlay.is-open { opacity:1; pointer-events:auto; }
-    .patient-registration-modal { width:min(35rem,100%); max-height:calc(100vh - 2rem); overflow:auto; border-radius:1rem; background:#fff; box-shadow:0 26px 70px rgba(0,0,0,.32); transform:translateY(.7rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
-    .patient-registration-overlay.is-open .patient-registration-modal { transform:translateY(0) scale(1); }
+    .patient-registration-modal { display:flex; width:min(37rem,100%); height:100%; max-height:100dvh; flex-direction:column; overflow:hidden auto; border-radius:1.35rem 0 0 1.35rem; background:#fff; box-shadow:-16px 0 46px rgba(0,0,0,.24); transform:translateX(100%); transition:transform .24s cubic-bezier(.23,1,.32,1); }
+    .patient-registration-overlay.is-open .patient-registration-modal { transform:translateX(0); }
+    .patient-registration-modal form { display:flex; min-height:100%; flex:1; flex-direction:column; } .patient-registration-modal form footer { margin-top:auto; background:inherit; }
+    @media (max-width: 640px) { .patient-registration-modal { width:100%; border-radius:0; } }
     .patient-registration-progress { height:2px; width:34%; background:#2f71e5; }
     .patient-phone-input, .iti { width:100%; }
     .iti .iti__tel-input { width:100% !important; }
