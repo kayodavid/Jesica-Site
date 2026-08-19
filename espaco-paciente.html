@@ -11,7 +11,7 @@
     tailwind.config = { theme: { extend: { colors: { primary: '#a88b36', secondary: '#d4b76a', accent: '#f5e6c8', dark: '#3d3226', light: '#faf8f3' } } } };
   </script>
   <style>
-    body { font-family: 'Poppins', sans-serif; transition: background .2s, color .2s; }
+    html, body { max-width:100%; overflow-x:hidden; } body { font-family: 'Poppins', sans-serif; transition: background .2s, color .2s; scrollbar-width:thin; scrollbar-color:rgba(168,139,54,.55) transparent; } body::-webkit-scrollbar { width:8px; } body::-webkit-scrollbar-track { background:transparent; } body::-webkit-scrollbar-thumb { border:2px solid transparent; border-radius:999px; background:rgba(168,139,54,.55); background-clip:content-box; } body::-webkit-scrollbar-thumb:hover { background:rgba(168,139,54,.8); background-clip:content-box; }
     .patient-sidebar { background: rgba(255,255,255,.8); border: 1px solid rgba(168,139,54,.16); }
     .patient-sidebar-link { display:flex; align-items:center; gap:.75rem; padding:.78rem .9rem; border-radius:1rem; color:#615442; font-size:.86rem; font-weight:600; transition:all .18s ease; }
     .patient-sidebar-link:hover { background:#f5e6c8; color:#3d3226; }
@@ -25,7 +25,7 @@
     .weekly-mark-a { background:#a88b36; }
     .weekly-mark-t { background:#5d806e; }
     .weekly-mark-h { background:#5c85a5; }
-    body[data-patient-theme='black'] { background:#17181d !important; color:#f5f5f5; }
+    body[data-patient-theme='black'] { background:#17181d !important; color:#f5f5f5; scrollbar-color:rgba(212,183,106,.58) transparent; } body[data-patient-theme='black']::-webkit-scrollbar-track { background:transparent; } body[data-patient-theme='black']::-webkit-scrollbar-thumb { background:rgba(212,183,106,.58); background-clip:content-box; } body[data-patient-theme='black']::-webkit-scrollbar-thumb:hover { background:rgba(212,183,106,.82); background-clip:content-box; }
     body[data-patient-theme='black'] nav { background:#1d1e24 !important; border-color:rgba(255,255,255,.08); }
     body[data-patient-theme='black'] .text-dark { color:#fff !important; }
     body[data-patient-theme='black'] .text-gray-500, body[data-patient-theme='black'] .text-gray-600 { color:#a9abb3 !important; }
