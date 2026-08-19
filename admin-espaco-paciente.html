@@ -948,6 +948,13 @@
       status.textContent = 'Informações salvas.'; status.className = 'text-xs font-semibold text-green-600';
     }
 
+    const sidebarHashRoutes = { inicio:'inicio-dashboard', 'patient-directory':'patient-directory', 'pending-review':'pending-review', 'send-report':'send-report', 'response-report':'response-report', 'engagement-report':'engagement-report', 'transaction-report':'transaction-report', configuracoes:'services-manager', 'questions-manager':'questions-manager', 'quizzes-manager':'quizzes-manager', 'reminders-manager':'reminders-manager', workspace:'workspace' };
+    const sidebarRouteSections = ['inicio','inicio-dashboard','patient-directory','pending-review','send-report','response-report','engagement-report','transaction-report','services-manager','questions-manager','quizzes-manager','reminders-manager','patient-selection-area','workspace','empty-state'];
+    const openSidebarHashRoute = ({ scroll = false } = {}) => { const hash = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); const targetId = sidebarHashRoutes[hash]; if (!targetId) return; sidebarRouteSections.forEach(id => document.getElementById(id)?.classList.add('hidden')); if (targetId === 'inicio-dashboard') { document.getElementById('inicio')?.classList.remove('hidden'); document.getElementById('inicio-dashboard')?.classList.remove('hidden'); } else { document.getElementById(targetId)?.classList.remove('hidden'); } document.querySelectorAll('[data-admin-nav]').forEach(link => { const href = String(link.getAttribute('href') || '').replace(/^#/, ''); const active = href === hash || (hash === 'configuracoes' && link.dataset.adminNav === 'servicos'); link.classList.toggle('is-active', active); }); if (scroll) document.getElementById(targetId)?.scrollIntoView({ behavior:'smooth', block:'start' }); };
+    window.addEventListener('hashchange', () => openSidebarHashRoute({ scroll:true }));
+    document.addEventListener('click', event => { const link = event.target.closest?.('#admin-sidebar-menu a[href^="#"]'); if (!link) return; window.setTimeout(() => openSidebarHashRoute({ scroll:true }), 0); });
+    openSidebarHashRoute();
+
     (async () => {
       applyPatientTheme(); document.getElementById('theme-toggle').addEventListener('click', togglePatientTheme);
       const session = await db.ready();
