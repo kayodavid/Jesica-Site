@@ -25,7 +25,9 @@ function cleanText(value) {
 
 function getNutrient(nutriments, key) {
   const value = nutriments?.[`${key}_100g`] ?? nutriments?.[key];
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  if (value === null || value === undefined || value === '') return null;
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : null;
 }
 
 function normalizeTags(tags) {
@@ -81,7 +83,8 @@ export default async function handler(req, res) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7000);
   try {
-    const response = await fetch(`https://world.openfoodfacts.org/api/v3.6/product/${encodeURIComponent(code)}.json`, {
+    // A leitura v2 mantém os campos nutricionais normalizados necessários para esta tela.
+    const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=code,product_name,product_name_pt,brands,quantity,image_front_url,image_url,ingredients_text,ingredients_text_pt,allergens_tags,nutrition_grades,nova_group,nutriments`, {
       headers: {
         'User-Agent': 'JessicaMeloNutri/1.0 (contato@jessicamelonutri.com.br)',
         'Accept': 'application/json',
@@ -92,7 +95,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) throw new Error(`Open Food Facts respondeu com status ${response.status}`);
     const data = await response.json();
-    const found = data?.status === 'success' && data?.result?.id === 'product_found' && data?.product;
+    const found = Number(data?.status) === 1 && data?.product;
     res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
     if (!found) return res.status(404).json({ error: 'Produto não encontrado na base consultada.', code });
     return res.status(200).json({ product: mapProduct(code, data.product) });
