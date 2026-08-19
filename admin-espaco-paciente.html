@@ -947,7 +947,7 @@
       document.getElementById('patient-label-manager-open').addEventListener('click', () => patientLabelManagerController.open());
       patientProfileController = renderPatientProfilePage({ getActivePatient:() => selectedPatient, labelModal:patientLabelModalController, notify:showToast, onBack:() => { document.getElementById('patient-profile-page').classList.add('hidden'); showDirectory(); } });
       const patientRegistrationController = renderPatientRegistrationModal(() => window.location.reload(), showToast, patientLabelModalController);
-      document.querySelectorAll('[data-add-patient]').forEach(button => button.addEventListener('click', () => patientRegistrationController.open()));
+      document.addEventListener('click', event => { const button = event.target.closest('[data-add-patient]'); if (!button) return; event.preventDefault(); patientRegistrationController.open(); });
       document.querySelectorAll('[data-export-patients]').forEach(button => button.addEventListener('click', () => { const count = patientDirectoryController.exportCsv(); showToast(`${count} paciente${count === 1 ? '' : 's'} exportado${count === 1 ? '' : 's'} em CSV.`); }));
       const sidebar = document.getElementById('admin-sidebar');
       document.getElementById('sidebar-mobile-toggle').addEventListener('click', () => { const collapsed = sidebar.classList.toggle('is-collapsed'); document.getElementById('sidebar-mobile-toggle').setAttribute('aria-expanded', String(!collapsed)); document.getElementById('sidebar-mobile-toggle').textContent = collapsed ? 'Abrir menu' : 'Menu'; });
