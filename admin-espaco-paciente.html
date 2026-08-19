@@ -313,7 +313,7 @@
         </aside>
         <div class="min-w-0">
       <header id="inicio" class="scroll-mt-28 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-5">
-        <div><p class="text-xs uppercase font-bold tracking-[.18em] text-primary">Acompanhamento clínico</p><h1 class="mt-1 text-3xl font-bold text-dark">Olá, <span id="admin-first-name">Jessica</span>!</h1><p class="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe a atividade dos pacientes e priorize as próximas ações de cuidado.</p></div>
+        <div><p class="text-xs uppercase font-bold tracking-[.18em] text-primary">Acompanhamento clínico</p><h1 class="mt-1 text-3xl font-bold text-dark">Olá, Dra. <span id="admin-first-name">Jessica</span>!</h1><p class="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe a atividade dos pacientes e priorize as próximas ações de cuidado.</p></div>
         <div class="flex flex-wrap items-center gap-2"><a href="/espaco-paciente" target="_blank" rel="noopener" class="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h6m0 0v6m0-6-8 8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2 2V7a2 2 0 012-2h6"/></svg>Ver área do paciente</a><button type="button" data-add-patient class="inline-flex w-fit items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white hover:bg-dark transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-5 10a5 5 0 0 1 10 0"/></svg>Adicionar paciente</button></div>
       </header>
 
@@ -661,7 +661,10 @@
       const next = document.getElementById('pending-next-page');
       const selectAll = document.getElementById('pending-select-all');
       const pending = items.filter(item => item.pending);
-      let page = 1;
+      let page = 1, serviceLinks = [];
+      const patientKey = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
+      const serviceEnd = link => { if (!link?.startDate || !Number(link.duration)) return null; const end = new Date(`${String(link.startDate).slice(0, 10)}T12:00:00`); if (Number.isNaN(end.getTime())) return null; end.setDate(end.getDate() + Number(link.duration)); return end; };
+      const planFor = item => { const all = serviceLinks.filter(link => link.patientKey === patientKey(item.patient)); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); const active = all.filter(link => { const status = String(link.status || '').toLocaleLowerCase('pt-BR'); const end = serviceEnd(link); return !['expired', 'finished', 'finalized', 'finalizado', 'concluido', 'concluído', 'cancelled', 'canceled'].includes(status) && (!end || end.getTime() >= today.getTime()); }); const pool = active.length ? active : all; return [...pool].sort((a, b) => String(b.startDate || b.createdAt || '').localeCompare(String(a.startDate || a.createdAt || '')))[0] || null; };
       const openReview = async item => { document.getElementById('pending-review').classList.add('hidden'); document.getElementById('inicio').classList.add('hidden'); document.getElementById('inicio-dashboard').classList.add('hidden'); document.getElementById('patient-selection-area').classList.remove('hidden'); await activatePatient(item.index, 'feedback-area'); };
       const draw = () => {
         const size = Number(pageSize.value); const pages = Math.max(1, Math.ceil(pending.length / size)); page = Math.min(page, pages);
@@ -670,7 +673,8 @@
         visible.forEach(item => {
           const row = document.createElement('tr');
           const country = phoneCountryForPatient(item.patient);
-          row.innerHTML = `<td><input class="review-select pending-row-select" type="checkbox" aria-label="Selecionar revisão de ${item.patient.name}"></td><td><button type="button" class="patient-name-button">${country ? `<span class="patient-flag iti__flag iti__${country}" title="País do telefone" aria-label="País do telefone"></span>` : ''}<span>${item.patient.name}</span></button></td><td>Feedback individual</td><td>Espaço do Paciente</td><td>${formatLastActivity(item.summary)}</td><td><span class="patient-tag-empty">Sem etiqueta</span></td><td><button type="button" class="review-action" aria-label="Revisar acompanhamento de ${item.patient.name}"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12.5 9.5 17 19 7.5"/></svg></button></td>`;
+          const plan = planFor(item);
+          row.innerHTML = `<td><input class="review-select pending-row-select" type="checkbox" aria-label="Selecionar revisão de ${item.patient.name}"></td><td><button type="button" class="patient-name-button">${country ? `<span class="patient-flag iti__flag iti__${country}" title="País do telefone" aria-label="País do telefone"></span>` : ''}<span>${item.patient.name}</span></button></td><td>Feedback individual</td><td>${plan?.serviceName || 'Sem plano cadastrado'}</td><td>${formatLastActivity(item.summary)}</td><td><span class="patient-tag-empty">Sem etiqueta</span></td><td><button type="button" class="review-action" aria-label="Revisar acompanhamento de ${item.patient.name}"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12.5 9.5 17 19 7.5"/></svg></button></td>`;
           row.querySelector('.patient-name-button').addEventListener('click', () => openReview(item));
           row.querySelector('.review-action').addEventListener('click', () => openReview(item));
           rows.appendChild(row);
@@ -680,7 +684,9 @@
       selectAll.addEventListener('change', () => document.querySelectorAll('.pending-row-select').forEach(input => { input.checked = selectAll.checked; }));
       pageSize.addEventListener('change', () => { page = 1; draw(); });
       previous.addEventListener('click', () => { page--; draw(); }); next.addEventListener('click', () => { page++; draw(); });
-      draw();
+      const refresh = async () => { serviceLinks = await db.getPatientServiceLinks(); draw(); };
+      void refresh();
+      return { refresh };
     }
     function formatSendDate(value) {
       if (!value) return 'Sem data';
@@ -996,12 +1002,12 @@
       const openPatientProfile = async index => { if (!Number.isInteger(index) || !patients[index]) return; select.value = String(index); selectedPatient = patients[index]; ['inicio','inicio-dashboard','patient-directory','pending-review','send-report','response-report','engagement-report','transaction-report','services-manager','questions-manager','quizzes-manager','reminders-manager','patient-selection-area','workspace','empty-state'].forEach(id => document.getElementById(id)?.classList.add('hidden')); document.getElementById('patient-profile-page').classList.remove('hidden'); document.querySelectorAll('[data-admin-nav]').forEach(item => item.classList.toggle('is-active', item.dataset.adminNav === 'pacientes')); await patientProfileController?.open(selectedPatient); };
       const fallbackDashboardItems = patients.map((patient, index) => ({ patient, index, calendar:{ days:{}, dayObservations:{} }, summary:{ a:0, t:0, h:0, active:0, last:0 }, feedback:{}, weeklyTotal:0, pending:true })); let dashboardItems = fallbackDashboardItems; try { const loadedItems = await renderDashboard(patients, activatePatient); if (loadedItems?.length || !patients.length) dashboardItems = loadedItems; } catch (error) { console.error('Não foi possível atualizar os indicadores do Início.', error); } const refreshDashboard = async () => { try { const loadedItems = await renderDashboard(patients, activatePatient); if (loadedItems?.length || !patients.length) dashboardItems = loadedItems; } catch (error) { console.error('Não foi possível atualizar os indicadores do Início.', error); } return dashboardItems; };
       const patientDirectoryController = renderPatientDirectory(dashboardItems, openPatientProfile);
-      renderPendingReviews(dashboardItems, activatePatient);
+      const pendingReviewController = renderPendingReviews(dashboardItems, activatePatient);
       const sendReportController = renderSendReport(dashboardItems);
       const responseReportController = renderResponseReport(dashboardItems);
       const engagementReportController = renderEngagementReport(patients);
       const transactionReportController = renderTransactionReport();
-      document.addEventListener('patient-services-updated', () => { void refreshDashboard(); void transactionReportController.refresh(); });
+      document.addEventListener('patient-services-updated', () => { void refreshDashboard(); void pendingReviewController.refresh(); void transactionReportController.refresh(); });
       let servicesManagerController, questionsManagerController, quizzesManagerController, remindersManagerController;
       const setActiveNavigation = key => document.querySelectorAll('[data-admin-nav]').forEach(item => item.classList.toggle('is-active', item.dataset.adminNav === key));
       const showHome = () => { void refreshDashboard(); document.getElementById('inicio').classList.remove('hidden'); document.getElementById('inicio-dashboard').classList.remove('hidden'); document.getElementById('patient-directory').classList.add('hidden'); document.getElementById('pending-review').classList.add('hidden'); document.getElementById('send-report').classList.add('hidden'); document.getElementById('response-report').classList.add('hidden'); document.getElementById('engagement-report').classList.add('hidden'); document.getElementById('transaction-report').classList.add('hidden'); document.getElementById('services-manager').classList.add('hidden'); document.getElementById('questions-manager').classList.add('hidden'); document.getElementById('quizzes-manager').classList.add('hidden'); document.getElementById('reminders-manager').classList.add('hidden'); document.getElementById('patient-selection-area').classList.add('hidden'); document.getElementById('workspace').classList.add('hidden'); document.getElementById('empty-state').classList.add('hidden'); setActiveNavigation('inicio'); };
