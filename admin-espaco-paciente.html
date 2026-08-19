@@ -520,7 +520,7 @@
           const feedback = calendar.dayObservations[FEEDBACK_KEY] || {};
           return { patient, index, calendar, summary, feedback, weeklyTotal:getWeeklyTotal(calendar), pending:!feedback.message || feedback.visible === false };
         })),
-        db.getPatientServiceLinks()
+        db.getPatientServiceLinks().catch(() => [])
       ]);
       const patientKeyFor = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
       const currentDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -965,7 +965,7 @@
       select.addEventListener('change', async () => { if (select.value === '') { selectedPatient = null; document.getElementById('workspace').classList.add('hidden'); document.getElementById('empty-state').classList.remove('hidden'); return; } await activatePatient(Number(select.value)); });
       let patientProfileController;
       const openPatientProfile = async index => { if (!Number.isInteger(index) || !patients[index]) return; select.value = String(index); selectedPatient = patients[index]; ['inicio','inicio-dashboard','patient-directory','pending-review','send-report','response-report','engagement-report','transaction-report','services-manager','questions-manager','quizzes-manager','reminders-manager','patient-selection-area','workspace','empty-state'].forEach(id => document.getElementById(id)?.classList.add('hidden')); document.getElementById('patient-profile-page').classList.remove('hidden'); document.querySelectorAll('[data-admin-nav]').forEach(item => item.classList.toggle('is-active', item.dataset.adminNav === 'pacientes')); await patientProfileController?.open(selectedPatient); };
-      let dashboardItems = await renderDashboard(patients, activatePatient); const refreshDashboard = async () => { dashboardItems = await renderDashboard(patients, activatePatient); return dashboardItems; };
+      let dashboardItems = []; try { dashboardItems = await renderDashboard(patients, activatePatient); } catch (error) { console.error('Não foi possível atualizar os indicadores do Início.', error); } const refreshDashboard = async () => { try { dashboardItems = await renderDashboard(patients, activatePatient); } catch (error) { console.error('Não foi possível atualizar os indicadores do Início.', error); } return dashboardItems; };
       const patientDirectoryController = renderPatientDirectory(dashboardItems, openPatientProfile);
       renderPendingReviews(dashboardItems, activatePatient);
       const sendReportController = renderSendReport(dashboardItems);
