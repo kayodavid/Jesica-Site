@@ -24,7 +24,9 @@ export default defineConfig({
         videos: resolve(__dirname, 'videos.html'),
         acompanhamentoNutricional: resolve(__dirname, 'acompanhamento-nutricional.html'),
         calculadoras: resolve(__dirname, 'calculadoras.html'),
-        analiseRotulos: resolve(__dirname, 'analise-rotulos.html')
+        analiseRotulos: resolve(__dirname, 'analise-rotulos.html'),
+        espacoPaciente: resolve(__dirname, 'espaco-paciente.html'),
+        adminEspacoPaciente: resolve(__dirname, 'admin-espaco-paciente.html')
       },
       output: {
         // Gera arquivos em pastas separadas para URLs limpas

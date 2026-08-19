@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Espaço do Paciente - Jessica Melo Nutri</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/jpeg" href="/assets/images/Jessica-site2.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: '#a88b36', secondary: '#d4b76a', accent: '#f5e6c8', dark: '#3d3226', light: '#faf8f3' } } } };
+  </script>
+  <style>
+    body { font-family: 'Poppins', sans-serif; transition: background .2s, color .2s; }
+    .patient-sidebar { background: rgba(255,255,255,.8); border: 1px solid rgba(168,139,54,.16); }
+    .patient-sidebar-link { display:flex; align-items:center; gap:.75rem; padding:.78rem .9rem; border-radius:1rem; color:#615442; font-size:.86rem; font-weight:600; transition:all .18s ease; }
+    .patient-sidebar-link:hover { background:#f5e6c8; color:#3d3226; }
+    .patient-sidebar-link.is-active { background:#a88b36; color:#fff; box-shadow:0 8px 18px rgba(168,139,54,.22); }
+    .metric-card { border: 1px solid rgba(168,139,54,.15); background: rgba(255,255,255,.86); }
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring-track { stroke: rgba(168,139,54,.15); }
+    .progress-ring-value { stroke: #a88b36; stroke-linecap: round; transition: stroke-dashoffset .45s ease; }
+    .weekly-column { min-height: 5.5rem; display:flex; align-items:flex-end; justify-content:center; gap:.16rem; }
+    .weekly-mark { width:.38rem; min-height:.32rem; border-radius:.35rem .35rem .12rem .12rem; transition:height .3s ease; }
+    .weekly-mark-a { background:#a88b36; }
+    .weekly-mark-t { background:#5d806e; }
+    .weekly-mark-h { background:#5c85a5; }
+    body[data-patient-theme='black'] { background:#17181d !important; color:#f5f5f5; }
+    body[data-patient-theme='black'] nav { background:#1d1e24 !important; border-color:rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] .text-dark { color:#fff !important; }
+    body[data-patient-theme='black'] .text-gray-500, body[data-patient-theme='black'] .text-gray-600 { color:#a9abb3 !important; }
+    body[data-patient-theme='black'] .bg-white, body[data-patient-theme='black'] .metric-card { background:#22242b !important; border-color:rgba(255,255,255,.08) !important; }
+    body[data-patient-theme='black'] .bg-light { background:#1d1e24 !important; }
+    body[data-patient-theme='black'] .patient-sidebar { background:#1d1e24; border-color:rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] .patient-sidebar-link { color:#d8c99c; }
+    body[data-patient-theme='black'] .patient-sidebar-link:hover { background:rgba(212,183,106,.14); color:#fff; }
+    body[data-patient-theme='black'] .patient-sidebar-link.is-active { background:#a88b36; color:#fff; }
+    body[data-patient-theme='black'] .border-gray-100, body[data-patient-theme='black'] .border-gray-200 { border-color:rgba(255,255,255,.1) !important; }
+    body[data-patient-theme='black'] nav #user-display-name, body[data-patient-theme='black'] nav #logout-btn, body[data-patient-theme='black'] nav [data-theme-toggle] { color:#d4b76a !important; }
+    body[data-patient-theme='black'] .empty-panel { background:rgba(34,36,43,.92) !important; border-color:rgba(212,183,106,.18) !important; }
+    @media (max-width: 1023px) { .patient-sidebar { position:static; } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col">
+  <nav class="bg-white/80 backdrop-blur-md border-b border-white/40 py-3 shadow-sm sticky top-0 z-40">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <a href="/paciente.html"><img data-patient-logo src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista"></a>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span id="user-display-name" class="text-sm font-semibold text-primary hidden sm:inline">Paciente</span>
+        <button data-theme-toggle id="theme-toggle" type="button" class="bg-primary/10 hover:bg-primary hover:text-white text-primary w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema"></button>
+        <a href="/paciente.html" class="hidden sm:inline-flex bg-primary/10 hover:bg-primary hover:text-white text-primary px-3.5 py-2 rounded-full text-xs font-semibold transition-all">Menu principal</a>
+        <button id="logout-btn" type="button" class="bg-primary/10 hover:bg-primary hover:text-white text-primary px-3.5 py-2 rounded-full text-xs font-semibold transition-all">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow px-4 py-6 sm:py-8">
+    <div class="container mx-auto max-w-7xl">
+      <div class="grid grid-cols-1 lg:grid-cols-[242px_minmax(0,1fr)] gap-5 lg:gap-7">
+        <aside class="patient-sidebar lg:sticky lg:top-24 h-fit rounded-3xl p-3 shadow-sm" aria-label="Navegação do Espaço do Paciente">
+          <a href="#meu-painel" class="patient-sidebar-link is-active" data-panel-link="meu-painel">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12 12 4l9 8v8a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-8Z"/></svg>
+            Meu painel
+          </a>
+          <a href="#meus-registros" class="patient-sidebar-link" data-panel-link="meus-registros">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg>
+            Meus registros
+          </a>
+          <a href="#minha-evolucao" class="patient-sidebar-link" data-panel-link="minha-evolucao">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m4 15 5-5 3 3 7-8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 5h4v4"/></svg>
+            Minha evolução
+          </a>
+          <a href="#orientacoes" class="patient-sidebar-link" data-panel-link="orientacoes">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Orientações
+          </a>
+          <div class="mt-3 border-t border-gray-100 pt-3">
+            <a href="/calendario.html" class="flex items-center justify-center gap-2 bg-primary text-white rounded-2xl px-3 py-3 text-xs font-bold hover:bg-dark transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Registrar meu dia
+            </a>
+          </div>
+          <p class="px-2 pt-4 text-[11px] leading-relaxed text-gray-500">Seu painel reúne informações registradas no Calendário de Automonitoramento.</p>
+        </aside>
+
+        <div class="min-w-0 space-y-5 sm:space-y-6">
+          <section id="meu-painel" class="relative overflow-hidden rounded-3xl bg-dark px-5 py-6 sm:px-8 sm:py-8 text-white shadow-lg">
+            <div class="absolute -right-10 -top-12 h-44 w-44 rounded-full bg-primary/45 blur-2xl"></div>
+            <div class="absolute right-16 bottom-0 h-20 w-20 rounded-t-full bg-secondary/20"></div>
+            <div class="relative flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+              <div class="max-w-2xl">
+                <p class="text-[11px] uppercase font-bold tracking-[.18em] text-secondary">Espaço do Paciente</p>
+                <h1 class="mt-2 text-2xl font-bold sm:text-3xl">Olá, <span id="patient-first-name">Paciente</span>. Seu cuidado em um só lugar.</h1>
+                <p class="mt-3 max-w-xl text-sm leading-relaxed text-white/75">Acompanhe os seus registros, reconheça a sua evolução e organize os próximos passos da jornada nutricional.</p>
+              </div>
+              <div class="flex items-center gap-4 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
+                <div class="relative h-[74px] w-[74px] shrink-0">
+                  <svg class="progress-ring h-full w-full" viewBox="0 0 36 36" aria-label="Índice de acompanhamento do mês">
+                    <path class="progress-ring-track" fill="none" stroke-width="3" d="M18 2.5a15.5 15.5 0 1 1 0 31a15.5 15.5 0 1 1 0-31" />
+                    <path id="month-progress-circle" class="progress-ring-value" fill="none" stroke-width="3" stroke-dasharray="100, 100" stroke-dashoffset="100" d="M18 2.5a15.5 15.5 0 1 1 0 31a15.5 15.5 0 1 1 0-31" />
+                  </svg>
+                  <span id="month-progress-number" class="absolute inset-0 flex items-center justify-center text-sm font-bold">0%</span>
+                </div>
+                <div><p class="text-xs font-semibold text-white/65">Ritmo do mês</p><p id="month-progress-label" class="mt-1 text-sm font-bold">Comece seu primeiro registro</p></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="meus-registros" class="scroll-mt-28">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between mb-3">
+              <div><p class="text-xs uppercase font-bold tracking-widest text-primary">Visão atual</p><h2 class="text-xl font-bold text-dark">Registros de <span id="month-name">este mês</span></h2></div>
+              <a href="/calendario.html" class="text-sm font-bold text-primary hover:text-dark transition-colors">Abrir calendário completo →</a>
+            </div>
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">
+              <article class="metric-card rounded-2xl p-4 sm:p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold text-gray-500">Alimentação</p><p id="count-a" class="mt-2 text-3xl font-bold text-dark">0</p></div><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold">A</span></div><p class="mt-3 text-[11px] text-gray-500">marcas de alimentação adequada</p></article>
+              <article class="metric-card rounded-2xl p-4 sm:p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold text-gray-500">Treino</p><p id="count-t" class="mt-2 text-3xl font-bold text-dark">0</p></div><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#dcebe3] text-[#47745f] font-bold">T</span></div><p class="mt-3 text-[11px] text-gray-500">marcas de treino realizadas</p></article>
+              <article class="metric-card rounded-2xl p-4 sm:p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold text-gray-500">Hidratação</p><p id="count-h" class="mt-2 text-3xl font-bold text-dark">0</p></div><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#dce9f2] text-[#47708d] font-bold">H</span></div><p class="mt-3 text-[11px] text-gray-500">marcas de hidratação</p></article>
+              <article class="metric-card rounded-2xl p-4 sm:p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-semibold text-gray-500">Dias ativos</p><p id="count-active-days" class="mt-2 text-3xl font-bold text-dark">0</p></div><span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#f5e6c8] text-primary"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg></span></div><p class="mt-3 text-[11px] text-gray-500">dias com algum registro</p></article>
+            </div>
+          </section>
+
+          <section id="minha-evolucao" class="scroll-mt-28 grid grid-cols-1 xl:grid-cols-[minmax(0,1.5fr)_minmax(260px,.75fr)] gap-5">
+            <article class="metric-card rounded-3xl p-5 sm:p-6 shadow-sm">
+              <div class="flex items-start justify-between gap-4"><div><p class="text-xs uppercase font-bold tracking-widest text-primary">Últimos sete dias</p><h2 class="mt-1 text-lg font-bold text-dark">Consistência da semana</h2><p class="mt-1 text-xs text-gray-500">Cada barra representa os registros A, T e H feitos em um dia.</p></div><div class="flex flex-col gap-1 text-[10px] font-semibold text-gray-500"><span><i class="inline-block h-2 w-2 rounded-full bg-primary mr-1"></i>Alimentação</span><span><i class="inline-block h-2 w-2 rounded-full bg-[#5d806e] mr-1"></i>Treino</span><span><i class="inline-block h-2 w-2 rounded-full bg-[#5c85a5] mr-1"></i>Hidratação</span></div></div>
+              <div id="weekly-chart" class="mt-6 grid grid-cols-7 gap-2 sm:gap-3"></div>
+            </article>
+            <article class="metric-card rounded-3xl p-5 sm:p-6 shadow-sm"><p class="text-xs uppercase font-bold tracking-widest text-primary">Próximo passo</p><h2 class="mt-1 text-lg font-bold text-dark">Mantenha seu ritmo</h2><p id="next-step-copy" class="mt-3 text-sm leading-relaxed text-gray-600">Faça o registro do seu dia sempre que concluir suas rotinas de alimentação, treino ou hidratação.</p><a href="/calendario.html" class="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white hover:bg-dark transition-colors">Registrar agora</a></article>
+          </section>
+
+          <section id="orientacoes" class="scroll-mt-28 grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <article class="metric-card rounded-3xl p-5 sm:p-6 shadow-sm"><div class="flex items-center gap-3"><span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><div><p class="text-xs uppercase font-bold tracking-widest text-primary">Orientações</p><h2 class="text-lg font-bold text-dark">Mensagens da nutricionista</h2></div></div><div id="nutritionist-feedback-box" class="empty-panel mt-5 rounded-2xl border border-dashed border-primary/25 bg-light p-4"><p id="nutritionist-feedback-title" class="text-sm font-semibold text-dark">Nenhuma nova orientação no momento</p><p id="nutritionist-feedback-message" class="mt-1 text-xs leading-relaxed text-gray-500">As observações individualizadas compartilhadas pela nutricionista aparecerão neste espaço.</p></div></article>
+            <article class="metric-card rounded-3xl p-5 sm:p-6 shadow-sm"><p class="text-xs uppercase font-bold tracking-widest text-primary">Cuidado contínuo</p><h2 class="mt-1 text-lg font-bold text-dark">Um registro de cada vez</h2><p class="mt-3 text-sm leading-relaxed text-gray-600">O acompanhamento é mais útil quando reflete a sua rotina real. Use o calendário para registrar seus dias e leve essas informações para as consultas.</p><div class="mt-5 flex items-center gap-3 rounded-2xl bg-primary/5 p-3"><span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 13 4 4L19 7"/></svg></span><p class="text-xs font-semibold text-dark">Informações pessoais disponíveis somente na sua área logada.</p></div></article>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-white py-6 px-4 text-center text-xs"><p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p></footer>
+
+  <script type="module">
+    import { db, applyPatientTheme, togglePatientTheme } from '/assets/js/db.js';
+
+    const markIsActive = (value, mark) => {
+      if (Array.isArray(value)) return value.map(String).includes(mark);
+      if (value && typeof value === 'object') return Boolean(value[mark] ?? value[mark.toLowerCase()] ?? value[mark.toUpperCase()]);
+      return String(value || '').toUpperCase().includes(mark);
+    };
+    const dayState = (days, day) => {
+      const value = days?.[day] ?? days?.[String(day)] ?? [];
+      return { a: markIsActive(value, 'A'), t: markIsActive(value, 'T'), h: markIsActive(value, 'H') };
+    };
+    const formatMonth = date => date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const shortWeekday = date => date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').slice(0, 3);
+    const FEEDBACK_KEY = '__nutritionist_feedback__';
+    const SETTINGS_KEY = '__patient_space_settings__';
+
+    function renderWeeklyChart(days, referenceDate) {
+      const chart = document.getElementById('weekly-chart');
+      chart.innerHTML = '';
+      for (let offset = 6; offset >= 0; offset--) {
+        const date = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate() - offset);
+        const sameMonth = date.getMonth() === referenceDate.getMonth() && date.getFullYear() === referenceDate.getFullYear();
+        const state = sameMonth ? dayState(days, date.getDate()) : { a:false, t:false, h:false };
+        const total = Number(state.a) + Number(state.t) + Number(state.h);
+        const heights = [state.a, state.t, state.h].map(active => active ? (total === 1 ? 52 : total === 2 ? 68 : 78) : 10);
+        const item = document.createElement('div');
+        item.className = 'min-w-0 text-center';
+        item.innerHTML = `<div class="weekly-column"> <span class="weekly-mark weekly-mark-a" style="height:${heights[0]}px; opacity:${state.a ? 1 : .16}"></span><span class="weekly-mark weekly-mark-t" style="height:${heights[1]}px; opacity:${state.t ? 1 : .16}"></span><span class="weekly-mark weekly-mark-h" style="height:${heights[2]}px; opacity:${state.h ? 1 : .16}"></span></div><p class="mt-2 text-[10px] font-semibold ${offset === 0 ? 'text-primary' : 'text-gray-500'}">${shortWeekday(date)}</p><p class="text-xs font-bold text-dark">${date.getDate()}</p>`;
+        chart.appendChild(item);
+      }
+    }
+
+    (async () => {
+      applyPatientTheme();
+      document.getElementById('theme-toggle').addEventListener('click', togglePatientTheme);
+      const session = await db.ready();
+      if (!session || session.role !== 'patient') {
+        window.location.href = session && session.role === 'admin' ? '/admin.html' : '/login.html';
+        return;
+      }
+      document.getElementById('user-display-name').textContent = session.name;
+      document.getElementById('patient-first-name').textContent = session.name.split(' ')[0];
+      document.getElementById('logout-btn').addEventListener('click', async () => { await db.logout(); window.location.href = '/login.html'; });
+      document.querySelectorAll('[data-panel-link]').forEach(link => link.addEventListener('click', () => {
+        document.querySelectorAll('[data-panel-link]').forEach(item => item.classList.remove('is-active'));
+        link.classList.add('is-active');
+      }));
+
+      const now = new Date();
+      document.getElementById('month-name').textContent = formatMonth(now);
+      let calendar = { days: {} };
+      try { calendar = await db.getCalendarData(session.email, now.getFullYear(), now.getMonth() + 1) || { days: {} }; } catch {}
+      const days = calendar.days || {};
+      const metadata = calendar.dayObservations || {};
+      const settings = { showSummary: true, showWeekly: true, showFeedback: true, ...(metadata[SETTINGS_KEY] || {}) };
+      const feedback = metadata[FEEDBACK_KEY] || {};
+      document.getElementById('meus-registros').classList.toggle('hidden', settings.showSummary === false);
+      document.getElementById('minha-evolucao').classList.toggle('hidden', settings.showWeekly === false);
+      document.getElementById('orientacoes').classList.toggle('hidden', settings.showFeedback === false);
+      if (settings.showFeedback !== false && feedback.visible !== false && feedback.message) {
+        document.getElementById('nutritionist-feedback-title').textContent = 'Uma mensagem para você';
+        document.getElementById('nutritionist-feedback-message').textContent = feedback.message;
+      }
+      const currentDay = now.getDate();
+      let countA = 0, countT = 0, countH = 0, activeDays = 0;
+      for (let day = 1; day <= currentDay; day++) {
+        const state = dayState(days, day);
+        countA += Number(state.a); countT += Number(state.t); countH += Number(state.h);
+        activeDays += Number(state.a || state.t || state.h);
+      }
+      document.getElementById('count-a').textContent = countA;
+      document.getElementById('count-t').textContent = countT;
+      document.getElementById('count-h').textContent = countH;
+      document.getElementById('count-active-days').textContent = activeDays;
+      const percentage = currentDay ? Math.min(100, Math.round((activeDays / currentDay) * 100)) : 0;
+      document.getElementById('month-progress-number').textContent = `${percentage}%`;
+      document.getElementById('month-progress-circle').style.strokeDashoffset = String(100 - percentage);
+      document.getElementById('month-progress-label').textContent = activeDays ? `${activeDays} dia${activeDays === 1 ? '' : 's'} acompanhado${activeDays === 1 ? '' : 's'}` : 'Comece seu primeiro registro';
+      document.getElementById('next-step-copy').textContent = activeDays
+        ? `Você registrou ${activeDays} dia${activeDays === 1 ? '' : 's'} neste mês. Continue usando o calendário para tornar sua evolução ainda mais visível.`
+        : 'Faça o registro do seu dia sempre que concluir suas rotinas de alimentação, treino ou hidratação.';
+      renderWeeklyChart(days, now);
+    })();
+  </script>
+</body>
+</html>
