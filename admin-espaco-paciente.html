@@ -14,6 +14,24 @@
     body { font-family:'Poppins',sans-serif; transition:background .2s,color .2s; }
     .panel-card { background:rgba(255,255,255,.88); border:1px solid rgba(168,139,54,.15); }
     .metric-card { border:1px solid rgba(168,139,54,.15); background:rgba(250,248,243,.78); }
+    .admin-shell { display:grid; grid-template-columns:minmax(216px, 240px) minmax(0, 1fr); gap:1.5rem; align-items:start; }
+    .admin-sidebar { position:sticky; top:5.75rem; max-height:calc(100vh - 7rem); overflow-y:auto; padding:.75rem; border:1px solid rgba(168,139,54,.16); border-radius:1.5rem; background:rgba(255,255,255,.84); box-shadow:0 14px 35px rgba(61,50,38,.06); }
+    .admin-sidebar-heading { padding:.4rem .55rem .7rem; color:#a88b36; font-size:.64rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+    .admin-nav-link, .admin-nav-toggle, .admin-sidebar-suggestion { display:flex; align-items:center; gap:.7rem; width:100%; padding:.72rem .7rem; border-radius:.85rem; color:#5d5140; font-size:.82rem; font-weight:600; text-align:left; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease; }
+    .admin-nav-link:hover, .admin-nav-toggle:hover, .admin-sidebar-suggestion:hover { color:#3d3226; background:#f5e6c8; transform:translateX(2px); }
+    .admin-nav-link.is-active { color:#fff; background:#a88b36; box-shadow:0 8px 18px rgba(168,139,54,.22); }
+    .admin-nav-icon { width:1.05rem; height:1.05rem; flex:none; }
+    .admin-nav-badge { margin-left:auto; display:inline-flex; min-width:1.25rem; height:1.25rem; align-items:center; justify-content:center; border-radius:999px; background:#47708d; color:#fff; font-size:.63rem; font-weight:700; }
+    .admin-nav-chevron { width:.9rem; height:.9rem; margin-left:auto; transition:transform .18s ease; }
+    .admin-nav-toggle[aria-expanded='true'] .admin-nav-chevron { transform:rotate(180deg); }
+    .admin-nav-submenu { display:grid; gap:.15rem; margin:.1rem 0 .35rem .72rem; padding:.2rem 0 .15rem .72rem; border-left:1px solid rgba(168,139,54,.22); }
+    .admin-nav-submenu a, .admin-nav-submenu button { display:block; width:100%; padding:.45rem .55rem; border-radius:.65rem; color:#756858; font-size:.72rem; font-weight:600; text-align:left; }
+    .admin-nav-submenu a:hover, .admin-nav-submenu button:hover { color:#a88b36; background:#f5e6c8; }
+    .admin-sidebar-divider { height:1px; margin:.7rem .45rem; background:rgba(168,139,54,.14); }
+    .admin-sidebar-footer { margin-top:.55rem; padding-top:.6rem; border-top:1px solid rgba(168,139,54,.14); }
+    .admin-sidebar-mobile-toggle { display:none; }
+    .admin-toast { position:fixed; left:50%; bottom:1.5rem; z-index:60; max-width:calc(100vw - 2rem); transform:translate(-50%, 140%); opacity:0; border:1px solid rgba(168,139,54,.28); border-radius:1rem; background:#3d3226; padding:.8rem 1rem; color:#fff; font-size:.78rem; font-weight:600; box-shadow:0 16px 32px rgba(0,0,0,.2); transition:transform .22s cubic-bezier(.23,1,.32,1), opacity .22s ease; }
+    .admin-toast.is-visible { transform:translate(-50%, 0); opacity:1; }
     body[data-patient-theme='black'] { background:#17181d !important; color:#f5f5f5; }
     body[data-patient-theme='black'] nav { background:#1d1e24 !important; border-color:rgba(255,255,255,.08); }
     body[data-patient-theme='black'] .text-dark { color:#fff !important; }
@@ -23,6 +41,13 @@
     body[data-patient-theme='black'] input, body[data-patient-theme='black'] textarea, body[data-patient-theme='black'] select { background:#2a2c34 !important; color:#f5f5f5 !important; border-color:rgba(255,255,255,.12) !important; }
     body[data-patient-theme='black'] .border-gray-100, body[data-patient-theme='black'] .border-gray-200 { border-color:rgba(255,255,255,.1) !important; }
     body[data-patient-theme='black'] nav .text-dark, body[data-patient-theme='black'] nav #logout-btn, body[data-patient-theme='black'] nav [data-theme-toggle] { color:#d4b76a !important; }
+    body[data-patient-theme='black'] .admin-sidebar { background:#1d1e24; border-color:rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] .admin-nav-link, body[data-patient-theme='black'] .admin-nav-toggle, body[data-patient-theme='black'] .admin-sidebar-suggestion { color:#d8c99c; }
+    body[data-patient-theme='black'] .admin-nav-link:hover, body[data-patient-theme='black'] .admin-nav-toggle:hover, body[data-patient-theme='black'] .admin-sidebar-suggestion:hover, body[data-patient-theme='black'] .admin-nav-submenu a:hover, body[data-patient-theme='black'] .admin-nav-submenu button:hover { background:rgba(212,183,106,.14); color:#fff; }
+    body[data-patient-theme='black'] .admin-nav-link.is-active { color:#fff; background:#a88b36; }
+    body[data-patient-theme='black'] .admin-nav-submenu a, body[data-patient-theme='black'] .admin-nav-submenu button { color:#bcb6aa; }
+    body[data-patient-theme='black'] .admin-sidebar-divider, body[data-patient-theme='black'] .admin-sidebar-footer { border-color:rgba(255,255,255,.1); background-color:rgba(255,255,255,.1); }
+    @media (max-width: 1023px) { .admin-shell { grid-template-columns:1fr; gap:1rem; } .admin-sidebar { position:static; max-height:none; overflow:visible; padding:.65rem; } .admin-sidebar-mobile-toggle { display:inline-flex; align-items:center; gap:.45rem; margin-left:auto; padding:.48rem .65rem; border-radius:.7rem; background:#a88b36; color:#fff; font-size:.7rem; font-weight:700; } .admin-sidebar.is-collapsed .admin-sidebar-menu, .admin-sidebar.is-collapsed .admin-sidebar-footer { display:none; } }
   </style>
 </head>
 <body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col">
@@ -34,15 +59,40 @@
   </nav>
 
   <main class="flex-grow px-4 py-7 sm:py-9">
-    <div class="container mx-auto max-w-6xl">
-      <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-7">
+    <div class="container mx-auto max-w-7xl">
+      <div class="admin-shell">
+        <aside id="admin-sidebar" class="admin-sidebar" aria-label="Navegação administrativa do Espaço do Paciente">
+          <div class="flex items-center gap-2 px-2 pt-1 pb-2"><div><p class="text-[10px] font-bold uppercase tracking-[.16em] text-primary">Acompanhamento</p><h2 class="mt-0.5 text-sm font-bold text-dark">Espaço do Paciente</h2></div><button id="sidebar-mobile-toggle" type="button" class="admin-sidebar-mobile-toggle" aria-expanded="true" aria-controls="admin-sidebar-menu">Menu</button></div>
+          <nav id="admin-sidebar-menu" class="admin-sidebar-menu" aria-label="Recursos administrativos">
+            <p class="admin-sidebar-heading">Visão geral</p>
+            <a href="#inicio" class="admin-nav-link is-active" data-admin-nav="inicio"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg>Início</a>
+            <a href="#pacientes" class="admin-nav-link" data-admin-nav="pacientes"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg>Pacientes</a>
+            <a href="#pendencias" class="admin-nav-link" data-admin-nav="pendencias"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 5h14l1 5-3 9H7L4 10l1-5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 5V3m8 2V3M8 14h8"/></svg>Pendências<span id="pending-count" class="admin-nav-badge">1</span></a>
+            <button type="button" class="admin-nav-toggle" data-sidebar-toggle="reports-menu" aria-expanded="true"><span class="admin-nav-icon"><svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 19V5m5 14v-6m5 6V9m5 10V3"/></svg></span>Relatórios<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button>
+            <div id="reports-menu" class="admin-nav-submenu"><a href="#registros" data-admin-nav="relatorios">Automonitoramento</a><a href="#workspace" data-admin-nav="evolucao">Evolução mensal</a></div>
+            <a href="#pendencias" class="admin-nav-link" data-admin-nav="envios"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 3 18 9-18 9 4-9-4-9Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 12h14"/></svg>Envios</a>
+            <a href="#pendencias" class="admin-nav-link" data-admin-nav="respostas"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 11.5a7.5 7.5 0 0 1-8 7.48A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 8-7.48A7.5 7.5 0 0 1 21 11.5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11h8m-8 3h5"/></svg>Respostas</a>
+            <a href="#registros" class="admin-nav-link" data-admin-nav="engajamento"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 21 4-5 4 5M12 16V3m0 0 4 4m-4-4-4 4"/></svg>Engajamento</a>
+            <button type="button" class="admin-nav-link" data-coming-soon="O resumo de transações será disponibilizado quando houver registro financeiro integrado."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 10h16m-9 5h2"/></svg>Transações</button>
+            <div class="admin-sidebar-divider"></div>
+            <p class="admin-sidebar-heading">Configurações</p>
+            <button type="button" class="admin-nav-toggle" data-sidebar-toggle="settings-menu" aria-expanded="true"><span class="admin-nav-icon"><svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.6 2.6-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3.68v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.6-2.6.06-.06A1.7 1.7 0 0 0 5.38 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3.68h.08A1.7 1.7 0 0 0 5.38 9.26a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.6-2.6.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3.68v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.6 2.6-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.08v3.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg></span>Configurações<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button>
+            <div id="settings-menu" class="admin-nav-submenu"><a href="#configuracoes" data-admin-nav="servicos">Serviços</a><button type="button" data-coming-soon="Questionários personalizados serão incluídos em uma próxima etapa do acompanhamento.">Questionários</button></div>
+            <a href="#workspace" class="admin-nav-link" data-admin-nav="area-paciente"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4h16v16H4z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 9h8m-8 4h8m-8 4h5"/></svg>Área do paciente</a>
+            <button type="button" class="admin-nav-link" data-coming-soon="Lembretes automáticos serão configurados em uma evolução futura do módulo."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h4"/></svg>Lembretes</button>
+            <button type="button" class="admin-nav-link" data-coming-soon="As integrações estarão disponíveis quando forem conectadas ao acompanhamento."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/></svg>Integrações</button>
+          </nav>
+          <div class="admin-sidebar-footer"><button type="button" class="admin-sidebar-suggestion" data-coming-soon="Obrigada pela sugestão. Em breve será possível enviar ideias diretamente por este espaço."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Enviar uma sugestão</button></div>
+        </aside>
+        <div class="min-w-0">
+      <header id="inicio" class="scroll-mt-28 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-7">
         <div><p class="text-xs uppercase font-bold tracking-[.18em] text-primary">Acompanhamento clínico</p><h1 class="mt-1 text-3xl font-bold text-dark">Espaço do Paciente</h1><p class="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe a consistência dos registros e envie orientações que o paciente visualizará na própria área logada.</p></div>
         <a href="/espaco-paciente" target="_blank" rel="noopener" class="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h6m0 0v6m0-6-8 8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6"/></svg>Ver experiência do paciente</a>
       </header>
 
       <section class="panel-card rounded-3xl p-5 sm:p-6 shadow-sm">
         <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 lg:items-end">
-          <div><label for="patient-select" class="block text-sm font-bold text-dark mb-2">Selecionar paciente</label><select id="patient-select" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"><option value="">Carregando pacientes...</option></select></div>
+          <div id="pacientes" class="scroll-mt-28"><label for="patient-select" class="block text-sm font-bold text-dark mb-2">Selecionar paciente</label><select id="patient-select" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"><option value="">Carregando pacientes...</option></select></div>
           <div class="rounded-2xl bg-primary/5 px-4 py-3"><p class="text-[10px] font-bold uppercase tracking-widest text-primary">Período exibido</p><p id="selected-month" class="mt-1 text-sm font-bold text-dark">Mês atual</p></div>
         </div>
       </section>
@@ -56,20 +106,23 @@
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(290px,.72fr)] gap-5">
-          <section class="panel-card rounded-3xl p-5 sm:p-6 shadow-sm">
+          <section id="pendencias" class="panel-card scroll-mt-28 rounded-3xl p-5 sm:p-6 shadow-sm">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><p class="text-xs uppercase font-bold tracking-widest text-primary">Feedback individual</p><h2 class="mt-1 text-xl font-bold text-dark">Orientação para <span id="selected-patient-name">o paciente</span></h2><p class="mt-1 text-sm text-gray-500">A mensagem ficará visível no Espaço do Paciente quando a exibição estiver habilitada.</p></div><span id="feedback-status" class="text-xs font-semibold text-gray-500"></span></div>
             <form id="feedback-form" class="mt-5 space-y-4"><textarea id="feedback-message" rows="7" maxlength="1800" placeholder="Ex.: Parabéns pela constância desta semana. Para os próximos dias, priorize..." class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/40"></textarea><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><label class="inline-flex items-center gap-2 text-sm font-semibold text-dark"><input id="feedback-visible" type="checkbox" class="h-4 w-4 accent-primary" checked>Exibir esta orientação ao paciente</label><button type="submit" class="rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-dark transition-colors">Salvar orientação</button></div></form>
           </section>
 
-          <section class="panel-card rounded-3xl p-5 sm:p-6 shadow-sm"><p class="text-xs uppercase font-bold tracking-widest text-primary">Configuração da tela</p><h2 class="mt-1 text-xl font-bold text-dark">O que o paciente verá</h2><p class="mt-1 text-sm text-gray-500">Os controles abaixo se aplicam ao Espaço do Paciente selecionado.</p><form id="settings-form" class="mt-5 space-y-3"><label class="flex items-start gap-3 rounded-2xl border border-gray-100 p-3 cursor-pointer"><input id="show-summary" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><strong class="block text-sm text-dark">Resumo do mês</strong><span class="block mt-1 text-xs text-gray-500">Indicadores de alimentação, treino, hidratação e dias ativos.</span></span></label><label class="flex items-start gap-3 rounded-2xl border border-gray-100 p-3 cursor-pointer"><input id="show-weekly" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><strong class="block text-sm text-dark">Evolução semanal</strong><span class="block mt-1 text-xs text-gray-500">Gráfico dos últimos sete dias registrados.</span></span></label><label class="flex items-start gap-3 rounded-2xl border border-gray-100 p-3 cursor-pointer"><input id="show-feedback" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><strong class="block text-sm text-dark">Orientações</strong><span class="block mt-1 text-xs text-gray-500">Área destinada às suas mensagens individualizadas.</span></span></label><button type="submit" class="w-full rounded-xl border border-primary/30 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors">Salvar configuração da tela</button></form></section>
+          <section id="configuracoes" class="panel-card scroll-mt-28 rounded-3xl p-5 sm:p-6 shadow-sm"><p class="text-xs uppercase font-bold tracking-widest text-primary">Configuração da tela</p><h2 class="mt-1 text-xl font-bold text-dark">O que o paciente verá</h2><p class="mt-1 text-sm text-gray-500">Os controles abaixo se aplicam ao Espaço do Paciente selecionado.</p><form id="settings-form" class="mt-5 space-y-3"><label class="flex items-start gap-3 rounded-2xl border border-gray-100 p-3 cursor-pointer"><input id="show-summary" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><strong class="block text-sm text-dark">Resumo do mês</strong><span class="block mt-1 text-xs text-gray-500">Indicadores de alimentação, treino, hidratação e dias ativos.</span></span></label><label class="flex items-start gap-3 rounded-2xl border border-gray-100 p-3 cursor-pointer"><input id="show-weekly" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><strong class="block text-sm text-dark">Evolução semanal</strong><span class="block mt-1 text-xs text-gray-500">Gráfico dos últimos sete dias registrados.</span></span></label><label class="flex items-start gap-3 rounded-2xl border border-gray-100 p-3 cursor-pointer"><input id="show-feedback" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><strong class="block text-sm text-dark">Orientações</strong><span class="block mt-1 text-xs text-gray-500">Área destinada às suas mensagens individualizadas.</span></span></label><button type="submit" class="w-full rounded-xl border border-primary/30 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors">Salvar configuração da tela</button></form></section>
         </div>
 
-        <section class="panel-card rounded-3xl p-5 sm:p-6 shadow-sm"><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs uppercase font-bold tracking-widest text-primary">Leitura rápida</p><h2 class="mt-1 text-xl font-bold text-dark">Registros recentes</h2></div><a id="calendar-link" href="/calendario.html" class="text-sm font-bold text-primary hover:text-dark">Abrir calendário do paciente →</a></div><div id="recent-records" class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div></section>
+        <section id="registros" class="panel-card scroll-mt-28 rounded-3xl p-5 sm:p-6 shadow-sm"><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs uppercase font-bold tracking-widest text-primary">Leitura rápida</p><h2 class="mt-1 text-xl font-bold text-dark">Registros recentes</h2></div><a id="calendar-link" href="/calendario.html" class="text-sm font-bold text-primary hover:text-dark">Abrir calendário do paciente →</a></div><div id="recent-records" class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div></section>
       </section>
 
       <section id="empty-state" class="panel-card mt-5 rounded-3xl p-10 text-center shadow-sm"><span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.5 13.5 11 11l2 2 3-3"/></svg></span><h2 class="mt-4 text-lg font-bold text-dark">Selecione um paciente para começar</h2><p class="mx-auto mt-2 max-w-md text-sm text-gray-500">Você poderá analisar os registros do mês, preparar uma orientação individual e definir os elementos exibidos no painel desse paciente.</p></section>
+        </div>
+      </div>
     </div>
   </main>
+  <div id="admin-toast" class="admin-toast" role="status" aria-live="polite"></div>
 
   <footer class="bg-dark text-white py-6 px-4 text-center text-xs"><p>&copy; 2025 Jessica Melo Nutricionista. Todos os direitos reservados.</p></footer>
 
@@ -119,6 +172,10 @@
       document.getElementById('show-feedback').checked = settings.showFeedback !== false;
       renderRecentRecords(selectedCalendar);
       document.getElementById('feedback-status').textContent = feedback.updatedAt ? `Atualizado em ${new Date(feedback.updatedAt).toLocaleDateString('pt-BR')}` : 'Pronto para editar';
+      const pendingBadge = document.getElementById('pending-count');
+      const hasPendingFeedback = !feedback.message || feedback.visible === false;
+      pendingBadge.textContent = hasPendingFeedback ? '1' : '0';
+      pendingBadge.classList.toggle('hidden', !hasPendingFeedback);
     }
     async function savePatientSpace({ saveFeedback = false, saveSettings = false }) {
       if (!selectedPatient) return;
@@ -142,8 +199,16 @@
       const select = document.getElementById('patient-select'); select.innerHTML = '<option value="">Selecione um paciente</option>';
       patients.forEach((patient, index) => { const option = document.createElement('option'); option.value = String(index); option.textContent = `${patient.name} — ${patient.email}`; select.appendChild(option); });
       if (!patients.length) select.innerHTML = '<option value="">Nenhum paciente cadastrado</option>';
-      select.addEventListener('change', async () => { selectedPatient = patients[Number(select.value)] || null; document.getElementById('workspace').classList.toggle('hidden', !selectedPatient); document.getElementById('empty-state').classList.toggle('hidden', Boolean(selectedPatient)); if (selectedPatient) await loadPatientData(); });
-      document.getElementById('feedback-form').addEventListener('submit', async event => { event.preventDefault(); await savePatientSpace({ saveFeedback:true }); });
+      select.addEventListener('change', async () => { selectedPatient = select.value === '' ? null : (patients[Number(select.value)] || null); document.getElementById('workspace').classList.toggle('hidden', !selectedPatient); document.getElementById('empty-state').classList.toggle('hidden', Boolean(selectedPatient)); if (selectedPatient) await loadPatientData(); });
+      const toast = document.getElementById('admin-toast');
+      let toastTimer;
+      const showToast = message => { toast.textContent = message; toast.classList.add('is-visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3600); };
+      document.querySelectorAll('[data-sidebar-toggle]').forEach(button => button.addEventListener('click', () => { const menu = document.getElementById(button.dataset.sidebarToggle); const expanded = button.getAttribute('aria-expanded') === 'true'; button.setAttribute('aria-expanded', String(!expanded)); menu.classList.toggle('hidden', expanded); }));
+      document.querySelectorAll('[data-admin-nav]').forEach(link => link.addEventListener('click', () => { document.querySelectorAll('[data-admin-nav]').forEach(item => item.classList.remove('is-active')); link.classList.add('is-active'); }));
+      document.querySelectorAll('[data-coming-soon]').forEach(button => button.addEventListener('click', () => showToast(button.dataset.comingSoon)));
+      const sidebar = document.getElementById('admin-sidebar');
+      document.getElementById('sidebar-mobile-toggle').addEventListener('click', () => { const collapsed = sidebar.classList.toggle('is-collapsed'); document.getElementById('sidebar-mobile-toggle').setAttribute('aria-expanded', String(!collapsed)); document.getElementById('sidebar-mobile-toggle').textContent = collapsed ? 'Abrir menu' : 'Menu'; });
+      document.getElementById('feedback-form').addEventListener('submit', async event => { event.preventDefault(); await savePatientSpace({ saveFeedback:true }); const hasMessage = document.getElementById('feedback-message').value.trim(); const pendingBadge = document.getElementById('pending-count'); pendingBadge.textContent = hasMessage ? '0' : '1'; pendingBadge.classList.toggle('hidden', Boolean(hasMessage)); });
       document.getElementById('settings-form').addEventListener('submit', async event => { event.preventDefault(); await savePatientSpace({ saveSettings:true }); });
     })();
   </script>
