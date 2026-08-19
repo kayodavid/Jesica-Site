@@ -327,7 +327,7 @@
         </div>
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
           <section class="dashboard-alert rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><h2 class="text-base font-bold text-dark">Pacientes em risco de abandono</h2></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.73 2.4 17.4A2 2 0 0 0 4.13 20h15.74a2 2 0 0 0 1.73-3L13.7 3.73a2 2 0 0 0-3.4 0Z"/></svg><div><p class="text-xs font-bold text-primary">Acompanhe pacientes sem registros recentes</p><p class="mt-1 text-xs leading-relaxed text-gray-500">A ausência de atividade pode indicar menor adesão ao acompanhamento.</p></div></div></div><div id="dashboard-risk-list" class="min-h-[8.3rem]"></div></section>
-          <section class="dashboard-alert rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><h2 class="text-base font-bold text-dark">Acompanhamento da semana</h2></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg><div><p class="text-xs font-bold text-primary">Atividade dos últimos sete dias</p><p class="mt-1 text-xs leading-relaxed text-gray-500">Use este resumo para priorizar os próximos contatos e orientações.</p></div></div></div><div id="dashboard-weekly-summary" class="min-h-[8.3rem]"></div></section>
+          <section class="dashboard-alert relative rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><div class="relative flex items-center gap-2"><button id="dashboard-due-settings" type="button" class="directory-tool !h-8 !w-8 shrink-0" aria-label="Configurar vencimentos" aria-expanded="false" title="Configurar vencimentos"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.6 2.6-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3.68v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.6-2.6.06-.06A1.7 1.7 0 0 0 5.38 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3.68h.08A1.7 1.7 0 0 0 5.38 9.26a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.6-2.6.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3.68v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.6 2.6-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.08v3.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg></button><h2 id="dashboard-due-title" class="text-base font-bold text-dark">Vencimentos da Semana</h2><div id="dashboard-due-menu" class="hidden absolute left-0 top-10 z-20 w-56 rounded-xl border border-primary/15 bg-white p-1.5 shadow-xl"><button type="button" data-dashboard-due-period="week" class="w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-dark hover:bg-primary/10">Vencimentos da Semana</button><button type="button" data-dashboard-due-period="month" class="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-dark hover:bg-primary/10">Vencimentos do Mês</button></div></div></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg><div><p id="dashboard-due-kicker" class="text-xs font-bold text-primary">Planos que vencem nos próximos 7 dias</p><p id="dashboard-due-description" class="mt-1 text-xs leading-relaxed text-gray-500">Acompanhe os planos com vencimento próximo e priorize os contatos.</p></div></div></div><div id="dashboard-due-list" class="min-h-[8.3rem]"></div></section>
         </div>
       </section>
 
@@ -462,6 +462,9 @@
     let selectedPatient = null;
     let selectedCalendar = { days: {}, notes: '', dayObservations: {} };
     const now = new Date();
+    const DASHBOARD_DUE_PERIOD_KEY = 'jessicamelo_dashboard_due_period';
+    let dashboardDuePeriod = (() => { try { return localStorage.getItem(DASHBOARD_DUE_PERIOD_KEY) === 'month' ? 'month' : 'week'; } catch { return 'week'; } })();
+    let dashboardDueState = { items:[], serviceLinks:[], selectPatient:null };
     const formatLastActivity = summary => { const day = Number(summary?.last || 0); if (!Number.isFinite(day) || day < 1) return 'Sem atividade'; const date = new Date(now.getFullYear(), now.getMonth(), day); return Number.isNaN(date.getTime()) ? 'Sem atividade' : date.toLocaleDateString('pt-BR'); };
     const markIsActive = (value, mark) => Array.isArray(value) ? value.map(String).includes(mark) : value && typeof value === 'object' ? Boolean(value[mark] ?? value[mark.toLowerCase()] ?? value[mark.toUpperCase()]) : String(value || '').toUpperCase().includes(mark);
     const stateForDay = (days, day) => { const value = days?.[day] ?? days?.[String(day)] ?? []; return { a:markIsActive(value,'A'), t:markIsActive(value,'T'), h:markIsActive(value,'H') }; };
@@ -503,11 +506,30 @@
       if (!atRisk.length) { target.innerHTML = '<div class="flex min-h-[8.3rem] items-center justify-center px-5 text-center"><div><p class="text-sm font-semibold text-dark">Nenhum paciente em alerta</p><p class="mt-1 text-xs text-gray-500">Todos os pacientes possuem registros no mês atual.</p></div></div>'; return; }
       atRisk.forEach(item => target.appendChild(createDashboardRow(item.patient, 'Sem registros neste mês', () => selectPatient(item.index, 'pendencias'))));
     }
-    function renderDashboardWeek(items, selectPatient) {
-      const target = document.getElementById('dashboard-weekly-summary'); target.innerHTML = '';
-      const active = items.filter(item => item.weeklyTotal > 0).sort((a, b) => b.weeklyTotal - a.weeklyTotal).slice(0, 3);
-      if (!active.length) { target.innerHTML = '<div class="flex min-h-[8.3rem] items-center justify-center px-5 text-center"><div><p class="text-sm font-semibold text-dark">Sem registros nesta semana</p><p class="mt-1 text-xs text-gray-500">Assim que houver atividade, ela aparecerá aqui.</p></div></div>'; return; }
-      active.forEach(item => target.appendChild(createDashboardRow(item.patient, `${item.weeklyTotal} registro${item.weeklyTotal === 1 ? '' : 's'} nos últimos 7 dias`, () => selectPatient(item.index, 'registros'))));
+    function renderDashboardDue(items, serviceLinks, selectPatient) {
+      dashboardDueState = { items, serviceLinks, selectPatient };
+      const target = document.getElementById('dashboard-due-list');
+      const title = document.getElementById('dashboard-due-title');
+      const kicker = document.getElementById('dashboard-due-kicker');
+      const description = document.getElementById('dashboard-due-description');
+      const settings = document.getElementById('dashboard-due-settings');
+      const menu = document.getElementById('dashboard-due-menu');
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const end = dashboardDuePeriod === 'month' ? new Date(now.getFullYear(), now.getMonth() + 1, 0) : new Date(now.getFullYear(), now.getMonth(), now.getDate() + 6);
+      const keyFor = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
+      const patientsByKey = new Map(items.map(item => [keyFor(item.patient), item]));
+      const serviceEnd = link => { if (!link?.startDate || !Number(link.duration)) return null; const date = new Date(`${String(link.startDate).slice(0, 10)}T12:00:00`); if (Number.isNaN(date.getTime())) return null; date.setDate(date.getDate() + Number(link.duration)); return date; };
+      const due = serviceLinks.map(link => ({ link, endDate:serviceEnd(link) })).filter(item => { const status = String(item.link?.status || '').toLocaleLowerCase('pt-BR'); return item.endDate && !['expired', 'finished', 'finalized', 'finalizado', 'concluido', 'concluído', 'cancelled', 'canceled'].includes(status) && item.endDate.getTime() >= start.getTime() && item.endDate.getTime() <= end.getTime(); }).map(item => ({ ...item, patient:patientsByKey.get(item.link.patientKey) })).filter(item => item.patient).sort((a, b) => a.endDate - b.endDate);
+      const endLabel = end.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' });
+      const modeTitle = dashboardDuePeriod === 'month' ? 'Vencimentos do Mês' : 'Vencimentos da Semana';
+      title.textContent = modeTitle;
+      kicker.textContent = dashboardDuePeriod === 'month' ? `Planos que vencem até ${endLabel}` : 'Planos que vencem nos próximos 7 dias';
+      description.textContent = 'Acompanhe os planos com vencimento próximo e priorize os contatos.';
+      document.querySelectorAll('[data-dashboard-due-period]').forEach(button => button.classList.toggle('bg-primary/10', button.dataset.dashboardDuePeriod === dashboardDuePeriod));
+      target.innerHTML = '';
+      if (!due.length) { const periodText = dashboardDuePeriod === 'month' ? 'até o fim deste mês' : 'nos próximos 7 dias'; target.innerHTML = `<div class="flex min-h-[8.3rem] items-center justify-center px-5 text-center"><div><p class="text-sm font-semibold text-dark">Nenhum plano vence ${periodText}</p><p class="mt-1 text-xs text-gray-500">Os próximos vencimentos aparecerão aqui em ordem cronológica.</p></div></div>`; }
+      due.forEach(item => { const endText = item.endDate.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }); const plan = item.link.serviceName || 'Plano contratado'; target.appendChild(createDashboardRow(item.patient.patient, `${plan} · vence em ${endText}`, () => selectPatient(item.patient.index, 'workspace'))); });
+      if (!settings.dataset.bound) { settings.dataset.bound = 'true'; settings.addEventListener('click', event => { event.stopPropagation(); const open = menu.classList.toggle('hidden'); settings.setAttribute('aria-expanded', String(!open)); }); document.querySelectorAll('[data-dashboard-due-period]').forEach(button => button.addEventListener('click', () => { dashboardDuePeriod = button.dataset.dashboardDuePeriod === 'month' ? 'month' : 'week'; try { localStorage.setItem(DASHBOARD_DUE_PERIOD_KEY, dashboardDuePeriod); } catch {} menu.classList.add('hidden'); settings.setAttribute('aria-expanded', 'false'); renderDashboardDue(dashboardDueState.items, dashboardDueState.serviceLinks, dashboardDueState.selectPatient); })); document.addEventListener('click', event => { if (!menu.contains(event.target) && !settings.contains(event.target)) { menu.classList.add('hidden'); settings.setAttribute('aria-expanded', 'false'); } }); }
     }
     async function renderDashboard(patients, selectPatient) {
       const dashboardUpdatedAt = document.getElementById('dashboard-updated-at');
@@ -539,7 +561,7 @@
       document.getElementById('dashboard-period').textContent = now.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
       dashboardUpdatedAt.textContent = `Última atualização dos dados: ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })}`;
       renderDashboardRisk(items, selectPatient);
-      renderDashboardWeek(items, selectPatient);
+      renderDashboardDue(items, serviceLinks, selectPatient);
       return items;
     }
     function renderPatientDirectory(items, activatePatient) {
