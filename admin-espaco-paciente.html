@@ -32,6 +32,12 @@
     .admin-sidebar-mobile-toggle { display:none; }
     .admin-toast { position:fixed; left:50%; bottom:1.5rem; z-index:60; max-width:calc(100vw - 2rem); transform:translate(-50%, 140%); opacity:0; border:1px solid rgba(168,139,54,.28); border-radius:1rem; background:#3d3226; padding:.8rem 1rem; color:#fff; font-size:.78rem; font-weight:600; box-shadow:0 16px 32px rgba(0,0,0,.2); transition:transform .22s cubic-bezier(.23,1,.32,1), opacity .22s ease; }
     .admin-toast.is-visible { transform:translate(-50%, 0); opacity:1; }
+    .dashboard-summary { background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(245,230,200,.5)); border:1px solid rgba(168,139,54,.18); }
+    .dashboard-metric { min-height:9rem; border:1px solid rgba(168,139,54,.16); background:rgba(255,255,255,.86); transition:transform .18s cubic-bezier(.23,1,.32,1), box-shadow .18s ease; }
+    .dashboard-metric:hover { transform:translateY(-2px); box-shadow:0 12px 26px rgba(61,50,38,.08); }
+    .dashboard-alert { border:1px solid rgba(168,139,54,.16); background:rgba(255,255,255,.86); }
+    .dashboard-notice { border-top:1px solid rgba(168,139,54,.16); border-bottom:1px solid rgba(168,139,54,.16); background:rgba(232,242,249,.78); }
+    .dashboard-list-row + .dashboard-list-row { border-top:1px solid rgba(168,139,54,.12); }
     body[data-patient-theme='black'] { background:#17181d !important; color:#f5f5f5; }
     body[data-patient-theme='black'] nav { background:#1d1e24 !important; border-color:rgba(255,255,255,.08); }
     body[data-patient-theme='black'] .text-dark { color:#fff !important; }
@@ -42,6 +48,8 @@
     body[data-patient-theme='black'] .border-gray-100, body[data-patient-theme='black'] .border-gray-200 { border-color:rgba(255,255,255,.1) !important; }
     body[data-patient-theme='black'] nav .text-dark, body[data-patient-theme='black'] nav #logout-btn, body[data-patient-theme='black'] nav [data-theme-toggle] { color:#d4b76a !important; }
     body[data-patient-theme='black'] .admin-sidebar { background:#1d1e24; border-color:rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='black'] .dashboard-metric, body[data-patient-theme='black'] .dashboard-alert { background:#22242b; border-color:rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] .dashboard-notice { background:rgba(54,74,88,.36); border-color:rgba(212,183,106,.15); }
     body[data-patient-theme='black'] .admin-nav-link, body[data-patient-theme='black'] .admin-nav-toggle, body[data-patient-theme='black'] .admin-sidebar-suggestion { color:#d8c99c; }
     body[data-patient-theme='black'] .admin-nav-link:hover, body[data-patient-theme='black'] .admin-nav-toggle:hover, body[data-patient-theme='black'] .admin-sidebar-suggestion:hover, body[data-patient-theme='black'] .admin-nav-submenu a:hover, body[data-patient-theme='black'] .admin-nav-submenu button:hover { background:rgba(212,183,106,.14); color:#fff; }
     body[data-patient-theme='black'] .admin-nav-link.is-active { color:#fff; background:#a88b36; }
@@ -85,10 +93,24 @@
           <div class="admin-sidebar-footer"><button type="button" class="admin-sidebar-suggestion" data-coming-soon="Obrigada pela sugestão. Em breve será possível enviar ideias diretamente por este espaço."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Enviar uma sugestão</button></div>
         </aside>
         <div class="min-w-0">
-      <header id="inicio" class="scroll-mt-28 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-7">
-        <div><p class="text-xs uppercase font-bold tracking-[.18em] text-primary">Acompanhamento clínico</p><h1 class="mt-1 text-3xl font-bold text-dark">Espaço do Paciente</h1><p class="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe a consistência dos registros e envie orientações que o paciente visualizará na própria área logada.</p></div>
-        <a href="/espaco-paciente" target="_blank" rel="noopener" class="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h6m0 0v6m0-6-8 8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6"/></svg>Ver experiência do paciente</a>
+      <header id="inicio" class="scroll-mt-28 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-5">
+        <div><p class="text-xs uppercase font-bold tracking-[.18em] text-primary">Acompanhamento clínico</p><h1 class="mt-1 text-3xl font-bold text-dark">Olá, <span id="admin-first-name">Jessica</span>!</h1><p class="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe a atividade dos pacientes e priorize as próximas ações de cuidado.</p></div>
+        <div class="flex flex-wrap items-center gap-2"><a href="/espaco-paciente" target="_blank" rel="noopener" class="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h6m0 0v6m0-6-8 8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2 2V7a2 2 0 012-2h6"/></svg>Ver área do paciente</a><a href="/admin.html" class="inline-flex w-fit items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white hover:bg-dark transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-5 10a5 5 0 0 1 10 0"/></svg>Adicionar paciente</a></div>
       </header>
+
+      <section id="inicio-dashboard" class="mb-6 space-y-5">
+        <div class="dashboard-summary rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div class="flex items-center gap-2"><svg class="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg><p id="dashboard-updated-at" class="text-xs font-medium text-gray-500">Atualizando dados do painel...</p></div><p id="dashboard-period" class="rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">Mês atual</p></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="pending"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Revisões pendentes</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 5h14l1 5-3 9H7L4 10l1-5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 14h8"/></svg></div><p id="dashboard-pending-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Ir para pendências <span>›</span></span></button>
+          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="patients"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Pacientes ativos</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg></div><p id="dashboard-patient-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Ir para pacientes <span>›</span></span></button>
+          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="engagement"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Pacientes acompanhados</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 17 10 13l3 3 5-6"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 10h4v4"/></svg></div><p id="dashboard-engaged-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Com registros no mês <span>›</span></span></button>
+          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="reports"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Registros no mês</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg></div><p id="dashboard-record-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Marcas A, T e H <span>›</span></span></button>
+        </div>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <section class="dashboard-alert rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><h2 class="text-base font-bold text-dark">Pacientes em risco de abandono</h2></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.73 2.4 17.4A2 2 0 0 0 4.13 20h15.74a2 2 0 0 0 1.73-3L13.7 3.73a2 2 0 0 0-3.4 0Z"/></svg><div><p class="text-xs font-bold text-primary">Acompanhe pacientes sem registros recentes</p><p class="mt-1 text-xs leading-relaxed text-gray-500">A ausência de atividade pode indicar menor adesão ao acompanhamento.</p></div></div></div><div id="dashboard-risk-list" class="min-h-[8.3rem]"></div></section>
+          <section class="dashboard-alert rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><h2 class="text-base font-bold text-dark">Acompanhamento da semana</h2></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg><div><p class="text-xs font-bold text-primary">Atividade dos últimos sete dias</p><p class="mt-1 text-xs leading-relaxed text-gray-500">Use este resumo para priorizar os próximos contatos e orientações.</p></div></div></div><div id="dashboard-weekly-summary" class="min-h-[8.3rem]"></div></section>
+        </div>
+      </section>
 
       <section class="panel-card rounded-3xl p-5 sm:p-6 shadow-sm">
         <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 lg:items-end">
@@ -150,6 +172,59 @@
       if (!records.length) { target.innerHTML = '<p class="sm:col-span-2 lg:col-span-4 rounded-2xl border border-dashed border-gray-200 p-5 text-center text-sm text-gray-500">Ainda não há registros no mês atual.</p>'; return; }
       records.forEach(({ day, state }) => { const labels = [['A',state.a,'bg-primary/10 text-primary'],['T',state.t,'bg-[#dcebe3] text-[#47745f]'],['H',state.h,'bg-[#dce9f2] text-[#47708d]']].filter(([,active]) => active).map(([label,,className]) => `<span class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ${className}">${label}</span>`).join(''); target.insertAdjacentHTML('beforeend', `<article class="metric-card rounded-2xl p-4"><p class="text-sm font-bold text-dark">${formatDate(day)}</p><div class="mt-3 flex gap-2">${labels}</div></article>`); });
     }
+    function getWeeklyTotal(calendar) {
+      let total = 0;
+      for (let day = Math.max(1, now.getDate() - 6); day <= now.getDate(); day++) { const state = stateForDay(calendar.days || {}, day); total += Number(state.a) + Number(state.t) + Number(state.h); }
+      return total;
+    }
+    function createDashboardRow(patient, subtitle, onClick) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'dashboard-list-row flex w-full items-center justify-between gap-3 px-5 py-3.5 text-left hover:bg-primary/5 transition-colors';
+      const content = document.createElement('span');
+      const name = document.createElement('strong'); name.className = 'block text-sm text-dark'; name.textContent = patient.name;
+      const detail = document.createElement('span'); detail.className = 'mt-0.5 block text-xs text-gray-500'; detail.textContent = subtitle;
+      content.append(name, detail);
+      button.append(content);
+      button.insertAdjacentHTML('beforeend', '<svg class="h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/></svg>');
+      button.addEventListener('click', onClick);
+      return button;
+    }
+    function renderDashboardRisk(items, selectPatient) {
+      const target = document.getElementById('dashboard-risk-list'); target.innerHTML = '';
+      const atRisk = items.filter(item => item.summary.active === 0).slice(0, 3);
+      if (!atRisk.length) { target.innerHTML = '<div class="flex min-h-[8.3rem] items-center justify-center px-5 text-center"><div><p class="text-sm font-semibold text-dark">Nenhum paciente em alerta</p><p class="mt-1 text-xs text-gray-500">Todos os pacientes possuem registros no mês atual.</p></div></div>'; return; }
+      atRisk.forEach(item => target.appendChild(createDashboardRow(item.patient, 'Sem registros neste mês', () => selectPatient(item.index, 'pendencias'))));
+    }
+    function renderDashboardWeek(items, selectPatient) {
+      const target = document.getElementById('dashboard-weekly-summary'); target.innerHTML = '';
+      const active = items.filter(item => item.weeklyTotal > 0).sort((a, b) => b.weeklyTotal - a.weeklyTotal).slice(0, 3);
+      if (!active.length) { target.innerHTML = '<div class="flex min-h-[8.3rem] items-center justify-center px-5 text-center"><div><p class="text-sm font-semibold text-dark">Sem registros nesta semana</p><p class="mt-1 text-xs text-gray-500">Assim que houver atividade, ela aparecerá aqui.</p></div></div>'; return; }
+      active.forEach(item => target.appendChild(createDashboardRow(item.patient, `${item.weeklyTotal} registro${item.weeklyTotal === 1 ? '' : 's'} nos últimos 7 dias`, () => selectPatient(item.index, 'registros'))));
+    }
+    async function renderDashboard(patients, selectPatient) {
+      const dashboardUpdatedAt = document.getElementById('dashboard-updated-at');
+      dashboardUpdatedAt.textContent = 'Atualizando dados de acompanhamento...';
+      const items = await Promise.all(patients.map(async (patient, index) => {
+        let calendar = { days:{}, dayObservations:{} };
+        try { calendar = await db.getCalendarData(patient.email, now.getFullYear(), now.getMonth() + 1) || calendar; } catch {}
+        calendar.days ||= {}; calendar.dayObservations ||= {};
+        const summary = getMonthSummary(calendar);
+        const feedback = calendar.dayObservations[FEEDBACK_KEY] || {};
+        return { patient, index, calendar, summary, weeklyTotal:getWeeklyTotal(calendar), pending:!feedback.message || feedback.visible === false };
+      }));
+      const pending = items.filter(item => item.pending).length;
+      const engaged = items.filter(item => item.summary.active > 0).length;
+      const records = items.reduce((total, item) => total + item.summary.a + item.summary.t + item.summary.h, 0);
+      document.getElementById('dashboard-pending-count').textContent = pending;
+      document.getElementById('dashboard-patient-count').textContent = patients.length;
+      document.getElementById('dashboard-engaged-count').textContent = engaged;
+      document.getElementById('dashboard-record-count').textContent = records;
+      const pendingBadge = document.getElementById('pending-count'); pendingBadge.textContent = pending; pendingBadge.classList.toggle('hidden', pending === 0);
+      document.getElementById('dashboard-period').textContent = now.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+      dashboardUpdatedAt.textContent = `Última atualização dos dados: ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })}`;
+      renderDashboardRisk(items, selectPatient);
+      renderDashboardWeek(items, selectPatient);
+    }
     async function loadPatientData() {
       if (!selectedPatient) return;
       document.getElementById('feedback-status').textContent = 'Carregando...';
@@ -193,13 +268,17 @@
       applyPatientTheme(); document.getElementById('theme-toggle').addEventListener('click', togglePatientTheme);
       const session = await db.ready();
       if (!session || session.role !== 'admin') { window.location.href = '/login.html'; return; }
+      document.getElementById('admin-first-name').textContent = (session.name || 'Jessica').split(' ')[0];
       document.getElementById('logout-btn').addEventListener('click', async () => { await db.logout(); window.location.href = '/login.html'; });
       document.getElementById('selected-month').textContent = now.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
       const patients = await db.getPatients();
       const select = document.getElementById('patient-select'); select.innerHTML = '<option value="">Selecione um paciente</option>';
       patients.forEach((patient, index) => { const option = document.createElement('option'); option.value = String(index); option.textContent = `${patient.name} — ${patient.email}`; select.appendChild(option); });
       if (!patients.length) select.innerHTML = '<option value="">Nenhum paciente cadastrado</option>';
-      select.addEventListener('change', async () => { selectedPatient = select.value === '' ? null : (patients[Number(select.value)] || null); document.getElementById('workspace').classList.toggle('hidden', !selectedPatient); document.getElementById('empty-state').classList.toggle('hidden', Boolean(selectedPatient)); if (selectedPatient) await loadPatientData(); });
+      const activatePatient = async (index, targetId = 'workspace') => { if (!Number.isInteger(index) || !patients[index]) return; select.value = String(index); selectedPatient = patients[index]; document.getElementById('workspace').classList.remove('hidden'); document.getElementById('empty-state').classList.add('hidden'); await loadPatientData(); document.getElementById(targetId)?.scrollIntoView({ behavior:'smooth', block:'start' }); };
+      select.addEventListener('change', async () => { if (select.value === '') { selectedPatient = null; document.getElementById('workspace').classList.add('hidden'); document.getElementById('empty-state').classList.remove('hidden'); return; } await activatePatient(Number(select.value)); });
+      await renderDashboard(patients, activatePatient);
+      document.querySelectorAll('[data-dashboard-action]').forEach(button => button.addEventListener('click', () => { const targets = { pending:'pendencias', patients:'pacientes', engagement:'registros', reports:'registros' }; document.getElementById(targets[button.dataset.dashboardAction])?.scrollIntoView({ behavior:'smooth', block:'start' }); }));
       const toast = document.getElementById('admin-toast');
       let toastTimer;
       const showToast = message => { toast.textContent = message; toast.classList.add('is-visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3600); };
