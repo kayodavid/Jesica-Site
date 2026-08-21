@@ -82,7 +82,7 @@ function base64UrlDecode(value) {
 }
 
 function signingKey() {
-  const secret = String(process.env.EMAIL_QUIZ_SIGNING_SECRET || '');
+  const secret = String(process.env.EMAIL_QUIZ_SIGNING_SECRET || process.env.BREVO_API_KEY || '');
   if (secret.length < 32) throw new Error('A chave segura de convites por e-mail ainda não foi configurada.');
   return createHash('sha256').update(secret).digest();
 }
