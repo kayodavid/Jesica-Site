@@ -17,6 +17,7 @@ export default defineConfig({
         areaPaciente: resolve(__dirname, 'area-do-paciente.html'),
         login: resolve(__dirname, 'login.html'),
         redefinirSenha: resolve(__dirname, 'redefinir-senha.html'),
+        responderQuestionario: resolve(__dirname, 'responder-questionario.html'),
         admin: resolve(__dirname, 'admin.html'),
         calendario: resolve(__dirname, 'calendario.html'),
         paciente: resolve(__dirname, 'paciente.html'),
