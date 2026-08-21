@@ -26,6 +26,7 @@
     { "source": "/acompanhamento-nutricional", "destination": "/acompanhamento-nutricional.html" },
     { "source": "/analise-rotulos", "destination": "/analise-rotulos.html" },
     { "source": "/espaco-paciente", "destination": "/espaco-paciente.html" },
-    { "source": "/admin-espaco-paciente", "destination": "/admin-espaco-paciente.html" }
+    { "source": "/admin-espaco-paciente", "destination": "/admin-espaco-paciente.html" },
+    { "source": "/responder-questionario", "destination": "/responder-questionario.html" }
   ]
 }
