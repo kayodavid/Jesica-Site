@@ -14,8 +14,14 @@
     body { font-family:'Poppins',sans-serif; transition:background .2s,color .2s; }
     .panel-card { background:rgba(255,255,255,.88); border:1px solid rgba(168,139,54,.15); }
     .metric-card { border:1px solid rgba(168,139,54,.15); background:rgba(250,248,243,.78); }
-    .admin-shell { display:grid; grid-template-columns:minmax(216px, 240px) minmax(0, 1fr); gap:1.5rem; align-items:start; }
-    .admin-sidebar { position:sticky; top:5.75rem; max-height:calc(100vh - 7rem); overflow-y:auto; padding:.75rem; border:1px solid rgba(168,139,54,.16); border-radius:1.5rem; background:rgba(255,255,255,.84); box-shadow:0 14px 35px rgba(61,50,38,.06); }
+    .admin-layout-container { width:100%; max-width:none; padding:0; }
+    .admin-shell { display:grid; min-height:calc(100vh - 4.05rem); grid-template-columns:18rem minmax(0, 1fr); gap:0; align-items:stretch; }
+    .admin-sidebar { position:sticky; top:4.05rem; display:flex; height:calc(100vh - 4.05rem); min-height:calc(100vh - 4.05rem); max-height:calc(100vh - 4.05rem); flex-direction:column; overflow:hidden; padding:1rem .85rem 1.15rem; border:0; border-right:1px solid rgba(168,139,54,.16); border-radius:0; background:rgba(255,255,255,.94); box-shadow:none; }
+    .admin-content { min-width:0; padding:1.8rem clamp(1.25rem, 3vw, 2.75rem) 3rem; }
+    .admin-sidebar-menu { display:flex; min-height:0; flex:1 1 auto; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; padding-right:.2rem; }
+    .admin-sidebar-menu::-webkit-scrollbar { width:.42rem; }
+    .admin-sidebar-menu::-webkit-scrollbar-thumb { border-radius:999px; background:rgba(168,139,54,.3); }
+    .admin-sidebar-footer { flex:none; }
     .admin-sidebar-heading { padding:.4rem .55rem .7rem; color:#a88b36; font-size:.64rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
     .admin-nav-link, .admin-nav-toggle, .admin-sidebar-suggestion { display:flex; align-items:center; gap:.7rem; width:100%; padding:.72rem .7rem; border-radius:.85rem; color:#5d5140; font-size:.82rem; font-weight:600; text-align:left; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease; }
     .admin-nav-link:hover, .admin-nav-toggle:hover, .admin-sidebar-suggestion:hover { color:#3d3226; background:#f5e6c8; transform:translateX(2px); }
@@ -28,7 +34,7 @@
     .admin-nav-submenu a, .admin-nav-submenu button { display:flex; align-items:center; gap:.48rem; width:100%; padding:.45rem .55rem; border-radius:.65rem; color:#756858; font-size:.72rem; font-weight:600; text-align:left; }
     .admin-nav-submenu a:hover, .admin-nav-submenu button:hover { color:#a88b36; background:#f5e6c8; }
     .admin-sidebar-divider { height:1px; margin:.7rem .45rem; background:rgba(168,139,54,.14); }
-    .admin-sidebar-footer { margin-top:.55rem; padding-top:.6rem; border-top:1px solid rgba(168,139,54,.14); }
+    .admin-sidebar-footer { margin-top:.7rem; padding-top:.7rem; border-top:1px solid rgba(168,139,54,.14); }
     .admin-sidebar-mobile-toggle { display:none; }
     .admin-toast { position:fixed; left:50%; bottom:1.5rem; z-index:60; max-width:calc(100vw - 2rem); transform:translate(-50%, 140%); opacity:0; border:1px solid rgba(168,139,54,.28); border-radius:1rem; background:#3d3226; padding:.8rem 1rem; color:#fff; font-size:.78rem; font-weight:600; box-shadow:0 16px 32px rgba(0,0,0,.2); transition:transform .22s cubic-bezier(.23,1,.32,1), opacity .22s ease; }
     .admin-toast.is-visible { transform:translate(-50%, 0); opacity:1; }
@@ -288,7 +294,7 @@
     body[data-patient-theme='black'] input, body[data-patient-theme='black'] textarea, body[data-patient-theme='black'] select { background:#2a2c34 !important; color:#f5f5f5 !important; border-color:rgba(255,255,255,.12) !important; }
     body[data-patient-theme='black'] .border-gray-100, body[data-patient-theme='black'] .border-gray-200 { border-color:rgba(255,255,255,.1) !important; }
     body[data-patient-theme='black'] nav .text-dark, body[data-patient-theme='black'] nav #logout-btn, body[data-patient-theme='black'] nav [data-theme-toggle] { color:#d4b76a !important; }
-    body[data-patient-theme='black'] .admin-sidebar { background:#1d1e24; border-color:rgba(255,255,255,.08); }
+    body[data-patient-theme='black'] .admin-sidebar { background:#1b1d23; border-color:rgba(255,255,255,.1); } body[data-patient-theme='black'] .admin-content { background:#17181d; }
     body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='black'] .dashboard-metric, body[data-patient-theme='black'] .dashboard-alert, body[data-patient-theme='black'] .patient-filter-drawer, body[data-patient-theme='black'] .patient-table-config-drawer, body[data-patient-theme='black'] .patient-directory, body[data-patient-theme='black'] .pending-review, body[data-patient-theme='black'] .send-report, body[data-patient-theme='black'] .send-metric, body[data-patient-theme='black'] .response-report, body[data-patient-theme='black'] .response-metric, body[data-patient-theme='black'] .response-filter-drawer, body[data-patient-theme='black'] .engagement-report, body[data-patient-theme='black'] .engagement-filter-drawer, body[data-patient-theme='black'] .engagement-info-modal, body[data-patient-theme='black'] .transaction-report, body[data-patient-theme='black'] .transaction-chart-card, body[data-patient-theme='black'] .transaction-metric, body[data-patient-theme='black'] .transaction-filter-drawer, body[data-patient-theme='black'] .transaction-customize-drawer, body[data-patient-theme='black'] .transaction-entry-drawer, body[data-patient-theme='black'] .services-manager, body[data-patient-theme='black'] .service-drawer, body[data-patient-theme='black'] .service-action-menu, body[data-patient-theme='black'] .questions-manager, body[data-patient-theme='black'] .question-drawer, body[data-patient-theme='black'] .question-preview, body[data-patient-theme='black'] .reminders-manager, body[data-patient-theme='black'] .reminder-modal, body[data-patient-theme='black'] .patient-registration-modal, body[data-patient-theme='black'] .patient-label-options, body[data-patient-theme='black'] .quizzes-manager, body[data-patient-theme='black'] .quiz-drawer, body[data-patient-theme='black'] .quiz-preview, body[data-patient-theme='black'] .quiz-builder-question { background:#22242b; border-color:rgba(255,255,255,.08); }
     body[data-patient-theme='black'] .send-tab.is-active, body[data-patient-theme='black'] .send-filter-drawer, body[data-patient-theme='black'] .send-filter-field { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); }
     body[data-patient-theme='black'] .patient-tab.is-active, body[data-patient-theme='black'] .question-tab.is-active, body[data-patient-theme='black'] .directory-tool, body[data-patient-theme='black'] .patient-search, body[data-patient-theme='black'] .patient-label-trigger { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); } body[data-patient-theme='black'] .patient-label-add { background:rgba(212,183,106,.12); color:#d4b76a; border-color:rgba(212,183,106,.26); }
@@ -318,7 +324,7 @@
     body[data-patient-theme='black'] .admin-nav-link.is-active { color:#fff; background:#a88b36; }
     body[data-patient-theme='black'] .admin-nav-submenu a, body[data-patient-theme='black'] .admin-nav-submenu button { color:#bcb6aa; }
     body[data-patient-theme='black'] .admin-sidebar-divider, body[data-patient-theme='black'] .admin-sidebar-footer { border-color:rgba(255,255,255,.1); background-color:rgba(255,255,255,.1); }
-    @media (max-width: 1023px) { .admin-shell { grid-template-columns:1fr; gap:1rem; } .admin-sidebar { position:static; max-height:none; overflow:visible; padding:.65rem; } .admin-sidebar-mobile-toggle { display:inline-flex; align-items:center; gap:.45rem; margin-left:auto; padding:.48rem .65rem; border-radius:.7rem; background:#a88b36; color:#fff; font-size:.7rem; font-weight:700; } .admin-sidebar.is-collapsed .admin-sidebar-menu, .admin-sidebar.is-collapsed .admin-sidebar-footer { display:none; } }
+    @media (max-width: 1023px) { .admin-shell { min-height:0; grid-template-columns:1fr; gap:1rem; } .admin-sidebar { position:static; height:auto; min-height:0; max-height:none; overflow:visible; padding:.65rem; border:1px solid rgba(168,139,54,.16); border-radius:1.25rem; } .admin-content { padding:0; } .admin-sidebar-menu { display:block; overflow:visible; padding-right:0; } .admin-sidebar-mobile-toggle { display:inline-flex; align-items:center; gap:.45rem; margin-left:auto; padding:.48rem .65rem; border-radius:.7rem; background:#a88b36; color:#fff; font-size:.7rem; font-weight:700; } .admin-sidebar.is-collapsed .admin-sidebar-menu, .admin-sidebar.is-collapsed .admin-sidebar-footer { display:none; } }
   </style>
 </head>
 <body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col">
@@ -329,8 +335,8 @@
     </div>
   </nav>
 
-  <main class="flex-grow px-4 py-7 sm:py-9">
-    <div class="container mx-auto max-w-7xl">
+  <main id="admin-main" class="flex-grow">
+    <div id="admin-layout-container" class="admin-layout-container">
       <div class="admin-shell">
         <aside id="admin-sidebar" class="admin-sidebar" aria-label="Navegação administrativa do Espaço do Paciente">
           <div class="flex items-center gap-2 px-2 pt-1 pb-2"><div><p class="text-[10px] font-bold uppercase tracking-[.16em] text-primary">Acompanhamento</p><h2 class="mt-0.5 text-sm font-bold text-dark">Espaço do Paciente</h2></div><button id="sidebar-mobile-toggle" type="button" class="admin-sidebar-mobile-toggle" aria-expanded="true" aria-controls="admin-sidebar-menu">Menu</button></div>
@@ -348,7 +354,7 @@
           </nav>
           <div class="admin-sidebar-footer"><button type="button" class="admin-sidebar-suggestion" data-coming-soon="Obrigada pela sugestão. Em breve será possível enviar ideias diretamente por este espaço."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Enviar uma sugestão</button></div>
         </aside>
-        <div class="min-w-0">
+        <div class="admin-content">
       <header id="inicio" class="scroll-mt-28 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-5">
         <div><p class="text-xs uppercase font-bold tracking-[.18em] text-primary">Acompanhamento clínico</p><h1 class="mt-1 text-3xl font-bold text-dark">Olá, Dra. <span id="admin-first-name">Jessica</span>!</h1><p class="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe a atividade dos pacientes e priorize as próximas ações de cuidado.</p></div>
         <div class="flex flex-wrap items-center gap-2"><a href="/espaco-paciente" target="_blank" rel="noopener" class="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/25 bg-white px-4 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h6m0 0v6m0-6-8 8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2 2V7a2 2 0 012-2h6"/></svg>Ver área do paciente</a><button type="button" data-add-patient class="inline-flex w-fit items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white hover:bg-dark transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-5 10a5 5 0 0 1 10 0"/></svg>Adicionar paciente</button></div>
