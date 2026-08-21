@@ -208,6 +208,64 @@ async function sendBrevoEmail({ to, subject, htmlContent, replyTo }) {
   return data || {};
 }
 
+function validDateKey(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
+}
+
+function normalizeBrevoQuestionnaireEvents(events) {
+  const grouped = new Map();
+  (Array.isArray(events) ? events : []).forEach(item => {
+    const subject = String(item?.subject || '');
+    if (!/^Questionário disponível\s*[—-]/i.test(subject)) return;
+    const email = String(item?.email || '').trim().toLowerCase();
+    const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || '');
+    const occurredAt = Number(item?.ts_epoch || item?.ts_event || (Number(item?.ts || 0) * 1000) || Date.parse(item?.date || '')) || 0;
+    const key = messageId || `${email}|${subject}|${Math.floor(occurredAt / 60_000)}`;
+    const event = String(item?.event || '').toLowerCase();
+    const existing = grouped.get(key) || { id:key, email, subject, sentAt:occurredAt || null, events:[] };
+    if (!existing.sentAt || (event === 'request' && occurredAt < existing.sentAt)) existing.sentAt = occurredAt || existing.sentAt;
+    existing.events.push({ event, occurredAt });
+    grouped.set(key, existing);
+  });
+  const failures = new Set(['soft_bounce','hard_bounce','invalid_email','blocked','error','spam']);
+  return [...grouped.values()].map(item => {
+    const names = new Set(item.events.map(event => event.event));
+    const eventTime = kind => Math.max(0, ...item.events.filter(event => event.event === kind).map(event => event.occurredAt || 0));
+    const failed = [...names].some(name => failures.has(name));
+    const clickedAt = eventTime('click');
+    const openedAt = Math.max(eventTime('unique_opened'), eventTime('opened'), eventTime('proxy_open'), eventTime('unique_proxy_open'));
+    const deliveredAt = eventTime('delivered');
+    const requestedAt = eventTime('request') || item.sentAt || 0;
+    return {
+      id:item.id,
+      email:item.email,
+      subject:item.subject,
+      sentAt:requestedAt ? new Date(requestedAt).toISOString() : '',
+      deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '',
+      openedAt:openedAt ? new Date(openedAt).toISOString() : '',
+      clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '',
+      failed,
+      status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent')))
+    };
+  }).filter(item => item.sentAt).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+}
+
+async function getBrevoQuestionnaireEvents(startDate, endDate) {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) throw new Error('O serviço de e-mail ainda não foi configurado.');
+  const url = new URL('https://api.brevo.com/v3/smtp/statistics/events');
+  url.searchParams.set('startDate', startDate);
+  url.searchParams.set('endDate', endDate);
+  url.searchParams.set('limit', '1000');
+  url.searchParams.set('sort', 'desc');
+  const response = await fetch(url, { headers: { 'api-key': apiKey, Accept: 'application/json' } });
+  const text = await response.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch {}
+  if (!response.ok) throw new Error(`Brevo ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
+  return normalizeBrevoQuestionnaireEvents(data?.events || data?.data || []);
+}
+
 async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt }) {
   const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`;
   const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long', timeZone: 'America/Sao_Paulo' }).format(new Date(expiresAt));
@@ -277,6 +335,18 @@ export default async function handler(req, res) {
       const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
       await sendResponseReceipt({ invitation, quiz, answers, summary: body.responseSummary || {} });
       return json(res, 200, { success: true, quiz_title: quiz.title });
+    }
+
+    if (action === 'report') {
+      const sessionToken = String(body.sessionToken || '');
+      const startDate = String(body.startDate || '');
+      const endDate = String(body.endDate || '');
+      if (!sessionToken || !validDateKey(startDate) || !validDateKey(endDate) || startDate > endDate) return json(res, 400, { success:false, message:'Informe um período válido para consultar os envios.' });
+      const windowDays = Math.ceil((Date.parse(`${endDate}T00:00:00Z`) - Date.parse(`${startDate}T00:00:00Z`)) / 86_400_000) + 1;
+      if (windowDays > 90) return json(res, 400, { success:false, message:'O período máximo para consulta é de 90 dias.' });
+      await requireAdmin(sessionToken);
+      const events = await getBrevoQuestionnaireEvents(startDate, endDate);
+      return json(res, 200, { success:true, channel:'email', events, updatedAt:new Date().toISOString() });
     }
 
     if (action === 'list') return json(res, 200, { success: true, invitations: [] });
