@@ -191,13 +191,18 @@ export default async function handler(req, res) {
     }
 
     if (action === 'get') {
-      const invitation = decryptInvitation(String(body.token || ''));
-      const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
-      return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString() });
+      try {
+        const invitation = decryptInvitation(String(body.token || ''));
+        const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
+        return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString() });
+      } catch (error) {
+        return json(res, 200, { state: /expirado/i.test(error.message) ? 'expired' : 'invalid' });
+      }
     }
 
     if (action === 'submit') {
-      const invitation = decryptInvitation(String(body.token || ''));
+      let invitation;
+      try { invitation = decryptInvitation(String(body.token || '')); } catch (error) { return json(res, 200, { success: false, reason: /expirado/i.test(error.message) ? 'expired' : 'invalid' }); }
       const answers = Array.isArray(body.answers) ? body.answers : [];
       if (!answers.length || answers.length > 100) return json(res, 400, { success: false, message: 'As respostas informadas são inválidas.' });
       const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
