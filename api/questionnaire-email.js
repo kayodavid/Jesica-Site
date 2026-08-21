@@ -4,6 +4,8 @@ const SUPABASE_URL = 'https://mcsilxhgwbxtvydytjcx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_PKWZS9Za2vfbGCvKNcquow_zuymCA72';
 const QUESTIONNAIRE_BASE_URL = 'https://jessicamelonutri.com.br/responder-questionario';
 const QUIZ_DELIMITER = '\n---QUIZ---\n';
+const QUESTION_DELIMITER = '\n---QUESTION---\n';
+const QUESTION_THEME = '__patient_question__';
 
 function json(res, status, body) {
   res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -65,10 +67,77 @@ function normalizeQuiz(record) {
   };
 }
 
+function usableText(value) {
+  const text = String(value ?? '').trim();
+  return text && !/^(undefined|null)$/i.test(text) ? text : '';
+}
+
+function isQuestionRecord(record) {
+  const source = String(record?.embedUrl || record?.embed_url || '');
+  return /^question:\/\/[a-z0-9_-]+$/i.test(source) || record?.theme === QUESTION_THEME;
+}
+
+function normalizeQuestion(record) {
+  const rawDescription = String(record?.description || '');
+  const [questionText, packed] = rawDescription.split(QUESTION_DELIMITER);
+  let data = {};
+  try { data = JSON.parse(packed || '{}'); } catch {}
+  return {
+    id: String(record?.id || ''),
+    title: usableText(record?.title) || 'Pergunta',
+    questionText: usableText(questionText),
+    questionHtml: usableText(data.questionHtml),
+    questionImage: usableText(data.questionImage),
+    code: usableText(data.code || record?.code),
+    label: usableText(data.label || record?.label),
+    type: usableText(data.type || record?.type) || 'single',
+    icon: usableText(data.icon || record?.icon) || '○',
+    options: Array.isArray(data.options) ? data.options.filter(Boolean) : [],
+    optionSettings: Array.isArray(data.optionSettings) ? data.optionSettings : [],
+    scaleConfig: data.scaleConfig && typeof data.scaleConfig === 'object' ? data.scaleConfig : null,
+    metricUnit: usableText(data.metricUnit),
+    openResponseTitle: usableText(data.openResponseTitle),
+    numericOnly: data.numericOnly === true || data.type === 'metric',
+    required: data.required !== false,
+    versionAt: record?.updatedAt || record?.updated_at || record?.createdAt || record?.created_at || ''
+  };
+}
+
+function hydrateQuestionSnapshot(snapshot, sourceQuestion) {
+  const saved = snapshot && typeof snapshot === 'object' ? snapshot : {};
+  const current = sourceQuestion && typeof sourceQuestion === 'object' ? sourceQuestion : {};
+  return {
+    ...current,
+    ...saved,
+    id: usableText(saved.id) || usableText(current.id),
+    title: usableText(saved.title) || usableText(current.title) || 'Pergunta',
+    questionText: usableText(saved.questionText) || usableText(current.questionText),
+    questionHtml: usableText(saved.questionHtml) || usableText(current.questionHtml),
+    questionImage: usableText(saved.questionImage) || usableText(current.questionImage),
+    code: usableText(saved.code) || usableText(current.code),
+    label: usableText(saved.label) || usableText(current.label),
+    type: usableText(saved.type) || usableText(current.type) || 'single',
+    icon: usableText(saved.icon) || usableText(current.icon) || '○',
+    options: Array.isArray(saved.options) && saved.options.length ? saved.options : (Array.isArray(current.options) ? current.options : []),
+    optionSettings: Array.isArray(saved.optionSettings) && saved.optionSettings.length ? saved.optionSettings : (Array.isArray(current.optionSettings) ? current.optionSettings : []),
+    scaleConfig: saved.scaleConfig && typeof saved.scaleConfig === 'object' ? saved.scaleConfig : current.scaleConfig,
+    metricUnit: usableText(saved.metricUnit) || usableText(current.metricUnit),
+    openResponseTitle: usableText(saved.openResponseTitle) || usableText(current.openResponseTitle),
+    numericOnly: saved.numericOnly === true || current.numericOnly === true,
+    required: saved.required !== false && current.required !== false
+  };
+}
+
 async function loadQuiz(sessionToken, quizId) {
-  const records = await callRpc('app_list_videos', { p_token: sessionToken });
-  const rawQuiz = (Array.isArray(records) ? records : []).find(item => String(item?.id || '') === String(quizId || ''));
+  const listed = await callRpc('app_list_videos', { p_token: sessionToken });
+  const records = Array.isArray(listed) ? listed : [];
+  const rawQuiz = records.find(item => String(item?.id || '') === String(quizId || ''));
   const quiz = normalizeQuiz(rawQuiz);
+  const questionsById = new Map(records.filter(isQuestionRecord).map(record => {
+    const question = normalizeQuestion(record);
+    return [question.id, question];
+  }));
+  quiz.questionSnapshots = quiz.questionSnapshots.map(snapshot => hydrateQuestionSnapshot(snapshot, questionsById.get(String(snapshot?.id || ''))));
   if (!quiz.id || !quiz.active || !quiz.questionSnapshots.length) throw new Error('Este questionário não está disponível para envio.');
   return quiz;
 }
