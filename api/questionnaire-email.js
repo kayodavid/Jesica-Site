@@ -212,6 +212,20 @@ async function sendBrevoEmail({ to, subject, htmlContent, replyTo, scheduledAt }
   return data || {};
 }
 
+async function cancelBrevoEmail(identifier) {
+  const apiKey = process.env.BREVO_API_KEY;
+  const value = String(identifier || '').trim();
+  if (!apiKey) throw new Error('O serviço de e-mail ainda não foi configurado.');
+  if (!value) return true;
+  const response = await fetch(`https://api.brevo.com/v3/smtp/email/${encodeURIComponent(value)}`, {
+    method: 'DELETE',
+    headers: { 'api-key': apiKey, Accept: 'application/json' }
+  });
+  if (response.status === 404) return true;
+  if (!response.ok) throw new Error('Não foi possível cancelar o agendamento na Brevo.');
+  return true;
+}
+
 function validDateKey(value) {
   return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
 }
@@ -553,7 +567,19 @@ async function cancelStoredSchedule(sessionToken, schedule) {
     const value = await callRpc('app_questionnaire_schedule_cancel', { p_token:sessionToken, p_schedule_id:schedule.id });
     return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
   }
-  return upsertStoredSchedule(sessionToken, { ...schedule, status:'cancelled', providerStatus:'cancelled', cancelledAt:new Date().toISOString() });
+  return { ...schedule, status:'cancelled', providerStatus:'cancelled', cancelledAt:new Date().toISOString() };
+}
+
+async function pauseStoredSchedule(sessionToken, schedule) {
+  if (schedule.storage !== 'queue') throw new Error('Este agendamento antigo precisa ser recadastrado antes de ser pausado.');
+  const value = await callRpc('app_questionnaire_schedule_pause', { p_token:sessionToken, p_schedule_id:schedule.id });
+  return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
+}
+
+async function resumeStoredSchedule(sessionToken, schedule) {
+  if (schedule.storage !== 'queue') throw new Error('Este agendamento antigo precisa ser recadastrado antes de ser retomado.');
+  const value = await callRpc('app_questionnaire_schedule_resume', { p_token:sessionToken, p_schedule_id:schedule.id });
+  return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
 }
 
 async function claimQueueSchedules(secret, workerId, limit = 20) {
@@ -756,6 +782,31 @@ export default async function handler(req, res) {
       await requireAdmin(sessionToken);
       const schedules = await listSchedulesWithProviderStatus(sessionToken, String(body.patientKey || '').trim(), String(body.quizLinkId || '').trim());
       return json(res, 200, { success:true, schedules, updatedAt:new Date().toISOString() });
+    }
+
+    if (action === 'pause-schedule') {
+      const sessionToken = String(body.sessionToken || '');
+      const scheduleId = String(body.scheduleId || '').trim();
+      if (!sessionToken || !scheduleId) return json(res, 400, { success:false, message:'Agendamento não identificado.' });
+      await requireAdmin(sessionToken);
+      const schedule = (await listStoredSchedules(sessionToken)).find(item => item.id === scheduleId || item.recordId === scheduleId);
+      if (!schedule) return json(res, 404, { success:false, message:'Agendamento não encontrado.' });
+      if (['cancelled', 'cancelado', 'sent', 'enviado', 'delivered', 'entregue', 'failed', 'falha_de_agendamento', 'expirado'].includes(String(schedule.status).toLowerCase())) return json(res, 409, { success:false, message:'Este agendamento não pode mais ser pausado.' });
+      if (schedule.providerMessageId && !['cancelled', 'cancelado', 'sent', 'enviado', 'delivered', 'entregue', 'failed', 'falha_de_agendamento'].includes(String(schedule.status).toLowerCase())) await cancelBrevoEmail(schedule.providerMessageId);
+      const updated = await pauseStoredSchedule(sessionToken, schedule);
+      return json(res, 200, { success:true, schedule:updated });
+    }
+
+    if (action === 'resume-schedule') {
+      const sessionToken = String(body.sessionToken || '');
+      const scheduleId = String(body.scheduleId || '').trim();
+      if (!sessionToken || !scheduleId) return json(res, 400, { success:false, message:'Agendamento não identificado.' });
+      await requireAdmin(sessionToken);
+      const schedule = (await listStoredSchedules(sessionToken)).find(item => item.id === scheduleId || item.recordId === scheduleId);
+      if (!schedule) return json(res, 404, { success:false, message:'Agendamento não encontrado.' });
+      if (String(schedule.status).toLowerCase() !== 'pausado') return json(res, 409, { success:false, message:'Este agendamento não está pausado.' });
+      const updated = await resumeStoredSchedule(sessionToken, schedule);
+      return json(res, 200, { success:true, schedule:updated });
     }
 
     if (action === 'cancel-schedule') {
