@@ -1,3 +1,5 @@
+import { getMetaReadiness } from './meta-readiness.js';
+
 const META_API_VERSION = process.env.WHATSAPP_GRAPH_API_VERSION || 'v26.0';
 const MAX_MESSAGES_PER_RUN = 100;
 
@@ -93,7 +95,8 @@ export async function dispatch(req) {
   try {
     const settingsRows = await supabase('whatsapp_automation_settings?id=eq.true&select=*');
     const settings = settingsRows?.[0];
-    if (!settings?.enabled || !settings?.provider_ready) return json(200, { success:true, sent:0, skipped:0, message:'Automação desativada ou ainda não configurada.' });
+    const metaReadiness = await getMetaReadiness();
+    if (!settings?.enabled || !settings?.provider_ready || !metaReadiness.ready) return json(200, { success:true, sent:0, skipped:0, message:'Automação desativada ou a integração oficial da Meta ainda não foi validada.' });
     const [rules, contacts, snapshots] = await Promise.all([
       supabase('whatsapp_automation_rules?active=eq.true&template_name=not.is.null&select=*'),
       supabase('whatsapp_patient_contacts?consent_status=eq.granted&automations_enabled=eq.true&select=*'),
