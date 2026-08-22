@@ -62,12 +62,12 @@ security definer
 set search_path = public
 as $$
 declare
+  v_user jsonb;
   v_role text;
 begin
-  select role::text into v_role
-  from public.app_current_user(p_token)
-  limit 1;
-  if coalesce(v_role, '') <> 'admin' then
+  v_user := public.app_current_user(p_token);
+  v_role := coalesce(v_user ->> 'role', '');
+  if v_role <> 'admin' then
     raise exception 'Sem permissão para administrar os agendamentos de questionários.';
   end if;
 end;
