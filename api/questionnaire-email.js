@@ -562,6 +562,26 @@ async function enqueueStoredSchedule(sessionToken, schedule) {
   return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
 }
 
+async function enqueueStoredScheduleBatch(sessionToken, schedules) {
+  const value = await callRpc('app_questionnaire_schedule_enqueue_batch', {
+    p_token:sessionToken,
+    p_entries:schedules.map(schedule => ({
+      scheduleKey:schedule.scheduleKey,
+      patientKey:schedule.patientKey,
+      patientName:schedule.patientName,
+      recipientEmail:schedule.recipientEmail,
+      quizLinkId:schedule.quizLinkId || '',
+      quizId:schedule.quizId,
+      quizTitle:schedule.quizTitle,
+      quizSnapshot:schedule.quizSnapshot,
+      invitationToken:schedule.invitationToken,
+      scheduledFor:schedule.scheduledFor,
+      expiresAt:schedule.expiresAt
+    }))
+  });
+  return (Array.isArray(value) ? value : []).map(normalizeQueueSchedule);
+}
+
 async function cancelStoredSchedule(sessionToken, schedule) {
   if (schedule.storage === 'queue') {
     const value = await callRpc('app_questionnaire_schedule_cancel', { p_token:sessionToken, p_schedule_id:schedule.id });
@@ -636,6 +656,41 @@ async function createQuestionnaireSchedule({ sessionToken, patientKey, patientNa
   return { schedule, duplicate:false };
 }
 
+async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, entries }) {
+  const prepared = entries.map((entry, index) => {
+    const scheduledAt = validateQueueScheduledAt(entry.scheduledAt || localDateTimeToIso(entry.date, entry.time));
+    const expiresAt = responseDeadline(scheduledAt, entry.responseAmount, entry.responseUnit);
+    const invitation = {
+      version:2,
+      id:randomBytes(12).toString('hex'),
+      sessionToken,
+      patientKey,
+      patientName,
+      recipientEmail,
+      quizId:quiz.id,
+      quizTitle:quiz.title,
+      quizLinkId:quizLinkId || '',
+      sentAt:scheduledAt,
+      expiresAt:Date.parse(expiresAt)
+    };
+    return {
+      scheduleKey:String(entry.scheduleKey || `${quizLinkId || quiz.id}:daily:${index}:${scheduledAt}`),
+      patientKey,
+      patientName,
+      recipientEmail,
+      quizLinkId:quizLinkId || '',
+      quizId:quiz.id,
+      quizTitle:quiz.title,
+      quizSnapshot:quiz,
+      invitationToken:encryptInvitation(invitation),
+      scheduledFor:scheduledAt,
+      expiresAt
+    };
+  });
+  const schedules = await enqueueStoredScheduleBatch(sessionToken, prepared);
+  return { schedules, failed:[], message:'Envios diários colocados na fila de agendamento.' };
+}
+
 async function listSchedulesWithProviderStatus(sessionToken, patientKey = '', quizLinkId = '') {
   const schedules = await listStoredSchedules(sessionToken, patientKey, quizLinkId);
   return Promise.all(schedules.map(async schedule => {
@@ -687,6 +742,7 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
     try {
       const quiz = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
       if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
+      try { await storeInvitation(decryptInvitation(schedule.invitation_token), quiz); } catch (historyError) { console.error('Queued invitation history error:', historyError.message); }
       const brevoResult = await sendQuestionnaireEmail({
         recipientEmail:schedule.recipient_email,
         patientName:schedule.patient_name,
@@ -755,10 +811,18 @@ export default async function handler(req, res) {
       const recipientEmail = String(body.recipientEmail || '').trim().toLowerCase();
       const quizId = String(body?.quiz?.id || body.quizId || '').trim();
       const quizLinkId = String(body.quizLinkId || '').trim();
-      const entries = Array.isArray(body.entries) ? body.entries.slice(0, 32) : [];
+      const entries = Array.isArray(body.entries) ? body.entries.slice(0, 180) : [];
       if (!sessionToken || !patientKey || !validEmail(recipientEmail) || !quizId || !entries.length) return json(res, 400, { success:false, message:'Não foi possível preparar o agendamento. Confira o paciente, o e-mail, o questionário e as datas.' });
       await requireAdmin(sessionToken);
       const quiz = await loadQuiz(sessionToken, quizId);
+      if (entries.length > 32) {
+        try {
+          const result = await createQuestionnaireScheduleBatch({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, entries });
+          return json(res, 200, { success:true, schedules:result.schedules, failed:result.failed, message:result.message });
+        } catch (error) {
+          return json(res, 502, { success:false, message:error.message || 'Não foi possível cadastrar a série diária.', schedules:[], failed:[] });
+        }
+      }
       const schedules = [];
       const failed = [];
       for (const entry of entries) {
