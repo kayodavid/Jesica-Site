@@ -477,130 +477,153 @@ function isEmailQuizScheduleRecord(record) {
   return record?.theme === EMAIL_QUIZ_SCHEDULE_THEME || source.startsWith('email-quiz-schedule://');
 }
 
-function normalizeStoredSchedule(record) {
+function normalizeStoredSchedule(record, storage = 'legacy') {
   const data = parseStoredRecord(record);
   return {
     id: usableText(data.scheduleId) || String(record?.id || ''),
     recordId: String(record?.id || ''),
-    scheduleKey: usableText(data.scheduleKey),
-    patientKey: usableText(data.patientKey),
-    patientName: usableText(data.patientName) || 'Paciente',
-    recipientEmail: usableText(data.recipientEmail).toLowerCase(),
-    quizLinkId: usableText(data.quizLinkId),
-    quizId: usableText(data.quizId),
-    quizTitle: usableText(data.quizTitle) || 'Questionário',
-    scheduledFor: usableText(data.scheduledFor),
-    expiresAt: usableText(data.expiresAt),
+    storage,
+    scheduleKey: usableText(data.scheduleKey || data.schedule_key),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizLinkId: usableText(data.quizLinkId || data.quiz_link_id),
+    quizId: usableText(data.quizId || data.quiz_id),
+    quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    scheduledFor: usableText(data.scheduledFor || data.scheduled_for),
+    expiresAt: usableText(data.expiresAt || data.expires_at),
     provider: usableText(data.provider) || 'brevo',
-    providerMessageId: usableText(data.providerMessageId),
-    providerStatus: usableText(data.providerStatus),
+    providerMessageId: usableText(data.providerMessageId || data.provider_message_id),
+    providerStatus: usableText(data.providerStatus || data.provider_status),
     status: usableText(data.status) || 'scheduled',
-    errorMessage: usableText(data.errorMessage),
-    cancelledAt: usableText(data.cancelledAt),
-    createdAt: usableText(data.createdAt) || record?.createdAt || record?.created_at || '',
-    updatedAt: usableText(data.updatedAt) || record?.updatedAt || record?.updated_at || ''
+    retryable: data.retryable === true,
+    attemptCount: Number(data.attemptCount ?? data.attempt_count ?? 0),
+    nextAttemptAt: usableText(data.nextAttemptAt || data.next_attempt_at),
+    lastAttemptAt: usableText(data.lastAttemptAt || data.last_attempt_at),
+    errorMessage: usableText(data.errorMessage || data.last_error),
+    cancelledAt: usableText(data.cancelledAt || data.cancelled_at),
+    finalFailureAt: usableText(data.finalFailureAt || data.final_failure_at),
+    createdAt: usableText(data.createdAt || data.created_at) || record?.createdAt || record?.created_at || '',
+    updatedAt: usableText(data.updatedAt || data.updated_at) || record?.updatedAt || record?.updated_at || ''
   };
 }
 
-async function listStoredSchedules(sessionToken, patientKey = '', quizLinkId = '') {
+function normalizeQueueSchedule(record) {
+  const data = record && typeof record === 'object' ? record : {};
+  return normalizeStoredSchedule({ id:data.id, description:JSON.stringify(data) }, 'queue');
+}
+
+async function listLegacyStoredSchedules(sessionToken, patientKey = '', quizLinkId = '') {
   const records = await listStoredQuestionnaireRecords(sessionToken);
-  return records.filter(isEmailQuizScheduleRecord).map(normalizeStoredSchedule).filter(item => {
+  return records.filter(isEmailQuizScheduleRecord).map(record => normalizeStoredSchedule(record, 'legacy')).filter(item => {
     return (!patientKey || item.patientKey === patientKey) && (!quizLinkId || item.quizLinkId === quizLinkId);
   });
 }
 
-async function upsertStoredSchedule(sessionToken, schedule) {
-  const data = {
-    ...schedule,
-    scheduleId: usableText(schedule.scheduleId || schedule.id) || randomBytes(12).toString('hex'),
-    provider: 'brevo',
-    updatedAt: new Date().toISOString()
-  };
-  data.id = data.scheduleId;
-  const records = await listStoredQuestionnaireRecords(sessionToken);
-  const source = `email-quiz-schedule://${data.scheduleId}`;
-  const payload = {
-    p_token: sessionToken,
-    p_title: `Agendamento — ${data.quizTitle || 'Questionário'} — ${data.patientName || data.recipientEmail}`,
-    p_theme: EMAIL_QUIZ_SCHEDULE_THEME,
-    p_description: JSON.stringify(data),
-    p_url: `https://jessicamelonutri.com.br/${source}`,
-    p_provider: 'youtube',
-    p_embed_url: source,
-    p_thumbnail_url: ''
-  };
-  const current = records.find(record => recordSource(record) === source);
-  const result = current ? await callRpc('app_update_video', { ...payload, p_id: current.id }) : await callRpc('app_add_video', payload);
-  return { ...data, recordId: String(current?.id || result?.id || result?.video?.id || '') };
+async function listStoredSchedules(sessionToken, patientKey = '', quizLinkId = '') {
+  try {
+    const value = await callRpc('app_questionnaire_schedule_list', { p_token:sessionToken, p_patient_key:patientKey || null, p_quiz_link_id:quizLinkId || null });
+    return (Array.isArray(value) ? value : []).map(normalizeQueueSchedule);
+  } catch (error) {
+    console.error('Questionnaire queue list fallback:', error.message);
+    return listLegacyStoredSchedules(sessionToken, patientKey, quizLinkId);
+  }
 }
 
-async function getBrevoEmailStatus(messageId) {
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey || !messageId) return {};
-  const response = await fetch(`https://api.brevo.com/v3/smtp/emailStatus/${encodeURIComponent(messageId)}`, {
-    headers: { 'api-key': apiKey, Accept: 'application/json' }
+async function enqueueStoredSchedule(sessionToken, schedule) {
+  const value = await callRpc('app_questionnaire_schedule_enqueue', {
+    p_token:sessionToken,
+    p_schedule_key:schedule.scheduleKey,
+    p_patient_key:schedule.patientKey,
+    p_patient_name:schedule.patientName,
+    p_recipient_email:schedule.recipientEmail,
+    p_quiz_link_id:schedule.quizLinkId || '',
+    p_quiz_id:schedule.quizId,
+    p_quiz_title:schedule.quizTitle,
+    p_quiz_snapshot:schedule.quizSnapshot,
+    p_invitation_token:schedule.invitationToken,
+    p_scheduled_for:schedule.scheduledFor,
+    p_expires_at:schedule.expiresAt
   });
-  const text = await response.text();
-  let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch {}
-  if (!response.ok) throw new Error(`Brevo ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
-  return data || {};
+  return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
 }
 
-async function cancelBrevoEmail(messageId) {
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey || !messageId) return {};
-  const response = await fetch(`https://api.brevo.com/v3/smtp/email/${encodeURIComponent(messageId)}`, {
-    method: 'DELETE',
-    headers: { 'api-key': apiKey, Accept: 'application/json' }
+async function cancelStoredSchedule(sessionToken, schedule) {
+  if (schedule.storage === 'queue') {
+    const value = await callRpc('app_questionnaire_schedule_cancel', { p_token:sessionToken, p_schedule_id:schedule.id });
+    return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
+  }
+  return upsertStoredSchedule(sessionToken, { ...schedule, status:'cancelled', providerStatus:'cancelled', cancelledAt:new Date().toISOString() });
+}
+
+async function claimQueueSchedules(secret, workerId, limit = 20) {
+  const value = await callRpc('app_questionnaire_schedule_claim', { p_secret:secret, p_worker_id:workerId, p_limit:limit });
+  return (Array.isArray(value) ? value : []).map(item => item && typeof item === 'object' ? item : {});
+}
+
+async function finalizeMissedQueueSchedules(secret) {
+  const value = await callRpc('app_questionnaire_schedule_finalize_missed', { p_secret:secret });
+  return Number(Array.isArray(value) ? value[0] : value) || 0;
+}
+
+async function markQueueProvider(secret, scheduleId, providerMessageId, providerStatus = 'scheduled') {
+  const value = await callRpc('app_questionnaire_schedule_mark_provider', { p_secret:secret, p_schedule_id:scheduleId, p_provider_message_id:providerMessageId, p_provider_status:providerStatus });
+  return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
+}
+
+async function markQueueFailure(secret, scheduleId, errorMessage, retryable = true) {
+  const value = await callRpc('app_questionnaire_schedule_mark_failure', { p_secret:secret, p_schedule_id:scheduleId, p_error_message:errorMessage, p_retryable:retryable });
+  return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
+}
+
+async function createQuestionnaireSchedule({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, scheduledAt, expiresAt, scheduleKey }) {
+  const existing = (await listStoredSchedules(sessionToken, patientKey, quizLinkId)).find(item => item.scheduleKey === scheduleKey && !['cancelled', 'cancelado', 'sent', 'enviado', 'delivered', 'entregue'].includes(String(item.status).toLowerCase()));
+  if (existing) return { schedule:existing, duplicate:true };
+  const invitation = {
+    version:2,
+    id:randomBytes(12).toString('hex'),
+    sessionToken,
+    patientKey,
+    patientName,
+    recipientEmail,
+    quizId:quiz.id,
+    quizTitle:quiz.title,
+    quizLinkId:quizLinkId || '',
+    sentAt:scheduledAt,
+    expiresAt:Date.parse(expiresAt)
+  };
+  const accessToken = encryptInvitation(invitation);
+  const schedule = await enqueueStoredSchedule(sessionToken, {
+    scheduleKey,
+    patientKey,
+    patientName,
+    recipientEmail,
+    quizLinkId:quizLinkId || '',
+    quizId:quiz.id,
+    quizTitle:quiz.title,
+    quizSnapshot:quiz,
+    invitationToken:accessToken,
+    scheduledFor:scheduledAt,
+    expiresAt:new Date(expiresAt).toISOString()
   });
-  const text = await response.text();
-  let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch {}
-  if (!response.ok) throw new Error(`Brevo ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
-  return data || {};
-}
-
-function scheduleStatusFromProvider(status, fallback = 'scheduled') {
-  const value = String(status || '').toLowerCase();
-  if (['cancelled', 'canceled'].includes(value)) return 'cancelled';
-  if (['delivered', 'sent', 'processed', 'accepted'].includes(value)) return 'sent';
-  if (['error', 'failed', 'soft_bounce', 'hard_bounce', 'blocked', 'invalid_email'].includes(value)) return 'failed';
-  if (['queued', 'scheduled', 'pending', 'request'].includes(value)) return 'scheduled';
-  return fallback;
+  try { await storeInvitation(invitation, quiz); } catch (error) { console.error('Queued invitation history error:', error.message); }
+  return { schedule, duplicate:false };
 }
 
 async function listSchedulesWithProviderStatus(sessionToken, patientKey = '', quizLinkId = '') {
   const schedules = await listStoredSchedules(sessionToken, patientKey, quizLinkId);
   return Promise.all(schedules.map(async schedule => {
-    if (!schedule.providerMessageId || !['scheduled', 'queued', 'pending'].includes(String(schedule.status).toLowerCase())) return schedule;
+    if (!schedule.providerMessageId || !['agendado_na_brevo', 'scheduled', 'queued', 'pending'].includes(String(schedule.status).toLowerCase())) return schedule;
     try {
       const provider = await getBrevoEmailStatus(schedule.providerMessageId);
       const providerStatus = usableText(provider.status || provider.messageStatus || provider.event);
-      return { ...schedule, providerStatus, status: scheduleStatusFromProvider(providerStatus, schedule.status) };
+      const mapped = scheduleStatusFromProvider(providerStatus, schedule.status);
+      return { ...schedule, providerStatus, status: schedule.storage === 'queue' ? ({ scheduled:'agendado_na_brevo', sent:'enviado', failed:'falha_de_agendamento', cancelled:'cancelado' }[mapped] || mapped) : mapped };
     } catch (error) {
       console.error('Brevo schedule status error:', error.message);
       return schedule;
     }
   })).then(items => items.sort((a, b) => new Date(a.scheduledFor || 0) - new Date(b.scheduledFor || 0)));
-}
-
-
-function localDateTimeToIso(date, time) {
-  const dateKey = String(date || '').trim();
-  const timeKey = String(time || '').trim();
-  if (!validDateKey(dateKey) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(timeKey)) throw new Error('Informe uma data e um horário válidos para o envio.');
-  const timestamp = Date.parse(`${dateKey}T${timeKey}:00-03:00`);
-  if (!Number.isFinite(timestamp)) throw new Error('Informe uma data e um horário válidos para o envio.');
-  return new Date(timestamp).toISOString();
-}
-
-function validateScheduledAt(value) {
-  const timestamp = Date.parse(String(value || ''));
-  if (!Number.isFinite(timestamp)) throw new Error('Informe uma data e um horário válidos para o envio.');
-  if (timestamp <= Date.now() + 30_000) throw new Error('O horário agendado precisa estar no futuro.');
-  if (timestamp > Date.now() + (72 * 60 * 60 * 1000)) throw new Error('A Brevo aceita agendamentos de e-mail com até 72 horas de antecedência.');
-  return new Date(timestamp).toISOString();
 }
 
 function responseDeadline(scheduledAt, amount, unit) {
@@ -609,55 +632,54 @@ function responseDeadline(scheduledAt, amount, unit) {
   return new Date(Date.parse(scheduledAt) + (numericAmount * multiplier)).toISOString();
 }
 
-async function createBrevoScheduledQuestionnaire({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, scheduledAt, expiresAt, scheduleKey }) {
-  const existing = (await listStoredSchedules(sessionToken, patientKey, quizLinkId)).find(item => item.scheduleKey === scheduleKey && item.status !== 'cancelled');
-  if (existing?.providerMessageId) return { schedule: existing, duplicate: true };
+async function createBrevoScheduledQuestionnaire(args) {
+  return createQuestionnaireSchedule(args);
+}
 
-  const scheduleId = randomBytes(12).toString('hex');
-  const invitation = {
-    version: 2,
-    id: randomBytes(12).toString('hex'),
-    sessionToken,
-    patientKey,
-    patientName,
-    recipientEmail,
-    quizId: quiz.id,
-    quizTitle: quiz.title,
-    quizLinkId: quizLinkId || '',
-    sentAt: scheduledAt,
-    expiresAt: Date.parse(expiresAt)
-  };
-  const accessToken = encryptInvitation(invitation);
-  const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt: invitation.expiresAt, scheduledAt });
-  const providerMessageId = usableText(brevoResult.messageId);
-  if (!providerMessageId) throw new Error('A Brevo não retornou o identificador do agendamento.');
+function validateQueueScheduledAt(value) {
+  const timestamp = Date.parse(String(value || ''));
+  if (!Number.isFinite(timestamp)) throw new Error('Informe uma data e um horário válidos para o envio.');
+  if (timestamp <= Date.now() + 30_000) throw new Error('O horário agendado precisa estar no futuro.');
+  if (timestamp > Date.now() + (180 * 24 * 60 * 60 * 1000)) throw new Error('O agendamento não pode ultrapassar 180 dias.');
+  return new Date(timestamp).toISOString();
+}
 
-  const now = new Date().toISOString();
-  let schedule;
-  try {
-    schedule = await upsertStoredSchedule(sessionToken, {
-      scheduleId,
-      scheduleKey,
-      patientKey,
-      patientName,
-      recipientEmail,
-      quizLinkId: quizLinkId || '',
-      quizId: quiz.id,
-      quizTitle: quiz.title,
-      scheduledFor: scheduledAt,
-      expiresAt: new Date(expiresAt).toISOString(),
-      providerMessageId,
-      providerStatus: 'scheduled',
-      status: 'scheduled',
-      createdAt: now,
-      updatedAt: now
-    });
-  } catch (error) {
-    try { await cancelBrevoEmail(providerMessageId); } catch (cancelError) { console.error('Brevo compensation cancellation error:', cancelError.message); }
-    throw error;
+function workerSecretFromRequest(req, body = {}) {
+  const authorization = String(req?.headers?.authorization || req?.headers?.Authorization || '');
+  const headerSecret = authorization.replace(/^Bearer\s+/i, '').trim();
+  return headerSecret || String(body.schedulerSecret || body.secret || '').trim();
+}
+
+async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') {
+  const finalized = await finalizeMissedQueueSchedules(secret);
+  const claimed = await claimQueueSchedules(secret, workerId, 20);
+  const processed = [];
+  const failed = [];
+  for (const schedule of claimed) {
+    const scheduledAt = new Date(schedule.scheduled_for).toISOString();
+    const expiresAt = new Date(schedule.expires_at).toISOString();
+    try {
+      const quiz = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
+      if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
+      const brevoResult = await sendQuestionnaireEmail({
+        recipientEmail:schedule.recipient_email,
+        patientName:schedule.patient_name,
+        quiz,
+        accessToken:schedule.invitation_token,
+        expiresAt:Date.parse(expiresAt),
+        scheduledAt
+      });
+      const providerMessageId = usableText(brevoResult.messageId);
+      if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
+      const stored = await markQueueProvider(secret, schedule.id, providerMessageId, 'scheduled');
+      processed.push({ id:schedule.id, providerMessageId, scheduledFor:scheduledAt, status:stored.status });
+    } catch (error) {
+      const message = error?.message || 'Não foi possível cadastrar o envio na Brevo.';
+      try { await markQueueFailure(secret, schedule.id, message, true); } catch (markError) { console.error('Queue failure persistence error:', markError.message); }
+      failed.push({ id:schedule.id, scheduledFor:scheduledAt, message });
+    }
   }
-  try { await storeInvitation(invitation, quiz); } catch (error) { console.error('Scheduled invitation history error:', error.message); }
-  return { schedule, duplicate: false };
+  return { success:true, finalized, claimed:claimed.length, processed, failed, workerId };
 }
 
 function requestBody(req) {
@@ -671,6 +693,15 @@ export default async function handler(req, res) {
   const action = String(body.action || '').trim();
 
   try {
+    if (action === 'worker') {
+      const secret = workerSecretFromRequest(req, body);
+      const expected = String(process.env.QUESTIONNAIRE_SCHEDULER_SECRET || '').trim();
+      if (!secret || !expected || secret !== expected) return json(res, 401, { success:false, message:'Worker não autorizado.' });
+      const workerId = String(req?.headers?.['x-worker-id'] || body.workerId || 'supabase-pg-cron');
+      const result = await processQuestionnaireQueue(secret, workerId);
+      return json(res, 200, result);
+    }
+
     if (action === 'send') {
       const sessionToken = String(body.sessionToken || '');
       const patientKey = String(body.patientKey || '').trim();
@@ -706,7 +737,7 @@ export default async function handler(req, res) {
       const failed = [];
       for (const entry of entries) {
         try {
-          const scheduledAt = validateScheduledAt(entry.scheduledAt || localDateTimeToIso(entry.date, entry.time));
+          const scheduledAt = validateQueueScheduledAt(entry.scheduledAt || localDateTimeToIso(entry.date, entry.time));
           const expiresAt = responseDeadline(scheduledAt, entry.responseAmount, entry.responseUnit);
           const scheduleKey = String(entry.scheduleKey || (quizLinkId || quiz.id) + ':' + scheduledAt);
           const result = await createBrevoScheduledQuestionnaire({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, scheduledAt, expiresAt, scheduleKey });
@@ -716,7 +747,7 @@ export default async function handler(req, res) {
         }
       }
       if (!schedules.length && failed.length) return json(res, 502, { success:false, message:failed[0].message, schedules, failed });
-      return json(res, 200, { success:true, schedules, failed, message:failed.length ? 'Alguns envios foram cadastrados e outros precisam de revisão.' : 'Envios cadastrados na Brevo.' });
+      return json(res, 200, { success:true, schedules, failed, message:failed.length ? 'Alguns envios foram colocados na fila e outros precisam de revisão.' : 'Envios colocados na fila de agendamento.' });
     }
 
     if (action === 'list-schedules') {
@@ -735,23 +766,23 @@ export default async function handler(req, res) {
       const schedule = (await listStoredSchedules(sessionToken)).find(item => item.id === scheduleId || item.recordId === scheduleId);
       if (!schedule) return json(res, 404, { success:false, message:'Agendamento não encontrado.' });
       if (schedule.providerMessageId && !['cancelled', 'sent', 'failed'].includes(schedule.status)) await cancelBrevoEmail(schedule.providerMessageId);
-      const updated = await upsertStoredSchedule(sessionToken, { ...schedule, status:'cancelled', providerStatus:'cancelled', cancelledAt:new Date().toISOString() });
+      const updated = await cancelStoredSchedule(sessionToken, schedule);
       return json(res, 200, { success:true, schedule:updated });
     }
 
     if (action === 'reschedule-schedule') {
       const sessionToken = String(body.sessionToken || '');
       const scheduleId = String(body.scheduleId || '').trim();
-      const scheduledAt = validateScheduledAt(body.scheduledAt || localDateTimeToIso(body.date, body.time));
+      const scheduledAt = validateQueueScheduledAt(body.scheduledAt || localDateTimeToIso(body.date, body.time));
       if (!sessionToken || !scheduleId) return json(res, 400, { success:false, message:'Agendamento não identificado.' });
       await requireAdmin(sessionToken);
       const previous = (await listStoredSchedules(sessionToken)).find(item => item.id === scheduleId || item.recordId === scheduleId);
       if (!previous) return json(res, 404, { success:false, message:'Agendamento não encontrado.' });
-      if (previous.providerMessageId && !['cancelled', 'sent', 'failed'].includes(previous.status)) await cancelBrevoEmail(previous.providerMessageId);
-      await upsertStoredSchedule(sessionToken, { ...previous, status:'cancelled', providerStatus:'cancelled', cancelledAt:new Date().toISOString() });
+      if (previous.providerMessageId && !['cancelled', 'cancelado', 'sent', 'enviado', 'failed', 'falha_de_agendamento'].includes(String(previous.status).toLowerCase())) await cancelBrevoEmail(previous.providerMessageId);
+      await cancelStoredSchedule(sessionToken, previous);
       const quiz = await loadQuiz(sessionToken, previous.quizId);
       const expiresAt = responseDeadline(scheduledAt, body.responseAmount, body.responseUnit);
-      const result = await createBrevoScheduledQuestionnaire({ sessionToken, patientKey:previous.patientKey, patientName:previous.patientName, recipientEmail:previous.recipientEmail, quizLinkId:previous.quizLinkId, quiz, scheduledAt, expiresAt, scheduleKey:(previous.quizLinkId || previous.quizId) + ':' + scheduledAt });
+      const result = await createBrevoScheduledQuestionnaire({ sessionToken, patientKey:previous.patientKey, patientName:previous.patientName, recipientEmail:previous.recipientEmail, quizLinkId:previous.quizLinkId, quiz, scheduledAt, expiresAt, scheduleKey:(previous.scheduleKey || (previous.quizLinkId || previous.quizId)) + ':reschedule:' + Date.now() });
       return json(res, 200, { success:true, previousScheduleId:previous.id, schedule:result.schedule });
     }
 
