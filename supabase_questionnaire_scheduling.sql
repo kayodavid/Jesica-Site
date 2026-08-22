@@ -305,7 +305,7 @@ begin
       retryable = false,
       last_error = 'O envio não foi cadastrado na Brevo dentro da margem de segurança.',
       final_failure_at = now(),
-      next_attempt_at = null,
+      next_attempt_at = now(),
       claimed_at = null,
       updated_at = now()
   where ((status in ('aguardando_brevo', 'falha_de_agendamento') and scheduled_for <= now() + interval '10 minutes')
@@ -340,7 +340,7 @@ begin
       scheduled_at_brevo = now(),
       last_error = null,
       final_failure_at = null,
-      next_attempt_at = null,
+      next_attempt_at = now(),
       claimed_at = null,
       updated_at = now()
   where id = p_schedule_id
@@ -374,7 +374,7 @@ begin
   set status = 'falha_de_agendamento',
       retryable = coalesce(v_can_retry, false),
       last_error = left(coalesce(p_error_message, 'Falha ao cadastrar o envio na Brevo.'), 1000),
-      next_attempt_at = case when coalesce(v_can_retry, false) then now() + interval '15 minutes' else null end,
+      next_attempt_at = case when coalesce(v_can_retry, false) then now() + interval '15 minutes' else now() end,
       final_failure_at = case when coalesce(v_can_retry, false) then null else now() end,
       claimed_at = null,
       updated_at = now()
