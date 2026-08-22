@@ -337,6 +337,47 @@
     body[data-patient-theme='black'] .admin-nav-link.is-active { color:#fff; background:#a88b36; }
     body[data-patient-theme='black'] .admin-nav-submenu a, body[data-patient-theme='black'] .admin-nav-submenu button { color:#bcb6aa; }
     body[data-patient-theme='black'] .admin-sidebar-divider, body[data-patient-theme='black'] .admin-sidebar-footer { border-color:rgba(255,255,255,.1); background-color:rgba(255,255,255,.1); }
+    /* Contraste reforçado: Gestão de Clientes › Perguntas */
+    .questions-manager { color:#3d3226; box-shadow:0 10px 28px rgba(61,50,38,.06); }
+    .questions-manager .text-gray-500, .questions-manager .text-gray-400 { color:#665a4d; }
+    .questions-manager .question-tab { color:#4f4438; }
+    .questions-manager .question-tab.is-active { border:1px solid rgba(168,139,54,.22); }
+    .questions-manager .question-type { background:rgba(168,139,54,.14); color:#56472f; }
+    .questions-manager .question-action { border-color:rgba(168,139,54,.28); color:#5a4935; }
+    .questions-manager .question-action:hover { border-color:#a88b36; }
+    .question-drawer { color:#3d3226; }
+    .question-drawer > header, .question-drawer > form > footer { background:#fffdf8; border-color:rgba(168,139,54,.22) !important; }
+    .question-drawer > form > div { background:#fff; }
+    .question-drawer .text-gray-500, .question-drawer .text-gray-400 { color:#665a4d; }
+    .question-drawer .send-filter-field, .question-drawer [contenteditable="true"] { background:#fff; color:#3d3226; border-color:rgba(168,139,54,.34); }
+    .question-drawer .send-filter-field:focus, .question-drawer [contenteditable="true"]:focus { border-color:#a88b36; box-shadow:0 0 0 3px rgba(168,139,54,.17); }
+    .question-drawer .question-preview { background:linear-gradient(145deg,#fff8e9,#fffdf8); border-color:rgba(168,139,54,.3); box-shadow:0 8px 18px rgba(61,50,38,.06); }
+    .question-drawer #question-preview-answer { background:#fff; border-color:rgba(168,139,54,.28); color:#594d40; }
+    body[data-patient-theme='black'] .questions-manager { background:#20232b !important; border-color:#4b5160 !important; box-shadow:0 14px 34px rgba(0,0,0,.2); }
+    body[data-patient-theme='black'] .questions-manager .text-dark { color:#fff !important; }
+    body[data-patient-theme='black'] .questions-manager .text-gray-500, body[data-patient-theme='black'] .questions-manager .text-gray-400 { color:#d3d7df !important; }
+    body[data-patient-theme='black'] .questions-manager .question-tabs { background:#2d313d; border:1px solid #4d5464; }
+    body[data-patient-theme='black'] .questions-manager .question-tab { color:#d7dbe4; }
+    body[data-patient-theme='black'] .questions-manager .question-tab.is-active { background:#3a3f4d; border-color:#656d7e; color:#fff; box-shadow:0 3px 10px rgba(0,0,0,.22); }
+    body[data-patient-theme='black'] .questions-manager .question-type { background:rgba(212,183,106,.18); color:#f2d98f; }
+    body[data-patient-theme='black'] .questions-manager .question-action { border-color:#596171; color:#e3e6ec; background:#292d37; }
+    body[data-patient-theme='black'] .questions-manager .question-action:hover { border-color:#d4b76a; background:#3a3f4c; color:#ffe5a0; }
+    body[data-patient-theme='black'] .questions-manager table thead { background:#2b303b; }
+    body[data-patient-theme='black'] .questions-manager table th { color:#f0db9b !important; border-color:#4e5565 !important; }
+    body[data-patient-theme='black'] .questions-manager table td { color:#e1e4e9 !important; border-color:#424957 !important; }
+    body[data-patient-theme='black'] .questions-manager table tbody tr:hover { background:#2b303b !important; }
+    body[data-patient-theme='black'] .question-drawer { background:#20232b !important; color:#f7f8fb; border-left:1px solid #4d5463; box-shadow:-18px 0 46px rgba(0,0,0,.42); }
+    body[data-patient-theme='black'] .question-drawer > header, body[data-patient-theme='black'] .question-drawer > form > footer { background:#292d37 !important; border-color:#535b6b !important; }
+    body[data-patient-theme='black'] .question-drawer > form > div { background:#20232b !important; }
+    body[data-patient-theme='black'] .question-drawer .text-dark { color:#fff !important; }
+    body[data-patient-theme='black'] .question-drawer .text-gray-500, body[data-patient-theme='black'] .question-drawer .text-gray-400 { color:#d4d8e0 !important; }
+    body[data-patient-theme='black'] .question-drawer .text-primary { color:#f0d37a !important; }
+    body[data-patient-theme='black'] .question-drawer .send-filter-field, body[data-patient-theme='black'] .question-drawer [contenteditable="true"] { background:#303541 !important; color:#fff !important; border-color:#677082 !important; }
+    body[data-patient-theme='black'] .question-drawer .send-filter-field::placeholder, body[data-patient-theme='black'] .question-drawer [contenteditable="true"]:empty::before { color:#bac1cd !important; opacity:1; }
+    body[data-patient-theme='black'] .question-drawer .send-filter-field:focus, body[data-patient-theme='black'] .question-drawer [contenteditable="true"]:focus { border-color:#e0c36f !important; box-shadow:0 0 0 3px rgba(224,195,111,.19); }
+    body[data-patient-theme='black'] .question-drawer .question-preview { background:linear-gradient(145deg,#303541,#292d37) !important; border-color:#646d7d !important; box-shadow:0 10px 24px rgba(0,0,0,.22); }
+    body[data-patient-theme='black'] .question-drawer #question-preview-answer { background:#242832 !important; border-color:#596171 !important; color:#dce0e7 !important; }
+    body[data-patient-theme='black'] .question-drawer [class~="bg-primary/10"], body[data-patient-theme='black'] .question-drawer [class*="bg-primary/[.03]"] { background-color:rgba(212,183,106,.16) !important; }
     @media (max-width: 1023px) { .admin-shell { min-height:0; grid-template-columns:1fr; gap:1rem; } .admin-sidebar { position:static; height:auto; min-height:0; max-height:none; overflow:visible; padding:.65rem; border:1px solid rgba(168,139,54,.16); border-radius:1.25rem; } .admin-content { padding:0; } .admin-sidebar-menu { display:block; overflow:visible; padding-right:0; } .admin-sidebar-mobile-toggle { display:inline-flex; align-items:center; gap:.45rem; margin-left:auto; padding:.48rem .65rem; border-radius:.7rem; background:#a88b36; color:#fff; font-size:.7rem; font-weight:700; } .admin-sidebar.is-collapsed .admin-sidebar-menu, .admin-sidebar.is-collapsed .admin-sidebar-footer { display:none; } }
   </style>
 </head>
