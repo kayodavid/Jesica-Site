@@ -18,14 +18,14 @@
     })();
   </script>
   <style>
-    html { background:#faf8f3; color-scheme:light; scrollbar-color:rgba(168,139,54,.42) #faf8f3; scrollbar-gutter:stable; }
-    html::-webkit-scrollbar { width:.85rem; background:#faf8f3; }
-    html::-webkit-scrollbar-track, html::-webkit-scrollbar-track-piece { background:#faf8f3; }
-    html::-webkit-scrollbar-thumb { border:.2rem solid #faf8f3; border-radius:999px; background:rgba(168,139,54,.42); }
-    html[data-patient-theme='traditional'] { background:#faf8f3; color-scheme:light; scrollbar-color:rgba(168,139,54,.42) #faf8f3; }
-    html[data-patient-theme='black'], html:has(body[data-patient-theme='black']) { background:#17181d; color-scheme:dark; scrollbar-color:#555d6c #17181d; }
-    html[data-patient-theme='black']::-webkit-scrollbar, html[data-patient-theme='black']::-webkit-scrollbar-track, html[data-patient-theme='black']::-webkit-scrollbar-track-piece, html:has(body[data-patient-theme='black'])::-webkit-scrollbar, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track-piece { background:#17181d; }
-    html[data-patient-theme='black']::-webkit-scrollbar-thumb, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-thumb { border-color:#17181d; background:#555d6c; }
+    html { background:#faf8f3; color-scheme:light; scrollbar-color:transparent transparent; scrollbar-gutter:auto; scrollbar-width:none; -ms-overflow-style:none; }
+    html::-webkit-scrollbar { width:0; height:0; display:none; background:transparent; }
+    html::-webkit-scrollbar-track, html::-webkit-scrollbar-track-piece { background:transparent; }
+    html::-webkit-scrollbar-thumb { border:0; background:transparent; }
+    html[data-patient-theme='traditional'] { background:#faf8f3; color-scheme:light; scrollbar-color:transparent transparent; }
+    html[data-patient-theme='black'], html:has(body[data-patient-theme='black']) { background:#17181d; color-scheme:dark; scrollbar-color:transparent transparent; }
+    html[data-patient-theme='black']::-webkit-scrollbar, html[data-patient-theme='black']::-webkit-scrollbar-track, html[data-patient-theme='black']::-webkit-scrollbar-track-piece, html:has(body[data-patient-theme='black'])::-webkit-scrollbar, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track-piece { background:transparent; }
+    html[data-patient-theme='black']::-webkit-scrollbar-thumb, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-thumb { border:0; background:transparent; }
     body { min-width:0; overflow-x:hidden; font-family:'Poppins',sans-serif; transition:background .2s,color .2s; }
     .panel-card { background:rgba(255,255,255,.88); border:1px solid rgba(168,139,54,.15); }
     .metric-card { border:1px solid rgba(168,139,54,.15); background:rgba(250,248,243,.78); }
