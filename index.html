@@ -103,27 +103,32 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="/index.html" class="text-dark font-medium relative group">
-            Início
+            <span data-i18n="navHome">Início</span>
             <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full"></span>
           </a>
           <a href="/sobre.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
-            Quem sou eu
+            <span data-i18n="navAbout">Quem sou eu</span>
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/blog.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
-            Blog
+            <span data-i18n="navBlog">Blog</span>
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/login.html" class="text-primary hover:text-dark font-bold relative group transition-colors flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-            Área do Paciente
+            <span data-i18n="navPatient">Área do Paciente</span>
           </a>
           <a href="/agendar-consulta.html"
-            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Agendar</a>
+            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"><span data-i18n="navSchedule">Agendar</span></a>
+        </div>
+        <div class="hidden md:flex items-center gap-1 rounded-full border border-primary/20 bg-white/70 p-1" role="group" aria-label="Idioma">
+          <span data-i18n="languageLabel" class="px-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">Idioma</span>
+          <button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button>
+          <button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-2.5 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button>
         </div>
 
         <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="md:hidden text-dark p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <button id="mobile-menu-btn" class="md:hidden text-dark p-2 hover:bg-gray-100 rounded-lg transition-colors" data-i18n-attr="aria-label:menuOpen">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
@@ -133,12 +138,16 @@
       <!-- Mobile Menu Dropdown -->
       <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4 animate-fade-in-up">
         <div class="flex flex-col space-y-2 bg-white/90 rounded-2xl p-4 shadow-lg border border-gray-100">
-          <a href="/index.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Início</a>
-          <a href="/sobre.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Quem sou eu</a>
-          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Blog</a>
-          <a href="/login.html" class="block py-3 px-4 text-primary hover:text-dark font-bold hover:bg-gray-50 rounded-xl transition-colors">Área do Paciente</a>
+          <a href="/index.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl"><span data-i18n="navHome">Início</span></a>
+          <a href="/sobre.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navAbout">Quem sou eu</span></a>
+          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navBlog">Blog</span></a>
+          <a href="/login.html" class="block py-3 px-4 text-primary hover:text-dark font-bold hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navPatient">Área do Paciente</span></a>
           <a href="/agendar-consulta.html"
-            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md">Agendar</a>
+            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md"><span data-i18n="navSchedule">Agendar</span></a>
+          <div class="mt-2 flex items-center justify-between rounded-xl border border-primary/15 bg-light px-4 py-3" role="group" aria-label="Idioma">
+            <span data-i18n="languageLabel" class="text-xs font-bold text-gray-600">Idioma</span>
+            <span class="flex items-center gap-1"><button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button><button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-3 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button></span>
+          </div>
         </div>
       </div>
     </div>
@@ -153,12 +162,12 @@
     <div class="container mx-auto max-w-6xl relative z-10">
       <div class="flex flex-col md:flex-row items-center justify-between gap-12">
         <div class="w-full md:w-1/2 text-center md:text-left animate-fade-in-up">
-          <h1 class="text-[28.5px] leading-[1.425] sm:text-4xl sm:leading-normal lg:text-5xl font-bold text-white mb-8">
+          <h1 data-i18n-html="heroTitle" class="text-[28.5px] leading-[1.425] sm:text-4xl sm:leading-normal lg:text-5xl font-bold text-white mb-8">
             Atendimento nutricional <span class="text-dark">personalizado</span>, baseado em ciência e adaptado às suas necessidades individuais.
           </h1>
           <a href="https://wa.me/5561993349412" target="_blank" rel="noopener noreferrer"
             class="inline-block bg-dark text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-dark transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 border border-transparent hover:border-dark/10">
-            AGENDAR ATENDIMENTO
+            <span data-i18n="heroCta">AGENDAR ATENDIMENTO</span>
           </a>
         </div>
         
@@ -179,7 +188,7 @@
     <div class="container mx-auto max-w-4xl relative z-10 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.3s_forwards]">
       <div class="bg-light/50 border border-primary/10 rounded-3xl p-8 sm:p-12 shadow-sm text-center">
         <div class="w-16 h-1 bg-primary mx-auto rounded-full mb-8"></div>
-        <p class="text-lg sm:text-xl text-dark leading-relaxed font-medium">
+        <p data-i18n="purpose" class="text-lg sm:text-xl text-dark leading-relaxed font-medium">
           O objetivo é orientar e apoiar em sua jornada, com escuta ativa, combinando nutrição, comportamento alimentar, rotina e autoconsciência para melhora dos desfechos de saúde.
         </p>
       </div>
@@ -192,16 +201,16 @@
       
       <div class="py-12 border-y border-primary/20 my-8">
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark leading-tight space-y-2">
-          <span class="block">Sem sofrer,</span>
-          <span class="block">Sem passar fome,</span>
-          <span class="block text-primary">Comendo o que você gosta.</span>
+          <span data-i18n="freedomOne" class="block">Sem sofrer,</span>
+          <span data-i18n="freedomTwo" class="block">Sem passar fome,</span>
+          <span data-i18n="freedomThree" class="block text-primary">Comendo o que você gosta.</span>
         </h2>
       </div>
 
       <div class="mt-12">
         <a href="https://wa.me/5561993349412" target="_blank" rel="noopener noreferrer"
           class="inline-block bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-dark transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-          EU QUERO INVESTIR NA MINHA SAÚDE
+          <span data-i18n="freedomCta">EU QUERO INVESTIR NA MINHA SAÚDE</span>
         </a>
       </div>
     </div>
@@ -214,7 +223,7 @@
 
     <div class="container mx-auto max-w-4xl relative z-10">
       <div class="text-center mb-16 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark relative inline-block">
+        <h2 data-i18n="seekTitle" class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark relative inline-block">
           Quando buscar atendimento nutricional?
           <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1.5 bg-primary rounded-full"></span>
         </h2>
@@ -222,12 +231,12 @@
 
       <div class="bg-light/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-primary/10 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.4s_forwards]">
         <ul class="check-list text-lg sm:text-xl text-gray-700 space-y-6">
-          <li class="font-medium">Baixa energia, fadiga constante ou dificuldade de concentração;</li>
-          <li class="font-medium">Para reduzir problemas emocionais, como estresse e ansiedade;</li>
-          <li class="font-medium">Não saber o que comer, quanto comer e quando comer;</li>
-          <li class="font-medium">Sensação de culpa ou obsessão com alimentação;</li>
-          <li class="font-medium">Vive em um ciclo de engorda e emagrece infinito;</li>
-          <li class="font-medium">Sofrimento com dietas restritivas.</li>
+          <li data-i18n="seekOne" class="font-medium">Baixa energia, fadiga constante ou dificuldade de concentração;</li>
+          <li data-i18n="seekTwo" class="font-medium">Para reduzir problemas emocionais, como estresse e ansiedade;</li>
+          <li data-i18n="seekThree" class="font-medium">Não saber o que comer, quanto comer e quando comer;</li>
+          <li data-i18n="seekFour" class="font-medium">Sensação de culpa ou obsessão com alimentação;</li>
+          <li data-i18n="seekFive" class="font-medium">Vive em um ciclo de engorda e emagrece infinito;</li>
+          <li data-i18n="seekSix" class="font-medium">Sofrimento com dietas restritivas.</li>
         </ul>
       </div>
     </div>
@@ -237,7 +246,7 @@
   <section class="py-24 px-4 bg-light relative">
     <div class="container mx-auto max-w-4xl relative z-10">
       <div class="text-center mb-16">
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark">Perguntas Frequentes</h2>
+        <h2 data-i18n="faqTitle" class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark">Perguntas Frequentes</h2>
         <div class="w-16 h-1.5 bg-primary mx-auto rounded-full mt-4"></div>
       </div>
 
@@ -245,39 +254,39 @@
         <!-- FAQ Item 1 -->
         <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
           <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-6 text-lg text-dark hover:bg-gray-50 transition-colors">
-            <span>1. Já testei várias dietas e não funcionaram. O que muda aqui?</span>
+            <span data-i18n="faqOneQuestion">1. Já testei várias dietas e não funcionaram. O que muda aqui?</span>
             <span class="transition group-open:rotate-180">
               <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
             </span>
           </summary>
           <div class="text-gray-600 p-6 pt-0 text-base leading-relaxed border-t border-gray-50 mt-2">
-            O meu trabalho tem como base a mudança de comportamento, antes da mudança alimentar. Vou entender o porquê que você não consegue emagrecer ou alcançar seus objetivos e te direcionar em um caminho com mais clareza. Além disso, o atendimento é individualizado, levando em conta sua rotina, preferências e histórico de saúde, sempre baseado em evidências científicas.
+            <span data-i18n="faqOneAnswer">O meu trabalho tem como base a mudança de comportamento, antes da mudança alimentar. Vou entender o porquê que você não consegue emagrecer ou alcançar seus objetivos e te direcionar em um caminho com mais clareza. Além disso, o atendimento é individualizado, levando em conta sua rotina, preferências e histórico de saúde, sempre baseado em evidências científicas.</span>
           </div>
         </details>
 
         <!-- FAQ Item 2 -->
         <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
           <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-6 text-lg text-dark hover:bg-gray-50 transition-colors">
-            <span>2. A consulta é só sobre dieta?</span>
+            <span data-i18n="faqTwoQuestion">2. A consulta é só sobre dieta?</span>
             <span class="transition group-open:rotate-180">
               <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
             </span>
           </summary>
           <div class="text-gray-600 p-6 pt-0 text-base leading-relaxed border-t border-gray-50 mt-2">
-            Não. O atendimento também gira em torno de hábitos de vida, relação com a comida, sinais de fome e saciedade, comportamento alimentar, além de estratégias práticas para o seu dia-a-dia.
+            <span data-i18n="faqTwoAnswer">Não. O atendimento também gira em torno de hábitos de vida, relação com a comida, sinais de fome e saciedade, comportamento alimentar, além de estratégias práticas para o seu dia-a-dia.</span>
           </div>
         </details>
 
         <!-- FAQ Item 3 -->
         <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
           <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-6 text-lg text-dark hover:bg-gray-50 transition-colors">
-            <span>3. Vou ter que parar de comer tudo o que eu gosto?</span>
+            <span data-i18n="faqThreeQuestion">3. Vou ter que parar de comer tudo o que eu gosto?</span>
             <span class="transition group-open:rotate-180">
               <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
             </span>
           </summary>
           <div class="text-gray-600 p-6 pt-0 text-base leading-relaxed border-t border-gray-50 mt-2">
-            Não. O objetivo não é tirar seus alimentos preferidos, mas sim cuidar da sua saúde nutricional encontrando um equilíbrio que funciona para você, dentro da sua rotina.
+            <span data-i18n="faqThreeAnswer">Não. O objetivo não é tirar seus alimentos preferidos, mas sim cuidar da sua saúde nutricional encontrando um equilíbrio que funciona para você, dentro da sua rotina.</span>
           </div>
         </details>
       </div>
@@ -289,7 +298,7 @@
           <span
             class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-20 bg-gradient-to-b from-primary via-primary to-dark"></span>
           <span class="relative flex items-center gap-2 text-lg">
-            AGENDAR CONSULTA
+            <span data-i18n="faqCta">AGENDAR CONSULTA</span>
             <svg class="w-6 h-6 transform group-hover:translate-x-1 transition-transform text-primary" fill="none"
               stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -302,10 +311,11 @@
 
   <footer class="bg-dark text-white py-8 px-4 border-t border-white/10">
     <div class="container mx-auto text-center">
-      <p class="text-sm opacity-75">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+      <p data-i18n="footer" class="text-sm opacity-75">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
     </div>
   </footer>
 
+  <script type="module" src="/assets/js/site-language.js"></script>
   <script>
     // Mobile Menu Toggle
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
