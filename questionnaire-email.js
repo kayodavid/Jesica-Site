@@ -401,6 +401,12 @@ function normalizeStoredProgress(record) {
   };
 }
 
+function vividEvaluationEmoji(value, fallback = '') {
+  const candidate = usableText(value);
+  const match = candidate.match(/[🤩😊😐😟😭😍🙂😕😣😞🙁😄☺☻☹]/u);
+  const legacy = { '😍':'🤩', '🙂':'😊', '😕':'😟', '😣':'😭', '😞':'😭', '🙁':'😟', '😄':'🤩', '☺':'😊', '☻':'😊', '☹':'😟' };
+  return match ? (legacy[match[0]] || match[0]) : (candidate || fallback);
+}
 function safeStoredAnswer(answer) {
   const value = cleanAnswer(answer?.value);
   const isImage = /^data:image\//i.test(value);
@@ -413,7 +419,7 @@ function safeStoredAnswer(answer) {
     type: usableText(answer?.type) || 'single',
     label: usableText(answer?.label),
     evaluationLabel: usableText(answer?.evaluationLabel) || usableText(answer?.ratingLabel),
-    evaluationEmoji: usableText(answer?.evaluationEmoji) || usableText(answer?.ratingEmoji),
+    evaluationEmoji: vividEvaluationEmoji(answer?.evaluationEmoji || answer?.ratingEmoji),
     score: Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0,
     rawScore,
     weight,
@@ -424,11 +430,11 @@ function safeStoredAnswer(answer) {
 function responseScoreBand(scorePercent) {
   const percent = Number(scorePercent);
   if (!Number.isFinite(percent)) return { label:'Sem avaliação', emoji:'—' };
-  if (percent >= 80) return { label:'Ótimo', emoji:'😍' };
-  if (percent >= 60) return { label:'Bom', emoji:'🙂' };
+  if (percent >= 80) return { label:'Ótimo', emoji:'🤩' };
+  if (percent >= 60) return { label:'Bom', emoji:'😊' };
   if (percent >= 40) return { label:'Neutro', emoji:'😐' };
-  if (percent >= 20) return { label:'Ruim', emoji:'😕' };
-  return { label:'Péssimo', emoji:'😣' };
+  if (percent >= 20) return { label:'Ruim', emoji:'😟' };
+  return { label:'Péssimo', emoji:'😭' };
 }
 function questionOptionSetting(question, value) {
   const target = String(value ?? '');
@@ -451,7 +457,7 @@ function enrichResponseAnswer(quiz, answer) {
     score: active ? rawScore * weight : 0,
     scored: active,
     evaluationLabel: usableText(answer?.evaluationLabel) || usableText(setting?.text) || usableText(answer?.label),
-    evaluationEmoji: usableText(answer?.evaluationEmoji) || usableText(setting?.emoji) || (question.type === 'emoji' ? usableText(answer?.value) : '')
+    evaluationEmoji: vividEvaluationEmoji(answer?.evaluationEmoji || setting?.emoji, question.type === 'emoji' ? usableText(answer?.value) : '')
   };
 }
 function calculateResponseSummary(quiz, answers, submittedSummary = {}) {
