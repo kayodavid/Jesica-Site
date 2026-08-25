@@ -18,17 +18,21 @@
     })();
   </script>
   <style>
-    html { background:#faf8f3; color-scheme:light; scrollbar-color:transparent transparent; scrollbar-gutter:auto; scrollbar-width:none; -ms-overflow-style:none; }
-    html::-webkit-scrollbar { width:0; height:0; display:none; background:transparent; }
-    html::-webkit-scrollbar-track, html::-webkit-scrollbar-track-piece { background:transparent; }
-    html::-webkit-scrollbar-thumb { border:0; background:transparent; }
-    html[data-patient-theme='traditional'] { background:#faf8f3; color-scheme:light; scrollbar-color:transparent transparent; }
-    html[data-patient-theme='black'], html:has(body[data-patient-theme='black']) { background:#17181d; color-scheme:dark; scrollbar-color:transparent transparent; }
-    html[data-patient-theme='black']::-webkit-scrollbar, html[data-patient-theme='black']::-webkit-scrollbar-track, html[data-patient-theme='black']::-webkit-scrollbar-track-piece, html:has(body[data-patient-theme='black'])::-webkit-scrollbar, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track-piece { background:transparent; }
-    html[data-patient-theme='black']::-webkit-scrollbar-thumb, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-thumb { border:0; background:transparent; }
-    body { min-width:0; overflow-x:hidden; font-family:'Poppins',sans-serif; transition:background .2s,color .2s; scrollbar-width:none; -ms-overflow-style:none; }
-    body::-webkit-scrollbar { width:0; height:0; display:none; background:transparent; }
-    body::-webkit-scrollbar-track, body::-webkit-scrollbar-track-piece, body::-webkit-scrollbar-thumb { background:transparent; border:0; }
+    html { overflow-y:scroll; background:#faf8f3; color-scheme:light; scrollbar-color:#b39a5a #eee7d8; scrollbar-gutter:stable; scrollbar-width:thin; -ms-overflow-style:auto; }
+    html::-webkit-scrollbar { width:10px; height:10px; display:block; background:#eee7d8; }
+    html::-webkit-scrollbar-track, html::-webkit-scrollbar-track-piece { background:#eee7d8; }
+    html::-webkit-scrollbar-thumb { min-height:40px; border:2px solid #eee7d8; border-radius:999px; background:#b39a5a; }
+    html[data-patient-theme='traditional'] { background:#faf8f3; color-scheme:light; scrollbar-color:#b39a5a #eee7d8; }
+    html[data-patient-theme='black'], html:has(body[data-patient-theme='black']) { background:#17181d; color-scheme:dark; scrollbar-color:#7f7250 #252a33; }
+    html[data-patient-theme='black']::-webkit-scrollbar, html:has(body[data-patient-theme='black'])::-webkit-scrollbar, html[data-patient-theme='black']::-webkit-scrollbar-track, html[data-patient-theme='black']::-webkit-scrollbar-track-piece, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-track-piece { background:#252a33; }
+    html[data-patient-theme='black']::-webkit-scrollbar-thumb, html:has(body[data-patient-theme='black'])::-webkit-scrollbar-thumb { border-color:#252a33; background:#7f7250; }
+    body { min-width:0; overflow-x:hidden; font-family:'Poppins',sans-serif; transition:background .2s,color .2s; scrollbar-width:thin; scrollbar-color:#b39a5a #eee7d8; -ms-overflow-style:auto; }
+    body::-webkit-scrollbar { width:10px; height:10px; display:block; background:#eee7d8; }
+    body::-webkit-scrollbar-track, body::-webkit-scrollbar-track-piece { background:#eee7d8; }
+    body::-webkit-scrollbar-thumb { min-height:40px; border:2px solid #eee7d8; border-radius:999px; background:#b39a5a; }
+    body[data-patient-theme='black'] { scrollbar-color:#7f7250 #252a33; }
+    body[data-patient-theme='black']::-webkit-scrollbar, body[data-patient-theme='black']::-webkit-scrollbar-track, body[data-patient-theme='black']::-webkit-scrollbar-track-piece { background:#252a33; }
+    body[data-patient-theme='black']::-webkit-scrollbar-thumb { border-color:#252a33; background:#7f7250; }
     .panel-card { background:rgba(255,255,255,.88); border:1px solid rgba(168,139,54,.15); }
     .metric-card { border:1px solid rgba(168,139,54,.15); background:rgba(250,248,243,.78); }
     .admin-layout-container { width:100%; max-width:none; padding:0; }
