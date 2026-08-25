@@ -396,6 +396,7 @@
     } else {
       targetEmail = session.email;
       userDisplayName.innerText = session.name;
+      if (!(await db.hasPatientAccess('calendar', session.email))) { window.location.href = '/paciente.html'; return; }
     }
 
     // Ao mudar filtros de Mês e Ano

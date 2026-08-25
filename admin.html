@@ -320,6 +320,17 @@
   </div>
   <div id="delete-ebook-section-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300"><div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md border border-white/20 shadow-2xl mx-4"><h3 class="text-xl font-bold text-dark mb-2">Excluir seção de eBook?</h3><p class="text-sm text-gray-600 mb-6">Os eBooks serão movidos para <strong>Geral</strong>. O conteúdo não será apagado.</p><input type="hidden" id="delete-ebook-section-id" /><div class="flex gap-2"><button type="button" id="delete-ebook-section-cancel-btn" class="w-1/2 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button type="button" id="delete-ebook-section-confirm-btn" class="w-1/2 bg-[#6f3f35] text-white py-3 rounded-xl font-bold text-sm">Excluir seção</button></div></div></div>
 
+  <!-- Modal Permissões de acesso do paciente -->
+  <div id="patient-access-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300 p-4" role="dialog" aria-modal="true" aria-labelledby="patient-access-title">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+      <div class="flex items-start justify-between gap-4 mb-2"><div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Personalização do plano</p><h3 id="patient-access-title" class="text-xl font-bold text-dark">Acessos do paciente</h3><p class="text-xs text-gray-500 mt-1">Ative somente os cards que fazem parte do plano contratado. As áreas desativadas ficam ocultas e bloqueadas também por acesso direto.</p></div><button id="patient-access-close-btn" type="button" class="text-gray-400 hover:text-dark text-2xl leading-none" aria-label="Fechar permissões">×</button></div>
+      <p id="patient-access-status" class="hidden text-xs mt-4 rounded-xl px-3 py-2"></p>
+      <div id="patient-access-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5"></div>
+      <div class="mt-5 rounded-2xl border border-primary/15 bg-primary/5 p-4"><p class="text-xs text-gray-600"><strong class="text-dark">Exemplo:</strong> para um plano com somente vídeos, mantenha “Vídeos educativos” ativo e desative os demais cards.</p></div>
+      <div class="flex flex-col-reverse sm:flex-row gap-2 pt-5"><button type="button" id="patient-access-cancel-btn" class="sm:flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">Cancelar</button><button type="button" id="patient-access-save-btn" class="sm:flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Salvar permissões</button></div>
+    </div>
+  </div>
+
   <!-- Modal Resetar Senha Paciente -->
   <div id="reset-password-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm border border-white/20 shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
@@ -363,6 +374,29 @@
     const addPatientModal = document.getElementById('add-patient-modal');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const addPatientForm = document.getElementById('add-patient-form');
+    const patientAccessModal = document.getElementById('patient-access-modal');
+    const patientAccessList = document.getElementById('patient-access-list');
+    const patientAccessTitle = document.getElementById('patient-access-title');
+    const patientAccessStatus = document.getElementById('patient-access-status');
+    let patientAccessEmail = '';
+    let patientAccessDraft = {};
+    const patientAccessCards = [
+      { id:'calendar', title:'Calendário de Automonitoramento', description:'Registros de alimentação, treinos, hidratação e observações.', icon:'▣' },
+      { id:'videos', title:'Vídeos educativos', description:'Conteúdos educativos publicados para o paciente.', icon:'▶' },
+      { id:'ebooks', title:'eBooks', description:'Materiais de apoio e guias preparados para o acompanhamento.', icon:'▤' },
+      { id:'nutrition', title:'Acompanhamento Nutricional', description:'Calculadoras e análise de rótulos disponíveis no plano.', icon:'◉' },
+      { id:'patient_space', title:'Espaço do Paciente', description:'Painel de evolução, registros e orientações individualizadas.', icon:'⌂' }
+    ];
+    const escapeAdminHtml = value => String(value ?? '').replace(/[&<>]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[char]));
+    function setPatientAccessStatus(message, type = 'info') { patientAccessStatus.textContent = message; patientAccessStatus.className = `text-xs mt-4 rounded-xl px-3 py-2 ${type === 'error' ? 'bg-red-50 text-red-700' : type === 'success' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'}`; }
+    function renderPatientAccessCards() { patientAccessList.innerHTML = patientAccessCards.map(card => { const active = patientAccessDraft[card.id] !== false; return `<article class="rounded-2xl border ${active ? 'border-primary/30 bg-primary/5' : 'border-gray-200 bg-gray-50'} p-4 transition-colors"><div class="flex items-start gap-3"><span class="w-10 h-10 shrink-0 rounded-xl ${active ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'} flex items-center justify-center font-bold">${card.icon}</span><div class="min-w-0 flex-1"><h4 class="font-bold text-dark text-sm">${escapeAdminHtml(card.title)}</h4><p class="text-xs text-gray-500 mt-1 leading-relaxed">${escapeAdminHtml(card.description)}</p></div><button type="button" class="patient-access-toggle shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold ${active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}" data-card-id="${card.id}" aria-pressed="${active}">${active ? 'Ativo' : 'Desativado'}</button></div></article>`; }).join(''); patientAccessList.querySelectorAll('.patient-access-toggle').forEach(button => button.addEventListener('click', () => { const id = button.dataset.cardId; patientAccessDraft[id] = patientAccessDraft[id] === false; renderPatientAccessCards(); })); }
+    function showPatientAccessModal() { patientAccessModal.classList.remove('hidden'); patientAccessModal.classList.add('flex'); requestAnimationFrame(() => { patientAccessModal.classList.add('opacity-100'); patientAccessModal.querySelector('.transform').classList.remove('scale-95'); patientAccessModal.querySelector('.transform').classList.add('scale-100'); }); }
+    function closePatientAccessModal() { patientAccessModal.classList.remove('opacity-100'); patientAccessModal.querySelector('.transform').classList.remove('scale-100'); patientAccessModal.querySelector('.transform').classList.add('scale-95'); setTimeout(() => { patientAccessModal.classList.remove('flex'); patientAccessModal.classList.add('hidden'); }, 220); }
+    async function openPatientAccessModal(email, name) { patientAccessEmail = String(email || '').trim().toLowerCase(); patientAccessTitle.textContent = `Acessos de ${name || email}`; patientAccessList.innerHTML = '<p class="sm:col-span-2 text-sm text-gray-500">Carregando permissões...</p>'; patientAccessStatus.className = 'hidden'; showPatientAccessModal(); const access = await db.getPatientAccess(patientAccessEmail); patientAccessDraft = { ...access.accessCards }; renderPatientAccessCards(); }
+    document.getElementById('patient-access-close-btn').addEventListener('click', closePatientAccessModal);
+    document.getElementById('patient-access-cancel-btn').addEventListener('click', closePatientAccessModal);
+    patientAccessModal.addEventListener('click', event => { if (event.target === patientAccessModal) closePatientAccessModal(); });
+    document.getElementById('patient-access-save-btn').addEventListener('click', async () => { if (!patientAccessEmail) return; const button = document.getElementById('patient-access-save-btn'); button.disabled = true; button.textContent = 'Salvando...'; const result = await db.savePatientAccess(patientAccessEmail, patientAccessDraft); button.disabled = false; button.textContent = 'Salvar permissões'; if (!result.success) { setPatientAccessStatus(result.message || 'Não foi possível salvar as permissões.', 'error'); return; } setPatientAccessStatus(result.localOnly ? 'Permissões salvas neste dispositivo. A sincronização remota está indisponível.' : 'Permissões salvas com sucesso.', 'success'); setTimeout(closePatientAccessModal, 650); });
 
     // Navegação do menu administrativo
     const adminCards = [...document.querySelectorAll('.admin-module-card')];
@@ -508,6 +542,9 @@
           <td class="py-4 px-2"><code class="bg-light px-2.5 py-1 rounded text-xs font-mono border border-gray-100 text-primary font-bold">${patient.password}</code></td>
           <td class="py-4 px-2 text-right">
             <div class="flex gap-2 justify-end">
+              <button class="patient-access-btn bg-[#efe5c5] text-[#6f5721] hover:bg-primary hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all" data-email="${patient.email}" data-name="${encodeURIComponent(patient.name)}">
+                Configurar acessos
+              </button>
               <button class="view-calendar-btn bg-primary/10 text-primary hover:bg-primary hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all" data-email="${patient.email}">
                 Ver Calendário
               </button>
@@ -524,6 +561,7 @@
       });
 
       // Eventos dos botões
+      document.querySelectorAll('.patient-access-btn').forEach(btn => btn.addEventListener('click', event => { openPatientAccessModal(event.currentTarget.dataset.email, decodeURIComponent(event.currentTarget.dataset.name || '')); }));
       document.querySelectorAll('.view-calendar-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const email = e.target.getAttribute('data-email');

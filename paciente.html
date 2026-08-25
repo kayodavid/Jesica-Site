@@ -47,8 +47,8 @@
         <p class="text-gray-500 mt-2">Escolha uma opção para continuar seu acompanhamento.</p>
       </header>
 
-      <section class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <a href="/calendario.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+      <section id="patient-module-grid" class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <a data-patient-access="calendar" href="/calendario.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
           <div class="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center mb-3 group-hover:bg-dark transition-colors">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
           </div>
@@ -57,7 +57,7 @@
           <span class="inline-block mt-4 text-xs sm:text-sm font-bold text-primary group-hover:text-dark">Acessar calendário →</span>
         </a>
 
-        <a href="/videos.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+        <a data-patient-access="videos" href="/videos.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
           <div class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           </div>
@@ -65,7 +65,7 @@
           <p class="block text-xs text-gray-500 mt-1">Assista aos conteúdos educativos disponibilizados para você.</p>
           <span class="inline-block mt-4 text-xs sm:text-sm font-bold text-primary group-hover:text-dark">Assistir vídeos →</span>
         </a>
-        <a href="/ebooks.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+        <a data-patient-access="ebooks" href="/ebooks.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
           <div class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 014 16.5v-11zM4 5.5v11M8 7h8m-8 4h8m-8 4h5"/></svg>
           </div>
@@ -74,7 +74,7 @@
           <span class="inline-block mt-4 text-xs sm:text-sm font-bold text-primary group-hover:text-dark">Abrir eBooks →</span>
         </a>
 
-        <a href="/acompanhamento-nutricional.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+        <a data-patient-access="nutrition" href="/acompanhamento-nutricional.html" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
           <div class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 7v5l3 2"/></svg>
           </div>
@@ -83,7 +83,7 @@
           <span class="inline-block mt-4 text-xs sm:text-sm font-bold text-primary group-hover:text-dark">Acessar ferramentas →</span>
         </a>
 
-        <a href="/espaco-paciente" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+        <a data-patient-access="patient_space" href="/espaco-paciente" class="patient-module-card group text-left bg-white rounded-2xl p-4 sm:p-5 border-transparent shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
           <div class="w-11 h-11 rounded-2xl bg-[#efe5c5] text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.5 13.5 11 11l2 2 3-3"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 7v1"/></svg>
           </div>
@@ -92,6 +92,7 @@
           <span class="inline-block mt-4 text-xs sm:text-sm font-bold text-primary group-hover:text-dark">Abrir meu espaço →</span>
         </a>
       </section>
+      <p id="no-patient-access" class="hidden mt-5 rounded-2xl border border-dashed border-primary/30 bg-white/70 px-5 py-6 text-center text-sm text-gray-500">Nenhuma área foi liberada para este plano. Fale com sua nutricionista.</p>
     </div>
   </main>
 
@@ -126,6 +127,10 @@
     if (!session || session.role !== 'patient') {
       window.location.href = session && session.role === 'admin' ? '/admin.html' : '/login.html';
     } else {
+      const access = await db.getPatientAccess(session.email);
+      const patientCards = [...document.querySelectorAll('[data-patient-access]')];
+      patientCards.forEach(card => { const allowed = access.accessCards[card.dataset.patientAccess] !== false; card.classList.toggle('hidden', !allowed); card.setAttribute('aria-hidden', String(!allowed)); });
+      document.getElementById('no-patient-access').classList.toggle('hidden', !patientCards.every(card => card.classList.contains('hidden')));
       document.getElementById('user-display-name').innerText = session.name;
       document.getElementById('patient-name').innerText = session.name.split(' ')[0];
       if (session.isFirstAccess) document.getElementById('password-modal').classList.remove('hidden');
