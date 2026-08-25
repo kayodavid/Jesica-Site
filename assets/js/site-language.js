@@ -3,143 +3,78 @@
   const translations = {
     pt: {
       pageTitle: 'Nutricionista Jessica Melo',
+      aboutPageTitle: 'Quem sou eu - Nutricionista Jessica Melo',
+      blogPageTitle: 'Blog | Nutricionista Jessica Melo',
+      loginPageTitle: 'Login - Portal Jessica Melo',
+      bookingPageTitle: 'Agendamento - Jessica Melo Nutri',
       logoAlt: 'Jessica Melo Nutricionista',
-      navHome: 'Início',
-      navAbout: 'Quem sou eu',
-      navBlog: 'Blog',
-      navPatient: 'Área do Paciente',
-      navSchedule: 'Agendar',
-      languageLabel: 'Idioma',
-      languagePt: 'Português',
-      languageEn: 'English',
-      menuOpen: 'Abrir menu',
+      navHome: 'Início', navAbout: 'Quem sou eu', navBlog: 'Blog', navPatient: 'Área do Paciente', navSchedule: 'Agendar',
+      languageLabel: 'Idioma', languagePt: 'Português', languageEn: 'English', menuOpen: 'Abrir menu',
       heroTitle: 'Atendimento nutricional <span class="text-dark">personalizado</span>, baseado em ciência e adaptado às suas necessidades individuais.',
       heroCta: 'AGENDAR ATENDIMENTO',
       purpose: 'O objetivo é orientar e apoiar em sua jornada, com escuta ativa, combinando nutrição, comportamento alimentar, rotina e autoconsciência para melhora dos desfechos de saúde.',
-      freedomOne: 'Sem sofrer,',
-      freedomTwo: 'Sem passar fome,',
-      freedomThree: 'Comendo o que você gosta.',
-      freedomCta: 'EU QUERO INVESTIR NA MINHA SAÚDE',
-      seekTitle: 'Quando buscar atendimento nutricional?',
-      seekOne: 'Baixa energia, fadiga constante ou dificuldade de concentração;',
-      seekTwo: 'Para reduzir problemas emocionais, como estresse e ansiedade;',
-      seekThree: 'Não saber o que comer, quanto comer e quando comer;',
-      seekFour: 'Sensação de culpa ou obsessão com alimentação;',
-      seekFive: 'Vive em um ciclo de engorda e emagrece infinito;',
-      seekSix: 'Sofrimento com dietas restritivas.',
-      faqTitle: 'Perguntas Frequentes',
-      faqOneQuestion: '1. Já testei várias dietas e não funcionaram. O que muda aqui?',
-      faqOneAnswer: 'O meu trabalho tem como base a mudança de comportamento, antes da mudança alimentar. Vou entender o porquê que você não consegue emagrecer ou alcançar seus objetivos e te direcionar em um caminho com mais clareza. Além disso, o atendimento é individualizado, levando em conta sua rotina, preferências e histórico de saúde, sempre baseado em evidências científicas.',
-      faqTwoQuestion: '2. A consulta é só sobre dieta?',
-      faqTwoAnswer: 'Não. O atendimento também gira em torno de hábitos de vida, relação com a comida, sinais de fome e saciedade, comportamento alimentar, além de estratégias práticas para o seu dia-a-dia.',
-      faqThreeQuestion: '3. Vou ter que parar de comer tudo o que eu gosto?',
-      faqThreeAnswer: 'Não. O objetivo não é tirar seus alimentos preferidos, mas sim cuidar da sua saúde nutricional encontrando um equilíbrio que funciona para você, dentro da sua rotina.',
-      faqCta: 'AGENDAR CONSULTA',
-      footer: '© 2026 Jessica Melo Nutricionista. Todos os direitos reservados.'
+      freedomOne: 'Sem sofrer,', freedomTwo: 'Sem passar fome,', freedomThree: 'Comendo o que você gosta.', freedomCta: 'EU QUERO INVESTIR NA MINHA SAÚDE',
+      seekTitle: 'Quando buscar atendimento nutricional?', seekOne: 'Baixa energia, fadiga constante ou dificuldade de concentração;', seekTwo: 'Para reduzir problemas emocionais, como estresse e ansiedade;', seekThree: 'Não saber o que comer, quanto comer e quando comer;', seekFour: 'Sensação de culpa ou obsessão com alimentação;', seekFive: 'Vive em um ciclo de engorda e emagrece infinito;', seekSix: 'Sofrimento com dietas restritivas.',
+      faqTitle: 'Perguntas Frequentes', faqOneQuestion: '1. Já testei várias dietas e não funcionaram. O que muda aqui?', faqOneAnswer: 'O meu trabalho tem como base a mudança de comportamento, antes da mudança alimentar. Vou entender o porquê que você não consegue emagrecer ou alcançar seus objetivos e te direcionar em um caminho com mais clareza. Além disso, o atendimento é individualizado, levando em conta sua rotina, preferências e histórico de saúde, sempre baseado em evidências científicas.', faqTwoQuestion: '2. A consulta é só sobre dieta?', faqTwoAnswer: 'Não. O atendimento também gira em torno de hábitos de vida, relação com a comida, sinais de fome e saciedade, comportamento alimentar, além de estratégias práticas para o seu dia-a-dia.', faqThreeQuestion: '3. Vou ter que parar de comer tudo o que eu gosto?', faqThreeAnswer: 'Não. O objetivo não é tirar seus alimentos preferidos, mas sim cuidar da sua saúde nutricional encontrando um equilíbrio que funciona para você, dentro da sua rotina.', faqCta: 'AGENDAR CONSULTA',
+      footer: '© 2026 Jessica Melo Nutricionista. Todos os direitos reservados.',
+      aboutTitle: 'Quem sou eu',
+      aboutP1: 'Sou natural de Ceres, Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um contexto pessoal, que descobri minha verdadeira vocação para a Nutrição.',
+      aboutP2: 'Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da alimentação.',
+      aboutP3: 'Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das dietas restritivas e dos modismos passageiros.',
+      aboutP4: 'Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria.',
+      aboutP5: 'Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor e prático, criando as condições ideais para promover mudanças reais e sustentáveis.',
+      aboutClosing: 'Será um prazer fazer parte da sua jornada.', aboutWelcome: 'Seja bem-vindo(a)!', aboutRole: 'Nutricionista | CRN-1: 27052', aboutCtaTitle: 'Pronto para transformar sua rotina?', aboutCtaDescription: 'Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.', aboutCta: 'Agendar atendimento',
+      blogEnergyTitle: 'O papel da densidade energética no controle do peso corporal', blogAllOrNothingTitle: 'Por que a mentalidade do "tudo ou nada" está fadada ao fracasso?', blogEnergyChartTitle: 'Quantidade de energia em determinado peso de alimento (kcal/g)', blogEnergyQuestion: 'Então, como podemos usar o conhecimento sobre densidade energética a nosso favor?', blogReference: 'Referência', blogBalanceQuote: '"O segredo é sempre ter equilíbrio."', blogQuickNav: 'Navegação rápida', blogFindArticle: 'Encontre um artigo', blogArticles: 'Artigos', blogShowAll: 'Ver todos os artigos', blogShowLess: 'Mostrar menos artigos', blogIndexLabel: 'Índice de artigos', blogTitle: 'Blog', blogCtaTitle: 'Quer encontrar o seu equilíbrio?', blogCtaDescription: 'Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.', blogCta: 'Agendar consulta', blogEnergyIntro: 'Você já ouviu falar em densidade energética dos alimentos? Para pessoas que têm o objetivo de emagrecer ou manter a composição corporal, esse conhecimento sobre a densidade energética pode ser extremamente útil.', blogEnergyDefinition: 'Densidade energética é a quantidade de energia ou calorias em determinada quantidade de alimento, e geralmente é expressa em calorias por grama (kcal/g). Os macronutrientes (carboidratos, proteínas e gorduras) possuem quantidades diferentes de calorias por grama. O álcool também fornece energia.', blogEnergyImageAlt: 'Comparação de densidade energética', blogFat: 'Gorduras', blogAlcohol: 'Álcool', blogCarbs: 'Carboidratos', blogProtein: 'Proteínas', blogWaterFiber: 'Água e fibras', blogEnergyFoods: 'Alguns alimentos têm muita caloria em pouco volume, como sorvete, fast-food e frituras. Outros, como frutas e vegetais, têm menos caloria porque contêm mais água e fibras. Isso significa que você pode comer uma quantidade maior deles sem exagerar nas calorias.', blogEnergySwap: 'Então, se você substitui alimentos mais calóricos por alimentos com menos calorias, você come a mesma quantidade, mas consome menos energia. Isso ajuda tanto a emagrecer quanto a manter o peso.', blogEnergySatiety: 'Pesquisas sugerem que a sensação de saciedade está relacionada com o volume de comida consumido, e não com a quantidade de calorias. Por isso, priorizar alimentos com baixa densidade energética é uma estratégia eficaz para quem quer emagrecer sem passar fome.', blogEnergyGuidance: 'A orientação é aumentar a variedade e a disponibilidade de alimentos com baixa densidade energética, tanto em preparações salgadas quanto doces. Seguem algumas sugestões:', blogSavory: 'Preparações salgadas:', blogSavoryList: 'sopa de legumes, caldo de abóbora ou feijão, omelete com tomate e cenoura, abobrinha recheada, berinjela assada com ricota, salada com frango e legumes assados, panqueca de ricota com espinafre, torta de legumes e arroz de couve-flor com frango.', blogSavoryHtml: '<span class="font-semibold">Preparações salgadas:</span> sopa de legumes, caldo de abóbora ou feijão, omelete com tomate e cenoura, abobrinha recheada, berinjela assada com ricota, salada com frango e legumes assados, panqueca de ricota com espinafre, torta de legumes e arroz de couve-flor com frango.', blogSweet: 'Preparações doces:', blogSweetList: 'iogurte natural com morango, vitamina de frutas vermelhas, maçã ou pera assada com canela, creme de mamão, pudim de chia com fruta, mingau de aveia com maçã e salada de frutas.', blogSweetHtml: '<span class="font-semibold">Preparações doces:</span> iogurte natural com morango, vitamina de frutas vermelhas, maçã ou pera assada com canela, creme de mamão, pudim de chia com fruta, mingau de aveia com maçã e salada de frutas.', blogEnergyPortions: 'E por último, é importante controlar as porções ou limitar a ingestão de alimentos com alta densidade energética, como os alimentos gordurosos e secos.', blogSunburnAlt: 'Queimadura de sol', blogNoTanAlt: 'Não se bronzeia', blogOvertrainingAlt: 'Restrição alimentar extrema', blogSedentaryAlt: 'Sedentarismo', blogBalanceImageAlt: 'Equilíbrio alimentar', blogAllNothingIntro: 'Imagine que você está tomando sol com a intenção de se bronzear. Você tem duas opções:', blogSunburn: '1. Você fica gravemente queimado de sol.', blogNoTan: '2. Você não se bronzeia.', blogAllNothingQuestion: 'E se estivesse tentando perder peso, qual das opções abaixo você escolheria?', blogNoOption: 'Você não escolheria nenhuma dessas opções, certo?!', blogExtremeOption: '1. Você elimina todos os seus alimentos calóricos favoritos, deixa de participar de eventos sociais, come refeições diferentes do resto da sua família, força a ingestão de alimentos que não gosta e vai à academia sete dias por semana.', blogSedentaryOption: '2. Você come muitos alimentos calóricos, faz pedido de comida todos os dias, cancela sua matrícula na academia e se torna completamente sedentário.', blogAllNothingManifest: 'É assim que a mentalidade do "tudo ou nada" se manifesta. O risco é que o "tudo" seja tão intenso que simplesmente não consiga ser consistente. O resultado é que, naturalmente, o "nada" acaba vindo em seguida.', blogBalanceParagraph: 'Para evitar essas duas situações prejudiciais, o segredo é sempre manter o equilíbrio. Por exemplo, incluir alguns alimentos calóricos com moderação e pedir comida de vez em quando é como usar um protetor solar FPS 30. Você está no sol, mas tem uma proteção que te impede de ser muito agressivo, enquanto ainda consegue se bronzear.', blogRole: 'Nutricionista | CRN-1: 27052',
+      loginBack: 'Voltar ao site', loginHeading: 'Portal de Acompanhamento', loginIntro: 'Acesse seu calendário de automonitoramento', loginEmail: 'E-mail', loginEmailPlaceholder: 'seuemail@exemplo.com', loginRecoveryPlaceholder: 'seuemail@exemplo.com', loginPassword: 'Senha', loginPasswordPlaceholder: 'Digite sua senha', loginSubmit: 'Entrar no Portal', loginForgot: 'Esqueci minha senha', loginRecoveryTitle: 'Recuperar acesso', loginRecoveryIntro: 'Informe o e-mail cadastrado. Por segurança, a senha nunca é exibida nem enviada por esta página. Se o e-mail estiver cadastrado, enviaremos um link temporário para criar uma nova senha.', loginRecoveryEmail: 'E-mail do paciente', loginRecoverySend: 'Enviar link por e-mail', loginCancel: 'Cancelar', loginInvalidEmail: 'Informe um e-mail válido para solicitar a recuperação.', loginSending: 'Enviando...', loginRecoverySuccess: 'Se o e-mail estiver cadastrado, você receberá um link de recuperação em alguns instantes. Verifique também a pasta de spam.', loginSendError: 'Não foi possível enviar o e-mail agora.', loginSuccess: 'Login realizado com sucesso! Redirecionando...',
+      bookingSite: 'Site', bookingPatient: 'Área do Paciente', bookingName: 'Jessica Melo', bookingRole: 'Nutricionista', bookingTagline: 'Te ajudo a ter resultados enquanto a vida acontece', bookingCta: 'Agende sua consulta'
     },
     en: {
       pageTitle: 'Jessica Melo Nutritionist',
+      aboutPageTitle: 'About me - Jessica Melo Nutritionist',
+      blogPageTitle: 'Blog | Jessica Melo Nutritionist',
+      loginPageTitle: 'Login - Jessica Melo Portal',
+      bookingPageTitle: 'Book an appointment - Jessica Melo Nutritionist',
       logoAlt: 'Jessica Melo Nutritionist',
-      navHome: 'Home',
-      navAbout: 'About me',
-      navBlog: 'Blog',
-      navPatient: 'Patient Area',
-      navSchedule: 'Book now',
-      languageLabel: 'Language',
-      languagePt: 'Português',
-      languageEn: 'English',
-      menuOpen: 'Open menu',
+      navHome: 'Home', navAbout: 'About me', navBlog: 'Blog', navPatient: 'Patient Area', navSchedule: 'Book now',
+      languageLabel: 'Language', languagePt: 'Português', languageEn: 'English', menuOpen: 'Open menu',
       heroTitle: 'Personalized <span class="text-dark">nutrition care</span>, grounded in science and tailored to your individual needs.',
       heroCta: 'BOOK AN APPOINTMENT',
       purpose: 'My goal is to guide and support you on your journey through active listening, combining nutrition, eating behavior, daily routine and self-awareness to improve your health outcomes.',
-      freedomOne: 'Without suffering,',
-      freedomTwo: 'Without going hungry,',
-      freedomThree: 'Eating what you love.',
-      freedomCta: 'I WANT TO INVEST IN MY HEALTH',
-      seekTitle: 'When should you seek nutrition care?',
-      seekOne: 'Low energy, constant fatigue or difficulty concentrating;',
-      seekTwo: 'To reduce emotional challenges such as stress and anxiety;',
-      seekThree: 'Not knowing what to eat, how much to eat or when to eat;',
-      seekFour: 'Feelings of guilt or an obsession with food;',
-      seekFive: 'Being stuck in an endless cycle of losing and regaining weight;',
-      seekSix: 'Struggling with restrictive diets.',
-      faqTitle: 'Frequently Asked Questions',
-      faqOneQuestion: '1. I have tried several diets and they did not work. What is different here?',
-      faqOneAnswer: 'My work is based on changing behavior before changing food choices. I will understand why you have not been able to lose weight or reach your goals and guide you toward a clearer path. Care is individualized, taking your routine, preferences and health history into account, always grounded in scientific evidence.',
-      faqTwoQuestion: '2. Is the consultation only about diet?',
-      faqTwoAnswer: 'No. Care also addresses lifestyle habits, your relationship with food, hunger and fullness cues, eating behavior and practical strategies for your everyday life.',
-      faqThreeQuestion: '3. Will I have to stop eating everything I enjoy?',
-      faqThreeAnswer: 'No. The goal is not to take away your favorite foods, but to care for your nutritional health by finding a balance that works for you and your routine.',
-      faqCta: 'BOOK A CONSULTATION',
-      footer: '© 2026 Jessica Melo Nutritionist. All rights reserved.'
+      freedomOne: 'Without suffering,', freedomTwo: 'Without going hungry,', freedomThree: 'Eating what you love.', freedomCta: 'I WANT TO INVEST IN MY HEALTH',
+      seekTitle: 'When should you seek nutrition care?', seekOne: 'Low energy, constant fatigue or difficulty concentrating;', seekTwo: 'To reduce emotional challenges such as stress and anxiety;', seekThree: 'Not knowing what to eat, how much to eat or when to eat;', seekFour: 'Feelings of guilt or an obsession with food;', seekFive: 'Being stuck in an endless cycle of losing and regaining weight;', seekSix: 'Struggling with restrictive diets.',
+      faqTitle: 'Frequently Asked Questions', faqOneQuestion: '1. I have tried several diets and they did not work. What is different here?', faqOneAnswer: 'My work is based on changing behavior before changing food choices. I will understand why you have not been able to lose weight or reach your goals and guide you toward a clearer path. Care is individualized, taking your routine, preferences and health history into account, always grounded in scientific evidence.', faqTwoQuestion: '2. Is the consultation only about diet?', faqTwoAnswer: 'No. Care also addresses lifestyle habits, your relationship with food, hunger and fullness cues, eating behavior and practical strategies for your everyday life.', faqThreeQuestion: '3. Will I have to stop eating everything I enjoy?', faqThreeAnswer: 'No. The goal is not to take away your favorite foods, but to care for your nutritional health by finding a balance that works for you and your routine.', faqCta: 'BOOK A CONSULTATION',
+      footer: '© 2026 Jessica Melo Nutritionist. All rights reserved.',
+      aboutTitle: 'About me',
+      aboutP1: 'I was born in Ceres, Goiás, and through close contact with healthcare professionals in a personal context, I discovered my true calling in Nutrition.',
+      aboutP2: 'My academic journey began with a degree in Biology, which allowed me to work as an educator at the Federal Institute of Goiás. After that experience, I chose to pursue Nutrition, a career transition driven by the certainty that I was following my purpose of caring for people through food.',
+      aboutP3: 'Committed to an excellent education, I devoted myself intensely to my studies during my degree at CEUB - DF. I completed my final project on the relationship between binge eating disorder in adults with overweight and obesity. During this period, I learned about the harms of restrictive diets and passing fads.',
+      aboutP4: 'At the end of my degree, I was invited to join the board of ANDF - the Association of Nutritionists of the Federal District — where I serve as a fiscal council member and contribute to discussions within our profession.',
+      aboutP5: 'I focus on weight management, behavior and performance through a straightforward, evidence-based approach free from fads. My goal is to provide welcoming, practical care and create the conditions for real, sustainable change.',
+      aboutClosing: 'It will be a pleasure to be part of your journey.', aboutWelcome: 'Welcome!', aboutRole: 'Nutritionist | CRN-1: 27052', aboutCtaTitle: 'Ready to transform your routine?', aboutCtaDescription: 'Book your consultation today and take the first step toward a healthier, more balanced life.', aboutCta: 'Book an appointment',
+      blogEnergyTitle: 'The role of energy density in weight management', blogAllOrNothingTitle: 'Why the all-or-nothing mindset is bound to fail', blogEnergyChartTitle: 'Energy in a given amount of food (kcal/g)', blogEnergyQuestion: 'So, how can we use our knowledge of energy density to our advantage?', blogReference: 'Reference', blogBalanceQuote: '"The secret is always balance."', blogQuickNav: 'Quick navigation', blogFindArticle: 'Find an article', blogArticles: 'Articles', blogShowAll: 'View all articles', blogShowLess: 'Show fewer articles', blogIndexLabel: 'Article index', blogTitle: 'Blog', blogCtaTitle: 'Ready to find your balance?', blogCtaDescription: 'Book your consultation today and take the first step toward a healthier, more balanced life.', blogCta: 'Book a consultation', blogEnergyIntro: 'Have you heard of the energy density of foods? For people who want to lose weight or maintain their body composition, understanding energy density can be extremely useful.', blogEnergyDefinition: 'Energy density is the amount of energy or calories in a given amount of food, usually expressed as calories per gram (kcal/g). Macronutrients — carbohydrates, proteins and fats — provide different amounts of calories per gram. Alcohol also provides energy.', blogEnergyImageAlt: 'Energy density comparison', blogFat: 'Fats', blogAlcohol: 'Alcohol', blogCarbs: 'Carbohydrates', blogProtein: 'Proteins', blogWaterFiber: 'Water and fiber', blogEnergyFoods: 'Some foods contain many calories in a small volume, such as ice cream, fast food and fried foods. Others, such as fruits and vegetables, contain fewer calories because they have more water and fiber. This means you can eat a larger amount without overdoing the calories.', blogEnergySwap: 'So, when you replace higher-calorie foods with lower-calorie options, you eat the same amount but consume less energy. This can help both with weight loss and with weight maintenance.', blogEnergySatiety: 'Research suggests that the feeling of fullness is related to the volume of food consumed, rather than to the number of calories. Therefore, prioritizing foods with low energy density is an effective strategy for anyone who wants to lose weight without going hungry.', blogEnergyGuidance: 'The guidance is to increase the variety and availability of low-energy-density foods, in both savory and sweet preparations. Here are some suggestions:', blogSavory: 'Savory preparations:', blogSavoryList: 'vegetable soup, pumpkin or bean broth, omelet with tomato and carrot, stuffed zucchini, baked eggplant with ricotta, salad with chicken and roasted vegetables, ricotta and spinach pancake, vegetable pie and cauliflower rice with chicken.', blogSavoryHtml: '<span class="font-semibold">Savory preparations:</span> vegetable soup, pumpkin or bean broth, omelet with tomato and carrot, stuffed zucchini, baked eggplant with ricotta, salad with chicken and roasted vegetables, ricotta and spinach pancake, vegetable pie and cauliflower rice with chicken.', blogSweet: 'Sweet preparations:', blogSweetList: 'plain yogurt with strawberries, mixed berry smoothie, baked apple or pear with cinnamon, papaya cream, chia pudding with fruit, oatmeal porridge with apple and fruit salad.', blogSweetHtml: '<span class="font-semibold">Sweet preparations:</span> plain yogurt with strawberries, mixed berry smoothie, baked apple or pear with cinnamon, papaya cream, chia pudding with fruit, oatmeal porridge with apple and fruit salad.', blogEnergyPortions: 'Finally, it is important to control portions or limit the intake of high-energy-density foods, such as fatty and dry foods.', blogSunburnAlt: 'Sunburn', blogNoTanAlt: 'No tan', blogOvertrainingAlt: 'Extreme dietary restriction', blogSedentaryAlt: 'Sedentary lifestyle', blogBalanceImageAlt: 'Balanced eating', blogAllNothingIntro: 'Imagine that you are sunbathing with the intention of getting a tan. You have two options:', blogSunburn: '1. You get severely sunburned.', blogNoTan: '2. You do not get a tan.', blogAllNothingQuestion: 'And if you were trying to lose weight, which of the options below would you choose?', blogNoOption: 'You would not choose either of these options, right?!', blogExtremeOption: '1. You eliminate all your favorite high-calorie foods, stop attending social events, eat different meals from the rest of your family, force yourself to eat foods you do not like and go to the gym seven days a week.', blogSedentaryOption: '2. You eat many high-calorie foods, order takeout every day, cancel your gym membership and become completely sedentary.', blogAllNothingManifest: 'This is how the all-or-nothing mindset shows up. The risk is that the "all" becomes so intense that you simply cannot be consistent. As a result, the "nothing" naturally follows.', blogBalanceParagraph: 'To avoid these two harmful situations, the secret is always to keep balance. For example, having some high-calorie foods in moderation and ordering takeout from time to time is like using SPF 30 sunscreen. You are in the sun, but you have protection that keeps you from being too aggressive while still allowing you to tan.', blogRole: 'Nutritionist | CRN-1: 27052',
+      loginBack: 'Back to website', loginHeading: 'Patient Monitoring Portal', loginIntro: 'Access your self-monitoring calendar', loginEmail: 'Email', loginEmailPlaceholder: 'youremail@example.com', loginRecoveryPlaceholder: 'youremail@example.com', loginPassword: 'Password', loginPasswordPlaceholder: 'Enter your password', loginSubmit: 'Enter the Portal', loginForgot: 'I forgot my password', loginRecoveryTitle: 'Recover access', loginRecoveryIntro: 'Enter the registered email address. For security, your password is never displayed or sent through this page. If the email is registered, we will send a temporary link to create a new password.', loginRecoveryEmail: 'Patient email', loginRecoverySend: 'Send email link', loginCancel: 'Cancel', loginInvalidEmail: 'Enter a valid email address to request recovery.', loginSending: 'Sending...', loginRecoverySuccess: 'If the email is registered, you will receive a recovery link shortly. Also check your spam folder.', loginSendError: 'We could not send the email right now.', loginSuccess: 'Login successful! Redirecting...',
+      bookingSite: 'Website', bookingPatient: 'Patient Area', bookingName: 'Jessica Melo', bookingRole: 'Nutritionist', bookingTagline: 'I help you achieve results while life happens', bookingCta: 'Book your consultation'
     }
   };
 
-  const getStoredLanguage = () => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'pt';
-    } catch {
-      return 'pt';
-    }
-  };
-
+  const getStoredLanguage = () => { try { return localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'pt'; } catch { return 'pt'; } };
+  const getCopy = () => translations[getStoredLanguage()];
   const applyLanguage = language => {
-    const locale = language === 'en' ? 'en' : 'pt';
-    const copy = translations[locale];
+    const locale = language === 'en' ? 'en' : 'pt'; const copy = translations[locale];
     document.documentElement.lang = locale === 'en' ? 'en' : 'pt-BR';
-    document.title = copy.pageTitle;
     document.body.dataset.siteLanguage = locale;
-
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-      const key = element.dataset.i18n;
-      if (copy[key] !== undefined) element.textContent = copy[key];
-    });
-    document.querySelectorAll('[data-i18n-html]').forEach(element => {
-      const key = element.dataset.i18nHtml;
-      if (copy[key] !== undefined) element.innerHTML = copy[key];
-    });
-    document.querySelectorAll('[data-i18n-attr]').forEach(element => {
-      const entries = element.dataset.i18nAttr.split('|');
-      entries.forEach(entry => {
-        const separator = entry.indexOf(':');
-        if (separator < 1) return;
-        const attribute = entry.slice(0, separator);
-        const key = entry.slice(separator + 1);
-        if (copy[key] !== undefined) element.setAttribute(attribute, copy[key]);
-      });
-    });
-    document.querySelectorAll('[data-language-choice]').forEach(button => {
-      const active = button.dataset.languageChoice === locale;
-      button.setAttribute('aria-pressed', String(active));
-      button.classList.toggle('bg-primary', active);
-      button.classList.toggle('text-white', active);
-      button.classList.toggle('shadow-sm', active);
-      button.classList.toggle('text-gray-500', !active);
-      button.classList.toggle('hover:text-dark', !active);
-    });
-
-    try {
-      localStorage.setItem(STORAGE_KEY, locale);
-    } catch {
-      // The page remains usable when storage is unavailable.
-    }
+    const titleKey = document.documentElement.dataset.i18nTitleKey || 'pageTitle';
+    document.title = copy[titleKey] || copy.pageTitle;
+    document.querySelectorAll('[data-i18n]').forEach(element => { const key = element.dataset.i18n; if (copy[key] !== undefined) element.textContent = copy[key]; });
+    document.querySelectorAll('[data-i18n-html]').forEach(element => { const key = element.dataset.i18nHtml; if (copy[key] !== undefined) element.innerHTML = copy[key]; });
+    document.querySelectorAll('[data-i18n-attr]').forEach(element => { (element.dataset.i18nAttr || '').split('|').forEach(entry => { const separator = entry.indexOf(':'); if (separator < 1) return; const attribute = entry.slice(0, separator); const key = entry.slice(separator + 1); if (copy[key] !== undefined) element.setAttribute(attribute, copy[key]); }); });
+    document.querySelectorAll('[data-language-choice]').forEach(button => { const active = button.dataset.languageChoice === locale; button.setAttribute('aria-pressed', String(active)); button.classList.toggle('bg-primary', active); button.classList.toggle('text-white', active); button.classList.toggle('shadow-sm', active); button.classList.toggle('text-gray-500', !active); button.classList.toggle('hover:text-dark', !active); });
+    document.dispatchEvent(new CustomEvent('site-language-applied', { detail: { locale, copy } }));
+    try { localStorage.setItem(STORAGE_KEY, locale); } catch {}
   };
-
-  const init = () => {
-    document.querySelectorAll('[data-language-choice]').forEach(button => {
-      button.addEventListener('click', () => applyLanguage(button.dataset.languageChoice));
-    });
-    applyLanguage(getStoredLanguage());
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
+  const init = () => { document.querySelectorAll('[data-language-choice]').forEach(button => button.addEventListener('click', () => applyLanguage(button.dataset.languageChoice))); applyLanguage(getStoredLanguage()); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
 
-export {}; 
-
-// Keep this file compatible with Vite's static HTML entry points.
+export {};
 if (typeof module !== 'undefined') module.exports = {};
