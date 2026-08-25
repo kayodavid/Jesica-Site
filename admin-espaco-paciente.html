@@ -853,7 +853,8 @@
     async function renderDashboard(patients, selectPatient) {
       const dashboardUpdatedAt = document.getElementById('dashboard-updated-at');
       dashboardUpdatedAt.textContent = 'Atualizando dados de acompanhamento e financeiros...';
-      const [items, serviceLinks] = await Promise.all([
+      const responseEndDate = new Date(); const responseStartDate = new Date(responseEndDate); responseStartDate.setDate(responseStartDate.getDate() - 365);
+      const [items, serviceLinks, responseReport] = await Promise.all([
         Promise.all(patients.map(async (patient, index) => {
           let calendar = { days:{}, dayObservations:{} };
           try { calendar = await db.getCalendarData(patient.email, now.getFullYear(), now.getMonth() + 1) || calendar; } catch {}
@@ -862,7 +863,8 @@
           const feedback = calendar.dayObservations[FEEDBACK_KEY] || {};
           return { patient, index, calendar, summary, feedback, weeklyTotal:getWeeklyTotal(calendar), pending:!feedback.message || feedback.visible === false };
         })),
-        db.getPatientServiceLinks().catch(() => [])
+        db.getPatientServiceLinks().catch(() => []),
+        db.getEmailQuizResponsesReport(responseStartDate.toISOString().slice(0,10), responseEndDate.toISOString().slice(0,10)).catch(() => ({ success:false, responses:[] }))
       ]);
       const patientKeyFor = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
       const currentDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -871,7 +873,8 @@
       const finished = patients.filter(patient => { const links = serviceLinks.filter(link => link.patientKey === patientKeyFor(patient)); return links.length > 0 && links.every(isFinishedLink); }).length;
       const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const revenue = serviceLinks.filter(link => String(link.paymentDate || link.startDate || '').startsWith(monthPrefix)).reduce((total, link) => total + Number(link.paymentValue ?? link.value ?? 0), 0);
-      const pending = items.filter(item => item.pending).length;
+      const questionnairePending = responseReport?.success ? (responseReport.responses || []).filter(event => event.status === 'responded').length : 0;
+      const pending = items.filter(item => item.pending).length + questionnairePending;
       document.getElementById('dashboard-pending-count').textContent = pending;
       document.getElementById('dashboard-patient-count').textContent = patients.length;
       document.getElementById('dashboard-finished-count').textContent = finished;
@@ -986,10 +989,11 @@
       const planFor = item => { const all = serviceLinks.filter(link => link.patientKey === patientKey(item.patient)); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); const active = all.filter(link => { const status = String(link.status || '').toLocaleLowerCase('pt-BR'); const end = serviceEnd(link); return !['expired','finished','finalized','finalizado','concluido','concluído','cancelled','canceled'].includes(status) && (!end || end.getTime() >= today.getTime()); }); const pool = active.length ? active : all; return [...pool].sort((a,b) => String(b.startDate || b.createdAt || '').localeCompare(String(a.startDate || a.createdAt || '')))[0] || null; };
       const patientForEvent = event => items.find(item => { const patient = item.patient || {}; return patientKey(patient) === String(event.patientKey || '') || String(patient.email || '').toLowerCase() === String(event.recipientEmail || '').toLowerCase() || String(patient.name || '').toLocaleLowerCase('pt-BR') === String(event.patientName || '').toLocaleLowerCase('pt-BR'); }) || null;
       const openQuestionnaire = event => { if (typeof window.__openResponseReview === 'function') { window.__openResponseReview(event); return; } window.__pendingResponseReview = event; document.dispatchEvent(new CustomEvent('open-response-review', { detail:event })); };
+      const updatePendingCounters = total => { const dashboardCounter = document.getElementById('dashboard-pending-count'); const sidebarCounter = document.getElementById('pending-count'); if (dashboardCounter) dashboardCounter.textContent = String(total); if (sidebarCounter) { sidebarCounter.textContent = String(total); sidebarCounter.classList.toggle('hidden', total === 0); } };
       const draw = () => {
         const questionnaireRows = questionnaireReviews.filter(event => event.status === 'responded').map(event => ({ kind:'questionnaire', event, item:patientForEvent(event) }));
         const legacyRows = feedbackPending.map(item => ({ kind:'feedback', item }));
-        const allRows = [...questionnaireRows, ...legacyRows];
+        const allRows = [...questionnaireRows, ...legacyRows]; updatePendingCounters(allRows.length);
         const size = Number(pageSize.value); const pages = Math.max(1, Math.ceil(allRows.length / size)); page = Math.min(page, pages); const visible = allRows.slice((page - 1) * size, page * size); rows.innerHTML = ''; selectAll.checked = false;
         if (!visible.length) rows.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-sm text-gray-500">Não há revisões pendentes neste momento.</td></tr>';
         visible.forEach(entry => {
@@ -1010,7 +1014,7 @@
       };
       selectAll.addEventListener('change', () => document.querySelectorAll('.pending-row-select').forEach(input => { input.checked = selectAll.checked; }));
       pageSize.addEventListener('change', () => { page = 1; draw(); }); previous.addEventListener('click', () => { page--; draw(); }); next.addEventListener('click', () => { page++; draw(); });
-      const refresh = async () => { serviceLinks = await db.getPatientServiceLinks(); try { const end = new Date(); const start = new Date(end); start.setDate(start.getDate() - 365); const result = await db.getEmailQuizResponsesReport(start.toISOString().slice(0,10), end.toISOString().slice(0,10)); questionnaireReviews = result.success ? (result.responses || []) : []; } catch { questionnaireReviews = []; } draw(); };
+      const refresh = async () => { let error = null; try { serviceLinks = await db.getPatientServiceLinks(); } catch (serviceError) { serviceLinks = []; error = serviceError; } try { const end = new Date(); const start = new Date(end); start.setDate(start.getDate() - 365); const result = await db.getEmailQuizResponsesReport(start.toISOString().slice(0,10), end.toISOString().slice(0,10)); questionnaireReviews = result.success ? (result.responses || []) : []; if (!result.success) error = new Error(result.message || 'Não foi possível consultar as respostas.'); } catch (responseError) { questionnaireReviews = []; error = responseError; console.error('Pending questionnaire review refresh error:', responseError); } draw(); const questionnaireCount = questionnaireReviews.filter(event => event.status === 'responded').length; return { count:questionnaireCount + feedbackPending.length, questionnaireCount, feedbackCount:feedbackPending.length, error }; };
       void refresh();
       return { refresh, draw };
     }
@@ -1659,7 +1663,11 @@
       document.querySelectorAll('[data-sidebar-toggle]').forEach(button => button.addEventListener('click', () => { const menu = document.getElementById(button.dataset.sidebarToggle); const expanded = button.getAttribute('aria-expanded') === 'true'; button.setAttribute('aria-expanded', String(!expanded)); menu.classList.toggle('hidden', expanded); }));
       document.querySelectorAll('[data-admin-nav]').forEach(link => link.addEventListener('click', () => { document.getElementById('patient-profile-page').classList.add('hidden'); document.querySelectorAll('[data-admin-nav]').forEach(item => item.classList.remove('is-active')); link.classList.add('is-active'); }));
       document.querySelectorAll('[data-coming-soon]').forEach(button => button.addEventListener('click', () => showToast(button.dataset.comingSoon)));
-      document.getElementById('pending-refresh').addEventListener('click', () => { showToast('A lista de revisões foi atualizada.'); });
+      const pendingRefreshButton = document.getElementById('pending-refresh');
+      const refreshPendingReviews = async ({ notify = true } = {}) => { if (!pendingRefreshButton || pendingRefreshButton.disabled) return null; pendingRefreshButton.disabled = true; pendingRefreshButton.setAttribute('aria-busy', 'true'); try { const result = await pendingReviewController?.refresh?.(); if (notify) showToast(result?.error ? 'Não foi possível atualizar as revisões.' : `${result?.count || 0} revisão${result?.count === 1 ? '' : 'ões'} pendente${result?.count === 1 ? '' : 's'} encontrada${result?.count === 1 ? '' : 's'}.`); return result; } catch (error) { console.error('Pending review refresh error:', error); if (notify) showToast('Não foi possível atualizar as revisões.'); return { error }; } finally { pendingRefreshButton.disabled = false; pendingRefreshButton.removeAttribute('aria-busy'); } };
+      pendingRefreshButton?.addEventListener('click', () => { void refreshPendingReviews(); });
+      window.setInterval(() => { const hash = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); if (!document.hidden && hash === 'pending-review') void refreshPendingReviews({ notify:false }); }, 30000);
+      document.addEventListener('visibilitychange', () => { const hash = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); if (!document.hidden && hash === 'pending-review') void refreshPendingReviews({ notify:false }); });
       const patientLabelModalController = renderPatientLabelModal(showToast); window.__patientLabelModalController = patientLabelModalController;
       const patientLabelManagerController = renderPatientLabelManager(patientLabelModalController, showToast); window.__patientLabelManagerController = patientLabelManagerController;
       document.getElementById('patient-label-manager-open').addEventListener('click', () => patientLabelManagerController.open());
