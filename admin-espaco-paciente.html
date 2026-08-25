@@ -984,7 +984,8 @@
       const previous = document.getElementById('pending-prev-page');
       const next = document.getElementById('pending-next-page');
       const selectAll = document.getElementById('pending-select-all');
-      const feedbackPending = items.filter(item => item.pending);
+      const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[character]));
+      const feedbackPending = Array.isArray(items) ? items.filter(item => item.pending) : [];
       let page = 1, serviceLinks = [], questionnaireReviews = Array.isArray(dashboardResponseReviews) ? [...dashboardResponseReviews] : [], refreshPromise = null;
       const patientKey = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
       const responseKey = event => [event?.patientKey || event?.recipientEmail || event?.patientName || '', event?.quizId || event?.quizTitle || ''].map(value => String(value).trim().toLowerCase()).join('|');
