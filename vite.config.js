@@ -27,6 +27,7 @@ export default defineConfig({
         calculadoras: resolve(__dirname, 'calculadoras.html'),
         analiseRotulos: resolve(__dirname, 'analise-rotulos.html'),
         espacoPaciente: resolve(__dirname, 'espaco-paciente.html'),
+        controleAcessoUsuarios: resolve(__dirname, 'controle-acesso-usuarios.html'),
         adminEspacoPaciente: resolve(__dirname, 'admin-espaco-paciente.html')
       },
       output: {
