@@ -215,7 +215,7 @@ function cleanAnswer(value) {
   return text.slice(0, 12_000);
 }
 
-async function sendBrevoEmail({ to, subject, htmlContent, replyTo, scheduledAt }) {
+async function sendBrevoEmail({ to, subject, htmlContent, replyTo, scheduledAt, tags = [] }) {
   const apiKey = process.env.BREVO_API_KEY;
   const senderEmail = process.env.BREVO_SENDER_EMAIL || 'contato@jessicamelonutri.com.br';
   const senderName = process.env.BREVO_SENDER_NAME || 'Jessica Melo Nutricionista';
@@ -229,7 +229,8 @@ async function sendBrevoEmail({ to, subject, htmlContent, replyTo, scheduledAt }
       ...(replyTo ? { replyTo } : {}),
       subject,
       htmlContent,
-      ...(scheduledAt ? { scheduledAt } : {})
+      ...(scheduledAt ? { scheduledAt } : {}),
+      ...(Array.isArray(tags) && tags.length ? { tags } : {})
     })
   });
   const text = await response.text();
@@ -257,14 +258,30 @@ function validDateKey(value) {
   return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
 }
 
-function normalizeBrevoQuestionnaireEvents(events) {
+function brevoEventTimestamp(item) {
+  const epoch = Number(item?.ts_epoch);
+  if (Number.isFinite(epoch) && epoch > 0) return epoch < 1_000_000_000_000 ? epoch * 1000 : epoch;
+  const eventEpoch = Number(item?.ts_event);
+  if (Number.isFinite(eventEpoch) && eventEpoch > 0) return eventEpoch < 1_000_000_000_000 ? eventEpoch * 1000 : eventEpoch;
+  const seconds = Number(item?.ts);
+  if (Number.isFinite(seconds) && seconds > 0) return seconds < 1_000_000_000_000 ? seconds * 1000 : seconds;
+  const parsed = Date.parse(String(item?.date || ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
+  const storedInvitations = (Array.isArray(invitations) ? invitations : []).map(invitation => ({ ...invitation, email:String(invitation.recipientEmail || '').trim().toLowerCase(), timestamp:Date.parse(invitation.sentAt || '') })).filter(invitation => invitation.email && Number.isFinite(invitation.timestamp));
+  const storedMessageIds = new Set(storedInvitations.map(invitation => String(invitation.providerMessageId || '').trim()).filter(Boolean));
+  const tagsOf = item => { const source = item?.tags ?? item?.tag ?? []; return Array.isArray(source) ? source.map(value => String(value || '').toLowerCase()) : String(source || '').split(/[,;|]/).map(value => value.trim().toLowerCase()).filter(Boolean); };
+  const isStoredInvitationEvent = item => { const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || '').trim(); if (messageId && storedMessageIds.has(messageId)) return true; const email = String(item?.email || '').trim().toLowerCase(); const occurredAt = brevoEventTimestamp(item); return !!email && !!occurredAt && storedInvitations.some(invitation => invitation.email === email && Math.abs(invitation.timestamp - occurredAt) <= 7 * 86_400_000); };
   const grouped = new Map();
   (Array.isArray(events) ? events : []).forEach(item => {
     const subject = String(item?.subject || '');
-    if (!/^Questionário disponível\s*[—-]/i.test(subject)) return;
+    const tagged = tagsOf(item).some(tag => /questionnaire|questionario|quiz/.test(tag));
+    if (!/^Questionário disponível\s*[—-]/i.test(subject) && !tagged && !isStoredInvitationEvent(item)) return;
     const email = String(item?.email || '').trim().toLowerCase();
     const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || '');
-    const occurredAt = Number(item?.ts_epoch || item?.ts_event || (Number(item?.ts || 0) * 1000) || Date.parse(item?.date || '')) || 0;
+    const occurredAt = brevoEventTimestamp(item);
     const key = messageId || `${email}|${subject}|${Math.floor(occurredAt / 60_000)}`;
     const event = String(item?.event || '').toLowerCase();
     const existing = grouped.get(key) || { id:key, email, subject, sentAt:occurredAt || null, events:[] };
@@ -281,21 +298,11 @@ function normalizeBrevoQuestionnaireEvents(events) {
     const openedAt = Math.max(eventTime('unique_opened'), eventTime('opened'), eventTime('proxy_open'), eventTime('unique_proxy_open'));
     const deliveredAt = eventTime('delivered');
     const requestedAt = eventTime('request') || item.sentAt || 0;
-    return {
-      id:item.id,
-      email:item.email,
-      subject:item.subject,
-      sentAt:requestedAt ? new Date(requestedAt).toISOString() : '',
-      deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '',
-      openedAt:openedAt ? new Date(openedAt).toISOString() : '',
-      clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '',
-      failed,
-      status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent')))
-    };
+    return { id:item.id, providerMessageId:item.id, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
   }).filter(item => item.sentAt).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
 }
 
-async function getBrevoQuestionnaireEvents(startDate, endDate) {
+async function getBrevoQuestionnaireEvents(startDate, endDate, invitations = []) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error('O serviço de e-mail ainda não foi configurado.');
   const url = new URL('https://api.brevo.com/v3/smtp/statistics/events');
@@ -308,42 +315,51 @@ async function getBrevoQuestionnaireEvents(startDate, endDate) {
   let data = {};
   try { data = text ? JSON.parse(text) : {}; } catch {}
   if (!response.ok) throw new Error(`Brevo ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
-  return normalizeBrevoQuestionnaireEvents(data?.events || data?.data || []);
+  return normalizeBrevoQuestionnaireEvents(data?.events || data?.data || [], invitations);
 }
 
 function recordSource(record) {
-  return String(record?.embedUrl || record?.embed_url || '');
+  return String(record?.embedUrl || record?.embed_url || record?.embedURL || record?.source || '');
 }
 
-function isEmailQuizInvitationRecord(record) {
-  return record?.theme === EMAIL_QUIZ_INVITATION_THEME || /^email-quiz-invitation:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
-}
-
-function isEmailQuizResponseRecord(record) {
-  return record?.theme === EMAIL_QUIZ_RESPONSE_THEME || /^email-quiz-response:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
-}
-
-function isEmailQuizProgressRecord(record) {
-  return record?.theme === EMAIL_QUIZ_PROGRESS_THEME || /^email-quiz-progress:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
+function recordTheme(record) {
+  return String(record?.theme || record?.category || record?.type || '').trim().toLowerCase();
 }
 
 function parseStoredRecord(record) {
+  if (record?.description && typeof record.description === 'object') return record.description;
   try { return JSON.parse(String(record?.description || '{}')); } catch { return {}; }
+}
+
+function isEmailQuizInvitationRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_INVITATION_THEME.toLowerCase() || /^email-quiz-invitation:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.quizId || data.quiz_id) && (data.recipientEmail || data.recipient_email) && (data.sentAt || data.sent_at));
+}
+
+function isEmailQuizResponseRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_RESPONSE_THEME.toLowerCase() || /^email-quiz-response:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.respondedAt || data.responded_at || data.submittedAt || data.submitted_at) && Array.isArray(data.answers));
+}
+
+function isEmailQuizProgressRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_PROGRESS_THEME.toLowerCase() || /^email-quiz-progress:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.updatedAt || data.updated_at) && (data.answeredQuestions || data.answered_questions));
 }
 
 function normalizeStoredInvitation(record) {
   const data = parseStoredRecord(record);
   return {
     id: String(record?.id || ''),
-    invitationId: usableText(data.invitationId),
-    patientKey: usableText(data.patientKey),
-    patientName: usableText(data.patientName) || 'Paciente',
-    recipientEmail: usableText(data.recipientEmail).toLowerCase(),
-    quizId: usableText(data.quizId),
-    quizTitle: usableText(data.quizTitle) || 'Questionário',
-    totalQuestions: Math.max(0, Number(data.totalQuestions || 0)),
-    sentAt: usableText(data.sentAt) || record?.createdAt || record?.created_at || '',
-    expiresAt: usableText(data.expiresAt),
+    invitationId: usableText(data.invitationId || data.invitation_id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizId: usableText(data.quizId || data.quiz_id),
+    quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    totalQuestions: Math.max(0, Number(data.totalQuestions ?? data.total_questions ?? 0)),
+    sentAt: usableText(data.sentAt || data.sent_at) || record?.createdAt || record?.created_at || '',
+    expiresAt: usableText(data.expiresAt || data.expires_at),
+    providerMessageId: usableText(data.providerMessageId || data.provider_message_id),
     channel: 'email'
   };
 }
@@ -352,14 +368,14 @@ function normalizeStoredResponse(record) {
   const data = parseStoredRecord(record);
   return {
     id: String(record?.id || ''),
-    invitationId: usableText(data.invitationId),
-    patientKey: usableText(data.patientKey),
-    patientName: usableText(data.patientName) || 'Paciente',
-    recipientEmail: usableText(data.recipientEmail).toLowerCase(),
-    quizId: usableText(data.quizId),
-    quizTitle: usableText(data.quizTitle) || 'Questionário',
-    sentAt: usableText(data.sentAt),
-    respondedAt: usableText(data.respondedAt) || record?.createdAt || record?.created_at || '',
+    invitationId: usableText(data.invitationId || data.invitation_id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizId: usableText(data.quizId || data.quiz_id),
+    quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    sentAt: usableText(data.sentAt || data.sent_at),
+    respondedAt: usableText(data.respondedAt || data.responded_at || data.submittedAt || data.submitted_at) || record?.createdAt || record?.created_at || '',
     answers: Array.isArray(data.answers) ? data.answers : [],
     summary: data.summary && typeof data.summary === 'object' ? data.summary : {},
     totalQuestions: Math.max(0, Number(data.summary?.totalQuestions || data.totalQuestions || 0)),
@@ -385,6 +401,12 @@ function normalizeStoredProgress(record) {
   };
 }
 
+function vividEvaluationEmoji(value, fallback = '') {
+  const candidate = usableText(value);
+  const match = candidate.match(/[🤩😊😐😟😭😍🙂😕😣😞🙁😄☺☻☹]/u);
+  const legacy = { '😍':'🤩', '🙂':'😊', '😕':'😟', '😣':'😭', '😞':'😭', '🙁':'😟', '😄':'🤩', '☺':'😊', '☻':'😊', '☹':'😟' };
+  return match ? (legacy[match[0]] || match[0]) : (candidate || fallback);
+}
 function safeStoredAnswer(answer) {
   const value = cleanAnswer(answer?.value);
   const isImage = /^data:image\//i.test(value);
@@ -397,7 +419,7 @@ function safeStoredAnswer(answer) {
     type: usableText(answer?.type) || 'single',
     label: usableText(answer?.label),
     evaluationLabel: usableText(answer?.evaluationLabel) || usableText(answer?.ratingLabel),
-    evaluationEmoji: usableText(answer?.evaluationEmoji) || usableText(answer?.ratingEmoji),
+    evaluationEmoji: vividEvaluationEmoji(answer?.evaluationEmoji || answer?.ratingEmoji),
     score: Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0,
     rawScore,
     weight,
@@ -408,11 +430,11 @@ function safeStoredAnswer(answer) {
 function responseScoreBand(scorePercent) {
   const percent = Number(scorePercent);
   if (!Number.isFinite(percent)) return { label:'Sem avaliação', emoji:'—' };
-  if (percent >= 80) return { label:'Ótimo', emoji:'😍' };
-  if (percent >= 60) return { label:'Bom', emoji:'🙂' };
+  if (percent >= 80) return { label:'Ótimo', emoji:'🤩' };
+  if (percent >= 60) return { label:'Bom', emoji:'😊' };
   if (percent >= 40) return { label:'Neutro', emoji:'😐' };
-  if (percent >= 20) return { label:'Ruim', emoji:'😕' };
-  return { label:'Péssimo', emoji:'😣' };
+  if (percent >= 20) return { label:'Ruim', emoji:'😟' };
+  return { label:'Péssimo', emoji:'😭' };
 }
 function questionOptionSetting(question, value) {
   const target = String(value ?? '');
@@ -435,7 +457,7 @@ function enrichResponseAnswer(quiz, answer) {
     score: active ? rawScore * weight : 0,
     scored: active,
     evaluationLabel: usableText(answer?.evaluationLabel) || usableText(setting?.text) || usableText(answer?.label),
-    evaluationEmoji: usableText(answer?.evaluationEmoji) || usableText(setting?.emoji) || (question.type === 'emoji' ? usableText(answer?.value) : '')
+    evaluationEmoji: vividEvaluationEmoji(answer?.evaluationEmoji || setting?.emoji, question.type === 'emoji' ? usableText(answer?.value) : '')
   };
 }
 function calculateResponseSummary(quiz, answers, submittedSummary = {}) {
@@ -493,24 +515,26 @@ async function listStoredQuestionnaireRecords(sessionToken) {
 async function storeInvitation(invitation, quiz) {
   const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
   const source = `email-quiz-invitation://${invitation.id}`;
-  if (records.some(record => recordSource(record) === source)) return;
-  await addStoredRecord(invitation.sessionToken, {
-    title: `Envio — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`,
-    theme: EMAIL_QUIZ_INVITATION_THEME,
-    source,
-    description: {
-      version: 1,
-      invitationId: invitation.id,
-      patientKey: invitation.patientKey,
-      patientName: invitation.patientName,
-      recipientEmail: invitation.recipientEmail,
-      quizId: quiz.id,
-      quizTitle: quiz.title,
-      sentAt: invitation.sentAt || new Date().toISOString(),
-      expiresAt: new Date(invitation.expiresAt).toISOString(),
-      totalQuestions: Array.isArray(quiz.questionSnapshots) ? quiz.questionSnapshots.length : 0
-    }
-  });
+  const current = records.find(record => recordSource(record) === source);
+  const description = {
+    version: 1,
+    invitationId: invitation.id,
+    patientKey: invitation.patientKey,
+    patientName: invitation.patientName,
+    recipientEmail: invitation.recipientEmail,
+    quizId: quiz.id,
+    quizTitle: quiz.title,
+    sentAt: invitation.sentAt || new Date().toISOString(),
+    expiresAt: new Date(invitation.expiresAt).toISOString(),
+    providerMessageId: usableText(invitation.providerMessageId) || usableText(parseStoredRecord(current).providerMessageId),
+    totalQuestions: Array.isArray(quiz.questionSnapshots) ? quiz.questionSnapshots.length : 0
+  };
+  if (current) {
+    if (!description.providerMessageId || description.providerMessageId === usableText(parseStoredRecord(current).providerMessageId)) return;
+    await callRpc('app_update_video', { p_token:invitation.sessionToken, p_id:current.id, p_title:`Envio — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, p_theme:EMAIL_QUIZ_INVITATION_THEME, p_description:JSON.stringify(description), p_url:`https://jessicamelonutri.com.br/${source}`, p_provider:'youtube', p_embed_url:source, p_thumbnail_url:'' });
+    return;
+  }
+  await addStoredRecord(invitation.sessionToken, { title:`Envio — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, theme:EMAIL_QUIZ_INVITATION_THEME, source, description });
 }
 
 async function storeProgress(invitation, quiz, answeredQuestions) {
@@ -571,7 +595,11 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
   const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
   const responses = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse).filter(item => item.invitationId);
   const progress = records.filter(isEmailQuizProgressRecord).map(normalizeStoredProgress).filter(item => item.invitationId);
-  const responsesByInvitation = new Map(responses.map(item => [item.invitationId, item]));
+  const responsesByInvitation = new Map();
+  responses.forEach(item => {
+    const current = responsesByInvitation.get(item.invitationId);
+    if (!current || new Date(item.respondedAt || 0).getTime() >= new Date(current.respondedAt || 0).getTime()) responsesByInvitation.set(item.invitationId, item);
+  });
   const progressByInvitation = new Map(progress.map(item => [item.invitationId, item]));
   const rows = invitations.map(invitation => {
     const response = responsesByInvitation.get(invitation.invitationId);
@@ -586,6 +614,8 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
     const status = isComplete ? 'responded' : (isExpired ? (hasProgress ? 'partial' : 'lost') : (hasProgress ? 'progress' : 'open'));
     return {
       id: invitation.invitationId,
+      invitationId: invitation.invitationId,
+      responseId: response?.id || '',
       patientKey: invitation.patientKey,
       patientName: invitation.patientName,
       recipientEmail: invitation.recipientEmail,
@@ -606,6 +636,8 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
     if (known.has(response.invitationId)) return;
     rows.push({
       id: response.invitationId,
+      invitationId: response.invitationId,
+      responseId: response.id || '',
       patientKey: response.patientKey,
       patientName: response.patientName,
       recipientEmail: response.recipientEmail,
@@ -637,7 +669,7 @@ function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, dea
 }
 
 async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template }) {
-  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const htmlContent = buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject:replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }), htmlContent, scheduledAt, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
+  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const htmlContent = buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl });   return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject:replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }), htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
 }
 
 async function sendResponseReceipt({ invitation, quiz, answers, summary }) {
@@ -922,6 +954,7 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
       const providerMessageId = usableText(brevoResult.messageId);
       if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
       const stored = await markQueueProvider(secret, schedule.id, providerMessageId, 'scheduled');
+      try { await storeInvitation({ ...invitation, providerMessageId }, quiz); } catch (historyError) { console.error('Queued provider id history error:', historyError.message); }
       processed.push({ id:schedule.id, providerMessageId, scheduledFor:scheduledAt, status:stored.status });
     } catch (error) {
       const message = error?.message || 'Não foi possível cadastrar o envio na Brevo.';
@@ -968,7 +1001,7 @@ export default async function handler(req, res) {
       const accessToken = encryptInvitation(invitation);
       const template = await getEmailTemplate(sessionToken);
       const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template });
-      await storeInvitation(invitation, quiz);
+      await storeInvitation({ ...invitation, providerMessageId:brevoResult.messageId || '' }, quiz);
       return json(res, 200, { success: true, message: 'Questionário enviado por e-mail.', expiresAt: new Date(expiresAt).toISOString(), providerMessageId: brevoResult.messageId || null });
     }
 
@@ -1127,7 +1160,9 @@ export default async function handler(req, res) {
       const windowDays = Math.ceil((Date.parse(`${endDate}T00:00:00Z`) - Date.parse(`${startDate}T00:00:00Z`)) / 86_400_000) + 1;
       if (windowDays > 90) return json(res, 400, { success:false, message:'O período máximo para consulta é de 90 dias.' });
       await requireAdmin(sessionToken);
-      const events = await getBrevoQuestionnaireEvents(startDate, endDate);
+      const records = await listStoredQuestionnaireRecords(sessionToken);
+      const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
+      const events = await getBrevoQuestionnaireEvents(startDate, endDate, invitations);
       return json(res, 200, { success:true, channel:'email', events, updatedAt:new Date().toISOString() });
     }
 
