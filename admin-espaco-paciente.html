@@ -1629,7 +1629,7 @@
       const activateAdminView = (viewId, navKey, { includeDashboard = false, scroll = true } = {}) => {
         ADMIN_VIEW_IDS.forEach(id => { const view = document.getElementById(id); if (!view) return; view.classList.add('hidden'); view.style.display = 'none'; });
         const activeView = document.getElementById(viewId); activeView?.classList.remove('hidden'); if (activeView) activeView.style.display = '';
-        if (includeDashboard) document.getElementById('inicio-dashboard')?.classList.remove('hidden');
+        if (includeDashboard) { const dashboard = document.getElementById('inicio-dashboard'); dashboard?.classList.remove('hidden'); if (dashboard) dashboard.style.display = ''; }
         document.getElementById('patient-profile-page')?.classList.add('hidden');
         setActiveNavigation(navKey);
         if (scroll) requestAnimationFrame(() => document.getElementById(viewId)?.scrollIntoView({ behavior:'smooth', block:'start' }));
