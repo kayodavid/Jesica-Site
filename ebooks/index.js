@@ -11,6 +11,7 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
     window.location.href = session && session.role === 'admin' ? '/admin.html' : '/login.html';
     return;
   }
+  if (!(await db.hasPatientAccess('ebooks', session.email))) { window.location.href = '/paciente.html'; return; }
 
   const settings = await db.getContentOrderSettings();
   const ebooks = await db.getPublishedEbooks();
