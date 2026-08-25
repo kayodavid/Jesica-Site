@@ -147,6 +147,27 @@
     body[data-patient-theme='black'] .pending-review-table td:last-child { background:#22242b; box-shadow:-10px 0 16px -14px rgba(0,0,0,.9); }
     body[data-patient-theme='black'] .pending-review-table thead th:last-child { background:#1d222b; }
     body[data-patient-theme='black'] .pending-review-table tbody tr:hover td:last-child { background:#303847; }
+    @media (min-width:1024px) {
+      .pending-review-table { min-width:0; width:100%; table-layout:fixed; }
+      .pending-review-table th, .pending-review-table td { padding:.62rem .5rem; }
+      .pending-review-table th:nth-child(1), .pending-review-table td:nth-child(1) { width:5%; }
+      .pending-review-table th:nth-child(2), .pending-review-table td:nth-child(2) { width:16%; }
+      .pending-review-table th:nth-child(3), .pending-review-table td:nth-child(3) { width:18%; }
+      .pending-review-table th:nth-child(4), .pending-review-table td:nth-child(4) { width:14%; }
+      .pending-review-table th:nth-child(5), .pending-review-table td:nth-child(5) { width:17%; }
+      .pending-review-table th:nth-child(6), .pending-review-table td:nth-child(6) { width:11%; }
+      .pending-review-table th:nth-child(7), .pending-review-table td:nth-child(7) { width:19%; min-width:7.75rem; padding-right:.4rem; padding-left:.4rem; }
+      .pending-review-table th:not(:first-child):not(:last-child), .pending-review-table td:not(:first-child):not(:last-child) { overflow-wrap:anywhere; }
+      .pending-review-table .patient-name-button { width:100%; max-width:100%; min-width:0; white-space:normal; }
+      .pending-review-table .patient-name-button span:last-child { overflow:visible; text-overflow:clip; white-space:normal; overflow-wrap:anywhere; }
+      .pending-review-table .pending-questionnaire-button { display:block; width:100%; max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+      .pending-review-table td:nth-child(5), .pending-review-table td:nth-child(6) { white-space:nowrap; }
+      .pending-review-table .pending-row-actions { width:100%; gap:.2rem; }
+    }
+    @media (max-width:1023px) {
+      .pending-review-table { min-width:56rem; }
+      .pending-review-table th, .pending-review-table td { padding:.65rem .6rem; }
+    }
     .pending-workspace-toolbar { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; }
     .pending-search-shell { display:flex; min-width:min(100%,24rem); flex:1 1 20rem; align-items:center; gap:.65rem; border:1px solid rgba(168,139,54,.18); border-radius:.8rem; background:#fff; padding:.15rem .75rem; transition:border-color .16s ease,box-shadow .16s ease; }
     .pending-search-shell:focus-within { border-color:#a88b36; box-shadow:0 0 0 3px rgba(168,139,54,.12); }
