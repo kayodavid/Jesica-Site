@@ -362,17 +362,90 @@ function normalizeStoredProgress(record) {
 function safeStoredAnswer(answer) {
   const value = cleanAnswer(answer?.value);
   const isImage = /^data:image\//i.test(value);
+  const rawScore = Number.isFinite(Number(answer?.rawScore)) ? Number(answer.rawScore) : (Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0);
+  const weight = Number.isFinite(Number(answer?.weight)) ? Number(answer.weight) : null;
   return {
     questionId: usableText(answer?.questionId),
     questionCode: usableText(answer?.questionCode),
     questionTitle: usableText(answer?.questionTitle) || 'Pergunta',
     type: usableText(answer?.type) || 'single',
     label: usableText(answer?.label),
+    evaluationLabel: usableText(answer?.evaluationLabel) || usableText(answer?.ratingLabel),
+    evaluationEmoji: usableText(answer?.evaluationEmoji) || usableText(answer?.ratingEmoji),
     score: Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0,
+    rawScore,
+    weight,
+    scored: answer?.scored === true || Number.isFinite(Number(answer?.rawScore)),
     value: isImage ? '[Imagem enviada pelo paciente]' : value
   };
 }
-
+function responseScoreBand(scorePercent) {
+  const percent = Number(scorePercent);
+  if (!Number.isFinite(percent)) return { label:'Sem avaliação', emoji:'—' };
+  if (percent >= 80) return { label:'Ótimo', emoji:'😍' };
+  if (percent >= 60) return { label:'Bom', emoji:'🙂' };
+  if (percent >= 40) return { label:'Neutro', emoji:'😐' };
+  if (percent >= 20) return { label:'Ruim', emoji:'😕' };
+  return { label:'Péssimo', emoji:'😣' };
+}
+function questionOptionSetting(question, value) {
+  const target = String(value ?? '');
+  const options = Array.isArray(question?.optionSettings) ? question.optionSettings : [];
+  return options.find(item => ['text','option','label','emoji','value'].some(key => String(item?.[key] ?? '') === target)) || null;
+}
+function enrichResponseAnswer(quiz, answer) {
+  const question = (Array.isArray(quiz?.questionSnapshots) ? quiz.questionSnapshots : []).find(item => String(item?.id || '') === String(answer?.questionId || '')) || {};
+  const settings = quiz?.questionSettings?.[answer?.questionId] || {};
+  const scoreable = ['single','linear','emoji'].includes(String(question.type || answer?.type || ''));
+  const setting = questionOptionSetting(question, answer?.value ?? answer?.label);
+  const active = scoreable && settings.active !== false && !!setting;
+  const rawScore = active && Number.isFinite(Number(setting?.score)) ? Number(setting.score) : 0;
+  const weightValue = Number(settings.weight ?? answer?.weight ?? 1);
+  const weight = Number.isFinite(weightValue) && weightValue >= 1 && weightValue <= 5 ? Math.round(weightValue) : 1;
+  return {
+    ...answer,
+    rawScore,
+    weight: active ? weight : null,
+    score: active ? rawScore * weight : 0,
+    scored: active,
+    evaluationLabel: usableText(answer?.evaluationLabel) || usableText(setting?.text) || usableText(answer?.label),
+    evaluationEmoji: usableText(answer?.evaluationEmoji) || usableText(setting?.emoji) || (question.type === 'emoji' ? usableText(answer?.value) : '')
+  };
+}
+function calculateResponseSummary(quiz, answers, submittedSummary = {}) {
+  const questionSnapshots = Array.isArray(quiz?.questionSnapshots) ? quiz.questionSnapshots : [];
+  const questionMap = new Map(questionSnapshots.map(question => [String(question?.id || ''), question]));
+  const scoreRows = (Array.isArray(answers) ? answers : []).filter(answer => answer?.scored === true || (answer?.scored === undefined && ['single','linear','emoji'].includes(String(answer?.type || ''))));
+  const totalScore = scoreRows.reduce((sum, answer) => sum + (Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0), 0);
+  const ranges = scoreRows.map(answer => {
+    const question = questionMap.get(String(answer?.questionId || '')) || {};
+    const settings = quiz?.questionSettings?.[answer?.questionId] || {};
+    const weightValue = Number(answer?.weight ?? settings.weight ?? 1);
+    const weight = Number.isFinite(weightValue) && weightValue >= 1 && weightValue <= 5 ? weightValue : 1;
+    const scores = (Array.isArray(question.optionSettings) ? question.optionSettings : []).map(item => Number(item?.score)).filter(Number.isFinite);
+    const fallback = Number.isFinite(Number(answer?.rawScore)) ? Number(answer.rawScore) : 0;
+    const minimum = scores.length ? Math.min(...scores) : fallback;
+    const maximum = scores.length ? Math.max(...scores) : fallback;
+    return { minimum:minimum * weight, maximum:maximum * weight };
+  });
+  const minimumScore = ranges.reduce((sum, item) => sum + item.minimum, 0);
+  const maximumScore = ranges.reduce((sum, item) => sum + item.maximum, 0);
+  const scorePercent = maximumScore > minimumScore ? Math.max(0, Math.min(100, ((totalScore - minimumScore) / (maximumScore - minimumScore)) * 100)) : null;
+  const band = responseScoreBand(scorePercent);
+  return {
+    ...submittedSummary,
+    totalQuestions: questionSnapshots.length || Number(submittedSummary.totalQuestions || answers?.length || 0),
+    answeredQuestions: Array.isArray(answers) ? answers.length : Number(submittedSummary.answeredQuestions || 0),
+    scoredQuestions: scoreRows.length,
+    totalScore: Math.round(totalScore * 100) / 100,
+    minimumScore: Math.round(minimumScore * 100) / 100,
+    maximumScore: Math.round(maximumScore * 100) / 100,
+    scorePercent: Number.isFinite(scorePercent) ? Math.round(scorePercent * 10) / 10 : null,
+    scoreLabel: band.label,
+    scoreEmoji: band.emoji,
+    submittedAt: submittedSummary.submittedAt || new Date().toISOString()
+  };
+}
 async function addStoredRecord(sessionToken, { title, theme, description, source }) {
   return callRpc('app_add_video', {
     p_token: sessionToken,
@@ -973,6 +1046,9 @@ export default async function handler(req, res) {
         const invitation = decryptInvitation(String(body.token || ''));
         const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
         const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+        const responseRecord = records.find(record => isEmailQuizResponseRecord(record) && normalizeStoredResponse(record).invitationId === invitation.id);
+        const savedResponse = responseRecord ? normalizeStoredResponse(responseRecord) : null;
+        if (savedResponse) return json(res, 200, { state:'answered', patient_name:invitation.patientName, quiz_title:quiz.title, summary:savedResponse.summary || null });
         const progressRecord = records.find(record => isEmailQuizProgressRecord(record) && normalizeStoredProgress(record).invitationId === invitation.id);
         const savedProgress = progressRecord ? normalizeStoredProgress(progressRecord) : null;
         return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString(), progress: savedProgress ? { totalQuestions:savedProgress.totalQuestions, answeredQuestions:savedProgress.answeredQuestions, updatedAt:savedProgress.updatedAt } : null });
@@ -996,10 +1072,12 @@ export default async function handler(req, res) {
       const answers = Array.isArray(body.answers) ? body.answers : [];
       if (!answers.length || answers.length > 100) return json(res, 400, { success: false, message: 'As respostas informadas são inválidas.' });
       const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
-      const saved = await storeResponse(invitation, quiz, answers, body.responseSummary || {});
+      const normalizedAnswers = answers.map(answer => enrichResponseAnswer(quiz, answer));
+      const responseSummary = calculateResponseSummary(quiz, normalizedAnswers, body.responseSummary || {});
+      const saved = await storeResponse(invitation, quiz, normalizedAnswers, responseSummary);
       if (!saved) return json(res, 200, { success: false, reason: 'already_answered' });
-      try { await sendResponseReceipt({ invitation, quiz, answers, summary: body.responseSummary || {} }); } catch (error) { console.error('Questionnaire response receipt error:', error.message); }
-      return json(res, 200, { success: true, quiz_title: quiz.title });
+      try { await sendResponseReceipt({ invitation, quiz, answers:normalizedAnswers, summary: responseSummary }); } catch (error) { console.error('Questionnaire response receipt error:', error.message); }
+      return json(res, 200, { success: true, quiz_title: quiz.title, summary: responseSummary });
     }
 
     if (action === 'responses-report') {
