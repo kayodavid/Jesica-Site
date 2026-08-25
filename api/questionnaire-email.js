@@ -621,10 +621,8 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
       channel: 'email'
     });
   });
-  return rows.filter(item => {
-    const date = String(item.sentAt || item.respondedAt || '').slice(0, 10);
-    return date && date >= startDate && date <= endDate;
-  }).sort((a, b) => new Date(b.respondedAt || b.sentAt || 0) - new Date(a.respondedAt || a.sentAt || 0));
+  const inDateRange = value => { const date = String(value || '').slice(0, 10); return date && date >= startDate && date <= endDate; };
+  return rows.filter(item => inDateRange(item.respondedAt) || inDateRange(item.sentAt)).sort((a, b) => new Date(b.respondedAt || b.sentAt || 0) - new Date(a.respondedAt || a.sentAt || 0));
 }
 
 function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, deadline, questionnaireUrl }) {

@@ -747,6 +747,7 @@
     const DASHBOARD_DUE_PERIOD_KEY = 'jessicamelo_dashboard_due_period';
     let dashboardDuePeriod = (() => { try { return localStorage.getItem(DASHBOARD_DUE_PERIOD_KEY) === 'month' ? 'month' : 'week'; } catch { return 'week'; } })();
     let dashboardDueState = { items:[], serviceLinks:[], selectPatient:null };
+    let dashboardResponseReviews = [];
     const formatLastActivity = summary => { const day = Number(summary?.last || 0); if (!Number.isFinite(day) || day < 1) return 'Sem atividade'; const date = new Date(now.getFullYear(), now.getMonth(), day); return Number.isNaN(date.getTime()) ? 'Sem atividade' : date.toLocaleDateString('pt-BR'); };
     const phoneCountryForPatient = patient => { const saved = String(patient?.profile?.phoneCountry || '').toLowerCase(); if (/^[a-z]{2}$/.test(saved)) return saved; const phone = String(patient?.profile?.whatsapp || patient?.whatsapp || patient?.phone || patient?.phoneNumber || '').replace(/\D/g, ''); const countries = intlTelInputWithUtils.getAllCountries(); const matches = countries.filter(country => phone.startsWith(country.dialCode)).sort((a, b) => b.dialCode.length - a.dialCode.length); if (!matches.length) return ''; const mostSpecific = matches.filter(country => country.dialCode === matches[0].dialCode); return mostSpecific.length === 1 ? mostSpecific[0].iso2 : ''; };
     const markIsActive = (value, mark) => Array.isArray(value) ? value.map(String).includes(mark) : value && typeof value === 'object' ? Boolean(value[mark] ?? value[mark.toLowerCase()] ?? value[mark.toUpperCase()]) : String(value || '').toUpperCase().includes(mark);
@@ -850,10 +851,11 @@
       due.forEach(item => { const endText = item.endDate.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }); const plan = item.link.serviceName || 'Plano contratado'; target.appendChild(createDashboardRow(item.patient.patient, `${plan} · vence em ${endText}`, () => selectPatient(item.patient.index, 'workspace'))); });
       if (!settings.dataset.bound) { settings.dataset.bound = 'true'; settings.addEventListener('click', event => { event.stopPropagation(); const open = menu.classList.toggle('hidden'); settings.setAttribute('aria-expanded', String(!open)); }); document.querySelectorAll('[data-dashboard-due-period]').forEach(button => button.addEventListener('click', () => { dashboardDuePeriod = button.dataset.dashboardDuePeriod === 'month' ? 'month' : 'week'; try { localStorage.setItem(DASHBOARD_DUE_PERIOD_KEY, dashboardDuePeriod); } catch {} menu.classList.add('hidden'); settings.setAttribute('aria-expanded', 'false'); renderDashboardDue(dashboardDueState.items, dashboardDueState.serviceLinks, dashboardDueState.selectPatient); })); document.addEventListener('click', event => { if (!menu.contains(event.target) && !settings.contains(event.target)) { menu.classList.add('hidden'); settings.setAttribute('aria-expanded', 'false'); } }); }
     }
+    function isSubmittedQuestionnaireResponse(event) { const status = String(event?.status || '').trim().toLowerCase(); return status === 'responded' || Boolean(String(event?.respondedAt || '').trim()); }
     async function renderDashboard(patients, selectPatient) {
       const dashboardUpdatedAt = document.getElementById('dashboard-updated-at');
       dashboardUpdatedAt.textContent = 'Atualizando dados de acompanhamento e financeiros...';
-      const responseEndDate = new Date(); const responseStartDate = new Date(responseEndDate); responseStartDate.setDate(responseStartDate.getDate() - 365);
+      const responseEndDate = new Date(); const responseStartDate = new Date('2000-01-01T00:00:00Z');
       const [items, serviceLinks, responseReport] = await Promise.all([
         Promise.all(patients.map(async (patient, index) => {
           let calendar = { days:{}, dayObservations:{} };
@@ -873,7 +875,8 @@
       const finished = patients.filter(patient => { const links = serviceLinks.filter(link => link.patientKey === patientKeyFor(patient)); return links.length > 0 && links.every(isFinishedLink); }).length;
       const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const revenue = serviceLinks.filter(link => String(link.paymentDate || link.startDate || '').startsWith(monthPrefix)).reduce((total, link) => total + Number(link.paymentValue ?? link.value ?? 0), 0);
-      const questionnairePending = responseReport?.success ? (responseReport.responses || []).filter(event => event.status === 'responded').length : 0;
+      if (responseReport?.success && Array.isArray(responseReport.responses)) dashboardResponseReviews = responseReport.responses;
+      const questionnairePending = dashboardResponseReviews.filter(isSubmittedQuestionnaireResponse).length;
       const pending = items.filter(item => item.pending).length + questionnairePending;
       document.getElementById('dashboard-pending-count').textContent = pending;
       document.getElementById('dashboard-patient-count').textContent = patients.length;
@@ -982,7 +985,7 @@
       const next = document.getElementById('pending-next-page');
       const selectAll = document.getElementById('pending-select-all');
       const feedbackPending = items.filter(item => item.pending);
-      let page = 1, serviceLinks = [], questionnaireReviews = [];
+      let page = 1, serviceLinks = [], questionnaireReviews = Array.isArray(dashboardResponseReviews) ? [...dashboardResponseReviews] : [], refreshPromise = null;
       const patientKey = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
       const responseKey = event => String(event?.patientKey || event?.recipientEmail || event?.patientName || '').trim().toLowerCase();
       const serviceEnd = link => { if (!link?.startDate || !Number(link.duration)) return null; const end = new Date(`${String(link.startDate).slice(0,10)}T12:00:00`); if (Number.isNaN(end.getTime())) return null; end.setDate(end.getDate() + Number(link.duration)); return end; };
@@ -991,10 +994,10 @@
       const openQuestionnaire = event => { if (typeof window.__openResponseReview === 'function') { window.__openResponseReview(event); return; } window.__pendingResponseReview = event; document.dispatchEvent(new CustomEvent('open-response-review', { detail:event })); };
       const updatePendingCounters = total => { const dashboardCounter = document.getElementById('dashboard-pending-count'); const sidebarCounter = document.getElementById('pending-count'); if (dashboardCounter) dashboardCounter.textContent = String(total); if (sidebarCounter) { sidebarCounter.textContent = String(total); sidebarCounter.classList.toggle('hidden', total === 0); } };
       const draw = () => {
-        const questionnaireRows = questionnaireReviews.filter(event => event.status === 'responded').map(event => ({ kind:'questionnaire', event, item:patientForEvent(event) }));
+        const questionnaireRows = questionnaireReviews.filter(isSubmittedQuestionnaireResponse).map(event => ({ kind:'questionnaire', event, item:patientForEvent(event) }));
         const legacyRows = feedbackPending.map(item => ({ kind:'feedback', item }));
         const allRows = [...questionnaireRows, ...legacyRows]; updatePendingCounters(allRows.length);
-        const size = Number(pageSize.value); const pages = Math.max(1, Math.ceil(allRows.length / size)); page = Math.min(page, pages); const visible = allRows.slice((page - 1) * size, page * size); rows.innerHTML = ''; selectAll.checked = false;
+        const size = Number(pageSize.value) || 10; const pages = Math.max(1, Math.ceil(allRows.length / size)); page = Math.min(Math.max(1, page), pages); const visible = allRows.slice((page - 1) * size, page * size); rows.innerHTML = ''; selectAll.checked = false;
         if (!visible.length) rows.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-sm text-gray-500">Não há revisões pendentes neste momento.</td></tr>';
         visible.forEach(entry => {
           const row = document.createElement('tr');
@@ -1010,11 +1013,12 @@
           }
           rows.appendChild(row);
         });
-        pageInfo.textContent = `Página ${page} de ${pages}`; previous.disabled = page === 1; next.disabled = page === pages;
+        pageInfo.textContent = `Página ${page} de ${pages}`; previous.disabled = page <= 1; next.disabled = page >= pages;
       };
       selectAll.addEventListener('change', () => document.querySelectorAll('.pending-row-select').forEach(input => { input.checked = selectAll.checked; }));
-      pageSize.addEventListener('change', () => { page = 1; draw(); }); previous.addEventListener('click', () => { page--; draw(); }); next.addEventListener('click', () => { page++; draw(); });
-      const refresh = async () => { let error = null; try { serviceLinks = await db.getPatientServiceLinks(); } catch (serviceError) { serviceLinks = []; error = serviceError; } try { const end = new Date(); const start = new Date(end); start.setDate(start.getDate() - 365); const result = await db.getEmailQuizResponsesReport(start.toISOString().slice(0,10), end.toISOString().slice(0,10)); questionnaireReviews = result.success ? (result.responses || []) : []; if (!result.success) error = new Error(result.message || 'Não foi possível consultar as respostas.'); } catch (responseError) { questionnaireReviews = []; error = responseError; console.error('Pending questionnaire review refresh error:', responseError); } draw(); const questionnaireCount = questionnaireReviews.filter(event => event.status === 'responded').length; return { count:questionnaireCount + feedbackPending.length, questionnaireCount, feedbackCount:feedbackPending.length, error }; };
+      pageSize.addEventListener('change', () => { page = 1; draw(); }); previous.addEventListener('click', () => { page = Math.max(1, page - 1); draw(); }); next.addEventListener('click', () => { page += 1; draw(); });
+      const refresh = async () => { if (refreshPromise) return refreshPromise; refreshPromise = (async () => { let error = null; try { serviceLinks = await db.getPatientServiceLinks(); } catch (serviceError) { serviceLinks = []; error = serviceError; } try { const end = new Date(); const start = new Date('2000-01-01T00:00:00Z'); const result = await db.getEmailQuizResponsesReport(start.toISOString().slice(0,10), end.toISOString().slice(0,10)); if (result.success) questionnaireReviews = Array.isArray(result.responses) ? result.responses : []; else error = new Error(result.message || 'Não foi possível consultar as respostas.'); } catch (responseError) { error = responseError; console.error('Pending questionnaire review refresh error:', responseError); } draw(); const questionnaireCount = questionnaireReviews.filter(isSubmittedQuestionnaireResponse).length; return { count:questionnaireCount + feedbackPending.length, questionnaireCount, feedbackCount:feedbackPending.length, error }; })(); try { return await refreshPromise; } finally { refreshPromise = null; } };
+      draw();
       void refresh();
       return { refresh, draw };
     }
