@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-i18n-title-key="blogPageTitle">
 
 <head>
   <meta charset="UTF-8" />
@@ -71,23 +71,27 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="/index.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
-            Início
+            <span data-i18n="navHome">Início</span>
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/sobre.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
-            Quem sou eu
+            <span data-i18n="navAbout">Quem sou eu</span>
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/blog.html" class="text-dark font-medium relative group">
-            Blog
+            <span data-i18n="navBlog">Blog</span>
             <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full"></span>
           </a>
           <a href="/login.html" class="text-primary hover:text-dark font-bold relative group transition-colors flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-            Área do Paciente
+            <span data-i18n="navPatient">Área do Paciente</span>
           </a>
           <a href="/agendar-consulta.html"
-            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Agendar</a>
+            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"><span data-i18n="navSchedule">Agendar</span></a>
+        </div>
+        <div class="hidden md:flex items-center gap-1 rounded-full border border-primary/20 bg-white/70 p-1" role="group" aria-label="Idioma">
+          <button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button>
+          <button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-2.5 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -101,12 +105,15 @@
       <!-- Mobile Menu Dropdown -->
       <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4 animate-fade-in-up">
         <div class="flex flex-col space-y-2 bg-white/90 rounded-2xl p-4 shadow-lg border border-gray-100">
-          <a href="/index.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Início</a>
-          <a href="/sobre.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Quem sou eu</a>
-          <a href="/blog.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Blog</a>
-          <a href="/login.html" class="block py-3 px-4 text-primary hover:text-dark font-bold hover:bg-gray-50 rounded-xl transition-colors">Área do Paciente</a>
+          <a href="/index.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navHome">Início</span></a>
+          <a href="/sobre.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navAbout">Quem sou eu</span></a>
+          <a href="/blog.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl"><span data-i18n="navBlog">Blog</span></a>
+          <a href="/login.html" class="block py-3 px-4 text-primary hover:text-dark font-bold hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navPatient">Área do Paciente</span></a>
           <a href="/agendar-consulta.html"
-            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md">Agendar</a>
+            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md"><span data-i18n="navSchedule">Agendar</span></a>
+          <div class="mt-2 flex items-center justify-end rounded-xl border border-primary/15 bg-light px-4 py-3" role="group" aria-label="Idioma">
+            <span class="flex items-center gap-1"><button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button><button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-3 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button></span>
+          </div>
         </div>
       </div>
     </div>
@@ -119,7 +126,7 @@
     <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl"></div>
 
     <div class="container mx-auto w-full flex items-center justify-center text-center text-white relative z-10">
-      <h1 class="mx-auto w-full text-center text-4xl sm:text-5xl md:text-6xl font-bold leading-tight m-0">Blog</h1>
+      <h1 data-i18n="blogTitle" class="mx-auto w-full text-center text-4xl sm:text-5xl md:text-6xl font-bold leading-tight m-0">Blog</h1>
 
     </div>
   </section>
@@ -127,8 +134,8 @@
   <!-- Índice de artigos: logo abaixo do título do Blog -->
   <section class="pt-6 pb-4 sm:pt-7 sm:pb-5 px-4 bg-light relative">
     <div class="container mx-auto max-w-4xl relative z-10">
-      <nav id="blog-index" class="bg-white/80 backdrop-blur-sm rounded-3xl border border-primary/10 shadow-sm p-5 sm:p-7" aria-label="Índice de artigos">
-        <div class="flex items-center justify-between gap-4 mb-4"><div><p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Navegação rápida</p><h2 class="text-xl sm:text-2xl font-bold text-dark">Encontre um artigo</h2></div><span class="text-primary text-2xl" aria-hidden="true">☰</span></div>
+      <nav id="blog-index" class="bg-white/80 backdrop-blur-sm rounded-3xl border border-primary/10 shadow-sm p-5 sm:p-7" data-i18n-attr="aria-label:blogIndexLabel" aria-label="Índice de artigos">
+        <div class="flex items-center justify-between gap-4 mb-4"><div><p data-i18n="blogQuickNav" class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Navegação rápida</p><h2 data-i18n="blogFindArticle" class="text-xl sm:text-2xl font-bold text-dark">Encontre um artigo</h2></div><span class="text-primary text-2xl" aria-hidden="true">☰</span></div>
         <div id="blog-index-list" class="grid sm:grid-cols-2 gap-2"></div>
       </nav>
     </div>
@@ -141,7 +148,7 @@
     <div class="container mx-auto max-w-4xl relative z-10">
       <!-- Blogs publicados pelo administrador: aparecem antes dos artigos antigos -->
       <section id="managed-blog-section" class="mb-16 sm:mb-24 hidden">
-        <div class="flex items-center gap-3 mb-10"><span class="h-px flex-1 bg-primary/20"></span><h2 class="text-2xl sm:text-3xl font-bold text-dark">Artigos</h2><span class="h-px flex-1 bg-primary/20"></span></div>
+        <div class="flex items-center gap-3 mb-10"><span class="h-px flex-1 bg-primary/20"></span><h2 data-i18n="blogArticles" class="text-2xl sm:text-3xl font-bold text-dark">Artigos</h2><span class="h-px flex-1 bg-primary/20"></span></div>
         <div id="managed-blog-list" class="space-y-12"></div>
       </section>
 
@@ -151,26 +158,24 @@
         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
         <div class="p-8 sm:p-12 md:p-16">
           <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-10 leading-tight relative inline-block">
-            O papel da densidade energética no controle do peso corporal
+            <span data-i18n="blogEnergyTitle">O papel da densidade energética no controle do peso corporal</span>
           </h2>
 
           <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 text-justify">
-            <p>
-              Você já ouviu falar em densidade energética dos alimentos?
-              Para pessoas que têm o objetivo de emagrecer ou manter a composição corporal, esse conhecimento sobre a densidade energética pode ser extremamente útil.
+            <p data-i18n="blogEnergyIntro">
+              Você já ouviu falar em densidade energética dos alimentos? Para pessoas que têm o objetivo de emagrecer ou manter a composição corporal, esse conhecimento sobre a densidade energética pode ser extremamente útil.
             </p>
 
-            <p>
-              Densidade energética é a quantidade de energia ou calorias em determinada quantidade de alimento, e geralmente é expressa em calorias por grama (kcal/g).
-              Os macronutrientes (carboidratos, proteínas e gorduras) possuem quantidades diferentes de calorias por gramas. O álcool também fornece energia.
+            <p data-i18n="blogEnergyDefinition">
+              Densidade energética é a quantidade de energia ou calorias em determinada quantidade de alimento, e geralmente é expressa em calorias por grama (kcal/g). Os macronutrientes (carboidratos, proteínas e gorduras) possuem quantidades diferentes de calorias por grama. O álcool também fornece energia.
             </p>
 
             <div class="bg-accent/20 rounded-2xl p-6 my-8 border border-primary/20" style="width: 60%; margin-left: auto; margin-right: auto;">
-              <h3 class="text-xl font-bold text-dark mb-4 text-center">Quantidade de energia em determinado peso de alimento (kcal/g)</h3>
+              <h3 data-i18n="blogEnergyChartTitle" class="text-xl font-bold text-dark mb-4 text-center">Quantidade de energia em determinado peso de alimento (kcal/g)</h3>
               <div class="space-y-5">
                 <div>
                   <div class="flex justify-between text-sm font-semibold mb-1 text-dark">
-                    <span>Gorduras</span><span>9 kcal/g</span>
+                    <span data-i18n="blogFat">Gorduras</span><span>9 kcal/g</span>
                   </div>
                   <div class="w-full bg-white rounded-full h-5 shadow-inner overflow-hidden">
                     <div class="bg-gradient-to-r from-orange-400 to-red-500 h-5 rounded-full shadow-md" style="width: 100%"></div>
@@ -178,7 +183,7 @@
                 </div>
                 <div>
                   <div class="flex justify-between text-sm font-semibold mb-1 text-dark">
-                    <span>Álcool</span><span>7 kcal/g</span>
+                    <span data-i18n="blogAlcohol">Álcool</span><span>7 kcal/g</span>
                   </div>
                   <div class="w-full bg-white rounded-full h-5 shadow-inner overflow-hidden">
                     <div class="bg-gradient-to-r from-yellow-400 to-orange-400 h-5 rounded-full shadow-md" style="width: 78%"></div>
@@ -186,7 +191,7 @@
                 </div>
                 <div>
                   <div class="flex justify-between text-sm font-semibold mb-1 text-dark">
-                    <span>Carboidratos</span><span>4 kcal/g</span>
+                    <span data-i18n="blogCarbs">Carboidratos</span><span>4 kcal/g</span>
                   </div>
                   <div class="w-full bg-white rounded-full h-5 shadow-inner overflow-hidden">
                     <div class="bg-gradient-to-r from-primary to-secondary h-5 rounded-full shadow-md" style="width: 44%"></div>
@@ -194,7 +199,7 @@
                 </div>
                 <div>
                   <div class="flex justify-between text-sm font-semibold mb-1 text-dark">
-                    <span>Proteínas</span><span>4 kcal/g</span>
+                    <span data-i18n="blogProtein">Proteínas</span><span>4 kcal/g</span>
                   </div>
                   <div class="w-full bg-white rounded-full h-5 shadow-inner overflow-hidden">
                     <div class="bg-gradient-to-r from-primary to-secondary h-5 rounded-full shadow-md" style="width: 44%"></div>
@@ -202,7 +207,7 @@
                 </div>
                 <div>
                   <div class="flex justify-between text-sm font-semibold mb-1 text-dark">
-                    <span>Água e Fibras</span><span>0 kcal/g</span>
+                    <span data-i18n="blogWaterFiber">Água e Fibras</span><span>0 kcal/g</span>
                   </div>
                   <div class="w-full bg-white rounded-full h-5 shadow-inner overflow-hidden">
                     <div class="bg-gray-300 h-5 rounded-full" style="width: 1%"></div>
@@ -211,45 +216,45 @@
               </div>
             </div>
 
-            <p>
+            <p data-i18n="blogEnergyFoods">
               Alguns alimentos têm muita caloria em pouco volume, como sorvete, fast-food e frituras. Outros, como frutas e vegetais, têm menos caloria porque contêm mais água e fibras. Isso significa que você pode comer uma quantidade maior deles sem exagerar nas calorias.
             </p>
-            <p>
+            <p data-i18n="blogEnergySwap">
               Então, se você substitui alimentos mais calóricos por alimentos com menos calorias, você come a mesma quantidade, mas consome menos energia. Isso ajuda tanto a emagrecer quanto a manter o peso.
             </p>
 
             <div class="my-10 relative">
-              <img src="/assets/images/blog/density_energy_food.jpg" alt="Comparação de densidade energética" class="rounded-2xl shadow-md h-auto object-cover block mx-auto" style="width: 80%;">
+              <img src="/assets/images/blog/density_energy_food.jpg" data-i18n-attr="alt:blogEnergyImageAlt" alt="Comparação de densidade energética" class="rounded-2xl shadow-md h-auto object-cover block mx-auto" style="width: 80%;">
               <p class="text-center text-sm text-gray-500 mt-2 italic">(ROLLS, 2017)</p>
             </div>
 
-            <p>
+            <p data-i18n="blogEnergySatiety">
               Pesquisas sugerem que a sensação de saciedade está relacionada com o volume de comida consumido, e não com a quantidade de calorias. Por isso, priorizar alimentos com baixa densidade energética é uma estratégia eficaz para quem quer emagrecer sem passar fome.
             </p>
 
-            <p class="font-bold text-dark text-xl mt-8">Então, como podemos usar o conhecimento sobre densidade energética a nosso favor?</p>
+            <p data-i18n="blogEnergyQuestion" class="font-bold text-dark text-xl mt-8">Então, como podemos usar o conhecimento sobre densidade energética a nosso favor?</p>
 
-            <p>
+            <p data-i18n="blogEnergyGuidance">
               A orientação é aumentar a variedade e a disponibilidade de alimentos com baixa densidade energética, tanto em preparações salgadas quanto doces. Seguem algumas sugestões:
             </p>
 
             <ul class="list-disc pl-6 space-y-2">
-              <li><span class="font-semibold">Preparações salgadas:</span> sopa de legumes, caldo de abóbora ou feijão, omelete com tomate e cenoura, abobrinha recheada, berinjela assada com ricota, salada com frango e legumes assados, panqueca de ricota com espinafre, torta de legumes e arroz de couve-flor com frango.</li>
-              <li><span class="font-semibold">Preparações doces:</span> iogurte natural com morango, vitamina de frutas vermelhas, maçã ou pera assada com canela, creme de mamão, pudim de chia com fruta, mingau de aveia com maçã e salada de frutas.</li>
+              <li data-i18n-html="blogSavoryHtml"><span class="font-semibold">Preparações salgadas:</span> sopa de legumes, caldo de abóbora ou feijão, omelete com tomate e cenoura, abobrinha recheada, berinjela assada com ricota, salada com frango e legumes assados, panqueca de ricota com espinafre, torta de legumes e arroz de couve-flor com frango.</li>
+              <li data-i18n-html="blogSweetHtml"><span class="font-semibold">Preparações doces:</span> iogurte natural com morango, vitamina de frutas vermelhas, maçã ou pera assada com canela, creme de mamão, pudim de chia com fruta, mingau de aveia com maçã e salada de frutas.</li>
             </ul>
 
-            <p class="mt-6">
+            <p data-i18n="blogEnergyPortions" class="mt-6">
               E por último, é importante controlar as porções ou limitar a ingestão de alimentos com alta densidade energética, como os alimentos gordurosos e secos.
             </p>
 
             <div class="mt-10 pt-6 border-t border-gray-100">
-              <p class="text-sm font-bold text-dark mb-2">Referência</p>
+              <p data-i18n="blogReference" class="text-sm font-bold text-dark mb-2">Referência</p>
               <p class="text-sm text-gray-500 leading-relaxed">Rolls, B. J. (2017). Dietary energy density: Applying behavioural science to weight management. <em>Nutrition Bulletin</em>, <em>42</em>(3), 246–253.</p>
             </div>
 
             <div class="flex flex-col items-center pt-6 border-t border-gray-100 mt-6">
               <p class="font-bold text-dark">Jessica Melo</p>
-              <p class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p>
+              <p data-i18n="blogRole" class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p>
             </div>
           </div>
         </div>
@@ -261,75 +266,67 @@
         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
         <div class="p-8 sm:p-12 md:p-16">
           <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-10 leading-tight relative inline-block">
-            Por que a mentalidade do "tudo ou nada" está fadada ao fracasso?
+            <span data-i18n="blogAllOrNothingTitle">Por que a mentalidade do "tudo ou nada" está fadada ao fracasso?</span>
           </h2>
 
           <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 text-justify">
-            <p>
+            <p data-i18n="blogAllNothingIntro">
               Imagine que você está tomando sol com a intenção de se bronzear. Você tem duas opções:
             </p>
 
             <div class="space-y-4 my-8">
               <div class="bg-accent/30 p-4 rounded-xl border-l-4 border-primary flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img src="/assets/images/blog/icon_sunburn.png" alt="Queimadura de sol" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
-                <p class="font-semibold text-dark">1. Você fica gravemente queimado de sol.</p>
+                <img src="/assets/images/blog/icon_sunburn.png" data-i18n-attr="alt:blogSunburnAlt" alt="Queimadura de sol" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
+                <p data-i18n="blogSunburn" class="font-semibold text-dark">1. Você fica gravemente queimado de sol.</p>
               </div>
               <div class="bg-accent/30 p-4 rounded-xl border-l-4 border-primary flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img src="/assets/images/blog/icon_notan.png" alt="Não se bronzeia" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
-                <p class="font-semibold text-dark">2. Você não se bronzeia.</p>
+                <img src="/assets/images/blog/icon_notan.png" data-i18n-attr="alt:blogNoTanAlt" alt="Não se bronzeia" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
+                <p data-i18n="blogNoTan" class="font-semibold text-dark">2. Você não se bronzeia.</p>
               </div>
             </div>
 
 
 
-            <p>
+            <p data-i18n="blogNoOption">
               Você não escolheria nenhuma dessas opções, certo?!
             </p>
 
-            <p>E se estivesse tentando perder peso, qual das opções abaixo você escolheria?</p>
+            <p data-i18n="blogAllNothingQuestion">E se estivesse tentando perder peso, qual das opções abaixo você escolheria?</p>
 
             <div class="space-y-4 my-8">
               <div class="bg-accent/30 p-4 rounded-xl border-l-4 border-primary flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img src="/assets/images/blog/icon_overtrain.png" alt="Restrição alimentar extrema" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
-                <p class="font-semibold text-dark">1. Você elimina todos os seus alimentos calóricos
-                  favoritos, deixa de participar de eventos sociais, come refeições diferentes do resto da sua família,
-                  força a ingestão de alimentos que não gosta e vai à academia sete dias por semana.</p>
+                <img src="/assets/images/blog/icon_overtrain.png" data-i18n-attr="alt:blogOvertrainingAlt" alt="Restrição alimentar extrema" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
+                <p data-i18n="blogExtremeOption" class="font-semibold text-dark">1. Você elimina todos os seus alimentos calóricos favoritos, deixa de participar de eventos sociais, come refeições diferentes do resto da sua família, força a ingestão de alimentos que não gosta e vai à academia sete dias por semana.</p>
               </div>
 
               <div class="bg-accent/30 p-4 rounded-xl border-l-4 border-primary flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img src="/assets/images/blog/icon_sedentary.png" alt="Sedentarismo" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
-                <p class="font-semibold text-dark">2. Você come muitos alimentos calóricos, faz pedido de
-                  comida todos os dias, cancela sua matrícula na academia e se torna completamente sedentário.</p>
+                <img src="/assets/images/blog/icon_sedentary.png" data-i18n-attr="alt:blogSedentaryAlt" alt="Sedentarismo" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 shadow-sm border border-black/5">
+                <p data-i18n="blogSedentaryOption" class="font-semibold text-dark">2. Você come muitos alimentos calóricos, faz pedido de comida todos os dias, cancela sua matrícula na academia e se torna completamente sedentário.</p>
               </div>
             </div>
 
-            <p>
-              É assim que a mentalidade do "tudo ou nada" se manifesta. O risco é que o "tudo" seja tão intenso que
-              simplesmente não consiga ser consistente. O resultado é que, naturalmente, o "nada" acaba vindo em
-              seguida.
+            <p data-i18n="blogAllNothingManifest">
+              É assim que a mentalidade do "tudo ou nada" se manifesta. O risco é que o "tudo" seja tão intenso que simplesmente não consiga ser consistente. O resultado é que, naturalmente, o "nada" acaba vindo em seguida.
             </p>
 
 
 
-            <p>
-              Para evitar essas duas situações prejudiciais, o segredo é sempre manter o equilíbrio. Por exemplo,
-              incluir alguns alimentos calóricos com moderação e pedir comida de vez em quando é como usar um protetor
-              solar FPS 30. Você está no sol, mas tem uma proteção que te impede de ser muito agressivo, enquanto ainda
-              consegue se bronzear.
+            <p data-i18n="blogBalanceParagraph">
+              Para evitar essas duas situações prejudiciais, o segredo é sempre manter o equilíbrio. Por exemplo, incluir alguns alimentos calóricos com moderação e pedir comida de vez em quando é como usar um protetor solar FPS 30. Você está no sol, mas tem uma proteção que te impede de ser muito agressivo, enquanto ainda consegue se bronzear.
             </p>
 
             <div class="my-10">
-              <img src="/assets/images/blog/alimentacao.png" alt="Equilíbrio alimentar"
+              <img src="/assets/images/blog/alimentacao.png" data-i18n-attr="alt:blogBalanceImageAlt" alt="Equilíbrio alimentar"
                 class="rounded-2xl shadow-md w-full h-auto object-contain">
             </div>
 
-            <blockquote class="text-2xl font-bold text-center text-primary py-8 border-y-2 border-accent my-10">
+            <blockquote data-i18n="blogBalanceQuote" class="text-2xl font-bold text-center text-primary py-8 border-y-2 border-accent my-10">
               "O segredo é sempre ter equilíbrio."
             </blockquote>
 
             <div class="flex flex-col items-center pt-6 border-t border-gray-100">
               <p class="font-bold text-dark">Jessica Melo</p>
-              <p class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p>
+              <p data-i18n="blogRole" class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p>
             </div>
           </div>
         </div>
@@ -344,10 +341,10 @@
     <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-transparent"></div>
 
     <div class="container mx-auto text-center relative z-10 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.4s_forwards]">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
+      <h2 data-i18n="blogCtaTitle" class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
         Quer encontrar o seu equilíbrio?
       </h2>
-      <p class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
+      <p data-i18n="blogCtaDescription" class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
         Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.
       </p>
 
@@ -356,7 +353,7 @@
         <span
           class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
         <span class="relative flex items-center gap-2">
-          Agendar consulta
+          <span data-i18n="blogCta">Agendar consulta</span>
           <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none"
             stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -368,7 +365,7 @@
 
   <footer class="bg-dark text-white py-8 px-4">
     <div class="container mx-auto text-center">
-      <p class="text-sm opacity-75">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+      <p data-i18n="footer" class="text-sm opacity-75">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
     </div>
   </footer>
 
@@ -385,9 +382,11 @@
     import { db } from '/assets/js/db.js';
     const managedSection = document.getElementById('managed-blog-section');
     const managedList = document.getElementById('managed-blog-list');
+    let managedPosts = [];
     const escapeHtml = value => String(value ?? '').replace(/[&<>\"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#039;' }[c]));
     const safeImageUrl = value => { const source = String(value || '').trim(); return /^https:\/\//i.test(source) || /^data:image\/(jpeg|png|webp|gif);base64,/i.test(source) ? source : ''; };
     function renderManagedBlogs(posts) {
+      managedPosts = posts;
       if (!posts.length) return;
       managedSection.classList.remove('hidden');
       managedList.innerHTML = posts.map(post => {
@@ -400,7 +399,7 @@
           }
           return String(block.text || '').split(/\n\s*\n|\n/).filter(Boolean).map(paragraph => `<p>${escapeHtml(paragraph)}</p>`).join('');
         }).join('');
-        return `<article id="managed-blog-${escapeHtml(post.id)}" class="blog-article bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden relative group scroll-mt-24"><div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div><div class="p-8 sm:p-12 md:p-16"><h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-10 leading-tight">${escapeHtml(post.title)}</h2><div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 text-justify">${post.excerpt ? `<p class="text-lg font-medium text-gray-500">${escapeHtml(post.excerpt)}</p>` : ''}${blocks}<div class="flex flex-col items-center pt-6 border-t border-gray-100 mt-6"><p class="font-bold text-dark">Jessica Melo</p><p class="text-sm text-gray-500">Nutricionista | CRN-1: 27052</p></div></div></div></article>`;
+        return `<article id="managed-blog-${escapeHtml(post.id)}" class="blog-article bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden relative group scroll-mt-24"><div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div><div class="p-8 sm:p-12 md:p-16"><h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-10 leading-tight">${escapeHtml(post.title)}</h2><div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 text-justify">${post.excerpt ? `<p class="text-lg font-medium text-gray-500">${escapeHtml(post.excerpt)}</p>` : ''}${blocks}<div class="flex flex-col items-center pt-6 border-t border-gray-100 mt-6"><p class="font-bold text-dark">Jessica Melo</p><p class="text-sm text-gray-500">${document.body.dataset.siteLanguage === 'en' ? 'Nutritionist | CRN-1: 27052' : 'Nutricionista | CRN-1: 27052'}</p></div></div></div></article>`;
       }).join('');
     }
     function renderBlogIndex() {
@@ -414,13 +413,15 @@
       toggle.type = 'button';
       toggle.className = 'mt-4 mx-auto block rounded-full border border-primary/30 px-5 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-colors';
       toggle.hidden = links.length <= 4;
-      toggle.textContent = 'Ver todos os artigos';
+      toggle.textContent = document.body.dataset.siteLanguage === 'en' ? 'View all articles' : 'Ver todos os artigos';
       let expanded = false;
-      toggle.onclick = () => { expanded = !expanded; list.innerHTML = expanded ? links.join('') : initialLinks; toggle.textContent = expanded ? 'Mostrar menos artigos' : 'Ver todos os artigos'; };
+      toggle.onclick = () => { expanded = !expanded; list.innerHTML = expanded ? links.join('') : initialLinks; toggle.textContent = expanded ? (document.body.dataset.siteLanguage === 'en' ? 'Show fewer articles' : 'Mostrar menos artigos') : (document.body.dataset.siteLanguage === 'en' ? 'View all articles' : 'Ver todos os artigos'); };
     }
+    document.addEventListener('site-language-applied', () => { if (managedPosts.length) renderManagedBlogs(managedPosts); renderBlogIndex(); });
     db.getPublishedBlogs().then(posts => { renderManagedBlogs(posts); renderBlogIndex(); }).catch(() => renderBlogIndex());
     renderBlogIndex();
   </script>
+  <script type="module" src="/assets/js/site-language.js"></script>
 </body>
 
 </html>

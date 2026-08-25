@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-i18n-title-key="aboutPageTitle">
 
 <head>
   <meta charset="UTF-8" />
@@ -76,23 +76,27 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="/index.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
-            Início
+            <span data-i18n="navHome">Início</span>
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/sobre.html" class="text-dark font-medium relative group">
-            Quem sou eu
+            <span data-i18n="navAbout">Quem sou eu</span>
             <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full"></span>
           </a>
           <a href="/blog.html" class="text-gray-500 hover:text-dark font-medium relative group transition-colors">
-            Blog
+            <span data-i18n="navBlog">Blog</span>
             <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full"></span>
           </a>
           <a href="/login.html" class="text-primary hover:text-dark font-bold relative group transition-colors flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-            Área do Paciente
+            <span data-i18n="navPatient">Área do Paciente</span>
           </a>
           <a href="/agendar-consulta.html"
-            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Agendar</a>
+            class="bg-primary text-white px-7 py-2.5 rounded-full font-medium hover:bg-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"><span data-i18n="navSchedule">Agendar</span></a>
+        </div>
+        <div class="hidden md:flex items-center gap-1 rounded-full border border-primary/20 bg-white/70 p-1" role="group" aria-label="Idioma">
+          <button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button>
+          <button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-2.5 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -106,12 +110,15 @@
       <!-- Mobile Menu Dropdown -->
       <div id="mobile-menu" class="mobile-menu md:hidden mt-4 pb-4 animate-fade-in-up">
         <div class="flex flex-col space-y-2 bg-white/90 rounded-2xl p-4 shadow-lg border border-gray-100">
-          <a href="/index.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Início</a>
-          <a href="/sobre.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl">Quem sou eu</a>
-          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors">Blog</a>
-          <a href="/login.html" class="block py-3 px-4 text-primary hover:text-dark font-bold hover:bg-gray-50 rounded-xl transition-colors">Área do Paciente</a>
+          <a href="/index.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navHome">Início</span></a>
+          <a href="/sobre.html" class="block py-3 px-4 text-dark font-medium bg-gray-50 rounded-xl"><span data-i18n="navAbout">Quem sou eu</span></a>
+          <a href="/blog.html" class="block py-3 px-4 text-gray-600 hover:text-dark hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navBlog">Blog</span></a>
+          <a href="/login.html" class="block py-3 px-4 text-primary hover:text-dark font-bold hover:bg-gray-50 rounded-xl transition-colors"><span data-i18n="navPatient">Área do Paciente</span></a>
           <a href="/agendar-consulta.html"
-            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md">Agendar</a>
+            class="block mt-2 bg-primary text-white px-4 py-3 rounded-xl hover:bg-dark transition-colors text-center font-medium shadow-md"><span data-i18n="navSchedule">Agendar</span></a>
+          <div class="mt-2 flex items-center justify-end rounded-xl border border-primary/15 bg-light px-4 py-3" role="group" aria-label="Idioma">
+            <span class="flex items-center gap-1"><button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button><button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-3 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button></span>
+          </div>
         </div>
       </div>
     </div>
@@ -121,7 +128,7 @@
   <section class="pt-32 pb-2 sm:pt-36 px-4 bg-light relative">
     <div class="container mx-auto max-w-4xl relative z-10">
       <div class="text-center animate-fade-in-up">
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-dark">Quem sou eu</h1>
+        <h1 data-i18n="aboutTitle" class="text-4xl sm:text-5xl md:text-6xl font-bold text-dark">Quem sou eu</h1>
       </div>
     </div>
   </section>
@@ -141,39 +148,39 @@
 
         <div class="relative z-10">
           <div class="text-base sm:text-lg text-gray-600 leading-relaxed space-y-6 text-justify">
-            <p>
+            <p data-i18n="aboutP1">
               Sou natural de Ceres, Goiás, e foi por meio de uma convivência próxima com profissionais de saúde, em um
               contexto pessoal, que descobri minha verdadeira vocação para a Nutrição.
             </p>
-            <p>
+            <p data-i18n="aboutP2">
               Minha trajetória acadêmica iniciou-se com a graduação em Biologia, experiência que me permitiu atuar como
               educadora no Instituto Federal Goiano. Após essa experiência, decidi trilhar o caminho da Nutrição, uma
               transição de carreira movida pela certeza de estar seguindo meu propósito de cuidar das pessoas através da
               alimentação.
             </p>
-            <p>
+            <p data-i18n="aboutP3">
               Comprometida com uma formação de excelência, dediquei-me intensamente aos estudos durante minha graduação
               no CEUB - DF. Realizei meu trabalho de conclusão de curso com o tema "Relação do transtorno de compulsão
               alimentar em adultos com sobrepeso e obesidade". Foi nesse período que aprendi sobre os malefícios das
               dietas restritivas e dos modismos passageiros.
             </p>
-            <p>
+            <p data-i18n="aboutP4">
               Ao final da graduação, recebi um convite para integrar a diretoria da ANDF - Associação de Nutricionistas
               do Distrito Federal, onde atuo como conselheira fiscal, contribuindo com as discussões da nossa categoria.
             </p>
-            <p>
+            <p data-i18n="aboutP5">
               Atuo com foco em emagrecimento, comportamento e performance, por meio de uma abordagem descomplicada e sem
               modismos, sempre fundamentada em evidências científicas. Meu objetivo é oferecer um atendimento acolhedor
               e prático, criando as condições ideais para promover mudanças reais e sustentáveis.
             </p>
 
             <div class="text-center pt-8 mt-8 border-t border-gray-100">
-              <p class="font-medium text-dark text-xl">Será um prazer fazer parte da sua jornada.</p>
-              <p class="text-primary mt-2 text-lg">Seja bem-vindo(a)!</p>
+              <p data-i18n="aboutClosing" class="font-medium text-dark text-xl">Será um prazer fazer parte da sua jornada.</p>
+              <p data-i18n="aboutWelcome" class="text-primary mt-2 text-lg">Seja bem-vindo(a)!</p>
               <div
                 class="mt-8 inline-block text-center bg-light px-6 py-4 rounded-2xl border border-gray-100 shadow-sm">
                 <strong class="block text-dark text-lg">Jessica Melo</strong>
-                <span class="text-gray-500 text-sm">Nutricionista | CRN-1: 27052</span>
+                <span data-i18n="aboutRole" class="text-gray-500 text-sm">Nutricionista | CRN-1: 27052</span>
               </div>
             </div>
           </div>
@@ -189,10 +196,10 @@
     <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-transparent"></div>
 
     <div class="container mx-auto text-center relative z-10">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
+      <h2 data-i18n="aboutCtaTitle" class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-white px-2">
         Pronto para transformar sua rotina?
       </h2>
-      <p class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
+      <p data-i18n="aboutCtaDescription" class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
         Agende agora sua consulta e dê o primeiro passo para uma vida mais saudável e equilibrada.
       </p>
 
@@ -201,7 +208,7 @@
         <span
           class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
         <span class="relative flex items-center gap-2">
-          Agendar atendimento
+          <span data-i18n="aboutCta">Agendar atendimento</span>
           <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none"
             stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -213,7 +220,7 @@
 
   <footer class="bg-dark text-white py-8 px-4 border-t border-white/10">
     <div class="container mx-auto text-center">
-      <p class="text-sm opacity-75">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+      <p data-i18n="footer" class="text-sm opacity-75">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
     </div>
   </footer>
 
@@ -226,6 +233,7 @@
       mobileMenu.classList.toggle('active');
     });
   </script>
+  <script type="module" src="/assets/js/site-language.js"></script>
 </body>
 
 </html>

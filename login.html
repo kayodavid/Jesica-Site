@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-i18n-title-key="loginPageTitle">
 
 <head>
   <meta charset="UTF-8" />
@@ -37,7 +37,13 @@
       <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
         <img src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
       </a>
-      <a href="/index.html" class="text-dark font-medium text-sm hover:text-primary transition-colors">Voltar ao site</a>
+      <div class="flex items-center gap-3">
+        <a href="/index.html" data-i18n="loginBack" class="text-dark font-medium text-sm hover:text-primary transition-colors">Voltar ao site</a>
+        <div class="flex items-center gap-1 rounded-full border border-primary/20 bg-white/70 p-1" role="group" aria-label="Idioma">
+          <button type="button" data-language-choice="pt" aria-pressed="true" class="language-option rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors">PT</button>
+          <button type="button" data-language-choice="en" aria-pressed="false" class="language-option rounded-full px-2.5 py-1.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-dark">EN</button>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -49,45 +55,45 @@
           <div class="absolute inset-0 bg-primary/20 rounded-full blur-md"></div>
           <img src="/assets/images/Jessica-site2.jpg" alt="Jessica Melo" class="relative w-20 h-20 rounded-full mx-auto object-cover border-2 border-white shadow-md" />
         </div>
-        <h2 class="text-2xl font-bold text-dark">Portal de Acompanhamento</h2>
-        <p class="text-gray-500 text-sm mt-1">Acesse seu calendário de automonitoramento</p>
+        <h2 data-i18n="loginHeading" class="text-2xl font-bold text-dark">Portal de Acompanhamento</h2>
+        <p data-i18n="loginIntro" class="text-gray-500 text-sm mt-1">Acesse seu calendário de automonitoramento</p>
       </div>
 
       <div id="alert-box" class="hidden mb-4 p-4 rounded-xl text-sm font-medium"></div>
 
       <form id="login-form" class="space-y-5">
         <div>
-          <label for="email" class="block text-sm font-semibold text-dark mb-1">E-mail</label>
-          <input type="email" id="email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white/70" />
+          <label data-i18n="loginEmail" for="email" class="block text-sm font-semibold text-dark mb-1">E-mail</label>
+          <input type="email" id="email" required data-i18n-attr="placeholder:loginEmailPlaceholder" placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white/70" />
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label for="password" class="block text-sm font-semibold text-dark">Senha</label>
+            <label data-i18n="loginPassword" for="password" class="block text-sm font-semibold text-dark">Senha</label>
           </div>
-          <input type="password" id="password" required placeholder="Digite sua senha" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white/70" />
+          <input type="password" id="password" required data-i18n-attr="placeholder:loginPasswordPlaceholder" data-i18n-attr="placeholder:loginPasswordPlaceholder" placeholder="Digite sua senha" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white/70" />
         </div>
 
         <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-base hover:bg-dark transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 mt-2">
-          Entrar no Portal
+          <span data-i18n="loginSubmit">Entrar no Portal</span>
         </button>
       </form>
 
       <div class="mt-5 text-center">
         <button type="button" id="forgot-password-btn" class="text-primary font-semibold text-sm hover:text-dark underline underline-offset-4 transition-colors">
-          Esqueci minha senha
+          <span data-i18n="loginForgot">Esqueci minha senha</span>
         </button>
       </div>
 
       <div id="recovery-panel" class="hidden mt-5 rounded-2xl border border-primary/20 bg-[#fffaf0] p-5">
-        <h3 class="font-bold text-dark text-base">Recuperar acesso</h3>
-        <p class="text-gray-600 text-sm mt-1 leading-relaxed">Informe o e-mail cadastrado. Por segurança, a senha nunca é exibida nem enviada por esta página. Se o e-mail estiver cadastrado, enviaremos um link temporário para criar uma nova senha.</p>
-        <label for="recovery-email" class="block text-sm font-semibold text-dark mt-4 mb-1">E-mail do paciente</label>
-        <input type="email" id="recovery-email" placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white" />
+        <h3 data-i18n="loginRecoveryTitle" class="font-bold text-dark text-base">Recuperar acesso</h3>
+        <p data-i18n="loginRecoveryIntro" class="text-gray-600 text-sm mt-1 leading-relaxed">Informe o e-mail cadastrado. Por segurança, a senha nunca é exibida nem enviada por esta página. Se o e-mail estiver cadastrado, enviaremos um link temporário para criar uma nova senha.</p>
+        <label data-i18n="loginRecoveryEmail" for="recovery-email" class="block text-sm font-semibold text-dark mt-4 mb-1">E-mail do paciente</label>
+        <input type="email" id="recovery-email" data-i18n-attr="placeholder:loginRecoveryPlaceholder" placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-white" />
         <div id="recovery-alert" class="hidden mt-3 rounded-xl p-3 text-sm font-medium"></div>
         <div class="flex gap-3 mt-4">
-          <button type="button" id="recovery-whatsapp-btn" class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors">Enviar link por e-mail</button>
-          <button type="button" id="recovery-cancel-btn" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-white transition-colors">Cancelar</button>
+          <button type="button" id="recovery-whatsapp-btn" class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-dark transition-colors"><span data-i18n="loginRecoverySend">Enviar link por e-mail</span></button>
+          <button type="button" id="recovery-cancel-btn" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-white transition-colors"><span data-i18n="loginCancel">Cancelar</span></button>
         </div>
       </div>
 
@@ -95,12 +101,17 @@
   </div>
 
   <footer class="bg-dark text-white py-6 px-4 text-center text-xs border-t border-white/10">
-    <p>&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
+    <p data-i18n="footer">&copy; 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p>
   </footer>
 
   <script type="module">
     import { db } from '/assets/js/db.js';
     (async () => {
+    const loginCopy = {
+      pt: { invalidEmail: 'Informe um e-mail válido para solicitar a recuperação.', sending: 'Enviando...', sendError: 'Não foi possível enviar o e-mail agora.', recoverySuccess: 'Se o e-mail estiver cadastrado, você receberá um link de recuperação em alguns instantes. Verifique também a pasta de spam.', loginSuccess: 'Login realizado com sucesso! Redirecionando...', sendLabel: 'Enviar link por e-mail' },
+      en: { invalidEmail: 'Enter a valid email address to request recovery.', sending: 'Sending...', sendError: 'We could not send the email right now.', recoverySuccess: 'If the email is registered, you will receive a recovery link shortly. Also check your spam folder.', loginSuccess: 'Login successful! Redirecting...', sendLabel: 'Send email link' }
+    };
+    const loginText = key => loginCopy[document.body.dataset.siteLanguage === 'en' ? 'en' : 'pt'][key];
 
     // Se já estiver logado, valida a sessão no Supabase antes de redirecionar
     const currentSession = await db.ready();
@@ -131,23 +142,23 @@
       const email = recoveryEmail.value.trim().toLowerCase();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-red-50 text-red-700';
-        recoveryAlert.textContent = 'Informe um e-mail válido para solicitar a recuperação.';
+        recoveryAlert.textContent = loginText('invalidEmail');
         return;
       }
       recoveryWhatsappBtn.disabled = true;
-      recoveryWhatsappBtn.textContent = 'Enviando...';
+      recoveryWhatsappBtn.textContent = loginText('sending');
       try {
         const response = await fetch('/api/password-recovery', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'request', email }) });
         const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || 'Não foi possível enviar o e-mail agora.');
+        if (!response.ok || !result.success) throw new Error(result.message || loginText('sendError'));
         recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-green-50 text-green-700';
-        recoveryAlert.textContent = 'Se o e-mail estiver cadastrado, você receberá um link de recuperação em alguns instantes. Verifique também a pasta de spam.';
+        recoveryAlert.textContent = loginText('recoverySuccess');
       } catch (error) {
         recoveryAlert.className = 'mt-3 rounded-xl p-3 text-sm font-medium bg-red-50 text-red-700';
-        recoveryAlert.textContent = error.message || 'Não foi possível enviar o e-mail agora. Tente novamente em alguns minutos.';
+        recoveryAlert.textContent = error.message || loginText('sendError');
       } finally {
         recoveryWhatsappBtn.disabled = false;
-        recoveryWhatsappBtn.textContent = 'Enviar link por e-mail';
+        recoveryWhatsappBtn.textContent = loginText('sendLabel');
       }
     });
 
@@ -161,7 +172,7 @@
       if (result.success) {
         alertBox.classList.remove('hidden', 'bg-red-50', 'text-red-700');
         alertBox.classList.add('bg-green-50', 'text-green-700');
-        alertBox.innerText = 'Login realizado com sucesso! Redirecionando...';
+        alertBox.innerText = loginText('loginSuccess');
         
         setTimeout(() => {
           if (result.user.role === 'admin') {
@@ -178,6 +189,7 @@
     });
     })();
   </script>
+  <script type="module" src="/assets/js/site-language.js"></script>
 </body>
 
 </html>
