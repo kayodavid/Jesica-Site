@@ -10,6 +10,8 @@ const EMAIL_QUIZ_INVITATION_THEME = '__email_quiz_invitation__';
 const EMAIL_QUIZ_RESPONSE_THEME = '__email_quiz_response__';
 const EMAIL_QUIZ_PROGRESS_THEME = '__email_quiz_progress__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
+const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
+const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
 
 function json(res, status, body) {
   res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -25,6 +27,30 @@ function escapeHtml(value = '') {
 
 function validEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+}
+
+function defaultEmailTemplate() {
+  return { version:1, id:'default', layout:'classic', logoUrl:'', logoDataUrl:'', brandName:'Jessica Melo Nutricionista', preheader:'Novo questionário disponível', title:'Novo questionário disponível', greeting:'Olá, {primeiro_nome}!', intro:'A Dra. Jessica preparou o questionário {questionario} para acompanhar o seu cuidado nutricional.', body:'Reserve alguns minutos para responder. Suas respostas serão enviadas de forma segura para o acompanhamento profissional.', buttonText:'Responder questionário', deadlineText:'Este convite é individual e fica disponível até {prazo}.', footerText:'© {ano} Jessica Melo Nutricionista. Todos os direitos reservados.', subject:'Questionário disponível — {questionario}', primaryColor:'#a88b36', backgroundColor:'#faf8f3', textColor:'#3d3226' };
+}
+
+function normalizeEmailTemplate(value) {
+  const fallback = defaultEmailTemplate(); const data = value && typeof value === 'object' ? value : {}; const layouts = new Set(['classic','modern','editorial','soft','midnight']);
+  const color = (candidate, fallbackColor) => /^#[0-9a-f]{6}$/i.test(String(candidate || '')) ? String(candidate).toLowerCase() : fallbackColor;
+  const logoDataUrl = /^data:image\/(?:png|jpe?g|webp|gif|svg\+xml);base64,[a-z0-9+/=\s]+$/i.test(String(data.logoDataUrl || '')) && String(data.logoDataUrl).length <= 700000 ? String(data.logoDataUrl) : '';
+  const logoUrl = String(data.logoUrl || '').trim().slice(0, 1000);
+  return { ...fallback, ...data, version:1, id:'default', layout:layouts.has(data.layout) ? data.layout : fallback.layout, logoUrl, logoDataUrl, brandName:String(data.brandName || fallback.brandName).trim().slice(0,100), preheader:String(data.preheader || fallback.preheader).trim().slice(0,180), title:String(data.title || fallback.title).trim().slice(0,160), greeting:String(data.greeting || fallback.greeting).trim().slice(0,180), intro:String(data.intro || fallback.intro).trim().slice(0,500), body:String(data.body || fallback.body).trim().slice(0,700), buttonText:String(data.buttonText || fallback.buttonText).trim().slice(0,80), deadlineText:String(data.deadlineText || fallback.deadlineText).trim().slice(0,260), footerText:String(data.footerText || fallback.footerText).trim().slice(0,260), subject:String(data.subject || fallback.subject).trim().slice(0,180), primaryColor:color(data.primaryColor, fallback.primaryColor), backgroundColor:color(data.backgroundColor, fallback.backgroundColor), textColor:color(data.textColor, fallback.textColor), updatedAt:String(data.updatedAt || '') };
+}
+
+function emailAssetUrl(value) {
+  const raw = String(value || '').trim(); if (!raw) return '';
+  if (/^data:image\/(?:png|jpe?g|webp|gif|svg\+xml);base64,[a-z0-9+/=\s]+$/i.test(raw) && raw.length <= 700000) return raw;
+  try { const parsed = new URL(raw, 'https://jessicamelonutri.com.br'); if (!['http:','https:'].includes(parsed.protocol)) return ''; return parsed.href; } catch { return ''; }
+}
+
+function replaceEmailTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{ano\}/g, values.year); }
+
+async function getEmailTemplate(sessionToken) {
+  try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === EMAIL_TEMPLATE_THEME || recordSource(item) === EMAIL_TEMPLATE_SOURCE); if (!record) return defaultEmailTemplate(); let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return normalizeEmailTemplate(data); } catch (error) { console.error('Email template load error:', error.message); return defaultEmailTemplate(); }
 }
 
 async function callRpc(name, body) {
@@ -601,18 +627,19 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
   }).sort((a, b) => new Date(b.respondedAt || b.sentAt || 0) - new Date(a.respondedAt || a.sentAt || 0));
 }
 
-async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt }) {
-  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`;
-  const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long', timeZone: 'America/Sao_Paulo' }).format(new Date(expiresAt));
-  const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá';
-  const htmlContent = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#faf8f3;font-family:Arial,Helvetica,sans-serif;color:#3d3226;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="background:#ffffff;border:1px solid #eadfca;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(61,50,38,.08)"><div style="background:#a88b36;color:#fff;padding:25px 28px"><p style="margin:0 0 5px;font-size:12px;letter-spacing:.11em;text-transform:uppercase;opacity:.88">Jessica Melo Nutricionista</p><h1 style="margin:0;font-size:24px;line-height:1.25">Novo questionário disponível</h1></div><div style="padding:28px"><p style="margin-top:0">Olá, <strong>${escapeHtml(firstName)}</strong>!</p><p>A Dra. Jessica preparou o questionário <strong>${escapeHtml(quiz.title)}</strong> para acompanhar o seu cuidado nutricional.</p><p>Reserve alguns minutos para responder. Suas respostas serão enviadas de forma segura para o acompanhamento profissional.</p><p style="margin:28px 0"><a href="${questionnaireUrl}" style="display:inline-block;background:#a88b36;border-radius:10px;color:#ffffff;padding:13px 20px;text-decoration:none;font-weight:700">Responder questionário</a></p><p style="font-size:13px;color:#6d6255;margin-bottom:0">Este convite é individual e fica disponível até <strong>${escapeHtml(deadline)}</strong>.</p></div></div><p style="font-size:12px;color:#827766;text-align:center;margin:18px 0 0">© 2026 Jessica Melo Nutricionista. Todos os direitos reservados.</p></div></body></html>`;
-  return sendBrevoEmail({
-    to: { email: recipientEmail, name: patientName },
-    subject: `Questionário disponível — ${quiz.title}`,
-    htmlContent,
-    scheduledAt,
-    replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: 'Jessica Melo Nutricionista' }
-  });
+function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, deadline, questionnaireUrl }) {
+  const template = normalizeEmailTemplate(rawTemplate); const values = { firstName:firstName || 'Olá', quizTitle:quizTitle || 'Questionário', deadline, year:new Date().getFullYear() }; const primary = template.primaryColor; const background = template.backgroundColor; const text = template.textColor; const brand = escapeHtml(template.brandName); const preheader = escapeHtml(replaceEmailTokens(template.preheader, values)); const title = escapeHtml(replaceEmailTokens(template.title, values)); const greeting = escapeHtml(replaceEmailTokens(template.greeting, values)); const intro = escapeHtml(replaceEmailTokens(template.intro, values)); const body = escapeHtml(replaceEmailTokens(template.body, values)); const button = escapeHtml(replaceEmailTokens(template.buttonText, values)); const deadlineText = escapeHtml(replaceEmailTokens(template.deadlineText, values)); const footer = escapeHtml(replaceEmailTokens(template.footerText, values)); const safeUrl = escapeHtml(questionnaireUrl); const logoSource = emailAssetUrl(template.logoDataUrl || template.logoUrl); const logo = logoSource ? `<img src="${escapeHtml(logoSource)}" alt="${brand}" style="display:block;max-width:190px;max-height:64px;height:auto;object-fit:contain;margin:0 0 12px">` : ''; const paragraphBlock = `<p style="margin:0 0 17px;line-height:1.62">${intro}</p><p style="margin:0 0 24px;line-height:1.62">${body}</p><p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:${primary};border-radius:${template.layout === 'modern' ? '999px' : '10px'};color:#fff;padding:13px 20px;text-decoration:none;font-weight:700">${button}</a></p><p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">${deadlineText}</p>`;
+  let inner;
+  if (template.layout === 'modern') inner = `<div style="border-left:7px solid ${primary};background:#fff;padding:30px 28px"><div style="margin-bottom:14px">${logo}<p style="margin:0;color:${primary};font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">${brand}</p></div><p style="margin:0 0 6px;color:#756b61;font-size:11px;letter-spacing:.08em;text-transform:uppercase">${preheader}</p><h1 style="margin:0 0 24px;color:${text};font-size:25px;line-height:1.2">${title}</h1><p style="margin:0 0 20px;color:${text};font-weight:700">${greeting}</p>${paragraphBlock}</div>`;
+  else if (template.layout === 'editorial') inner = `<div style="background:#fffdf8;padding:32px 29px;border-top:8px solid ${primary}">${logo ? logo.replace('margin:0 0 12px','margin:0 auto 12px') : ''}<p style="margin:0 0 12px;text-align:center;color:#827766;font-size:10px;letter-spacing:.16em;text-transform:uppercase">${preheader}</p><h1 style="margin:0 auto 24px;max-width:430px;text-align:center;color:${text};font-family:Georgia,serif;font-size:26px;font-weight:400;line-height:1.2">${title}</h1><p style="margin:0 0 20px;color:${text};font-family:Georgia,serif;font-size:16px">${greeting}</p>${paragraphBlock}</div>`;
+  else if (template.layout === 'soft') inner = `<div style="background:linear-gradient(145deg,#fff,#f1effa);padding:28px;border-radius:24px;border:1px solid #ded9ef">${logo}<p style="margin:0 0 5px;color:#7d73ad;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p><h1 style="margin:0 0 22px;color:${text};font-size:24px;line-height:1.24">${title}</h1><div style="border-radius:16px;background:#fff;padding:21px;box-shadow:0 8px 22px rgba(77,67,112,.08)"><p style="margin:0 0 20px;color:${text};font-weight:700">${greeting}</p>${paragraphBlock}</div></div>`;
+  else if (template.layout === 'midnight') inner = `<div style="background:#202532;padding:32px 29px;color:#fff"><div style="padding-bottom:22px;border-bottom:1px solid rgba(212,183,106,.35)">${logo}<p style="margin:0;color:#d4b76a;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800">${brand}</p></div><p style="margin:22px 0 7px;color:#d4b76a;font-size:10px;letter-spacing:.13em;text-transform:uppercase">${preheader}</p><h1 style="margin:0 0 24px;color:#fff;font-size:25px;line-height:1.2">${title}</h1><p style="margin:0 0 20px;color:#fff;font-weight:700">${greeting}</p><p style="margin:0 0 17px;color:#e7e8ed;line-height:1.62">${intro}</p><p style="margin:0 0 24px;color:#e7e8ed;line-height:1.62">${body}</p><p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:#d4b76a;border-radius:10px;color:#202532;padding:13px 20px;text-decoration:none;font-weight:800">${button}</a></p><p style="margin:0;color:#c5c9d2;font-size:12px;line-height:1.6">${deadlineText}</p></div>`;
+  else inner = `<div style="background:${primary};color:#fff;padding:25px 28px">${logo}<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p><p style="margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.75">${preheader}</p><h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="background:#fff;padding:28px;color:${text}"><p style="margin:0 0 20px;font-weight:700">${greeting}</p>${paragraphBlock}</div>`;
+  const footerColor = template.layout === 'midnight' ? '#d4d8e0' : '#827766'; return `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:${background};font-family:Arial,Helvetica,sans-serif;color:${text};line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${template.layout === 'soft' ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="font-size:12px;color:${footerColor};text-align:center;margin:18px 0 0">${footer}</p></div></body></html>`;
+}
+
+async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template }) {
+  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const htmlContent = buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject:replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }), htmlContent, scheduledAt, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
 }
 
 async function sendResponseReceipt({ invitation, quiz, answers, summary }) {
@@ -882,14 +909,17 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
     try {
       const quiz = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
       if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
-      try { await storeInvitation(decryptInvitation(schedule.invitation_token), quiz); } catch (historyError) { console.error('Queued invitation history error:', historyError.message); }
+      const invitation = decryptInvitation(schedule.invitation_token);
+      const template = await getEmailTemplate(invitation.sessionToken);
+      try { await storeInvitation(invitation, quiz); } catch (historyError) { console.error('Queued invitation history error:', historyError.message); }
       const brevoResult = await sendQuestionnaireEmail({
         recipientEmail:schedule.recipient_email,
         patientName:schedule.patient_name,
         quiz,
         accessToken:schedule.invitation_token,
         expiresAt:Date.parse(expiresAt),
-        scheduledAt
+        scheduledAt,
+        template
       });
       const providerMessageId = usableText(brevoResult.messageId);
       if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
@@ -938,7 +968,8 @@ export default async function handler(req, res) {
       const sentAt = new Date().toISOString();
       const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, sentAt, expiresAt };
       const accessToken = encryptInvitation(invitation);
-      const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt });
+      const template = await getEmailTemplate(sessionToken);
+      const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template });
       await storeInvitation(invitation, quiz);
       return json(res, 200, { success: true, message: 'Questionário enviado por e-mail.', expiresAt: new Date(expiresAt).toISOString(), providerMessageId: brevoResult.messageId || null });
     }
