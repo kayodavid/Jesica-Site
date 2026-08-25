@@ -8,6 +8,7 @@ const QUESTION_DELIMITER = '\n---QUESTION---\n';
 const QUESTION_THEME = '__patient_question__';
 const EMAIL_QUIZ_INVITATION_THEME = '__email_quiz_invitation__';
 const EMAIL_QUIZ_RESPONSE_THEME = '__email_quiz_response__';
+const EMAIL_QUIZ_PROGRESS_THEME = '__email_quiz_progress__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 
 function json(res, status, body) {
@@ -296,6 +297,10 @@ function isEmailQuizResponseRecord(record) {
   return record?.theme === EMAIL_QUIZ_RESPONSE_THEME || /^email-quiz-response:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
 }
 
+function isEmailQuizProgressRecord(record) {
+  return record?.theme === EMAIL_QUIZ_PROGRESS_THEME || /^email-quiz-progress:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
+}
+
 function parseStoredRecord(record) {
   try { return JSON.parse(String(record?.description || '{}')); } catch { return {}; }
 }
@@ -310,6 +315,7 @@ function normalizeStoredInvitation(record) {
     recipientEmail: usableText(data.recipientEmail).toLowerCase(),
     quizId: usableText(data.quizId),
     quizTitle: usableText(data.quizTitle) || 'Questionário',
+    totalQuestions: Math.max(0, Number(data.totalQuestions || 0)),
     sentAt: usableText(data.sentAt) || record?.createdAt || record?.created_at || '',
     expiresAt: usableText(data.expiresAt),
     channel: 'email'
@@ -330,6 +336,25 @@ function normalizeStoredResponse(record) {
     respondedAt: usableText(data.respondedAt) || record?.createdAt || record?.created_at || '',
     answers: Array.isArray(data.answers) ? data.answers : [],
     summary: data.summary && typeof data.summary === 'object' ? data.summary : {},
+    totalQuestions: Math.max(0, Number(data.summary?.totalQuestions || data.totalQuestions || 0)),
+    answeredQuestions: Math.max(0, Number(data.summary?.answeredQuestions || (Array.isArray(data.answers) ? data.answers.length : 0))),
+    channel: 'email'
+  };
+}
+
+function normalizeStoredProgress(record) {
+  const data = parseStoredRecord(record);
+  return {
+    id: String(record?.id || ''),
+    invitationId: usableText(data.invitationId),
+    patientKey: usableText(data.patientKey),
+    patientName: usableText(data.patientName) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail).toLowerCase(),
+    quizId: usableText(data.quizId),
+    quizTitle: usableText(data.quizTitle) || 'Questionário',
+    totalQuestions: Math.max(0, Number(data.totalQuestions || 0)),
+    answeredQuestions: Math.max(0, Number(data.answeredQuestions || 0)),
+    updatedAt: usableText(data.updatedAt) || record?.updatedAt || record?.updated_at || record?.createdAt || record?.created_at || '',
     channel: 'email'
   };
 }
@@ -383,9 +408,37 @@ async function storeInvitation(invitation, quiz) {
       quizId: quiz.id,
       quizTitle: quiz.title,
       sentAt: invitation.sentAt || new Date().toISOString(),
-      expiresAt: new Date(invitation.expiresAt).toISOString()
+      expiresAt: new Date(invitation.expiresAt).toISOString(),
+      totalQuestions: Array.isArray(quiz.questionSnapshots) ? quiz.questionSnapshots.length : 0
     }
   });
+}
+
+async function storeProgress(invitation, quiz, answeredQuestions) {
+  const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+  const source = `email-quiz-progress://${invitation.id}`;
+  const totalQuestions = Array.isArray(quiz?.questionSnapshots) ? quiz.questionSnapshots.length : 0;
+  const answered = Math.max(0, Math.min(Number(answeredQuestions || 0), totalQuestions));
+  if (!answered || !totalQuestions) return true;
+  const description = {
+    version: 1,
+    invitationId: invitation.id,
+    patientKey: invitation.patientKey,
+    patientName: invitation.patientName,
+    recipientEmail: invitation.recipientEmail,
+    quizId: quiz.id,
+    quizTitle: quiz.title,
+    totalQuestions,
+    answeredQuestions: answered,
+    updatedAt: new Date().toISOString()
+  };
+  const current = records.find(record => recordSource(record) === source);
+  if (current) {
+    await callRpc('app_update_video', { p_token:invitation.sessionToken, p_id:current.id, p_title:`Andamento — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, p_theme:EMAIL_QUIZ_PROGRESS_THEME, p_description:JSON.stringify(description), p_url:`https://jessicamelonutri.com.br/responder-questionario?token=${encodeURIComponent('progress')}`, p_provider:'youtube', p_embed_url:source, p_thumbnail_url:'' });
+  } else {
+    await addStoredRecord(invitation.sessionToken, { title:`Andamento — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, theme:EMAIL_QUIZ_PROGRESS_THEME, source, description });
+  }
+  return true;
 }
 
 async function storeResponse(invitation, quiz, answers, summary) {
@@ -418,10 +471,20 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
   const records = await listStoredQuestionnaireRecords(sessionToken);
   const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
   const responses = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse).filter(item => item.invitationId);
+  const progress = records.filter(isEmailQuizProgressRecord).map(normalizeStoredProgress).filter(item => item.invitationId);
   const responsesByInvitation = new Map(responses.map(item => [item.invitationId, item]));
+  const progressByInvitation = new Map(progress.map(item => [item.invitationId, item]));
   const rows = invitations.map(invitation => {
     const response = responsesByInvitation.get(invitation.invitationId);
+    const savedProgress = progressByInvitation.get(invitation.invitationId);
     const isExpired = invitation.expiresAt && Date.parse(invitation.expiresAt) < Date.now();
+    const savedAnswered = Number(savedProgress?.answeredQuestions || 0);
+    const responseAnswered = Number(response?.answeredQuestions || response?.answers?.length || 0);
+    const totalQuestions = Number(invitation.totalQuestions || savedProgress?.totalQuestions || response?.totalQuestions || response?.summary?.totalQuestions || responseAnswered || 0);
+    const answeredQuestions = Math.max(savedAnswered, responseAnswered);
+    const hasProgress = answeredQuestions > 0;
+    const isComplete = !!response && (totalQuestions === 0 || answeredQuestions >= totalQuestions);
+    const status = isComplete ? 'responded' : (isExpired ? (hasProgress ? 'partial' : 'lost') : (hasProgress ? 'progress' : 'open'));
     return {
       id: invitation.invitationId,
       patientKey: invitation.patientKey,
@@ -431,9 +494,11 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
       quizTitle: invitation.quizTitle,
       sentAt: invitation.sentAt,
       respondedAt: response?.respondedAt || '',
-      status: response ? 'responded' : (isExpired ? 'lost' : 'open'),
+      status,
       answers: response?.answers || [],
       summary: response?.summary || {},
+      totalQuestions,
+      answeredQuestions,
       channel: 'email'
     };
   });
@@ -449,9 +514,11 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
       quizTitle: response.quizTitle,
       sentAt: response.sentAt || response.respondedAt,
       respondedAt: response.respondedAt,
-      status: 'responded',
+      status: (Number(response.summary?.answeredQuestions || response.answers?.length || 0) >= Number(response.summary?.totalQuestions || response.totalQuestions || response.answers?.length || 0)) ? 'responded' : 'partial',
       answers: response.answers,
       summary: response.summary,
+      totalQuestions: response.totalQuestions || Number(response.summary?.totalQuestions || response.answers?.length || 0),
+      answeredQuestions: response.answeredQuestions || Number(response.summary?.answeredQuestions || response.answers?.length || 0),
       channel: 'email'
     });
   });
@@ -905,10 +972,22 @@ export default async function handler(req, res) {
       try {
         const invitation = decryptInvitation(String(body.token || ''));
         const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
-        return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString() });
+        const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+        const progressRecord = records.find(record => isEmailQuizProgressRecord(record) && normalizeStoredProgress(record).invitationId === invitation.id);
+        const savedProgress = progressRecord ? normalizeStoredProgress(progressRecord) : null;
+        return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString(), progress: savedProgress ? { totalQuestions:savedProgress.totalQuestions, answeredQuestions:savedProgress.answeredQuestions, updatedAt:savedProgress.updatedAt } : null });
       } catch (error) {
         return json(res, 200, { state: /expirado/i.test(error.message) ? 'expired' : 'invalid' });
       }
+    }
+
+    if (action === 'progress') {
+      let invitation;
+      try { invitation = decryptInvitation(String(body.token || '')); } catch (error) { return json(res, 200, { success:false, reason:/expirado/i.test(error.message) ? 'expired' : 'invalid' }); }
+      const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
+      const answeredQuestions = Math.max(0, Math.min(Number(body.answeredQuestions || 0), quiz.questionSnapshots.length));
+      if (answeredQuestions > 0) await storeProgress(invitation, quiz, answeredQuestions);
+      return json(res, 200, { success:true });
     }
 
     if (action === 'submit') {
