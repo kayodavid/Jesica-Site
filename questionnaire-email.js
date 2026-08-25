@@ -319,38 +319,46 @@ async function getBrevoQuestionnaireEvents(startDate, endDate, invitations = [])
 }
 
 function recordSource(record) {
-  return String(record?.embedUrl || record?.embed_url || '');
+  return String(record?.embedUrl || record?.embed_url || record?.embedURL || record?.source || '');
 }
 
-function isEmailQuizInvitationRecord(record) {
-  return record?.theme === EMAIL_QUIZ_INVITATION_THEME || /^email-quiz-invitation:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
-}
-
-function isEmailQuizResponseRecord(record) {
-  return record?.theme === EMAIL_QUIZ_RESPONSE_THEME || /^email-quiz-response:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
-}
-
-function isEmailQuizProgressRecord(record) {
-  return record?.theme === EMAIL_QUIZ_PROGRESS_THEME || /^email-quiz-progress:\/\/[a-z0-9_-]+$/i.test(recordSource(record));
+function recordTheme(record) {
+  return String(record?.theme || record?.category || record?.type || '').trim().toLowerCase();
 }
 
 function parseStoredRecord(record) {
+  if (record?.description && typeof record.description === 'object') return record.description;
   try { return JSON.parse(String(record?.description || '{}')); } catch { return {}; }
+}
+
+function isEmailQuizInvitationRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_INVITATION_THEME.toLowerCase() || /^email-quiz-invitation:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.quizId || data.quiz_id) && (data.recipientEmail || data.recipient_email) && (data.sentAt || data.sent_at));
+}
+
+function isEmailQuizResponseRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_RESPONSE_THEME.toLowerCase() || /^email-quiz-response:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.respondedAt || data.responded_at || data.submittedAt || data.submitted_at) && Array.isArray(data.answers));
+}
+
+function isEmailQuizProgressRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_PROGRESS_THEME.toLowerCase() || /^email-quiz-progress:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.updatedAt || data.updated_at) && (data.answeredQuestions || data.answered_questions));
 }
 
 function normalizeStoredInvitation(record) {
   const data = parseStoredRecord(record);
   return {
     id: String(record?.id || ''),
-    invitationId: usableText(data.invitationId),
-    patientKey: usableText(data.patientKey),
-    patientName: usableText(data.patientName) || 'Paciente',
-    recipientEmail: usableText(data.recipientEmail).toLowerCase(),
-    quizId: usableText(data.quizId),
-    quizTitle: usableText(data.quizTitle) || 'Questionário',
-    totalQuestions: Math.max(0, Number(data.totalQuestions || 0)),
-    sentAt: usableText(data.sentAt) || record?.createdAt || record?.created_at || '',
-    expiresAt: usableText(data.expiresAt),
+    invitationId: usableText(data.invitationId || data.invitation_id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizId: usableText(data.quizId || data.quiz_id),
+    quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    totalQuestions: Math.max(0, Number(data.totalQuestions ?? data.total_questions ?? 0)),
+    sentAt: usableText(data.sentAt || data.sent_at) || record?.createdAt || record?.created_at || '',
+    expiresAt: usableText(data.expiresAt || data.expires_at),
     providerMessageId: usableText(data.providerMessageId || data.provider_message_id),
     channel: 'email'
   };
@@ -360,14 +368,14 @@ function normalizeStoredResponse(record) {
   const data = parseStoredRecord(record);
   return {
     id: String(record?.id || ''),
-    invitationId: usableText(data.invitationId),
-    patientKey: usableText(data.patientKey),
-    patientName: usableText(data.patientName) || 'Paciente',
-    recipientEmail: usableText(data.recipientEmail).toLowerCase(),
-    quizId: usableText(data.quizId),
-    quizTitle: usableText(data.quizTitle) || 'Questionário',
-    sentAt: usableText(data.sentAt),
-    respondedAt: usableText(data.respondedAt) || record?.createdAt || record?.created_at || '',
+    invitationId: usableText(data.invitationId || data.invitation_id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizId: usableText(data.quizId || data.quiz_id),
+    quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    sentAt: usableText(data.sentAt || data.sent_at),
+    respondedAt: usableText(data.respondedAt || data.responded_at || data.submittedAt || data.submitted_at) || record?.createdAt || record?.created_at || '',
     answers: Array.isArray(data.answers) ? data.answers : [],
     summary: data.summary && typeof data.summary === 'object' ? data.summary : {},
     totalQuestions: Math.max(0, Number(data.summary?.totalQuestions || data.totalQuestions || 0)),
@@ -581,7 +589,11 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
   const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
   const responses = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse).filter(item => item.invitationId);
   const progress = records.filter(isEmailQuizProgressRecord).map(normalizeStoredProgress).filter(item => item.invitationId);
-  const responsesByInvitation = new Map(responses.map(item => [item.invitationId, item]));
+  const responsesByInvitation = new Map();
+  responses.forEach(item => {
+    const current = responsesByInvitation.get(item.invitationId);
+    if (!current || new Date(item.respondedAt || 0).getTime() >= new Date(current.respondedAt || 0).getTime()) responsesByInvitation.set(item.invitationId, item);
+  });
   const progressByInvitation = new Map(progress.map(item => [item.invitationId, item]));
   const rows = invitations.map(invitation => {
     const response = responsesByInvitation.get(invitation.invitationId);
@@ -596,6 +608,8 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
     const status = isComplete ? 'responded' : (isExpired ? (hasProgress ? 'partial' : 'lost') : (hasProgress ? 'progress' : 'open'));
     return {
       id: invitation.invitationId,
+      invitationId: invitation.invitationId,
+      responseId: response?.id || '',
       patientKey: invitation.patientKey,
       patientName: invitation.patientName,
       recipientEmail: invitation.recipientEmail,
@@ -616,6 +630,8 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
     if (known.has(response.invitationId)) return;
     rows.push({
       id: response.invitationId,
+      invitationId: response.invitationId,
+      responseId: response.id || '',
       patientKey: response.patientKey,
       patientName: response.patientName,
       recipientEmail: response.recipientEmail,
