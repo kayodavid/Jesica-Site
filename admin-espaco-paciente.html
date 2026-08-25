@@ -64,7 +64,7 @@
     .patient-table tbody tr:hover { background:rgba(245,230,200,.42); }
     .patient-name-button { display:flex; max-width:14rem; align-items:center; gap:.55rem; color:#3d3226; font-weight:700; text-align:left; }
     .patient-name-button span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .patient-flag { display:inline-block; width:20px; height:15px; flex:none; border-radius:2px; box-shadow:0 0 0 1px rgba(61,50,38,.08); }
+    .patient-flag { display:inline-flex; width:20px; height:15px; flex:none; align-items:center; justify-content:center; overflow:hidden; border-radius:2px; box-shadow:0 0 0 1px rgba(61,50,38,.08); vertical-align:middle; } .patient-flag.iti__flag { display:inline-block; background-color:#f4f1ea; } .patient-flag--fallback { color:#857865; background:#f4f1ea; font-size:10px; font-weight:800; }
     .patient-label-chips { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.65rem; }
     .patient-label-chip { display:inline-flex; align-items:center; gap:.35rem; border-radius:999px; padding:.28rem .42rem .28rem .58rem; color:#fff; font-size:.68rem; font-weight:800; line-height:1; }
     .patient-label-chip-remove { display:inline-flex; width:1rem; height:1rem; align-items:center; justify-content:center; border-radius:999px; color:inherit; font-size:.85rem; line-height:1; transition:background .15s ease; }
@@ -938,6 +938,26 @@
       let whatsappLoadError = '';
       let loading = false;
       let peopleByRecipient = new Map();
+      const countryFromPhone = phone => {
+        const digits = String(phone || '').replace(/\D/g, '');
+        try {
+          const countries = typeof intlTelInputWithUtils === 'function' && typeof intlTelInputWithUtils.getAllCountries === 'function' ? intlTelInputWithUtils.getAllCountries() : [];
+          const matches = countries.filter(country => digits.startsWith(String(country.dialCode || ''))).sort((a, b) => String(b.dialCode || '').length - String(a.dialCode || '').length);
+          if (!matches.length) return '';
+          const mostSpecific = matches.filter(country => String(country.dialCode || '') === String(matches[0].dialCode || ''));
+          return mostSpecific.length === 1 ? String(mostSpecific[0].iso2 || '').toLowerCase() : '';
+        } catch { return ''; }
+      };
+      const normalizedCountry = person => {
+        const explicit = String(person?.country || '').trim().toLowerCase();
+        if (/^[a-z]{2}$/.test(explicit)) return explicit;
+        return countryFromPhone(person?.phone);
+      };
+      const patientFlag = person => {
+        const iso2 = normalizedCountry(person);
+        if (/^[a-z]{2}$/.test(iso2)) return `<span class="patient-flag iti__flag iti__${iso2}" role="img" title="Bandeira do país do telefone" aria-label="Bandeira do país do telefone"></span>`;
+        return `<span class="patient-flag patient-flag--fallback" role="img" title="País do telefone não identificado" aria-label="País do telefone não identificado">?</span>`;
+      };
       document.getElementById('send-filter-from').value = defaultFrom;
       document.getElementById('send-filter-to').value = defaultTo;
 
@@ -947,13 +967,13 @@
         items.forEach(item => {
           const patient = item?.patient || {};
           const profile = patient.profile || {};
-          const person = { name:patient.name || profile.name || patient.email || profile.email || 'Paciente', country:patient.phoneCountry || profile.phoneCountry || 'br' };
+          const person = { name:patient.name || profile.name || patient.email || profile.email || 'Paciente', country:patient.phoneCountry || profile.phoneCountry || patient.countryCode || profile.countryCode || '', phone:patient.whatsapp || patient.phone || patient.phoneNumber || profile.whatsapp || profile.phone || profile.phoneNumber || '' };
           addPerson(directory, [patient.email, profile.email, patient.phone, patient.whatsapp, profile.phone, profile.whatsapp, patient.id, patient.key], person);
         });
         try {
           const profiles = await db.getPatientProfiles();
           profiles.forEach(profile => {
-            const person = { name:profile.name || profile.email || 'Paciente', country:profile.phoneCountry || 'br' };
+            const person = { name:profile.name || profile.email || 'Paciente', country:profile.phoneCountry || profile.countryCode || '', phone:profile.whatsapp || profile.phone || profile.phoneNumber || '' };
             addPerson(directory, [profile.email, profile.phone, profile.whatsapp, profile.id, profile.key], person);
           });
         } catch {}
@@ -1038,7 +1058,7 @@
           const person = keys.map(key => peopleByRecipient.get(key)).find(Boolean) || { name:event.patientName || event.email || event.phone || 'Paciente não associado', country:'br' };
           const status = getStatus(event);
           const row = document.createElement('tr');
-          row.innerHTML = `<td>${formatSendDate(event.sentAt)}</td><td><span class="inline-flex max-w-[18rem] items-center gap-2"><span class="patient-flag">${escape(String(person.country || 'br').toUpperCase())}</span><span class="truncate font-semibold text-dark">${escape(person.name)}</span></span></td><td><span class="rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">Questionário</span></td><td><span class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold ${status.className}">${status.icon} ${status.label}</span></td>`;
+          row.innerHTML = `<td>${formatSendDate(event.sentAt)}</td><td><span class="inline-flex max-w-[18rem] items-center gap-2">${patientFlag(person)}<span class="truncate font-semibold text-dark">${escape(person.name)}</span></span></td><td><span class="rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">Questionário</span></td><td><span class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold ${status.className}">${status.icon} ${status.label}</span></td>`;
           rows.appendChild(row);
         });
       };
