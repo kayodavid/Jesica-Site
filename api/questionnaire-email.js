@@ -285,7 +285,7 @@ function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
     const occurredAt = brevoEventTimestamp(item);
     const key = messageId || `${email}|${subject}|${Math.floor(occurredAt / 60_000)}`;
     const event = String(item?.event || '').toLowerCase();
-    const existing = grouped.get(key) || { id:key, email, subject, sentAt:occurredAt || null, events:[] };
+    const existing = grouped.get(key) || { id:key, messageId, email, subject, sentAt:occurredAt || null, events:[] };
     if (!existing.sentAt || (event === 'request' && occurredAt < existing.sentAt)) existing.sentAt = occurredAt || existing.sentAt;
     existing.events.push({ event, occurredAt });
     grouped.set(key, existing);
@@ -299,7 +299,8 @@ function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
     const openedAt = Math.max(eventTime('unique_opened'), eventTime('opened'), eventTime('proxy_open'), eventTime('unique_proxy_open'));
     const deliveredAt = eventTime('delivered');
     const requestedAt = eventTime('request') || item.sentAt || 0;
-    return { id:item.id || item.messageId || item['message-id'] || '', providerMessageId:messageId, messageId, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
+    const messageId = String(item?.messageId || '').trim();
+    return { id:item.id || '', providerMessageId:messageId, messageId, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
   }).filter(item => item.sentAt).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
 }
 
