@@ -299,7 +299,7 @@ function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
     const openedAt = Math.max(eventTime('unique_opened'), eventTime('opened'), eventTime('proxy_open'), eventTime('unique_proxy_open'));
     const deliveredAt = eventTime('delivered');
     const requestedAt = eventTime('request') || item.sentAt || 0;
-    return { id:item.id || item.messageId || item['message-id'] || messageId, providerMessageId:messageId, messageId, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
+    return { id:item.id || item.messageId || item['message-id'] || '', providerMessageId:messageId, messageId, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
   }).filter(item => item.sentAt).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
 }
 
