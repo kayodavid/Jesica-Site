@@ -160,6 +160,8 @@ function parseEbookUrl(url) {
 export function getPatientTheme() { return localStorage.getItem('jessicamelo_patient_theme') || 'black'; }
 export function applyPatientTheme() {
   const theme = getPatientTheme();
+  document.documentElement.dataset.patientTheme = theme;
+  document.documentElement.style.colorScheme = theme === 'black' ? 'dark' : 'light';
   document.body.dataset.patientTheme = theme;
   document.querySelectorAll('[data-theme-toggle]').forEach(button => {
     const isBlack = theme === 'black';
