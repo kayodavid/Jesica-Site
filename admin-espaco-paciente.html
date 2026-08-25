@@ -263,11 +263,13 @@
     .reminder-message-field { min-height:8.5rem; resize:vertical; white-space:pre-wrap; }
     .reminder-modal-overlay { position:fixed; inset:0; z-index:77; display:grid; place-items:center; padding:clamp(.5rem,2vw,1.5rem); background:rgba(23,24,29,.58); opacity:0; pointer-events:none; transition:opacity .2s ease; }
     .reminder-modal-overlay.is-open { opacity:1; pointer-events:auto; }
-    .reminder-modal { display:flex; width:min(70rem,100%); max-height:min(92vh,58rem); flex-direction:column; overflow:hidden; border:1px solid rgba(255,255,255,.24); border-radius:1.35rem; background:#fff; box-shadow:0 28px 80px rgba(0,0,0,.3); transform:translateY(.7rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
+    .reminder-modal { display:flex; width:min(70rem,100%); height:min(94vh,64rem); max-height:calc(100vh - 3rem); min-height:0; flex-direction:column; overflow:hidden; border:1px solid rgba(255,255,255,.24); border-radius:1.35rem; background:#fff; box-shadow:0 28px 80px rgba(0,0,0,.3); transform:translateY(.7rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
+    @supports (height:100dvh) { .reminder-modal { height:min(94dvh,64rem); max-height:calc(100dvh - 3rem); } }
     .reminder-modal-overlay.is-open .reminder-modal { transform:translateY(0) scale(1); }
     .reminder-modal-header { flex:none; border-bottom:1px solid rgba(168,139,54,.14); background:linear-gradient(135deg,#fff 0%,#faf8f3 100%); padding:1.2rem clamp(1rem,3vw,1.75rem); }
+    .reminder-modal > #reminder-config-form { min-height:0; flex:1 1 0; display:flex; flex-direction:column; }
     .reminder-modal-icon { display:inline-flex; height:2.75rem; width:2.75rem; flex:none; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.22); border-radius:1rem; background:rgba(168,139,54,.09); color:#9a7a20; box-shadow:0 8px 20px rgba(168,139,54,.1); }
-    .reminder-modal-body { min-height:0; flex:1; overflow-y:auto; display:grid; grid-template-columns:minmax(0,1.22fr) minmax(19rem,.78fr); gap:1.25rem; padding:clamp(1rem,3vw,1.5rem); background:#fbfaf8; }
+    .reminder-modal-body { min-height:0; height:0; flex:1 1 0; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; display:grid; grid-template-columns:minmax(0,1.22fr) minmax(19rem,.78fr); gap:1.25rem; padding:clamp(1rem,3vw,1.5rem); background:#fbfaf8; }
     .reminder-modal-main { min-width:0; display:grid; align-content:start; gap:1rem; }
     .reminder-section { border:1px solid rgba(168,139,54,.14); border-radius:1.05rem; background:#fff; padding:clamp(1rem,2.4vw,1.25rem); box-shadow:0 8px 22px rgba(87,67,37,.035); }
     .reminder-section-heading { display:flex; align-items:flex-start; gap:.7rem; }
@@ -297,7 +299,8 @@
     }
     @media (max-width: 640px) {
       .reminder-modal-overlay { place-items:end center; padding:0; }
-      .reminder-modal { width:100%; max-height:94vh; border-radius:1.25rem 1.25rem 0 0; }
+      .reminder-modal { width:100%; height:min(96vh,64rem); max-height:100vh; border-radius:1.25rem 1.25rem 0 0; }
+      @supports (height:100dvh) { .reminder-modal { height:min(96dvh,64rem); max-height:100dvh; } }
       .reminder-modal-header { padding:1rem; }
       .reminder-modal-body { gap:.85rem; padding:.85rem; }
       .reminder-mode-grid { grid-template-columns:1fr; }
