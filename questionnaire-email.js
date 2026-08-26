@@ -9,6 +9,7 @@ const QUESTION_THEME = '__patient_question__';
 const EMAIL_QUIZ_INVITATION_THEME = '__email_quiz_invitation__';
 const EMAIL_QUIZ_RESPONSE_THEME = '__email_quiz_response__';
 const EMAIL_QUIZ_PROGRESS_THEME = '__email_quiz_progress__';
+const EMAIL_QUIZ_CLICK_THEME = '__email_quiz_click__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
@@ -280,11 +281,11 @@ function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
     const tagged = tagsOf(item).some(tag => /questionnaire|questionario|quiz/.test(tag));
     if (!/^Questionário disponível\s*[—-]/i.test(subject) && !tagged && !isStoredInvitationEvent(item)) return;
     const email = String(item?.email || '').trim().toLowerCase();
-    const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || '');
+    const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || item?.id || '').trim();
     const occurredAt = brevoEventTimestamp(item);
     const key = messageId || `${email}|${subject}|${Math.floor(occurredAt / 60_000)}`;
     const event = String(item?.event || '').toLowerCase();
-    const existing = grouped.get(key) || { id:key, email, subject, sentAt:occurredAt || null, events:[] };
+    const existing = grouped.get(key) || { id:key, messageId, email, subject, sentAt:occurredAt || null, events:[] };
     if (!existing.sentAt || (event === 'request' && occurredAt < existing.sentAt)) existing.sentAt = occurredAt || existing.sentAt;
     existing.events.push({ event, occurredAt });
     grouped.set(key, existing);
@@ -298,7 +299,8 @@ function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
     const openedAt = Math.max(eventTime('unique_opened'), eventTime('opened'), eventTime('proxy_open'), eventTime('unique_proxy_open'));
     const deliveredAt = eventTime('delivered');
     const requestedAt = eventTime('request') || item.sentAt || 0;
-    return { id:item.id, providerMessageId:item.id, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
+    const messageId = String(item?.messageId || '').trim();
+    return { id:item.id || '', providerMessageId:messageId, messageId, email:item.email, subject:item.subject, sentAt:requestedAt ? new Date(requestedAt).toISOString() : '', deliveredAt:deliveredAt ? new Date(deliveredAt).toISOString() : '', openedAt:openedAt ? new Date(openedAt).toISOString() : '', clickedAt:clickedAt ? new Date(clickedAt).toISOString() : '', failed, status:failed ? 'failed' : (clickedAt ? 'clicked' : (openedAt ? 'opened' : (deliveredAt ? 'delivered' : 'sent'))) };
   }).filter(item => item.sentAt).sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
 }
 
@@ -316,6 +318,55 @@ async function getBrevoQuestionnaireEvents(startDate, endDate, invitations = [])
   try { data = text ? JSON.parse(text) : {}; } catch {}
   if (!response.ok) throw new Error(`Brevo ${response.status}: ${typeof data === 'string' ? data : JSON.stringify(data)}`);
   return normalizeBrevoQuestionnaireEvents(data?.events || data?.data || [], invitations);
+}
+
+function mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, responses) {
+  const invitationList = Array.isArray(invitations) ? invitations : [];
+  const clickByInvitation = new Map((Array.isArray(clicks) ? clicks : []).filter(item => item?.invitationId).map(item => [item.invitationId, item]));
+  const responseByInvitation = new Map();
+  (Array.isArray(responses) ? responses : []).filter(item => item?.invitationId).forEach(item => {
+    const previous = responseByInvitation.get(item.invitationId);
+    if (!previous || Date.parse(item.respondedAt || '') >= Date.parse(previous.respondedAt || '')) responseByInvitation.set(item.invitationId, item);
+  });
+  const isCompleteResponse = response => {
+    if (!response?.respondedAt) return false;
+    const summary = response.summary || {};
+    const totalQuestions = Number(response.totalQuestions || summary.totalQuestions || 0);
+    const answeredQuestions = Number(response.answeredQuestions || summary.answeredQuestions || response.answers?.length || 0);
+    return totalQuestions === 0 ? true : answeredQuestions >= totalQuestions;
+  };
+  const byMessageId = new Map(invitationList.filter(item => item.providerMessageId).map(item => [String(item.providerMessageId), item]));
+  const byEmail = new Map();
+  invitationList.forEach(item => { const email = String(item.recipientEmail || '').toLowerCase(); if (!email) return; const list = byEmail.get(email) || []; list.push(item); byEmail.set(email, list); });
+  const matchInvitation = event => {
+    const direct = byMessageId.get(String(event.providerMessageId || event.messageId || ''));
+    if (direct) return direct;
+    const email = String(event.email || '').toLowerCase();
+    const candidates = byEmail.get(email) || [];
+    const eventTime = Date.parse(event.sentAt || '') || 0;
+    return candidates.map(item => ({ item, distance:Math.abs((Date.parse(item.sentAt || '') || 0) - eventTime) })).sort((a, b) => a.distance - b.distance)[0]?.item || null;
+  };
+  const rows = [];
+  const representedInvitations = new Set();
+  (Array.isArray(providerEvents) ? providerEvents : []).forEach(event => {
+    const invitation = matchInvitation(event);
+    const invitationId = invitation?.invitationId || '';
+    const click = invitationId ? clickByInvitation.get(invitationId) : null;
+    const responseRecord = invitationId ? responseByInvitation.get(invitationId) : null;
+    const response = isCompleteResponse(responseRecord) ? responseRecord : null;
+    if (invitationId) representedInvitations.add(invitationId);
+    const clickedAt = [event.clickedAt, click?.clickedAt, invitation?.clickedAt].filter(Boolean).sort((a, b) => Date.parse(b) - Date.parse(a))[0] || '';
+    rows.push({ ...event, invitationId, patientKey:invitation?.patientKey || '', patientName:invitation?.patientName || '', quizId:invitation?.quizId || '', quizTitle:invitation?.quizTitle || event.subject || 'Questionário', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '' });
+  });
+  invitationList.forEach(invitation => {
+    const click = clickByInvitation.get(invitation.invitationId);
+    const responseRecord = responseByInvitation.get(invitation.invitationId);
+    const response = isCompleteResponse(responseRecord) ? responseRecord : null;
+    if (representedInvitations.has(invitation.invitationId) || (!click && !response)) return;
+    const clickedAt = click?.clickedAt || invitation.clickedAt || '';
+    rows.push({ id:invitation.providerMessageId || invitation.invitationId, providerMessageId:invitation.providerMessageId || '', email:invitation.recipientEmail, subject:`Questionário disponível — ${invitation.quizTitle}`, sentAt:invitation.sentAt || '', deliveredAt:'', openedAt:'', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '', patientKey:invitation.patientKey, patientName:invitation.patientName, quizId:invitation.quizId, quizTitle:invitation.quizTitle, failed:false, status:response ? 'responded' : (clickedAt ? 'clicked' : 'sent') });
+  });
+  return rows.sort((a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0));
 }
 
 function recordSource(record) {
@@ -346,6 +397,11 @@ function isEmailQuizProgressRecord(record) {
   return recordTheme(record) === EMAIL_QUIZ_PROGRESS_THEME.toLowerCase() || /^email-quiz-progress:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.updatedAt || data.updated_at) && (data.answeredQuestions || data.answered_questions));
 }
 
+function isEmailQuizClickRecord(record) {
+  const data = parseStoredRecord(record);
+  return recordTheme(record) === EMAIL_QUIZ_CLICK_THEME.toLowerCase() || /^email-quiz-click:\/\/[a-z0-9_-]+$/i.test(recordSource(record)) || Boolean((data.invitationId || data.invitation_id) && (data.clickedAt || data.clicked_at));
+}
+
 function normalizeStoredInvitation(record) {
   const data = parseStoredRecord(record);
   return {
@@ -360,6 +416,7 @@ function normalizeStoredInvitation(record) {
     sentAt: usableText(data.sentAt || data.sent_at) || record?.createdAt || record?.created_at || '',
     expiresAt: usableText(data.expiresAt || data.expires_at),
     providerMessageId: usableText(data.providerMessageId || data.provider_message_id),
+    clickedAt: usableText(data.clickedAt || data.clicked_at),
     channel: 'email'
   };
 }
@@ -397,6 +454,21 @@ function normalizeStoredProgress(record) {
     totalQuestions: Math.max(0, Number(data.totalQuestions || 0)),
     answeredQuestions: Math.max(0, Number(data.answeredQuestions || 0)),
     updatedAt: usableText(data.updatedAt) || record?.updatedAt || record?.updated_at || record?.createdAt || record?.created_at || '',
+    channel: 'email'
+  };
+}
+
+function normalizeStoredClick(record) {
+  const data = parseStoredRecord(record);
+  return {
+    id: String(record?.id || ''),
+    invitationId: usableText(data.invitationId || data.invitation_id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizId: usableText(data.quizId || data.quiz_id),
+    quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    clickedAt: usableText(data.clickedAt || data.clicked_at) || record?.createdAt || record?.created_at || '',
     channel: 'email'
   };
 }
@@ -562,6 +634,62 @@ async function storeProgress(invitation, quiz, answeredQuestions) {
     await addStoredRecord(invitation.sessionToken, { title:`Andamento — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, theme:EMAIL_QUIZ_PROGRESS_THEME, source, description });
   }
   return true;
+}
+
+async function storeClick(invitation) {
+  if (!invitation?.id || !invitation?.sessionToken) return false;
+  const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+  const clickSource = `email-quiz-click://${invitation.id}`;
+  const invitationSource = `email-quiz-invitation://${invitation.id}`;
+  const clickRecord = records.find(record => recordSource(record) === clickSource);
+  const invitationRecord = records.find(record => recordSource(record) === invitationSource);
+  const clickData = parseStoredRecord(clickRecord);
+  const invitationData = parseStoredRecord(invitationRecord);
+  const clickedAt = usableText(clickData.clickedAt || clickData.clicked_at) || usableText(invitationData.clickedAt || invitationData.clicked_at) || new Date().toISOString();
+  let stored = Boolean(clickRecord) || Boolean(usableText(invitationData.clickedAt || invitationData.clicked_at));
+
+  if (invitationRecord && !usableText(invitationData.clickedAt || invitationData.clicked_at)) {
+    try {
+      await callRpc('app_update_video', {
+        p_token:invitation.sessionToken,
+        p_id:invitationRecord.id,
+        p_title:invitationRecord.title || `Envio — ${invitation.quizTitle || 'Questionário'} — ${invitation.patientName || invitation.recipientEmail}`,
+        p_theme:invitationRecord.theme || EMAIL_QUIZ_INVITATION_THEME,
+        p_description:JSON.stringify({ ...invitationData, clickedAt }),
+        p_url:invitationRecord.url || `https://jessicamelonutri.com.br/${invitationSource}`,
+        p_provider:invitationRecord.provider || 'youtube',
+        p_embed_url:invitationSource,
+        p_thumbnail_url:invitationRecord.thumbnailUrl || invitationRecord.thumbnail_url || ''
+      });
+      stored = true;
+    } catch (error) {
+      console.error('Questionnaire invitation click update error:', error.message);
+    }
+  }
+
+  if (!clickRecord) {
+    try {
+      await addStoredRecord(invitation.sessionToken, {
+        title:`Clique — ${invitation.patientName || invitation.recipientEmail}`,
+        theme:EMAIL_QUIZ_CLICK_THEME,
+        source:clickSource,
+        description:{
+          version:1,
+          invitationId:invitation.id,
+          patientKey:invitation.patientKey,
+          patientName:invitation.patientName,
+          recipientEmail:invitation.recipientEmail,
+          quizId:invitation.quizId,
+          quizTitle:invitation.quizTitle || 'Questionário',
+          clickedAt
+        }
+      });
+      stored = true;
+    } catch (error) {
+      console.error('Questionnaire click event persistence error:', error.message);
+    }
+  }
+  return stored;
 }
 
 async function storeResponse(invitation, quiz, answers, summary) {
@@ -1103,9 +1231,17 @@ export default async function handler(req, res) {
       return json(res, 200, { success:true, previousScheduleId:previous.id, schedule:result.schedule });
     }
 
+    if (action === 'click') {
+      let invitation;
+      try { invitation = decryptInvitation(String(body.token || '')); } catch (error) { return json(res, 200, { success:false, reason:/expirado/i.test(error.message) ? 'expired' : 'invalid' }); }
+      await storeClick(invitation);
+      return json(res, 200, { success:true });
+    }
+
     if (action === 'get') {
       try {
         const invitation = decryptInvitation(String(body.token || ''));
+        await storeClick(invitation);
         const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
         const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
         const responseRecord = records.find(record => isEmailQuizResponseRecord(record) && normalizeStoredResponse(record).invitationId === invitation.id);
@@ -1162,7 +1298,10 @@ export default async function handler(req, res) {
       await requireAdmin(sessionToken);
       const records = await listStoredQuestionnaireRecords(sessionToken);
       const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
-      const events = await getBrevoQuestionnaireEvents(startDate, endDate, invitations);
+      const clicks = records.filter(isEmailQuizClickRecord).map(normalizeStoredClick).filter(item => item.invitationId);
+      const responses = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse).filter(item => item.invitationId);
+      const providerEvents = await getBrevoQuestionnaireEvents(startDate, endDate, invitations);
+      const events = mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, responses);
       return json(res, 200, { success:true, channel:'email', events, updatedAt:new Date().toISOString() });
     }
 
