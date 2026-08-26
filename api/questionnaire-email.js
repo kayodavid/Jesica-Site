@@ -483,6 +483,9 @@ function safeStoredAnswer(answer) {
   const isImage = /^data:image\//i.test(value);
   const rawScore = Number.isFinite(Number(answer?.rawScore)) ? Number(answer.rawScore) : (Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0);
   const weight = Number.isFinite(Number(answer?.weight)) ? Number(answer.weight) : null;
+  const clarificationPrompt = usableText(answer?.clarificationPrompt ?? answer?.clarification ?? answer?.followUpQuestion);
+  const clarificationResponse = cleanAnswer(answer?.clarificationResponse ?? answer?.clarificationAnswer ?? answer?.followUpResponse ?? answer?.extraResponse ?? answer?.extraText ?? answer?.comment ?? answer?.note ?? answer?.observation);
+  const extraResponse = cleanAnswer(answer?.extraResponse ?? answer?.extraText ?? answer?.comment ?? answer?.note ?? answer?.observation);
   return {
     questionId: usableText(answer?.questionId),
     questionCode: usableText(answer?.questionCode),
@@ -495,7 +498,10 @@ function safeStoredAnswer(answer) {
     rawScore,
     weight,
     scored: answer?.scored === true || Number.isFinite(Number(answer?.rawScore)),
-    value: isImage ? '[Imagem enviada pelo paciente]' : value
+    value: isImage ? '[Imagem enviada pelo paciente]' : value,
+    clarificationPrompt,
+    clarificationResponse,
+    extraResponse
   };
 }
 function responseScoreBand(scorePercent) {
