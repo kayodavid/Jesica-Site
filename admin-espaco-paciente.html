@@ -697,14 +697,14 @@
       body > nav { position:fixed !important; top:0; right:0; left:0; z-index:40; display:flex; height:4.05rem; min-height:4.05rem; align-items:center; }
       #admin-main { position:fixed; top:4.05rem; right:0; bottom:0; left:0; height:auto; min-height:0; margin:0; overflow:hidden; }
       #admin-layout-container, #admin-layout-container .admin-shell { height:100%; min-height:0; }
-      .admin-content { height:100%; min-height:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; }
+      .admin-content { position:fixed; top:4.05rem; right:0; bottom:0; left:18rem; width:auto; height:auto; min-height:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; }
     }
     @media (max-width:1023px) {
       html, body { height:auto; min-height:100%; overflow-x:hidden; overflow-y:auto; }
       body > nav { position:sticky !important; top:0; right:auto; left:auto; height:auto; min-height:0; }
       #admin-main { position:static; top:auto; right:auto; bottom:auto; left:auto; height:auto; min-height:0; margin:0; overflow:visible; }
       #admin-layout-container, #admin-layout-container .admin-shell, .admin-content { height:auto; min-height:0; }
-      .admin-content { overflow:visible; }
+      .admin-content { position:static; top:auto; right:auto; bottom:auto; left:auto; width:auto; height:auto; overflow:visible; }
     }
     @media print {
       @page { size: A4 portrait; margin: 12mm; }
