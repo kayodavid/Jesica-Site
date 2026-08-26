@@ -1254,6 +1254,23 @@ window.LIVECLIN_LIBRARY_QUESTIONS = [{"code":"APLAN","originalCode":"APLAN","tit
     const getResponseReviewState = event => { if (String(event?.reviewStatus || '').toLowerCase() === 'reviewed') return 'reviewed'; try { return localStorage.getItem(responseReviewStorageKey(event)) === 'reviewed' ? 'reviewed' : 'pending'; } catch { return 'pending'; } };
     const isResponseReviewed = event => getResponseReviewState(event) === 'reviewed';
     const isPendingQuestionnaireResponse = event => isSubmittedQuestionnaireResponse(event) && !isResponseReviewed(event);
+    const responseIdentity = event => {
+      const stable = String(event?.invitationId || event?.responseId || event?.id || '').trim();
+      if (stable) return `id:${stable}`;
+      const patient = String(event?.patientKey || event?.recipientEmail || event?.patientName || '').trim().toLocaleLowerCase('pt-BR');
+      const questionnaire = String(event?.quizId || event?.quizTitle || '').trim().toLocaleLowerCase('pt-BR');
+      const date = String(event?.respondedAt || event?.submittedAt || event?.completedAt || event?.createdAt || '').trim();
+      return `fallback:${patient}|${questionnaire}|${date}`;
+    };
+    const uniqueQuestionnaireResponses = events => {
+      const unique = new Map();
+      (Array.isArray(events) ? events : []).filter(Boolean).forEach(event => {
+        const key = responseIdentity(event);
+        if (!unique.has(key)) unique.set(key, event);
+      });
+      return [...unique.values()];
+    };
+    const getPendingQuestionnaireResponses = events => uniqueQuestionnaireResponses(events).filter(isPendingQuestionnaireResponse);
     const setResponseReviewState = (event, state) => { try { localStorage.setItem(responseReviewStorageKey(event), state === 'reviewed' ? 'reviewed' : 'pending'); } catch {} return state === 'reviewed' ? 'reviewed' : 'pending'; };
     const getResponseAnnotation = event => { try { return localStorage.getItem(responseAnnotationStorageKey(event)) || ''; } catch { return ''; } };
     const setResponseAnnotation = (event, value) => { try { const key = responseAnnotationStorageKey(event); if (String(value || '').trim()) localStorage.setItem(key, String(value).trim()); else localStorage.removeItem(key); } catch {} };
@@ -1281,8 +1298,8 @@ window.LIVECLIN_LIBRARY_QUESTIONS = [{"code":"APLAN","originalCode":"APLAN","tit
       const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const revenue = serviceLinks.filter(link => String(link.paymentDate || link.startDate || '').startsWith(monthPrefix)).reduce((total, link) => total + Number(link.paymentValue ?? link.value ?? 0), 0);
       if (responseReport?.success && Array.isArray(responseReport.responses)) dashboardResponseReviews = responseReport.responses;
-      const questionnairePending = dashboardResponseReviews.filter(isPendingQuestionnaireResponse).length;
-      const pending = items.filter(item => item.pending).length + questionnairePending;
+      const questionnairePending = getPendingQuestionnaireResponses(dashboardResponseReviews).length;
+      const pending = questionnairePending;
       document.getElementById('dashboard-pending-count').textContent = pending;
       document.getElementById('dashboard-patient-count').textContent = patients.length;
       document.getElementById('dashboard-finished-count').textContent = finished;
@@ -1396,7 +1413,7 @@ window.LIVECLIN_LIBRARY_QUESTIONS = [{"code":"APLAN","originalCode":"APLAN","tit
       const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[character]));
       let page = 1, serviceLinks = [], questionnaireReviews = Array.isArray(dashboardResponseReviews) ? [...dashboardResponseReviews] : [], refreshPromise = null, searchTerm = '';
       const patientKey = patient => patient?.profile?.id || (patient?.email ? `email:${String(patient.email).toLowerCase()}` : `name:${String(patient?.name || '').toLocaleLowerCase('pt-BR')}`);
-      const responseKey = event => [event?.patientKey || event?.recipientEmail || event?.patientName || '', event?.quizId || event?.quizTitle || ''].map(value => String(value).trim().toLowerCase()).join('|');
+      const responseKey = event => responseIdentity(event);
       const serviceEnd = link => { if (!link?.startDate || !Number(link.duration)) return null; const end = new Date(`${String(link.startDate).slice(0,10)}T12:00:00`); if (Number.isNaN(end.getTime())) return null; end.setDate(end.getDate() + Number(link.duration)); return end; };
       const planFor = item => { const all = serviceLinks.filter(link => link.patientKey === patientKey(item.patient)); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); const active = all.filter(link => { const status = String(link.status || '').toLocaleLowerCase('pt-BR'); const end = serviceEnd(link); return !['expired','finished','finalized','finalizado','concluido','concluído','cancelled','canceled'].includes(status) && (!end || end.getTime() >= today.getTime()); }); const pool = active.length ? active : all; return [...pool].sort((a,b) => String(b.startDate || b.createdAt || '').localeCompare(String(a.startDate || a.createdAt || '')))[0] || null; };
       const patientForEvent = event => items.find(item => { const patient = item.patient || {}; return patientKey(patient) === String(event.patientKey || '') || String(patient.email || '').toLowerCase() === String(event.recipientEmail || '').toLowerCase() || String(patient.name || '').toLocaleLowerCase('pt-BR') === String(event.patientName || '').toLocaleLowerCase('pt-BR'); }) || null;
@@ -1405,7 +1422,7 @@ window.LIVECLIN_LIBRARY_QUESTIONS = [{"code":"APLAN","originalCode":"APLAN","tit
       const updatePendingCounters = total => { const dashboardCounter = document.getElementById('dashboard-pending-count'); const sidebarCounter = document.getElementById('pending-count'); if (dashboardCounter) dashboardCounter.textContent = String(total); if (sidebarCounter) { sidebarCounter.textContent = String(total); sidebarCounter.classList.toggle('hidden', total === 0); } };
       const markReviewed = event => { if (!event) return; setResponseReviewState(event, 'reviewed'); notify('Relato revisado com sucesso!'); document.dispatchEvent(new CustomEvent('response-review-status-updated', { detail:{ event, state:'reviewed' } })); draw(); };
       const draw = () => {
-        const responsePool = []; const seenResponseIds = new Set(); [...((Array.isArray(dashboardResponseReviews) ? dashboardResponseReviews : [])), ...questionnaireReviews].forEach(event => { if (!event) return; const stableId = String(event.invitationId || event.responseId || event.id || '').trim(); if (stableId) { if (seenResponseIds.has(stableId)) return; seenResponseIds.add(stableId); } responsePool.push(event); });
+        const responsePool = uniqueQuestionnaireResponses([...(Array.isArray(dashboardResponseReviews) ? dashboardResponseReviews : []), ...questionnaireReviews]);
         const questionnaireRows = responsePool.filter(isPendingQuestionnaireResponse).map(event => ({ kind:'questionnaire', event, item:patientForEvent(event) }));
         const pendingRows = questionnaireRows;
         const query = searchTerm.trim().toLocaleLowerCase('pt-BR');
@@ -1430,7 +1447,7 @@ window.LIVECLIN_LIBRARY_QUESTIONS = [{"code":"APLAN","originalCode":"APLAN","tit
       };
       selectAll.addEventListener('change', () => { document.querySelectorAll('.pending-row-select').forEach(input => { input.checked = selectAll.checked; }); const selected = [...document.querySelectorAll('.pending-row-select:checked')].length; selectionSummary.textContent = selected ? `${selected} selecionada${selected === 1 ? '' : 's'}` : `${(searchTerm ? rows.querySelectorAll('.pending-row-select').length : 0)} resultado${rows.querySelectorAll('.pending-row-select').length === 1 ? '' : 's'} exibido${rows.querySelectorAll('.pending-row-select').length === 1 ? '' : 's'}`; });
       pageSize.addEventListener('change', () => { page = 1; draw(); }); previous.addEventListener('click', () => { page = Math.max(1, page - 1); draw(); }); next.addEventListener('click', () => { page += 1; draw(); }); searchInput.addEventListener('input', () => { searchTerm = searchInput.value; page = 1; draw(); }); searchClear.addEventListener('click', () => { searchInput.value = ''; searchTerm = ''; page = 1; draw(); searchInput.focus(); }); document.addEventListener('response-review-status-updated', () => draw());
-      const refresh = async () => { if (refreshPromise) return refreshPromise; refreshPromise = (async () => { let error = null; try { serviceLinks = await db.getPatientServiceLinks(); } catch (serviceError) { serviceLinks = []; error = serviceError; } try { const end = new Date(); const start = new Date('2000-01-01T00:00:00Z'); const result = await db.getEmailQuizResponsesReport(start.toISOString().slice(0,10), end.toISOString().slice(0,10)); if (result.success) { const nextResponses = Array.isArray(result.responses) ? result.responses : []; if (nextResponses.length || !questionnaireReviews.length) questionnaireReviews = nextResponses; dashboardResponseReviews = questionnaireReviews; } else error = new Error(result.message || 'Não foi possível consultar as respostas.'); } catch (responseError) { error = responseError; console.error('Pending questionnaire review refresh error:', responseError); } draw(); const questionnaireCount = questionnaireReviews.filter(isPendingQuestionnaireResponse).length; return { count:questionnaireCount, questionnaireCount, feedbackCount:0, error }; })(); try { return await refreshPromise; } finally { refreshPromise = null; } };
+      const refresh = async () => { if (refreshPromise) return refreshPromise; refreshPromise = (async () => { let error = null; try { serviceLinks = await db.getPatientServiceLinks(); } catch (serviceError) { serviceLinks = []; error = serviceError; } try { const end = new Date(); const start = new Date('2000-01-01T00:00:00Z'); const result = await db.getEmailQuizResponsesReport(start.toISOString().slice(0,10), end.toISOString().slice(0,10)); if (result.success) { const nextResponses = Array.isArray(result.responses) ? result.responses : []; questionnaireReviews = nextResponses; dashboardResponseReviews = nextResponses; } else error = new Error(result.message || 'Não foi possível consultar as respostas.'); } catch (responseError) { error = responseError; console.error('Pending questionnaire review refresh error:', responseError); } draw(); const questionnaireCount = getPendingQuestionnaireResponses(questionnaireReviews).length; return { count:questionnaireCount, questionnaireCount, feedbackCount:0, error }; })(); try { return await refreshPromise; } finally { refreshPromise = null; } };
       draw(); void refresh(); return { refresh, draw };
     }
     function formatSendDate(value) {
