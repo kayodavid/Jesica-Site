@@ -355,7 +355,7 @@ function mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, resp
     const responseRecord = invitationId ? responseByInvitation.get(invitationId) : null;
     const response = isCompleteResponse(responseRecord) ? responseRecord : null;
     if (invitationId) representedInvitations.add(invitationId);
-    const clickedAt = [event.clickedAt, click?.clickedAt, invitation?.clickedAt].filter(Boolean).sort((a, b) => Date.parse(b) - Date.parse(a))[0] || '';
+    const clickedAt = [event.clickedAt, click?.clickedAt].filter(Boolean).sort((a, b) => Date.parse(b) - Date.parse(a))[0] || '';
     rows.push({ ...event, invitationId, patientKey:invitation?.patientKey || '', patientName:invitation?.patientName || '', quizId:invitation?.quizId || '', quizTitle:invitation?.quizTitle || event.subject || 'Questionário', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '' });
   });
   invitationList.forEach(invitation => {
@@ -363,7 +363,7 @@ function mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, resp
     const responseRecord = responseByInvitation.get(invitation.invitationId);
     const response = isCompleteResponse(responseRecord) ? responseRecord : null;
     if (representedInvitations.has(invitation.invitationId) || (!click && !response)) return;
-    const clickedAt = click?.clickedAt || invitation.clickedAt || '';
+    const clickedAt = click?.clickedAt || '';
     rows.push({ id:invitation.providerMessageId || invitation.invitationId, providerMessageId:invitation.providerMessageId || '', email:invitation.recipientEmail, subject:`Questionário disponível — ${invitation.quizTitle}`, sentAt:invitation.sentAt || '', deliveredAt:'', openedAt:'', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '', patientKey:invitation.patientKey, patientName:invitation.patientName, quizId:invitation.quizId, quizTitle:invitation.quizTitle, failed:false, status:response ? 'responded' : (clickedAt ? 'clicked' : 'sent') });
   });
   return rows.sort((a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0));
@@ -416,7 +416,6 @@ function normalizeStoredInvitation(record) {
     sentAt: usableText(data.sentAt || data.sent_at) || record?.createdAt || record?.created_at || '',
     expiresAt: usableText(data.expiresAt || data.expires_at),
     providerMessageId: usableText(data.providerMessageId || data.provider_message_id),
-    clickedAt: usableText(data.clickedAt || data.clicked_at),
     channel: 'email'
   };
 }
@@ -492,6 +491,8 @@ function safeStoredAnswer(answer) {
     label: usableText(answer?.label),
     evaluationLabel: usableText(answer?.evaluationLabel) || usableText(answer?.ratingLabel),
     evaluationEmoji: vividEvaluationEmoji(answer?.evaluationEmoji || answer?.ratingEmoji),
+    clarificationPrompt: usableText(answer?.clarificationPrompt || answer?.followUpPrompt || answer?.follow_up_prompt),
+    clarificationResponse: cleanAnswer(answer?.clarificationResponse || answer?.followUpResponse || answer?.follow_up_response),
     score: Number.isFinite(Number(answer?.score)) ? Number(answer.score) : 0,
     rawScore,
     weight,
@@ -638,58 +639,30 @@ async function storeProgress(invitation, quiz, answeredQuestions) {
 
 async function storeClick(invitation) {
   if (!invitation?.id || !invitation?.sessionToken) return false;
-  const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
-  const clickSource = `email-quiz-click://${invitation.id}`;
-  const invitationSource = `email-quiz-invitation://${invitation.id}`;
-  const clickRecord = records.find(record => recordSource(record) === clickSource);
-  const invitationRecord = records.find(record => recordSource(record) === invitationSource);
-  const clickData = parseStoredRecord(clickRecord);
-  const invitationData = parseStoredRecord(invitationRecord);
-  const clickedAt = usableText(clickData.clickedAt || clickData.clicked_at) || usableText(invitationData.clickedAt || invitationData.clicked_at) || new Date().toISOString();
-  let stored = Boolean(clickRecord) || Boolean(usableText(invitationData.clickedAt || invitationData.clicked_at));
-
-  if (invitationRecord && !usableText(invitationData.clickedAt || invitationData.clicked_at)) {
-    try {
-      await callRpc('app_update_video', {
-        p_token:invitation.sessionToken,
-        p_id:invitationRecord.id,
-        p_title:invitationRecord.title || `Envio — ${invitation.quizTitle || 'Questionário'} — ${invitation.patientName || invitation.recipientEmail}`,
-        p_theme:invitationRecord.theme || EMAIL_QUIZ_INVITATION_THEME,
-        p_description:JSON.stringify({ ...invitationData, clickedAt }),
-        p_url:invitationRecord.url || `https://jessicamelonutri.com.br/${invitationSource}`,
-        p_provider:invitationRecord.provider || 'youtube',
-        p_embed_url:invitationSource,
-        p_thumbnail_url:invitationRecord.thumbnailUrl || invitationRecord.thumbnail_url || ''
-      });
-      stored = true;
-    } catch (error) {
-      console.error('Questionnaire invitation click update error:', error.message);
-    }
+  try {
+    const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+    const source = `email-quiz-click://${invitation.id}`;
+    if (records.some(record => recordSource(record) === source)) return true;
+    await addStoredRecord(invitation.sessionToken, {
+      title: `Clique — ${invitation.patientName || invitation.recipientEmail}`,
+      theme: EMAIL_QUIZ_CLICK_THEME,
+      source,
+      description: {
+        version: 1,
+        invitationId: invitation.id,
+        patientKey: invitation.patientKey,
+        patientName: invitation.patientName,
+        recipientEmail: invitation.recipientEmail,
+        quizId: invitation.quizId,
+        quizTitle: invitation.quizTitle || 'Questionário',
+        clickedAt: new Date().toISOString()
+      }
+    });
+    return true;
+  } catch (error) {
+    console.error('Questionnaire click tracking error:', error.message);
+    return false;
   }
-
-  if (!clickRecord) {
-    try {
-      await addStoredRecord(invitation.sessionToken, {
-        title:`Clique — ${invitation.patientName || invitation.recipientEmail}`,
-        theme:EMAIL_QUIZ_CLICK_THEME,
-        source:clickSource,
-        description:{
-          version:1,
-          invitationId:invitation.id,
-          patientKey:invitation.patientKey,
-          patientName:invitation.patientName,
-          recipientEmail:invitation.recipientEmail,
-          quizId:invitation.quizId,
-          quizTitle:invitation.quizTitle || 'Questionário',
-          clickedAt
-        }
-      });
-      stored = true;
-    } catch (error) {
-      console.error('Questionnaire click event persistence error:', error.message);
-    }
-  }
-  return stored;
 }
 
 async function storeResponse(invitation, quiz, answers, summary) {
