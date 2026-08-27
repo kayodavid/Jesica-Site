@@ -658,8 +658,11 @@ async function storeInvitation(invitation, quiz) {
     totalQuestions: Array.isArray(quiz.questionSnapshots) ? quiz.questionSnapshots.length : 0
   };
   if (current) {
-    if (!description.providerMessageId || description.providerMessageId === usableText(parseStoredRecord(current).providerMessageId)) return;
-    await callRpc('app_update_video', { p_token:invitation.sessionToken, p_id:current.id, p_title:`Envio — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, p_theme:EMAIL_QUIZ_INVITATION_THEME, p_description:JSON.stringify(description), p_url:`https://jessicamelonutri.com.br/${source}`, p_provider:'youtube', p_embed_url:source, p_thumbnail_url:'' });
+    const currentData = parseStoredRecord(current);
+    const currentDescription = JSON.stringify(currentData);
+    const nextDescription = JSON.stringify(description);
+    if (currentDescription === nextDescription) return;
+    await callRpc('app_update_video', { p_token:invitation.sessionToken, p_id:current.id, p_title:`Envio — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, p_theme:EMAIL_QUIZ_INVITATION_THEME, p_description:nextDescription, p_url:`https://jessicamelonutri.com.br/${source}`, p_provider:'youtube', p_embed_url:source, p_thumbnail_url:'' });
     return;
   }
   await addStoredRecord(invitation.sessionToken, { title:`Envio — ${quiz.title} — ${invitation.patientName || invitation.recipientEmail}`, theme:EMAIL_QUIZ_INVITATION_THEME, source, description });
@@ -953,6 +956,18 @@ async function cancelStoredSchedule(sessionToken, schedule) {
     return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
   }
   return { ...schedule, status:'cancelled', providerStatus:'cancelled', cancelledAt:new Date().toISOString() };
+}
+
+async function updateStoredScheduleDeadline(sessionToken, schedule, expiresAt, invitationToken = '') {
+  if (schedule.storage !== 'queue') throw new Error('Este agendamento antigo precisa ser recadastrado antes de ter o prazo alterado.');
+  const value = await callRpc('app_questionnaire_schedule_update_deadline', {
+    p_token:sessionToken,
+    p_schedule_id:schedule.id,
+    p_expires_at:expiresAt,
+    p_invitation_token:invitationToken || null
+  });
+  const raw = Array.isArray(value) ? value[0] : value;
+  return { schedule:normalizeQueueSchedule(raw), invitationToken:usableText(raw?.invitation_token || raw?.invitationToken) };
 }
 
 async function pauseStoredSchedule(sessionToken, schedule) {
@@ -1266,17 +1281,31 @@ export default async function handler(req, res) {
     if (action === 'reschedule-schedule') {
       const sessionToken = String(body.sessionToken || '');
       const scheduleId = String(body.scheduleId || '').trim();
-      const scheduledAt = validateQueueScheduledAt(body.scheduledAt || localDateTimeToIso(body.date, body.time));
       if (!sessionToken || !scheduleId) return json(res, 400, { success:false, message:'Agendamento não identificado.' });
       await requireAdmin(sessionToken);
       const previous = (await listStoredSchedules(sessionToken)).find(item => item.id === scheduleId || item.recordId === scheduleId);
       if (!previous) return json(res, 404, { success:false, message:'Agendamento não encontrado.' });
+      const previousScheduledAt = Date.parse(previous.scheduledFor || '');
+      const requestedScheduledAt = body.scheduledAt || localDateTimeToIso(body.date, body.time);
+      if (!Number.isFinite(previousScheduledAt)) return json(res, 409, { success:false, message:'A data original deste agendamento não pôde ser identificada.' });
+
+      // Uma série histórica pode continuar aberta na tela mesmo depois que a data
+      // de envio passou. Nesse caso, não tentamos recriar um envio no passado —
+      // apenas atualizamos o prazo da fila existente, que é o dado que o usuário
+      // está editando. Assim o cartão e a fila passam a refletir o novo prazo.
+      if (previousScheduledAt <= Date.now() + 30_000) {
+        const expiresAt = responseDeadline(previous.scheduledFor, body.responseAmount, body.responseUnit);
+        const updated = await updateStoredScheduleDeadline(sessionToken, previous, expiresAt);
+        return json(res, 200, { success:true, mode:'deadline-only', previousScheduleId:previous.id, schedule:updated.schedule, message:'Prazo de resposta atualizado.' });
+      }
+
+      const scheduledAt = validateQueueScheduledAt(requestedScheduledAt);
       if (previous.providerMessageId && !['cancelled', 'cancelado', 'sent', 'enviado', 'failed', 'falha_de_agendamento'].includes(String(previous.status).toLowerCase())) await cancelBrevoEmail(previous.providerMessageId);
       await cancelStoredSchedule(sessionToken, previous);
       const quiz = await loadQuiz(sessionToken, previous.quizId);
       const expiresAt = responseDeadline(scheduledAt, body.responseAmount, body.responseUnit);
       const result = await createBrevoScheduledQuestionnaire({ sessionToken, patientKey:previous.patientKey, patientName:previous.patientName, recipientEmail:previous.recipientEmail, quizLinkId:previous.quizLinkId, quiz, scheduledAt, expiresAt, scheduleKey:(previous.scheduleKey || (previous.quizLinkId || previous.quizId)) + ':reschedule:' + Date.now() });
-      return json(res, 200, { success:true, previousScheduleId:previous.id, schedule:result.schedule });
+      return json(res, 200, { success:true, mode:'rescheduled', previousScheduleId:previous.id, schedule:result.schedule });
     }
 
     if (action === 'click') {
