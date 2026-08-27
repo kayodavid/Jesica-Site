@@ -1664,6 +1664,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       let emailUpdatedAt = '';
       let whatsappUpdatedAt = '';
       const sortState = { key:'sentAt', direction:'desc' };
+      const emailReportCountingStartAt = Date.parse('2026-08-27T14:52:35.000Z');
       let emailLoadError = '';
       let whatsappLoadError = '';
       let loading = false;
@@ -1814,7 +1815,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           if (filters.channel === 'email') {
             const result = await db.getEmailQuizReport(filters.from, filters.to);
             if (result.success === false) emailLoadError = result.message || 'Não foi possível atualizar os dados de e-mail.';
-            else { emailEvents = result.events; emailUpdatedAt = result.updatedAt || new Date().toISOString(); }
+            else {
+              emailEvents = (Array.isArray(result.events) ? result.events : []).filter(event => {
+                const sentAt = Date.parse(event?.sentAt || '');
+                return Number.isFinite(sentAt) && (!Number.isFinite(emailReportCountingStartAt) || sentAt >= emailReportCountingStartAt);
+              });
+              emailUpdatedAt = result.updatedAt || new Date().toISOString();
+            }
           } else {
             const result = await db.getWhatsappAutomationConfig();
             whatsappEvents = normalizeWhatsappEvents(result?.logs);
