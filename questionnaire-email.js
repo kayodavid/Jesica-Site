@@ -55,6 +55,7 @@ function emailAssetUrl(value) {
 }
 
 function replaceEmailTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{ano\}/g, values.year); }
+function replaceReminderTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{paciente\}/g, values.patient).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{dias_restantes\}/g, values.daysRemaining).replace(/\{link_questionario\}/g, values.questionnaireUrl).replace(/\{nutricionista\}/g, values.nutritionist); }
 
 async function getEmailTemplate(sessionToken) {
   try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === EMAIL_TEMPLATE_THEME || recordSource(item) === EMAIL_TEMPLATE_SOURCE); if (!record) return defaultEmailTemplate(); let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return normalizeEmailTemplate(data); } catch (error) { console.error('Email template load error:', error.message); return defaultEmailTemplate(); }
@@ -846,6 +847,20 @@ function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, dea
   const footerColor = template.layout === 'midnight' ? '#d4d8e0' : '#827766'; return `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:${background};font-family:Arial,Helvetica,sans-serif;color:${text};line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${template.layout === 'soft' ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="font-size:12px;color:${footerColor};text-align:center;margin:18px 0 0">${footer}</p></div></body></html>`;
 }
 
+function buildReminderTestEmail({ reminder: rawReminder }) {
+  const reminder = rawReminder && typeof rawReminder === 'object' ? rawReminder : {};
+  const values = { firstName:'Marina', patient:'Marina Alves', quizTitle:'Acompanhamento semanal', deadline:'15 de setembro de 2026', daysRemaining:'3', questionnaireUrl:`${QUESTIONNAIRE_BASE_URL}?teste=1`, nutritionist:'Jessica Melo', year:new Date().getFullYear() };
+  const subject = replaceReminderTokens(usableText(reminder.subject) || 'Teste de lembrete', values).slice(0, 180);
+  const message = replaceReminderTokens(usableText(reminder.message) || 'Esta é uma mensagem de teste do lembrete.', values).slice(0, 1200);
+  const brand = escapeHtml('Jessica Melo Nutricionista');
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
+  const safeRecipient = escapeHtml(values.questionnaireUrl);
+  const title = escapeHtml(usableText(reminder.title) || 'Lembrete');
+  const htmlContent = `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:#faf8f3;font-family:Arial,Helvetica,sans-serif;color:#3d3226;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(168,139,54,.22);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(61,50,38,.1)"><div style="background:#a88b36;color:#fff;padding:25px 28px"><p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p><p style="margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.82">E-mail de teste</p><h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="padding:28px"><div style="margin:0 0 22px;border:1px solid #ead9a6;border-radius:12px;background:#fffaf0;padding:13px 15px;color:#725b20;font-size:13px;line-height:1.5"><strong>Mensagem de teste:</strong> este e-mail foi enviado somente para validar o lembrete. Nenhum paciente foi notificado.</div><p style="margin:0 0 16px;font-size:16px;font-weight:700;color:#3d3226">${safeSubject}</p><p style="margin:0 0 20px;color:#3d3226;line-height:1.7">${safeMessage}</p><p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">Os dados exibidos são exemplos e o link acima não representa um convite real.</p><p style="margin:20px 0 0"><a href="${safeRecipient}" style="display:inline-block;background:#a88b36;border-radius:10px;color:#fff;padding:11px 17px;text-decoration:none;font-weight:700">Abrir link de exemplo</a></p></div></div><p style="font-size:12px;color:#827766;text-align:center;margin:18px 0 0">Jessica Melo Nutricionista · Teste de lembrete</p></div></body></html>`;
+  return { subject:`Teste de lembrete — ${subject}`, htmlContent };
+}
+
 async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template }) {
   const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const htmlContent = buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl });   return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject:replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }), htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
 }
@@ -1181,6 +1196,22 @@ export default async function handler(req, res) {
       const workerId = String(req?.headers?.['x-worker-id'] || body.workerId || 'supabase-pg-cron');
       const result = await processQuestionnaireQueue(secret, workerId);
       return json(res, 200, result);
+    }
+
+    if (action === 'test-reminder') {
+      const sessionToken = String(body.sessionToken || '');
+      if (!sessionToken) return json(res, 400, { success:false, message:'Não foi possível iniciar o teste. Entre novamente no painel.' });
+      const admin = await requireAdmin(sessionToken);
+      const recipientEmail = String(admin.email || '').trim().toLowerCase();
+      if (!validEmail(recipientEmail)) return json(res, 400, { success:false, message:'Não foi possível identificar o e-mail da conta administrativa para receber o teste.' });
+      const reminder = body.reminder && typeof body.reminder === 'object' ? body.reminder : {};
+      const { subject, htmlContent } = buildReminderTestEmail({ reminder });
+      try {
+        await sendBrevoEmail({ to:{ email:recipientEmail, name:usableText(admin.name) || 'Administrador' }, subject, htmlContent, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:'Jessica Melo Nutricionista' }, tags:['reminder-test','questionnaire-test'] });
+        return json(res, 200, { success:true, message:`E-mail de teste enviado para ${recipientEmail}.`, recipientEmail });
+      } catch (error) {
+        return json(res, 502, { success:false, message:'Não foi possível enviar o e-mail de teste. Tente novamente e, caso o problema se repita, entre em contato com o suporte.' });
+      }
     }
 
     if (action === 'send') {
