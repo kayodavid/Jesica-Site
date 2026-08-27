@@ -1287,13 +1287,16 @@ export default async function handler(req, res) {
       if (!previous) return json(res, 404, { success:false, message:'Agendamento não encontrado.' });
       const previousScheduledAt = Date.parse(previous.scheduledFor || '');
       const requestedScheduledAt = body.scheduledAt || localDateTimeToIso(body.date, body.time);
+      const requestedTimestamp = Date.parse(requestedScheduledAt || '');
       if (!Number.isFinite(previousScheduledAt)) return json(res, 409, { success:false, message:'A data original deste agendamento não pôde ser identificada.' });
 
       // Uma série histórica pode continuar aberta na tela mesmo depois que a data
-      // de envio passou. Nesse caso, não tentamos recriar um envio no passado —
-      // apenas atualizamos o prazo da fila existente, que é o dado que o usuário
-      // está editando. Assim o cartão e a fila passam a refletir o novo prazo.
-      if (previousScheduledAt <= Date.now() + 30_000) {
+      // de envio passou. Nesse caso, quando o usuário mantém a data/horário e
+      // altera somente o prazo, não tentamos recriar um envio no passado — apenas
+      // atualizamos o prazo da fila existente. Se a data mudou, o fluxo normal de
+      // reagendamento futuro continua sendo usado.
+      const sameScheduledMoment = Number.isFinite(requestedTimestamp) && Math.abs(requestedTimestamp - previousScheduledAt) <= 60_000;
+      if (previousScheduledAt <= Date.now() + 30_000 && sameScheduledMoment) {
         const expiresAt = responseDeadline(previous.scheduledFor, body.responseAmount, body.responseUnit);
         const updated = await updateStoredScheduleDeadline(sessionToken, previous, expiresAt);
         return json(res, 200, { success:true, mode:'deadline-only', previousScheduleId:previous.id, schedule:updated.schedule, message:'Prazo de resposta atualizado.' });
