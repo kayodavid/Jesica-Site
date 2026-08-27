@@ -1072,6 +1072,14 @@ async function listSchedulesWithProviderStatus(sessionToken, patientKey = '', qu
   })).then(items => items.sort((a, b) => new Date(a.scheduledFor || 0) - new Date(b.scheduledFor || 0)));
 }
 
+function localDateTimeToIso(date, time) {
+  const normalizedDate = String(date || '').trim();
+  const normalizedTime = String(time || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedDate) || !/^\d{2}:\d{2}$/.test(normalizedTime)) return '';
+  const timestamp = Date.parse(`${normalizedDate}T${normalizedTime}:00-03:00`);
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : '';
+}
+
 function responseDeadline(scheduledAt, amount, unit) {
   const numericAmount = Math.max(1, Math.min(Number(amount || 2), 60));
   const multiplier = unit === 'hours' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
