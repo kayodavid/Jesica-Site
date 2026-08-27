@@ -13,6 +13,12 @@ const EMAIL_QUIZ_CLICK_THEME = '__email_quiz_click__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
+// Marco da nova base do relatório: registros anteriores permanecem preservados,
+// mas não entram nos totais de envios de e-mail a partir desta publicação.
+const EMAIL_REPORT_COUNTING_START_AT = '2026-08-27T14:52:35.000Z';
+// Marco da nova base do relatório de respostas: o histórico permanece preservado,
+// mas convites anteriores não entram nos indicadores desta nova fase.
+const RESPONSE_REPORT_COUNTING_START_AT = '2026-08-27T15:55:18.000Z';
 
 function json(res, status, body) {
   res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -742,8 +748,20 @@ async function storeResponse(invitation, quiz, answers, summary) {
 
 async function getStoredResponseReport(sessionToken, startDate, endDate) {
   const records = await listStoredQuestionnaireRecords(sessionToken);
-  const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
-  const responses = linkResponsesToInvitations(records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse), invitations);
+  const responseCountingStartAt = Date.parse(RESPONSE_REPORT_COUNTING_START_AT);
+  const isAfterResponseCountingStart = item => {
+    const sentAt = Date.parse(item?.sentAt || '');
+    return Number.isFinite(sentAt) && (!Number.isFinite(responseCountingStartAt) || sentAt >= responseCountingStartAt);
+  };
+  const allInvitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
+  const invitations = allInvitations.filter(isAfterResponseCountingStart);
+  const linkedResponses = linkResponsesToInvitations(records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse), allInvitations);
+  const newInvitationIds = new Set(invitations.map(item => item.invitationId));
+  const responses = linkedResponses.filter(response => {
+    if (response?.invitationId && newInvitationIds.has(response.invitationId)) return true;
+    const responseAt = Date.parse(response?.respondedAt || response?.sentAt || '');
+    return Number.isFinite(responseAt) && (!Number.isFinite(responseCountingStartAt) || responseAt >= responseCountingStartAt);
+  });
   const progress = records.filter(isEmailQuizProgressRecord).map(normalizeStoredProgress).filter(item => item.invitationId);
   const responsesByInvitation = new Map();
   responses.forEach(item => {
@@ -1307,7 +1325,7 @@ export default async function handler(req, res) {
       if (!sessionToken || !validDateKey(startDate) || !validDateKey(endDate) || startDate > endDate) return json(res, 400, { success:false, message:'Informe um período válido para consultar as respostas.' });
       await requireAdmin(sessionToken);
       const responses = await getStoredResponseReport(sessionToken, startDate, endDate);
-      return json(res, 200, { success:true, responses, updatedAt:new Date().toISOString() });
+      return json(res, 200, { success:true, responses, countingStartedAt:RESPONSE_REPORT_COUNTING_START_AT, updatedAt:new Date().toISOString() });
     }
 
     if (action === 'report') {
@@ -1318,13 +1336,18 @@ export default async function handler(req, res) {
       const windowDays = Math.ceil((Date.parse(`${endDate}T00:00:00Z`) - Date.parse(`${startDate}T00:00:00Z`)) / 86_400_000) + 1;
       if (windowDays > 90) return json(res, 400, { success:false, message:'O período máximo para consulta é de 90 dias.' });
       await requireAdmin(sessionToken);
+      const countingStartAt = Date.parse(EMAIL_REPORT_COUNTING_START_AT);
+      const isAfterCountingStart = item => {
+        const sentAt = Date.parse(item?.sentAt || '');
+        return Number.isFinite(sentAt) && (!Number.isFinite(countingStartAt) || sentAt >= countingStartAt);
+      };
       const records = await listStoredQuestionnaireRecords(sessionToken);
-      const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId);
+      const invitations = records.filter(isEmailQuizInvitationRecord).map(normalizeStoredInvitation).filter(item => item.invitationId && isAfterCountingStart(item));
       const clicks = records.filter(isEmailQuizClickRecord).map(normalizeStoredClick).filter(item => item.invitationId);
       const responses = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse);
-      const providerEvents = await getBrevoQuestionnaireEvents(startDate, endDate, invitations);
+      const providerEvents = (await getBrevoQuestionnaireEvents(startDate, endDate, invitations)).filter(isAfterCountingStart);
       const events = mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, responses);
-      return json(res, 200, { success:true, channel:'email', events, updatedAt:new Date().toISOString() });
+      return json(res, 200, { success:true, channel:'email', events, countingStartedAt:EMAIL_REPORT_COUNTING_START_AT, updatedAt:new Date().toISOString() });
     }
 
     if (action === 'list') {
