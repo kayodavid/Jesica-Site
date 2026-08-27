@@ -1772,11 +1772,16 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const draw = () => {
         const visible = sortedEvents(filteredEvents());
         const total = visible.length;
-        const delivered = visible.filter(event => !!event.deliveredAt).length;
-        const opened = visible.filter(event => !!event.openedAt).length;
-        const clicked = visible.filter(event => !!event.clickedAt && !event.respondedAt && event.responseStatus !== 'responded' && event.status !== 'responded').length;
-        const responded = visible.filter(event => !!event.respondedAt || event.responseStatus === 'responded' || event.status === 'responded').length;
-        const failed = visible.filter(event => event.failed).length;
+        const statusCounts = visible.reduce((counts, event) => {
+          const key = getStatus(event)?.key;
+          if (key) counts[key] = (counts[key] || 0) + 1;
+          return counts;
+        }, {});
+        const delivered = statusCounts.delivered || 0;
+        const opened = statusCounts.opened || 0;
+        const clicked = statusCounts.clicked || 0;
+        const responded = statusCounts.responded || 0;
+        const failed = statusCounts.failed || 0;
         setMetric('delivered', delivered, total); setMetric('opened', opened, total); setMetric('clicked', clicked, total); setMetric('responded', responded, total); setMetric('failed', failed, total);
         const fromLabel = filters.from ? filters.from.split('-').reverse().join('/') : '—';
         const toLabel = filters.to ? filters.to.split('-').reverse().join('/') : '—';
