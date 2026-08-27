@@ -48,6 +48,26 @@
     .admin-sidebar-heading { padding:.65rem .6rem .8rem; color:#a88b36; font-size:.64rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
     .admin-nav-link, .admin-nav-toggle, .admin-sidebar-suggestion { display:flex; align-items:center; gap:.72rem; width:100%; padding:.78rem .75rem; border-radius:.78rem; color:#5d5140; font-size:.82rem; font-weight:600; text-align:left; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease; }
     .admin-nav-link:hover, .admin-nav-toggle:hover, .admin-sidebar-suggestion:hover { color:#3d3226; background:#f5e6c8; transform:translateX(2px); }
+    .admin-sidebar-suggestion { min-height:1.35rem; padding:.18rem .75rem; font-size:.72rem; }
+    .admin-sidebar-suggestion .admin-nav-icon { width:1rem; height:1rem; }
+    .suggestion-overlay { position:fixed; inset:0; z-index:160; background:rgba(23,24,29,.48); opacity:0; pointer-events:none; transition:opacity .18s ease; }
+    .suggestion-overlay.is-open { opacity:1; pointer-events:auto; }
+    .suggestion-modal { position:fixed; inset:0; z-index:161; display:flex; align-items:center; justify-content:center; padding:1rem; opacity:0; pointer-events:none; transform:scale(.98); transition:opacity .18s ease,transform .18s cubic-bezier(.23,1,.32,1); }
+    .suggestion-modal.is-open { opacity:1; pointer-events:auto; transform:scale(1); }
+    .suggestion-dialog { width:min(100%,36rem); max-height:calc(100vh - 2rem); overflow-y:auto; border:1px solid rgba(168,139,54,.2); border-radius:1.25rem; background:#fffdf8; box-shadow:0 24px 70px rgba(23,24,29,.24); }
+    .suggestion-field { width:100%; border:1px solid rgba(168,139,54,.22); border-radius:.72rem; background:#fff; padding:.7rem .8rem; color:#3d3226; font-size:.8rem; outline:none; transition:border-color .16s ease,box-shadow .16s ease,background .16s ease; }
+    .suggestion-field:focus { border-color:#a88b36; box-shadow:0 0 0 3px rgba(168,139,54,.14); }
+    .suggestion-field::placeholder { color:#a69c8e; }
+    .suggestion-form-status { border-radius:.7rem; padding:.65rem .75rem; font-size:.75rem; line-height:1.4; }
+    .suggestion-form-status.is-success { background:#e8f6eb; color:#287447; }
+    .suggestion-form-status.is-error { background:#fae8e7; color:#a13e3c; }
+    .suggestion-honeypot { position:absolute !important; left:-10000px !important; width:1px !important; height:1px !important; opacity:0 !important; pointer-events:none !important; }
+    body[data-patient-theme='black'] .suggestion-dialog { border-color:#525b6b; background:#242932; box-shadow:0 24px 70px rgba(0,0,0,.5); }
+    body[data-patient-theme='black'] .suggestion-field { border-color:#596273; background:#1e232c; color:#f1f3f7; }
+    body[data-patient-theme='black'] .suggestion-field:focus { border-color:#d4b76a; box-shadow:0 0 0 3px rgba(212,183,106,.16); }
+    body[data-patient-theme='black'] .suggestion-field::placeholder { color:#aeb7c5; }
+    body[data-patient-theme='black'] .suggestion-form-status.is-success { background:#173e2a; color:#9be0ad; }
+    body[data-patient-theme='black'] .suggestion-form-status.is-error { background:#48272b; color:#ffb6b5; }
     .admin-nav-link.is-active { position:relative; color:#4b3b26; background:#f5e6c8; box-shadow:inset 4px 0 0 #a88b36; }
     .admin-nav-icon { width:1.05rem; height:1.05rem; flex:none; }
     .admin-nav-badge { margin-left:auto; display:inline-flex; min-width:1.25rem; height:1.25rem; align-items:center; justify-content:center; border-radius:999px; background:#47708d; color:#fff; font-size:.63rem; font-weight:700; }
@@ -900,7 +920,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             <button type="button" class="admin-nav-toggle" data-sidebar-toggle="settings-menu" aria-expanded="true"><span class="admin-nav-icon"><svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.6 2.6-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3.68v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.6-2.6.06-.06A1.7 1.7 0 0 0 5.38 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3.68h.08A1.7 1.7 0 0 0 5.38 9.26a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.6-2.6.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3.68v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.6 2.6-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.08v3.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg></span>Configurações<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button>
             <div id="settings-menu" class="admin-nav-submenu"><a href="#configuracoes" data-admin-nav="servicos"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 4h10l4 4v12H5z"/><path stroke-linecap="round" stroke-width="1.8" d="M15 4v4h4M8 13h8m-8 3h5"/></svg>Serviços</a><button type="button" class="admin-nav-toggle admin-subnav-toggle" data-sidebar-toggle="questionnaires-menu" aria-expanded="true"><span class="inline-flex h-3.5 w-3.5 shrink-0"><svg class="h-full w-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M9 9h6m-6 4h4m0 3h.01"/></svg></span>Gestão de Clientes<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button><div id="questionnaires-menu" class="admin-nav-submenu ml-4"><button type="button" data-admin-nav="perguntas">Perguntas</button><button type="button" data-admin-nav="questionarios">Questionários</button></div><a href="#workspace" data-admin-nav="area-paciente"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4h16v16H4z"/><path stroke-linecap="round" stroke-width="1.8" d="M8 9h8m-8 4h8m-8 4h5"/></svg>Personalizar Plataforma</a><button type="button" data-admin-nav="lembretes"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h4"/></svg>Lembretes</button><button type="button" data-admin-nav="whatsapp-automations"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path stroke-linecap="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01"/></svg>WhatsApp</button><button type="button" data-coming-soon="As integrações estarão disponíveis quando forem conectadas ao acompanhamento."><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/></svg>Integrações</button></div>
           </nav>
-          <div class="admin-sidebar-footer"><button type="button" class="admin-sidebar-suggestion" data-coming-soon="Obrigada pela sugestão. Em breve será possível enviar ideias diretamente por este espaço."><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Enviar uma sugestão</button></div>
+          <div class="admin-sidebar-footer"><button type="button" class="admin-sidebar-suggestion" data-suggestion-open><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Enviar uma sugestão</button></div>
         </aside>
         <div class="admin-content">
       <header id="inicio" class="scroll-mt-28 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-5">
@@ -2282,6 +2302,34 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const toast = document.getElementById('admin-toast');
       let toastTimer;
       const showToast = message => { toast.textContent = message; toast.classList.add('is-visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3600); };
+      const suggestionButton = document.querySelector('[data-suggestion-open]');
+      const suggestionOverlay = document.getElementById('suggestion-overlay');
+      const suggestionModal = document.getElementById('suggestion-modal');
+      const suggestionForm = document.getElementById('suggestion-form');
+      const suggestionStatus = document.getElementById('suggestion-form-status');
+      const suggestionSubmit = document.getElementById('suggestion-submit');
+      const suggestionClose = () => { suggestionOverlay?.classList.remove('is-open'); suggestionModal?.classList.remove('is-open'); suggestionOverlay?.setAttribute('aria-hidden', 'true'); suggestionModal?.setAttribute('aria-hidden', 'true'); };
+      const suggestionOpen = () => { suggestionForm?.reset(); suggestionStatus?.classList.add('hidden'); suggestionStatus?.classList.remove('is-success', 'is-error'); suggestionOverlay?.classList.add('is-open'); suggestionModal?.classList.add('is-open'); suggestionOverlay?.setAttribute('aria-hidden', 'false'); suggestionModal?.setAttribute('aria-hidden', 'false'); window.setTimeout(() => document.getElementById('suggestion-name')?.focus(), 20); };
+      suggestionButton?.addEventListener('click', suggestionOpen);
+      document.getElementById('suggestion-close')?.addEventListener('click', suggestionClose);
+      document.getElementById('suggestion-cancel')?.addEventListener('click', suggestionClose);
+      suggestionOverlay?.addEventListener('click', suggestionClose);
+      suggestionForm?.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!suggestionForm.reportValidity()) return;
+        const fields = { name:document.getElementById('suggestion-name'), phone:document.getElementById('suggestion-phone'), email:document.getElementById('suggestion-email'), suggestion:document.getElementById('suggestion-message'), website:document.getElementById('suggestion-website') };
+        const payload = { sessionToken:localStorage.getItem('jessicamelo_token') || '', name:fields.name.value.trim(), phone:fields.phone.value.trim(), email:fields.email.value.trim(), suggestion:fields.suggestion.value.trim(), website:fields.website.value.trim() };
+        suggestionSubmit.disabled = true; suggestionSubmit.classList.add('opacity-60'); suggestionSubmit.textContent = 'Enviando...'; suggestionStatus.classList.add('hidden'); suggestionStatus.classList.remove('is-success', 'is-error');
+        try {
+          const response = await fetch('/api/suggestion', { method:'POST', headers:{ 'Content-Type':'application/json', Accept:'application/json' }, body:JSON.stringify(payload) });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok || result.success === false) throw new Error(result.message || 'Não foi possível enviar a sugestão.');
+          suggestionStatus.textContent = 'Sugestão enviada com sucesso. Obrigado por contribuir com a plataforma.'; suggestionStatus.classList.remove('hidden'); suggestionStatus.classList.add('is-success'); suggestionForm.reset(); showToast('Sugestão enviada com sucesso.'); window.setTimeout(suggestionClose, 1200);
+        } catch (error) {
+          suggestionStatus.textContent = error?.message || 'Não foi possível enviar a sugestão agora. Tente novamente em alguns minutos.'; suggestionStatus.classList.remove('hidden'); suggestionStatus.classList.add('is-error');
+        } finally { suggestionSubmit.disabled = false; suggestionSubmit.classList.remove('opacity-60'); suggestionSubmit.textContent = 'Enviar sugestão'; }
+      });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && suggestionModal?.classList.contains('is-open')) suggestionClose(); });
       document.addEventListener('admin-toast-request', event => { if (event.detail?.message) showToast(event.detail.message); });
       servicesManagerController = renderServicesManager(() => transactionReportController.refresh(), showToast);
       questionsManagerController = renderQuestionsManager(showToast);
@@ -2337,5 +2385,12 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       <footer class="flex items-center justify-end gap-3 border-t border-primary/15 px-4 py-3 sm:px-5"><button id="quiz-cover-editor-cancel" type="button" class="rounded-lg border border-primary/20 px-4 py-2 text-xs font-bold text-dark transition hover:bg-primary/10">Cancelar</button><button id="quiz-cover-editor-apply" type="button" class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition hover:bg-dark">Aplicar imagem</button></footer>
     </div>
   </section>
-</body>
+  <div id="suggestion-overlay" class="suggestion-overlay" aria-hidden="true"></div>
+  <section id="suggestion-modal" class="suggestion-modal" role="dialog" aria-modal="true" aria-labelledby="suggestion-modal-title" aria-hidden="true">
+    <div class="suggestion-dialog">
+      <header class="flex items-start justify-between gap-4 border-b border-primary/15 px-5 py-4 sm:px-6"><div><p class="text-[10px] font-bold uppercase tracking-[.16em] text-primary">Fale com a equipe</p><h2 id="suggestion-modal-title" class="mt-1 text-xl font-bold text-dark">Enviar uma sugestão</h2><p class="mt-1 max-w-[30rem] text-xs leading-relaxed text-gray-500">Compartilhe uma ideia, melhoria ou observação para ajudar a evoluir a plataforma.</p></div><button id="suggestion-close" type="button" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xl text-dark transition hover:bg-primary/10" aria-label="Fechar formulário de sugestão">×</button></header>
+      <form id="suggestion-form" novalidate><div class="space-y-4 px-5 py-5 sm:px-6 sm:py-6"><div class="grid gap-4 sm:grid-cols-2"><label class="block"><span class="mb-1.5 block text-xs font-bold text-dark">Nome</span><input id="suggestion-name" name="name" type="text" class="suggestion-field" autocomplete="name" maxlength="120" placeholder="Como podemos chamar você?" required></label><label class="block"><span class="mb-1.5 block text-xs font-bold text-dark">Telefone</span><input id="suggestion-phone" name="phone" type="tel" class="suggestion-field" autocomplete="tel" maxlength="40" placeholder="(00) 00000-0000" required></label></div><label class="block"><span class="mb-1.5 block text-xs font-bold text-dark">E-mail</span><input id="suggestion-email" name="email" type="email" class="suggestion-field" autocomplete="email" maxlength="160" placeholder="seuemail@exemplo.com" required></label><label class="block"><span class="mb-1.5 block text-xs font-bold text-dark">Sugestão</span><textarea id="suggestion-message" name="suggestion" class="suggestion-field min-h-[8rem] resize-y" maxlength="4000" placeholder="Conte sua ideia ou observação..." required></textarea><span class="mt-1.5 block text-[11px] text-gray-500">Você pode escrever até 4.000 caracteres.</span></label><label class="suggestion-honeypot" aria-hidden="true">Website<input id="suggestion-website" name="website" type="text" tabindex="-1" autocomplete="off"></label><p id="suggestion-form-status" class="hidden suggestion-form-status" role="status" aria-live="polite"></p></div><footer class="flex flex-col-reverse gap-2 border-t border-primary/15 px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6"><button id="suggestion-cancel" type="button" class="rounded-lg border border-primary/20 px-4 py-2.5 text-xs font-bold text-dark transition hover:bg-primary/10">Cancelar</button><button id="suggestion-submit" type="submit" class="rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-white transition hover:bg-dark">Enviar sugestão</button></footer></form>
+    </div>
+  </section>
+  </body>
 </html>
