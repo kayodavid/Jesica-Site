@@ -14,6 +14,9 @@ const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
 const PATIENT_PROFILE_THEME = '__patient_profile__';
+const PATIENT_QUIZ_LINK_THEME = '__patient_quiz_link__';
+const EMAIL_SEND_MODES = new Set(['unique', 'daily', 'weekly', 'manual', 'open']);
+const EMAIL_SEND_MODE_LABELS = { unique:'Envio Único', daily:'Envio Diário', weekly:'Envio Semanal', manual:'Envio Manual', open:'Envio Aberto' };
 // Marco da nova base do relatório: registros anteriores permanecem preservados,
 // mas não entram nos totais de envios de e-mail a partir desta publicação.
 const EMAIL_REPORT_COUNTING_START_AT = '2026-08-27T14:52:35.000Z';
@@ -366,7 +369,7 @@ function mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, resp
     const response = isCompleteResponse(responseRecord) ? responseRecord : null;
     if (invitationId) representedInvitations.add(invitationId);
     const clickedAt = [event.clickedAt, click?.clickedAt].filter(Boolean).sort((a, b) => Date.parse(b) - Date.parse(a))[0] || '';
-    rows.push({ ...event, invitationId, patientKey:invitation?.patientKey || '', patientName:invitation?.patientName || '', quizId:invitation?.quizId || '', quizTitle:invitation?.quizTitle || event.subject || 'Questionário', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '' });
+    rows.push({ ...event, invitationId, patientKey:invitation?.patientKey || '',       patientName:invitation?.patientName || '', quizLinkId:invitation?.quizLinkId || '', quizId:invitation?.quizId || '', quizTitle:invitation?.quizTitle || event.subject || 'Questionário', sendMode:normalizeEmailSendMode(invitation?.sendMode) || emailSendModeFromScheduleKey(invitation?.scheduleKey), scheduleKey:invitation?.scheduleKey || '', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '' });
   });
   invitationList.forEach(invitation => {
     const click = clickByInvitation.get(invitation.invitationId);
@@ -374,7 +377,7 @@ function mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, resp
     const response = isCompleteResponse(responseRecord) ? responseRecord : null;
     if (representedInvitations.has(invitation.invitationId) || (!click && !response)) return;
     const clickedAt = click?.clickedAt || '';
-    rows.push({ id:invitation.providerMessageId || invitation.invitationId, providerMessageId:invitation.providerMessageId || '', email:invitation.recipientEmail, subject:`Questionário disponível — ${invitation.quizTitle}`, sentAt:invitation.sentAt || '', deliveredAt:'', openedAt:'', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '', patientKey:invitation.patientKey, patientName:invitation.patientName, quizId:invitation.quizId, quizTitle:invitation.quizTitle, failed:false, status:response ? 'responded' : (clickedAt ? 'clicked' : 'sent') });
+    rows.push({ id:invitation.providerMessageId || invitation.invitationId, providerMessageId:invitation.providerMessageId || '', email:invitation.recipientEmail, subject:`Questionário disponível — ${invitation.quizTitle}`, sentAt:invitation.sentAt || '', deliveredAt:'', openedAt:'', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '', patientKey:invitation.patientKey, patientName:invitation.patientName, quizLinkId:invitation.quizLinkId || '', quizId:invitation.quizId, quizTitle:invitation.quizTitle, sendMode:normalizeEmailSendMode(invitation.sendMode) || emailSendModeFromScheduleKey(invitation.scheduleKey), scheduleKey:invitation.scheduleKey || '', failed:false, status:response ? 'responded' : (clickedAt ? 'clicked' : 'sent') });
   });
   return rows.sort((a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0));
 }
@@ -404,6 +407,82 @@ function normalizeStoredPatientProfile(record) {
     name: usableText(data.name || data.title || record?.title) || 'Paciente',
     email: usableText(data.email || data.recipientEmail || record?.email).toLowerCase()
   };
+}
+
+function normalizeEmailSendMode(value) {
+  const mode = String(value || '').trim().toLowerCase();
+  return EMAIL_SEND_MODES.has(mode) ? mode : '';
+}
+
+function emailSendModeFromScheduleKey(value) {
+  const match = String(value || '').match(/(?:^|:)(unique|daily|weekly|manual|open)(?=:|$)/i);
+  return normalizeEmailSendMode(match?.[1]);
+}
+
+function emailSendModeLabel(value) {
+  return EMAIL_SEND_MODE_LABELS[normalizeEmailSendMode(value)] || EMAIL_SEND_MODE_LABELS.unique;
+}
+
+function isPatientQuizLinkRecord(record) {
+  const source = recordSource(record).toLowerCase();
+  return recordTheme(record) === PATIENT_QUIZ_LINK_THEME || /^patient-quiz-link:\/\//i.test(source);
+}
+
+function normalizeStoredQuizLink(record) {
+  const data = parseStoredRecord(record);
+  const config = data.sendConfig && typeof data.sendConfig === 'object' ? data.sendConfig : (data.send_config && typeof data.send_config === 'object' ? data.send_config : {});
+  return {
+    id: usableText(data.id || record?.id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    quizId: usableText(data.quizId || data.quiz_id),
+    frequency: Number(data.frequency ?? 0),
+    sendMode: normalizeEmailSendMode(data.sendMode || data.send_mode || config.sendMode || config.send_mode),
+    sendConfig: config,
+    scheduleKey: usableText(data.scheduleKey || data.schedule_key)
+  };
+}
+
+function emailSendModeFromQuizLink(link) {
+  if (!link) return '';
+  const direct = normalizeEmailSendMode(link.sendMode || link.sendConfig?.sendMode || link.sendConfig?.send_mode);
+  if (direct) return direct;
+  if (Number(link.sendConfig?.intervalWeeks) > 0) return 'weekly';
+  if (Number.isFinite(Number(link.frequency)) && Number(link.frequency) > 0 && Number(link.frequency) < 7) return 'weekly';
+  return '';
+}
+
+function sameEmailContext(left, right) {
+  if (!left || !right) return false;
+  const same = (a, b) => { const first = String(a || '').trim().toLowerCase(); const second = String(b || '').trim().toLowerCase(); return Boolean(first && second && first === second); };
+  return (same(left.quizLinkId, right.quizLinkId) && Boolean(left.quizLinkId)) || ((same(left.patientKey, right.patientKey) || same(left.recipientEmail, right.recipientEmail)) && (same(left.quizId, right.quizId) || same(left.quizTitle, right.quizTitle)));
+}
+
+function resolveEmailSendMode(event, invitations = [], quizLinks = [], schedules = []) {
+  const invitation = (Array.isArray(invitations) ? invitations : []).find(item => item?.invitationId && item.invitationId === event?.invitationId);
+  const direct = normalizeEmailSendMode(event?.sendMode || invitation?.sendMode);
+  if (direct) return direct;
+  const fromKey = emailSendModeFromScheduleKey(event?.scheduleKey || invitation?.scheduleKey);
+  if (fromKey) return fromKey;
+  const context = { ...invitation, ...event };
+  const eventTime = Date.parse(event?.sentAt || invitation?.sentAt || '') || 0;
+  const matchingSchedule = (Array.isArray(schedules) ? schedules : []).map(schedule => {
+    const scheduleContext = { ...schedule, recipientEmail:schedule.recipientEmail, sentAt:schedule.scheduledFor };
+    const sameContext = sameEmailContext(context, scheduleContext) || (String(context?.quizLinkId || '') && String(context.quizLinkId) === String(schedule?.quizLinkId || ''));
+    const scheduleTime = Date.parse(schedule?.scheduledFor || '') || 0;
+    return { schedule, sameContext, distance:eventTime && scheduleTime ? Math.abs(eventTime - scheduleTime) : Number.MAX_SAFE_INTEGER };
+  }).filter(item => item.sameContext).sort((left, right) => left.distance - right.distance)[0];
+  const scheduledMode = emailSendModeFromScheduleKey(matchingSchedule?.schedule?.scheduleKey);
+  if (scheduledMode) return scheduledMode;
+  const link = (Array.isArray(quizLinks) ? quizLinks : []).find(item => sameEmailContext(context, item) || (context?.quizLinkId && context.quizLinkId === item.id));
+  return emailSendModeFromQuizLink(link) || 'unique';
+}
+
+function enrichEmailSendModes(events, invitations = [], records = [], schedules = []) {
+  const quizLinks = (Array.isArray(records) ? records : []).filter(isPatientQuizLinkRecord).map(normalizeStoredQuizLink).filter(item => item.id || item.patientKey || item.quizId);
+  return (Array.isArray(events) ? events : []).map(event => {
+    const sendMode = resolveEmailSendMode(event, invitations, quizLinks, schedules);
+    return { ...event, sendMode, sendModeLabel:emailSendModeLabel(sendMode) };
+  });
 }
 
 async function findRegisteredPatientForTest(sessionToken, patientKey, recipientEmail) {
@@ -445,8 +524,11 @@ function normalizeStoredInvitation(record) {
     patientKey: usableText(data.patientKey || data.patient_key),
     patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
     recipientEmail: usableText(data.recipientEmail || data.recipient_email).toLowerCase(),
+    quizLinkId: usableText(data.quizLinkId || data.quiz_link_id),
     quizId: usableText(data.quizId || data.quiz_id),
     quizTitle: usableText(data.quizTitle || data.quiz_title) || 'Questionário',
+    sendMode: normalizeEmailSendMode(data.sendMode || data.send_mode || data.sendConfig?.sendMode || data.send_config?.sendMode) || emailSendModeFromScheduleKey(data.scheduleKey || data.schedule_key),
+    scheduleKey: usableText(data.scheduleKey || data.schedule_key),
     totalQuestions: Math.max(0, Number(data.totalQuestions ?? data.total_questions ?? 0)),
     sentAt: usableText(data.sentAt || data.sent_at) || record?.createdAt || record?.created_at || '',
     expiresAt: usableText(data.expiresAt || data.expires_at),
@@ -683,6 +765,9 @@ async function storeInvitation(invitation, quiz) {
     recipientEmail: invitation.recipientEmail,
     quizId: quiz.id,
     quizTitle: quiz.title,
+    quizLinkId: usableText(invitation.quizLinkId),
+    sendMode: normalizeEmailSendMode(invitation.sendMode) || emailSendModeFromScheduleKey(invitation.scheduleKey),
+    scheduleKey: usableText(invitation.scheduleKey),
     sentAt: invitation.sentAt || new Date().toISOString(),
     expiresAt: new Date(invitation.expiresAt).toISOString(),
     providerMessageId: usableText(invitation.providerMessageId) || usableText(parseStoredRecord(current).providerMessageId),
@@ -1061,6 +1146,8 @@ async function createQuestionnaireSchedule({ sessionToken, patientKey, patientNa
     quizId:quiz.id,
     quizTitle:quiz.title,
     quizLinkId:quizLinkId || '',
+    sendMode:emailSendModeFromScheduleKey(scheduleKey) || 'unique',
+    scheduleKey:String(scheduleKey || ''),
     sentAt:scheduledAt,
     expiresAt:Date.parse(expiresAt)
   };
@@ -1086,6 +1173,8 @@ async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, pati
   const prepared = entries.map((entry, index) => {
     const scheduledAt = validateQueueScheduledAt(entry.scheduledAt || localDateTimeToIso(entry.date, entry.time));
     const expiresAt = responseDeadline(scheduledAt, entry.responseAmount, entry.responseUnit);
+    const scheduleKey = String(entry.scheduleKey || `${quizLinkId || quiz.id}:daily:${index}:${scheduledAt}`);
+    const sendMode = normalizeEmailSendMode(entry.sendMode) || emailSendModeFromScheduleKey(scheduleKey) || 'daily';
     const invitation = {
       version:2,
       id:randomBytes(12).toString('hex'),
@@ -1096,11 +1185,13 @@ async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, pati
       quizId:quiz.id,
       quizTitle:quiz.title,
       quizLinkId:quizLinkId || '',
+      sendMode,
+      scheduleKey,
       sentAt:scheduledAt,
       expiresAt:Date.parse(expiresAt)
     };
     return {
-      scheduleKey:String(entry.scheduleKey || `${quizLinkId || quiz.id}:daily:${index}:${scheduledAt}`),
+      scheduleKey,
       patientKey,
       patientName,
       recipientEmail,
@@ -1248,13 +1339,15 @@ export default async function handler(req, res) {
       const patientName = String(body.patientName || '').trim();
       const recipientEmail = String(body.recipientEmail || '').trim().toLowerCase();
       const quizId = String(body?.quiz?.id || body.quizId || '').trim();
+      const quizLinkId = String(body.quizLinkId || '').trim();
+      const requestedSendMode = normalizeEmailSendMode(body.sendMode);
       const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 7), 7));
       if (!sessionToken || !patientKey || !validEmail(recipientEmail) || !quizId) return json(res, 400, { success: false, message: 'Não foi possível preparar o convite. Confira o paciente, o e-mail e o questionário.' });
       await requireAdmin(sessionToken);
       const quiz = await loadQuiz(sessionToken, quizId);
       const expiresAt = Date.now() + (expiresInDays * 24 * 60 * 60 * 1000);
       const sentAt = new Date().toISOString();
-      const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, sentAt, expiresAt };
+      const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, quizLinkId, sendMode:requestedSendMode || 'unique', sentAt, expiresAt };
       const accessToken = encryptInvitation(invitation);
       const template = await getEmailTemplate(sessionToken);
       const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template });
@@ -1453,7 +1546,10 @@ export default async function handler(req, res) {
       const responses = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse);
       const providerEvents = (await getBrevoQuestionnaireEvents(startDate, endDate, invitations)).filter(isAfterCountingStart);
       const events = mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, responses);
-      return json(res, 200, { success:true, channel:'email', events, countingStartedAt:EMAIL_REPORT_COUNTING_START_AT, updatedAt:new Date().toISOString() });
+      let schedules = [];
+      try { schedules = await listStoredSchedules(sessionToken); } catch (error) { console.error('Email report schedule context error:', error.message); }
+      const enrichedEvents = enrichEmailSendModes(events, invitations, records, schedules);
+      return json(res, 200, { success:true, channel:'email', events:enrichedEvents, countingStartedAt:EMAIL_REPORT_COUNTING_START_AT, updatedAt:new Date().toISOString() });
     }
 
     if (action === 'list') {
