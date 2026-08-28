@@ -1047,9 +1047,51 @@ async function cancelObsoleteServiceReminderSchedules(sessionToken, serviceId, d
 
 function buildReminderQueueEntry
 ({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '', scheduleKey = '' }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:scheduleKey || `email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
-async function scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) { const reminders = await getReminderSettings(sessionToken); const records = await listStoredQuestionnaireRecords(sessionToken); const jobs = []; const now = Date.now() + 11 * 60 * 1000; const responseReminder = reminders.find(item => item.id === 'response_due'); if (responseReminder?.active && responseReminder.email) { (responseReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => { const reminderAt = reminderTriggerAt(expiresAt, trigger); const timestamp = Date.parse(reminderAt); if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return; jobs.push(buildReminderQueueEntry({ reminder:responseReminder, kind:'response_due', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt, referenceAt:expiresAt, contextId:invitation.id, parentScheduleKey })); }); }
-  const serviceReminder = reminders.find(item => item.id === 'service_ending'); if (serviceReminder?.active && serviceReminder.email) { records.map(normalizeStoredServiceLinkForReminder).filter(item => item && item.patientKey === invitation.patientKey && item.status === 'active' && item.startDate && item.duration > 0).forEach(service => { const endDate = addDateKey(service.startDate, Math.max(0, service.duration - 1)); const serviceEndAt = localDateTimeToIso(endDate, '23:59'); (serviceReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => { const reminderAt = reminderTriggerAt(serviceEndAt, trigger); const timestamp = Date.parse(reminderAt); if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return; jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:service.id || `${service.startDate}:${service.duration}`, serviceName:service.serviceName, parentScheduleKey })); }); }); }
-  if (!jobs.length) return []; await enqueueStoredScheduleBatch(sessionToken, jobs); return jobs; }
+function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) {
+  const jobs = [];
+  const now = Date.now() + 11 * 60 * 1000;
+  const responseReminder = reminders.find(item => item.id === 'response_due');
+  if (responseReminder?.active && responseReminder.email) {
+    (responseReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => {
+      const reminderAt = reminderTriggerAt(expiresAt, trigger);
+      const timestamp = Date.parse(reminderAt);
+      if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return;
+      jobs.push(buildReminderQueueEntry({ reminder:responseReminder, kind:'response_due', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt, referenceAt:expiresAt, contextId:invitation.id, parentScheduleKey }));
+    });
+  }
+  const serviceReminder = reminders.find(item => item.id === 'service_ending');
+  if (serviceReminder?.active && serviceReminder.email) {
+    records.map(normalizeStoredServiceLinkForReminder).filter(item => item && item.patientKey === invitation.patientKey && item.status === 'active' && item.startDate && item.duration > 0).forEach(service => {
+      const endDate = addDateKey(service.startDate, Math.max(0, service.duration - 1));
+      const serviceEndAt = localDateTimeToIso(endDate, '23:59');
+      (serviceReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => {
+        const reminderAt = reminderTriggerAt(serviceEndAt, trigger);
+        const timestamp = Date.parse(reminderAt);
+        if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return;
+        jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:service.id || `${service.startDate}:${service.duration}`, serviceName:service.serviceName, parentScheduleKey }));
+      });
+    });
+  }
+  return jobs;
+}
+
+async function scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) {
+  const reminders = await getReminderSettings(sessionToken);
+  const records = await listStoredQuestionnaireRecords(sessionToken);
+  const jobs = buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey });
+  if (!jobs.length) return [];
+  await enqueueStoredScheduleBatch(sessionToken, jobs);
+  return jobs;
+}
+
+async function scheduleReminderJobsBatch({ sessionToken, prepared }) {
+  const reminders = await getReminderSettings(sessionToken);
+  const records = await listStoredQuestionnaireRecords(sessionToken);
+  const jobs = (Array.isArray(prepared) ? prepared : []).flatMap(item => buildReminderJobs({ reminders, records, invitation:item.invitation, quiz:item.quiz, accessToken:item.accessToken, scheduledAt:item.scheduledAt || item.scheduledFor, expiresAt:item.expiresAt, parentScheduleKey:item.scheduleKey }));
+  if (!jobs.length) return [];
+  await enqueueStoredScheduleBatch(sessionToken, jobs);
+  return jobs;
+}
 
 async function scheduleServiceReminderJobs({ sessionToken, service }) {
   const normalized = normalizeServiceReminderInput(service);
@@ -1199,24 +1241,32 @@ async function enqueueStoredSchedule(sessionToken, schedule) {
   return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
 }
 
+const SCHEDULE_BATCH_LIMIT = 90;
+
 async function enqueueStoredScheduleBatch(sessionToken, schedules) {
-  const value = await callRpc('app_questionnaire_schedule_enqueue_batch', {
-    p_token:sessionToken,
-    p_entries:schedules.map(schedule => ({
-      scheduleKey:schedule.scheduleKey,
-      patientKey:schedule.patientKey,
-      patientName:schedule.patientName,
-      recipientEmail:schedule.recipientEmail,
-      quizLinkId:schedule.quizLinkId || '',
-      quizId:schedule.quizId,
-      quizTitle:schedule.quizTitle,
-      quizSnapshot:schedule.quizSnapshot,
-      invitationToken:schedule.invitationToken,
-      scheduledFor:schedule.scheduledFor,
-      expiresAt:schedule.expiresAt
-    }))
-  });
-  return (Array.isArray(value) ? value : []).map(normalizeQueueSchedule);
+  const list = Array.isArray(schedules) ? schedules : [];
+  const result = [];
+  for (let start = 0; start < list.length; start += SCHEDULE_BATCH_LIMIT) {
+    const chunk = list.slice(start, start + SCHEDULE_BATCH_LIMIT);
+    const value = await callRpc('app_questionnaire_schedule_enqueue_batch', {
+      p_token:sessionToken,
+      p_entries:chunk.map(schedule => ({
+        scheduleKey:schedule.scheduleKey,
+        patientKey:schedule.patientKey,
+        patientName:schedule.patientName,
+        recipientEmail:schedule.recipientEmail,
+        quizLinkId:schedule.quizLinkId || '',
+        quizId:schedule.quizId,
+        quizTitle:schedule.quizTitle,
+        quizSnapshot:schedule.quizSnapshot,
+        invitationToken:schedule.invitationToken,
+        scheduledFor:schedule.scheduledFor,
+        expiresAt:schedule.expiresAt
+      }))
+    });
+    result.push(...(Array.isArray(value) ? value : []).map(normalizeQueueSchedule));
+  }
+  return result;
 }
 
 async function cancelStoredSchedule(sessionToken, schedule) {
@@ -1361,7 +1411,7 @@ async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, pati
     };
   });
   const schedules = await enqueueStoredScheduleBatch(sessionToken, prepared);
-  for (const item of prepared) { try { await scheduleReminderJobs({ sessionToken, invitation:item.invitation, quiz, accessToken:item.accessToken, scheduledAt:item.scheduledAt || item.scheduledFor, expiresAt:item.expiresAt, parentScheduleKey:item.scheduleKey }); } catch (reminderError) { console.error('Batch reminder scheduling error:', reminderError.message); } }
+  try { await scheduleReminderJobsBatch({ sessionToken, prepared:prepared.map(item => ({ ...item, quiz })) }); } catch (reminderError) { console.error('Batch reminder scheduling error:', reminderError.message); }
   return { schedules, failed:[], message:'Envios diários colocados na fila de agendamento.' };
 }
 
