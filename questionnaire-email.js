@@ -945,7 +945,7 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
 }
 
 function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, deadline, questionnaireUrl }) {
-  const template = normalizeEmailTemplate(rawTemplate); const values = { firstName:firstName || 'Olá', quizTitle:quizTitle || 'Questionário', deadline, year:new Date().getFullYear() }; const primary = template.primaryColor; const background = template.backgroundColor; const text = template.textColor;   const brand = escapeHtml(template.brandName); const title = escapeHtml(replaceEmailTokens(template.title, values)); const greeting = escapeHtml(replaceEmailTokens(template.greeting, values)); const intro = escapeHtml(replaceEmailTokens(template.intro, values)); const body = escapeHtml(replaceEmailTokens(template.body, values)); const button = escapeHtml(replaceEmailTokens(template.buttonText, values)); const deadlineText = escapeHtml(replaceEmailTokens(template.deadlineText, values)); const footer = escapeHtml(replaceEmailTokens(template.footerText, values)); const safeUrl = escapeHtml(questionnaireUrl); const logoSource = emailAssetUrl(template.logoDataUrl || template.logoUrl); const logo = logoSource ? `<img src="${escapeHtml(logoSource)}" alt="${brand}" style="display:block;max-width:190px;max-height:64px;height:auto;object-fit:contain;margin:0 0 12px">` : ''; const showBrandName = !logoSource || template.showBrandName !== false; const brandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:${primary};font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const softBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#7d73ad;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const midnightBrandMarkup = showBrandName ? `<p style="margin:0;color:#d4b76a;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const botanicalBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#557253;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const terracottaBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#a85f4d;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const classicBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p>` : ''; const paragraphBlock = `<p style="margin:0 0 17px;line-height:1.62">${intro}</p><p style="margin:0 0 24px;line-height:1.62">${body}</p><p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:${primary};border-radius:${template.layout === 'modern' ? '999px' : '10px'};color:#fff;padding:13px 20px;text-decoration:none;font-weight:700">${button}</a></p><p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">${deadlineText}</p>`;
+  const template = normalizeEmailTemplate(rawTemplate); const values = { firstName:firstName || 'Olá', quizTitle:quizTitle || 'Questionário', deadline, year:new Date().getFullYear() }; const primary = template.primaryColor; const background = template.backgroundColor; const text = template.textColor;   const brand = escapeHtml(template.brandName); const title = escapeHtml(replaceEmailTokens(template.title, values)); const greeting = escapeHtml(replaceEmailTokens(template.greeting, values)); const intro = escapeHtml(replaceEmailTokens(template.intro, values)).replace(/\n/g, '<br>'); const body = escapeHtml(replaceEmailTokens(template.body, values)).replace(/\n/g, '<br>'); const button = escapeHtml(replaceEmailTokens(template.buttonText, values)); const deadlineText = escapeHtml(replaceEmailTokens(template.deadlineText, values)); const footer = escapeHtml(replaceEmailTokens(template.footerText, values)); const safeUrl = escapeHtml(questionnaireUrl); const logoSource = emailAssetUrl(template.logoDataUrl || template.logoUrl); const logo = logoSource ? `<img src="${escapeHtml(logoSource)}" alt="${brand}" style="display:block;max-width:190px;max-height:64px;height:auto;object-fit:contain;margin:0 0 12px">` : ''; const showBrandName = !logoSource || template.showBrandName !== false; const brandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:${primary};font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const softBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#7d73ad;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const midnightBrandMarkup = showBrandName ? `<p style="margin:0;color:#d4b76a;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const botanicalBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#557253;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const terracottaBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#a85f4d;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const classicBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p>` : ''; const paragraphBlock = `${intro ? `<p style="margin:0 0 17px;line-height:1.62">${intro}</p>` : ''}${body ? `<p style="margin:0 0 24px;line-height:1.62">${body}</p>` : ''}${button && safeUrl ? `<p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:${primary};border-radius:${template.layout === 'modern' ? '999px' : '10px'};color:#fff;padding:13px 20px;text-decoration:none;font-weight:700">${button}</a></p>` : ''}${deadlineText ? `<p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">${deadlineText}</p>` : ''}`;
   let inner;
   if (template.layout === 'modern') inner = `<div style="border-left:7px solid ${primary};background:#fff;padding:30px 28px"><div style="margin-bottom:14px">${logo}${brandMarkup}</div><h1 style="margin:0 0 24px;color:${text};font-size:25px;line-height:1.2">${title}</h1><p style="margin:0 0 20px;color:${text};font-weight:700">${greeting}</p>${paragraphBlock}</div>`;
   else if (template.layout === 'editorial') inner = `<div style="background:#fffdf8;padding:32px 29px;border-top:8px solid ${primary}">${logo ? logo.replace('margin:0 0 12px','margin:0 auto 12px') : ''}<h1 style="margin:0 auto 24px;max-width:430px;text-align:center;color:${text};font-family:Georgia,serif;font-size:26px;font-weight:400;line-height:1.2">${title}</h1><p style="margin:0 0 20px;color:${text};font-family:Georgia,serif;font-size:16px">${greeting}</p>${paragraphBlock}</div>`;
@@ -970,11 +970,33 @@ function buildReminderTestEmail({ reminder: rawReminder, patientName = '' }) {
   const safeRecipient = escapeHtml(values.questionnaireUrl);
   const title = escapeHtml(usableText(reminder.title) || 'Lembrete');
   const htmlContent = `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:#faf8f3;font-family:Arial,Helvetica,sans-serif;color:#3d3226;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(168,139,54,.22);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(61,50,38,.1)"><div style="background:#a88b36;color:#fff;padding:25px 28px"><p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p><p style="margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.82">E-mail de teste</p><h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="padding:28px"><div style="margin:0 0 22px;border:1px solid #ead9a6;border-radius:12px;background:#fffaf0;padding:13px 15px;color:#725b20;font-size:13px;line-height:1.5"><strong>Mensagem de teste:</strong> este e-mail foi enviado somente para validar o lembrete. O link abaixo é apenas ilustrativo e não representa um convite real.</div><p style="margin:0 0 16px;font-size:16px;font-weight:700;color:#3d3226">${safeSubject}</p><p style="margin:0 0 20px;color:#3d3226;line-height:1.7">${safeMessage}</p><p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">Os dados exibidos são exemplos e o link acima não representa um convite real.</p><p style="margin:20px 0 0"><a href="${safeRecipient}" style="display:inline-block;background:#a88b36;border-radius:10px;color:#fff;padding:11px 17px;text-decoration:none;font-weight:700">Abrir link de exemplo</a></p></div></div><p style="font-size:12px;color:#827766;text-align:center;margin:18px 0 0">Jessica Melo Nutricionista · Teste de lembrete</p></div></body></html>`;
-  return { subject:`Teste de lembrete — ${subject}`, htmlContent };
+  return { subject:`Teste de lembrete — ${subject}`.slice(0, 180), htmlContent };
 }
 
-async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template }) {
-  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const htmlContent = buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl });   return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject:replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }), htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
+const DEFAULT_SERVER_REMINDERS = [
+  { id:'new_quiz', title:'Novo Questionário', active:true, email:true, subject:'Seu questionário está pronto', message:'Olá, {primeiro_nome}!\n\nSeu questionário {questionario} já está disponível. Responda quando puder pelo link: {link_questionario}', routine:{ triggers:[{ offset:0, unit:'minutes', relation:'after', time:'' }] } },
+  { id:'service_ending', title:'Serviço Finalizando', active:true, email:true, subject:'Seu acompanhamento está chegando ao fim', message:'Olá, {primeiro_nome}!\n\nSeu acompanhamento está próximo do fim. Faltam {dias_restantes} dias para o encerramento. Se precisar de ajuda, fale comigo.', routine:{ triggers:[{ offset:3, unit:'days', relation:'before', time:'' }, { offset:8, unit:'hours', relation:'before', time:'' }] } },
+  { id:'response_due', title:'Prazo de Resposta', active:true, email:true, subject:'Lembrete: prazo do questionário', message:'Olá, {primeiro_nome}!\n\nO prazo para responder {questionario} termina em {prazo}. Reserve alguns minutos e envie suas respostas pelo link: {link_questionario}', routine:{ triggers:[{ offset:12, unit:'hours', relation:'before', time:'' }] } }
+];
+function normalizeServerReminderTrigger(trigger = {}) { const data = trigger && typeof trigger === 'object' ? trigger : {}; const units = ['minutes','hours','days']; const relations = ['before','after']; const offset = Number(data.offset); return { offset:Number.isFinite(offset) ? Math.max(0, Math.min(5256000, Math.round(offset))) : 0, unit:units.includes(data.unit) ? data.unit : 'hours', relation:relations.includes(data.relation) ? data.relation : 'before', time:/^([01]\d|2[0-3]):[0-5]\d$/.test(String(data.time || '')) ? String(data.time) : '' }; }
+function normalizeServerReminder(item, fallback) { const data = item && typeof item === 'object' ? item : {}; const routine = data.routine && typeof data.routine === 'object' ? data.routine : {}; const sourceTriggers = Array.isArray(routine.triggers) && routine.triggers.length ? routine.triggers : fallback.routine.triggers; return { ...fallback, ...data, id:fallback.id, title:usableText(data.title) || fallback.title, active:data.active !== false, email:data.email !== false, subject:usableText(data.subject) || fallback.subject, message:usableText(data.message) || fallback.message, routine:{ ...fallback.routine, ...routine, triggers:(sourceTriggers || []).slice(0, 8).map(normalizeServerReminderTrigger) } }; }
+function normalizeServerReminders(value) { const list = Array.isArray(value) ? value : []; return DEFAULT_SERVER_REMINDERS.map(fallback => normalizeServerReminder(list.find(item => item?.id === fallback.id), fallback)); }
+async function getReminderSettings(sessionToken) { try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => recordTheme(item) === '__patient_reminder_settings__' || recordSource(item) === 'reminder://settings'); if (!record) return normalizeServerReminders([]); let data = []; try { data = JSON.parse(String(record.description || '[]')); } catch {} return normalizeServerReminders(data); } catch (error) { console.error('Reminder settings load error:', error.message); return normalizeServerReminders([]); } }
+function formatReminderDeadline(value) { const timestamp = Date.parse(value); return Number.isFinite(timestamp) ? new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(timestamp)) : ''; }
+function reminderDaysRemaining(value) { const timestamp = Date.parse(value); return Number.isFinite(timestamp) ? String(Math.max(0, Math.ceil((timestamp - Date.now()) / 86400000))) : ''; }
+function buildReminderEmail({ reminder:rawReminder, template:rawTemplate, patientName = '', quizTitle = '', expiresAt = '', accessToken = '', kind = '' }) { const reminder = rawReminder && typeof rawReminder === 'object' ? rawReminder : {}; const patient = usableText(patientName) || 'Paciente'; const questionnaireUrl = accessToken ? `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}` : ''; const deadline = formatReminderDeadline(expiresAt); const values = { firstName:patient.split(/\s+/)[0] || 'Olá', patient, quizTitle:usableText(quizTitle) || 'Questionário', deadline, daysRemaining:reminderDaysRemaining(expiresAt), questionnaireUrl, nutritionist:'Jessica Melo' }; const subject = replaceReminderTokens(usableText(reminder.subject) || 'Lembrete', values).slice(0, 180); const message = replaceReminderTokens(usableText(reminder.message) || 'Esta é uma mensagem de acompanhamento.', values); const template = normalizeEmailTemplate({ ...rawTemplate, title:usableText(reminder.title) || 'Lembrete', greeting:'', intro:message, body:'', buttonText:questionnaireUrl ? 'Responder questionário' : '', deadlineText:questionnaireUrl && deadline ? `Este questionário fica disponível até ${deadline}.` : '' }); const htmlContent = buildInvitationEmail({ template, firstName:values.firstName, quizTitle:values.quizTitle, deadline, questionnaireUrl }); return { subject, htmlContent, kind }; }
+function reminderOffsetMilliseconds(trigger) { const value = Math.max(0, Number(trigger?.offset || 0)); const unit = trigger?.unit === 'minutes' ? 60000 : trigger?.unit === 'days' ? 86400000 : 3600000; return value * unit; }
+function localDateFromTimestamp(timestamp) { const parts = new Intl.DateTimeFormat('en-CA', { timeZone:'America/Sao_Paulo', year:'numeric', month:'2-digit', day:'2-digit' }).formatToParts(new Date(timestamp)); const pick = type => parts.find(part => part.type === type)?.value || ''; return `${pick('year')}-${pick('month')}-${pick('day')}`; }
+function reminderTriggerAt(baseAt, trigger) { const baseTimestamp = Date.parse(baseAt); if (!Number.isFinite(baseTimestamp)) return ''; const direction = trigger?.relation === 'after' ? 1 : -1; const targetTimestamp = baseTimestamp + direction * reminderOffsetMilliseconds(trigger); if (trigger?.time) return localDateTimeToIso(localDateFromTimestamp(targetTimestamp), trigger.time); return new Date(targetTimestamp).toISOString(); }
+function addDateKey(dateKey, days) { const date = new Date(`${String(dateKey || '').slice(0, 10)}T12:00:00.000Z`); if (!Number.isFinite(date.getTime())) return ''; date.setUTCDate(date.getUTCDate() + Number(days || 0)); return date.toISOString().slice(0, 10); }
+function normalizeStoredServiceLinkForReminder(record) { const data = parseStoredRecord(record); const source = recordSource(record).toLowerCase(); if (recordTheme(record) !== '__patient_service_link__' && !source.startsWith('patient-service-link://')) return null; return { id:usableText(data.id || record?.id), patientKey:usableText(data.patientKey || data.patient_key), patientName:usableText(data.patientName || data.patient_name || record?.title), serviceName:usableText(data.serviceName || data.service_name || data.title || record?.title) || 'acompanhamento nutricional', duration:Math.max(0, Number(data.duration || data.durationDays || data.duration_days || 0)), startDate:usableText(data.startDate || data.start_date), status:usableText(data.status || 'active').toLowerCase() }; }
+function buildReminderQueueEntry({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '' }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:`email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
+async function scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) { const reminders = await getReminderSettings(sessionToken); const records = await listStoredQuestionnaireRecords(sessionToken); const jobs = []; const now = Date.now() + 11 * 60 * 1000; const responseReminder = reminders.find(item => item.id === 'response_due'); if (responseReminder?.active && responseReminder.email) { (responseReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => { const reminderAt = reminderTriggerAt(expiresAt, trigger); const timestamp = Date.parse(reminderAt); if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return; jobs.push(buildReminderQueueEntry({ reminder:responseReminder, kind:'response_due', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt, referenceAt:expiresAt, contextId:invitation.id, parentScheduleKey })); }); }
+  const serviceReminder = reminders.find(item => item.id === 'service_ending'); if (serviceReminder?.active && serviceReminder.email) { records.map(normalizeStoredServiceLinkForReminder).filter(item => item && item.patientKey === invitation.patientKey && item.status === 'active' && item.startDate && item.duration > 0).forEach(service => { const endDate = addDateKey(service.startDate, Math.max(0, service.duration - 1)); const serviceEndAt = localDateTimeToIso(endDate, '23:59'); (serviceReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => { const reminderAt = reminderTriggerAt(serviceEndAt, trigger); const timestamp = Date.parse(reminderAt); if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return; jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:service.id || `${service.startDate}:${service.duration}`, serviceName:service.serviceName, parentScheduleKey })); }); }); }
+  if (!jobs.length) return []; await enqueueStoredScheduleBatch(sessionToken, jobs); return jobs; }
+
+async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template, reminder = null }) {
+  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const reminderEmail = reminder && reminder.active !== false && reminder.email !== false ? buildReminderEmail({ reminder, template:normalizedTemplate, patientName, quizTitle:quiz.title, expiresAt, accessToken, kind:'new_quiz' }) : null; const htmlContent = reminderEmail?.htmlContent || buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); const subject = reminderEmail?.subject || replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject, htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
 }
 
 async function sendResponseReceipt({ invitation, quiz, answers, summary }) {
@@ -1130,6 +1152,15 @@ async function markQueueProvider(secret, scheduleId, providerMessageId, provider
   const value = await callRpc('app_questionnaire_schedule_mark_provider', { p_secret:secret, p_schedule_id:scheduleId, p_provider_message_id:providerMessageId, p_provider_status:providerStatus });
   return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
 }
+async function markQueueSent(secret, scheduleId, providerMessageId) {
+  try {
+    const value = await callRpc('app_questionnaire_schedule_mark_sent', { p_secret:secret, p_schedule_id:scheduleId, p_provider_message_id:providerMessageId, p_provider_status:'sent' });
+    return normalizeQueueSchedule(Array.isArray(value) ? value[0] : value);
+  } catch (error) {
+    console.error('Reminder sent-status RPC fallback:', error.message);
+    return markQueueProvider(secret, scheduleId, providerMessageId, 'sent');
+  }
+}
 
 async function markQueueFailure(secret, scheduleId, errorMessage, retryable = true) {
   const value = await callRpc('app_questionnaire_schedule_mark_failure', { p_secret:secret, p_schedule_id:scheduleId, p_error_message:errorMessage, p_retryable:retryable });
@@ -1155,6 +1186,9 @@ async function createQuestionnaireSchedule({ sessionToken, patientKey, patientNa
     expiresAt:Date.parse(expiresAt)
   };
   const accessToken = encryptInvitation(invitation);
+  const snapshotReminders = await getReminderSettings(sessionToken);
+  const snapshotTemplate = await getEmailTemplate(sessionToken);
+  const queueQuizSnapshot = { ...quiz, __emailTemplate:snapshotTemplate, __emailReminders:snapshotReminders, __emailNewQuizReminder:snapshotReminders.find(item => item.id === 'new_quiz') };
   const schedule = await enqueueStoredSchedule(sessionToken, {
     scheduleKey,
     patientKey,
@@ -1163,16 +1197,19 @@ async function createQuestionnaireSchedule({ sessionToken, patientKey, patientNa
     quizLinkId:quizLinkId || '',
     quizId:quiz.id,
     quizTitle:quiz.title,
-    quizSnapshot:quiz,
+    quizSnapshot:queueQuizSnapshot,
     invitationToken:accessToken,
     scheduledFor:scheduledAt,
     expiresAt:new Date(expiresAt).toISOString()
   });
   try { await storeInvitation(invitation, quiz); } catch (error) { console.error('Queued invitation history error:', error.message); }
+  try { await scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt, expiresAt:new Date(expiresAt).toISOString(), parentScheduleKey:scheduleKey }); } catch (reminderError) { console.error('Queued reminder scheduling error:', reminderError.message); }
   return { schedule, duplicate:false };
 }
 
 async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, entries }) {
+  const snapshotReminders = await getReminderSettings(sessionToken);
+  const snapshotTemplate = await getEmailTemplate(sessionToken);
   const prepared = entries.map((entry, index) => {
     const scheduledAt = validateQueueScheduledAt(entry.scheduledAt || localDateTimeToIso(entry.date, entry.time));
     const expiresAt = responseDeadline(scheduledAt, entry.responseAmount, entry.responseUnit);
@@ -1201,13 +1238,17 @@ async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, pati
       quizLinkId:quizLinkId || '',
       quizId:quiz.id,
       quizTitle:quiz.title,
-      quizSnapshot:quiz,
+      quizSnapshot:{ ...quiz, __emailTemplate:snapshotTemplate, __emailReminders:snapshotReminders, __emailNewQuizReminder:snapshotReminders.find(item => item.id === 'new_quiz') },
       invitationToken:encryptInvitation(invitation),
       scheduledFor:scheduledAt,
-      expiresAt
+      scheduledAt,
+      expiresAt,
+      invitation,
+      accessToken:encryptInvitation(invitation)
     };
   });
   const schedules = await enqueueStoredScheduleBatch(sessionToken, prepared);
+  for (const item of prepared) { try { await scheduleReminderJobs({ sessionToken, invitation:item.invitation, quiz, accessToken:item.accessToken, scheduledAt:item.scheduledAt || item.scheduledFor, expiresAt:item.expiresAt, parentScheduleKey:item.scheduleKey }); } catch (reminderError) { console.error('Batch reminder scheduling error:', reminderError.message); } }
   return { schedules, failed:[], message:'Envios diários colocados na fila de agendamento.' };
 }
 
@@ -1268,10 +1309,22 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
     const scheduledAt = new Date(schedule.scheduled_for).toISOString();
     const expiresAt = new Date(schedule.expires_at).toISOString();
     try {
-      const quiz = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
-      if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
+      const snapshot = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
       const invitation = decryptInvitation(schedule.invitation_token);
-      const template = await getEmailTemplate(invitation.sessionToken);
+      const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
+      if (snapshot?.__emailReminder) {
+        const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
+        const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
+        const reminderProviderMessageId = usableText(reminderResult.messageId);
+        if (!reminderProviderMessageId) throw new Error('O provedor não retornou o identificador do lembrete.');
+        const reminderStored = await markQueueSent(secret, schedule.id, reminderProviderMessageId);
+        processed.push({ id:schedule.id, providerMessageId:reminderProviderMessageId, scheduledFor:scheduledAt, status:reminderStored.status, kind:snapshot.__emailReminder.kind });
+        continue;
+      }
+      const quiz = snapshot;
+      if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
+      const reminders = Array.isArray(snapshot?.__emailReminders) ? snapshot.__emailReminders : await getReminderSettings(invitation.sessionToken);
+      const newQuizReminder = snapshot?.__emailNewQuizReminder || reminders.find(item => item.id === 'new_quiz');
       try { await storeInvitation(invitation, quiz); } catch (historyError) { console.error('Queued invitation history error:', historyError.message); }
       const brevoResult = await sendQuestionnaireEmail({
         recipientEmail:schedule.recipient_email,
@@ -1280,7 +1333,8 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
         accessToken:schedule.invitation_token,
         expiresAt:Date.parse(expiresAt),
         scheduledAt,
-        template
+        template,
+        reminder:newQuizReminder
       });
       const providerMessageId = usableText(brevoResult.messageId);
       if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
@@ -1353,8 +1407,11 @@ export default async function handler(req, res) {
       const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, quizLinkId, sendMode:requestedSendMode || 'unique', sentAt, expiresAt };
       const accessToken = encryptInvitation(invitation);
       const template = await getEmailTemplate(sessionToken);
-      const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template });
+      const reminders = await getReminderSettings(sessionToken);
+      const newQuizReminder = reminders.find(item => item.id === 'new_quiz');
+      const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template, reminder:newQuizReminder });
       await storeInvitation({ ...invitation, providerMessageId:brevoResult.messageId || '' }, quiz);
+      try { await scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt:sentAt, expiresAt:new Date(expiresAt).toISOString() }); } catch (reminderError) { console.error('Immediate reminder scheduling error:', reminderError.message); }
       return json(res, 200, { success: true, message: 'Questionário enviado por e-mail.', expiresAt: new Date(expiresAt).toISOString(), providerMessageId: brevoResult.messageId || null });
     }
 
