@@ -13,6 +13,7 @@ const EMAIL_QUIZ_CLICK_THEME = '__email_quiz_click__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
+const PATIENT_PROFILE_THEME = '__patient_profile__';
 // Marco da nova base do relatório: registros anteriores permanecem preservados,
 // mas não entram nos totais de envios de e-mail a partir desta publicação.
 const EMAIL_REPORT_COUNTING_START_AT = '2026-08-27T14:52:35.000Z';
@@ -389,6 +390,28 @@ function recordTheme(record) {
 function parseStoredRecord(record) {
   if (record?.description && typeof record.description === 'object') return record.description;
   try { return JSON.parse(String(record?.description || '{}')); } catch { return {}; }
+}
+
+function isPatientProfileRecord(record) {
+  const source = recordSource(record).toLowerCase();
+  return recordTheme(record) === PATIENT_PROFILE_THEME || /^patient-profile:\/\//i.test(source);
+}
+
+function normalizeStoredPatientProfile(record) {
+  const data = parseStoredRecord(record);
+  return {
+    id: usableText(data.id || data.patientKey || record?.id),
+    name: usableText(data.name || data.title || record?.title) || 'Paciente',
+    email: usableText(data.email || data.recipientEmail || record?.email).toLowerCase()
+  };
+}
+
+async function findRegisteredPatientForTest(sessionToken, patientKey, recipientEmail) {
+  const profiles = (await listStoredQuestionnaireRecords(sessionToken))
+    .filter(isPatientProfileRecord)
+    .map(normalizeStoredPatientProfile)
+    .filter(profile => profile.id && validEmail(profile.email));
+  return profiles.find(profile => profile.id === patientKey && profile.email === recipientEmail) || null;
 }
 
 function isEmailQuizInvitationRecord(record) {
@@ -847,9 +870,10 @@ function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, dea
   const footerColor = template.layout === 'midnight' ? '#d4d8e0' : '#827766'; return `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:${background};font-family:Arial,Helvetica,sans-serif;color:${text};line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${template.layout === 'soft' ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="font-size:12px;color:${footerColor};text-align:center;margin:18px 0 0">${footer}</p></div></body></html>`;
 }
 
-function buildReminderTestEmail({ reminder: rawReminder }) {
+function buildReminderTestEmail({ reminder: rawReminder, patientName = '' }) {
   const reminder = rawReminder && typeof rawReminder === 'object' ? rawReminder : {};
-  const values = { firstName:'Marina', patient:'Marina Alves', quizTitle:'Acompanhamento semanal', deadline:'15 de setembro de 2026', daysRemaining:'3', questionnaireUrl:`${QUESTIONNAIRE_BASE_URL}?teste=1`, nutritionist:'Jessica Melo', year:new Date().getFullYear() };
+  const patient = usableText(patientName) || 'Paciente selecionado';
+  const values = { firstName:patient.split(/\s+/)[0] || 'Olá', patient, quizTitle:'Acompanhamento semanal', deadline:'15 de setembro de 2026', daysRemaining:'3', questionnaireUrl:`${QUESTIONNAIRE_BASE_URL}?teste=1`, nutritionist:'Jessica Melo', year:new Date().getFullYear() };
   const subject = replaceReminderTokens(usableText(reminder.subject) || 'Teste de lembrete', values).slice(0, 180);
   const message = replaceReminderTokens(usableText(reminder.message) || 'Esta é uma mensagem de teste do lembrete.', values).slice(0, 1200);
   const brand = escapeHtml('Jessica Melo Nutricionista');
@@ -857,7 +881,7 @@ function buildReminderTestEmail({ reminder: rawReminder }) {
   const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
   const safeRecipient = escapeHtml(values.questionnaireUrl);
   const title = escapeHtml(usableText(reminder.title) || 'Lembrete');
-  const htmlContent = `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:#faf8f3;font-family:Arial,Helvetica,sans-serif;color:#3d3226;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(168,139,54,.22);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(61,50,38,.1)"><div style="background:#a88b36;color:#fff;padding:25px 28px"><p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p><p style="margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.82">E-mail de teste</p><h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="padding:28px"><div style="margin:0 0 22px;border:1px solid #ead9a6;border-radius:12px;background:#fffaf0;padding:13px 15px;color:#725b20;font-size:13px;line-height:1.5"><strong>Mensagem de teste:</strong> este e-mail foi enviado somente para validar o lembrete. Nenhum paciente foi notificado.</div><p style="margin:0 0 16px;font-size:16px;font-weight:700;color:#3d3226">${safeSubject}</p><p style="margin:0 0 20px;color:#3d3226;line-height:1.7">${safeMessage}</p><p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">Os dados exibidos são exemplos e o link acima não representa um convite real.</p><p style="margin:20px 0 0"><a href="${safeRecipient}" style="display:inline-block;background:#a88b36;border-radius:10px;color:#fff;padding:11px 17px;text-decoration:none;font-weight:700">Abrir link de exemplo</a></p></div></div><p style="font-size:12px;color:#827766;text-align:center;margin:18px 0 0">Jessica Melo Nutricionista · Teste de lembrete</p></div></body></html>`;
+  const htmlContent = `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:#faf8f3;font-family:Arial,Helvetica,sans-serif;color:#3d3226;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(168,139,54,.22);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(61,50,38,.1)"><div style="background:#a88b36;color:#fff;padding:25px 28px"><p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p><p style="margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.82">E-mail de teste</p><h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="padding:28px"><div style="margin:0 0 22px;border:1px solid #ead9a6;border-radius:12px;background:#fffaf0;padding:13px 15px;color:#725b20;font-size:13px;line-height:1.5"><strong>Mensagem de teste:</strong> este e-mail foi enviado somente para validar o lembrete. O link abaixo é apenas ilustrativo e não representa um convite real.</div><p style="margin:0 0 16px;font-size:16px;font-weight:700;color:#3d3226">${safeSubject}</p><p style="margin:0 0 20px;color:#3d3226;line-height:1.7">${safeMessage}</p><p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">Os dados exibidos são exemplos e o link acima não representa um convite real.</p><p style="margin:20px 0 0"><a href="${safeRecipient}" style="display:inline-block;background:#a88b36;border-radius:10px;color:#fff;padding:11px 17px;text-decoration:none;font-weight:700">Abrir link de exemplo</a></p></div></div><p style="font-size:12px;color:#827766;text-align:center;margin:18px 0 0">Jessica Melo Nutricionista · Teste de lembrete</p></div></body></html>`;
   return { subject:`Teste de lembrete — ${subject}`, htmlContent };
 }
 
@@ -1200,16 +1224,20 @@ export default async function handler(req, res) {
 
     if (action === 'test-reminder') {
       const sessionToken = String(body.sessionToken || '');
+      const patientKey = String(body.patientKey || '').trim();
+      const requestedEmail = String(body.recipientEmail || '').trim().toLowerCase();
       if (!sessionToken) return json(res, 400, { success:false, message:'Não foi possível iniciar o teste. Entre novamente no painel.' });
-      const admin = await requireAdmin(sessionToken);
-      const recipientEmail = String(admin.email || '').trim().toLowerCase();
-      if (!validEmail(recipientEmail)) return json(res, 400, { success:false, message:'Não foi possível identificar o e-mail da conta administrativa para receber o teste.' });
+      await requireAdmin(sessionToken);
+      if (!patientKey || !validEmail(requestedEmail)) return json(res, 400, { success:false, message:'Selecione um paciente cadastrado com e-mail válido antes de enviar o teste.' });
+      const patient = await findRegisteredPatientForTest(sessionToken, patientKey, requestedEmail);
+      if (!patient) return json(res, 400, { success:false, message:'O paciente selecionado não foi encontrado ou não possui o e-mail informado no cadastro.' });
       const reminder = body.reminder && typeof body.reminder === 'object' ? body.reminder : {};
-      const { subject, htmlContent } = buildReminderTestEmail({ reminder });
+      const { subject, htmlContent } = buildReminderTestEmail({ reminder, patientName:patient.name });
       try {
-        await sendBrevoEmail({ to:{ email:recipientEmail, name:usableText(admin.name) || 'Administrador' }, subject, htmlContent, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:'Jessica Melo Nutricionista' }, tags:['reminder-test','questionnaire-test'] });
-        return json(res, 200, { success:true, message:`E-mail de teste enviado para ${recipientEmail}.`, recipientEmail });
+        await sendBrevoEmail({ to:{ email:patient.email, name:patient.name }, subject, htmlContent, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:'Jessica Melo Nutricionista' }, tags:['reminder-test','questionnaire-test'] });
+        return json(res, 200, { success:true, message:`E-mail de teste enviado para ${patient.email}.`, recipientEmail:patient.email, patientKey:patient.id, patientName:patient.name });
       } catch (error) {
+        console.error('Reminder test email error:', error.message);
         return json(res, 502, { success:false, message:'Não foi possível enviar o e-mail de teste. Tente novamente e, caso o problema se repita, entre em contato com o suporte.' });
       }
     }
