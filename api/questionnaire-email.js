@@ -15,6 +15,7 @@ const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
 const PATIENT_PROFILE_THEME = '__patient_profile__';
 const PATIENT_QUIZ_LINK_THEME = '__patient_quiz_link__';
+const PATIENT_SERVICE_LINK_THEME = '__patient_service_link__';
 const EMAIL_SEND_MODES = new Set(['unique', 'daily', 'weekly', 'manual', 'open']);
 const EMAIL_SEND_MODE_LABELS = { unique:'Envio Único', daily:'Envio Diário', weekly:'Envio Semanal', manual:'Envio Manual', open:'Envio Aberto' };
 // Marco da nova base do relatório: registros anteriores permanecem preservados,
@@ -990,12 +991,124 @@ function localDateFromTimestamp(timestamp) { const parts = new Intl.DateTimeForm
 function reminderTriggerAt(baseAt, trigger) { const baseTimestamp = Date.parse(baseAt); if (!Number.isFinite(baseTimestamp)) return ''; const direction = trigger?.relation === 'after' ? 1 : -1; const targetTimestamp = baseTimestamp + direction * reminderOffsetMilliseconds(trigger); if (trigger?.time) return localDateTimeToIso(localDateFromTimestamp(targetTimestamp), trigger.time); return new Date(targetTimestamp).toISOString(); }
 function addDateKey(dateKey, days) { const date = new Date(`${String(dateKey || '').slice(0, 10)}T12:00:00.000Z`); if (!Number.isFinite(date.getTime())) return ''; date.setUTCDate(date.getUTCDate() + Number(days || 0)); return date.toISOString().slice(0, 10); }
 function normalizeStoredServiceLinkForReminder(record) { const data = parseStoredRecord(record); const source = recordSource(record).toLowerCase(); if (recordTheme(record) !== '__patient_service_link__' && !source.startsWith('patient-service-link://')) return null; return { id:usableText(data.id || record?.id), patientKey:usableText(data.patientKey || data.patient_key), patientName:usableText(data.patientName || data.patient_name || record?.title), serviceName:usableText(data.serviceName || data.service_name || data.title || record?.title) || 'acompanhamento nutricional', duration:Math.max(0, Number(data.duration || data.durationDays || data.duration_days || 0)), startDate:usableText(data.startDate || data.start_date), status:usableText(data.status || 'active').toLowerCase() }; }
-function buildReminderQueueEntry({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '' }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:`email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
+function normalizeServiceReminderInput(value = {}) {
+  const data = value && typeof value === 'object' ? value : {};
+  return {
+    id: usableText(data.id),
+    patientKey: usableText(data.patientKey || data.patient_key),
+    patientName: usableText(data.patientName || data.patient_name) || 'Paciente',
+    serviceName: usableText(data.serviceName || data.service_name || data.title) || 'acompanhamento nutricional',
+    duration: Math.max(0, Math.min(3650, Number(data.duration || data.durationDays || data.duration_days || 0))),
+    startDate: usableText(data.startDate || data.start_date).slice(0, 10),
+    status: usableText(data.status || 'active').toLowerCase()
+  };
+}
+
+function serviceReminderEndAt(service) {
+  const normalized = normalizeServiceReminderInput(service);
+  if (!validDateKey(normalized.startDate) || normalized.duration <= 0) return '';
+  const endDate = addDateKey(normalized.startDate, Math.max(0, normalized.duration - 1));
+  return localDateTimeToIso(endDate, '23:59');
+}
+
+function serviceReminderIsActive(service) {
+  return ['active', 'ativo'].includes(String(service?.status || '').toLowerCase());
+}
+
+async function findRegisteredPatientForService(sessionToken, service) {
+  const normalized = normalizeServiceReminderInput(service);
+  const entries = await callRpc('app_list_patients', { p_token:sessionToken });
+  const patientKey = normalized.patientKey.toLowerCase();
+  const patient = (Array.isArray(entries) ? entries : []).find(item => {
+    const id = usableText(item?.id).toLowerCase();
+    const email = usableText(item?.email).toLowerCase();
+    return id === patientKey || email === patientKey;
+  });
+  if (!patient || !validEmail(patient.email)) throw new Error('O paciente do vínculo não possui um e-mail válido cadastrado.');
+  return { id:usableText(patient.id) || normalized.patientKey, name:usableText(patient.name) || normalized.patientName, email:usableText(patient.email).toLowerCase() };
+}
+
+const SERVICE_REMINDER_TERMINAL_STATUSES = new Set(['enviado', 'entregue', 'sent', 'delivered', 'cancelado', 'cancelled', 'expirado', 'expired']);
+
+async function cancelObsoleteServiceReminderSchedules(sessionToken, serviceId, desiredKeys = new Set(), schedules = []) {
+  const prefix = `email-reminder:service_ending:${serviceId}:`;
+  const candidates = (Array.isArray(schedules) ? schedules : []).filter(schedule => {
+    const status = String(schedule?.status || '').toLowerCase();
+    return String(schedule?.scheduleKey || '').startsWith(prefix) && !desiredKeys.has(schedule.scheduleKey) && !SERVICE_REMINDER_TERMINAL_STATUSES.has(status);
+  });
+  let cancelled = 0;
+  for (const schedule of candidates) {
+    if (schedule.providerMessageId) await cancelBrevoEmail(schedule.providerMessageId);
+    await cancelStoredSchedule(sessionToken, schedule);
+    cancelled += 1;
+  }
+  return cancelled;
+}
+
+function buildReminderQueueEntry
+({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '', scheduleKey = '' }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:scheduleKey || `email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
 async function scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) { const reminders = await getReminderSettings(sessionToken); const records = await listStoredQuestionnaireRecords(sessionToken); const jobs = []; const now = Date.now() + 11 * 60 * 1000; const responseReminder = reminders.find(item => item.id === 'response_due'); if (responseReminder?.active && responseReminder.email) { (responseReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => { const reminderAt = reminderTriggerAt(expiresAt, trigger); const timestamp = Date.parse(reminderAt); if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return; jobs.push(buildReminderQueueEntry({ reminder:responseReminder, kind:'response_due', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt, referenceAt:expiresAt, contextId:invitation.id, parentScheduleKey })); }); }
   const serviceReminder = reminders.find(item => item.id === 'service_ending'); if (serviceReminder?.active && serviceReminder.email) { records.map(normalizeStoredServiceLinkForReminder).filter(item => item && item.patientKey === invitation.patientKey && item.status === 'active' && item.startDate && item.duration > 0).forEach(service => { const endDate = addDateKey(service.startDate, Math.max(0, service.duration - 1)); const serviceEndAt = localDateTimeToIso(endDate, '23:59'); (serviceReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => { const reminderAt = reminderTriggerAt(serviceEndAt, trigger); const timestamp = Date.parse(reminderAt); if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return; jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:service.id || `${service.startDate}:${service.duration}`, serviceName:service.serviceName, parentScheduleKey })); }); }); }
   if (!jobs.length) return []; await enqueueStoredScheduleBatch(sessionToken, jobs); return jobs; }
 
-async function sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template, reminder = null }) {
+async function scheduleServiceReminderJobs({ sessionToken, service }) {
+  const normalized = normalizeServiceReminderInput(service);
+  if (!normalized.id || !normalized.patientKey) throw new Error('O vínculo de serviço não possui uma identificação válida.');
+  const reminders = await getReminderSettings(sessionToken);
+  const serviceReminder = reminders.find(item => item.id === 'service_ending');
+  const schedules = await listStoredSchedules(sessionToken);
+  const serviceEndAt = serviceReminderEndAt(normalized);
+  const canSchedule = serviceReminder?.active && serviceReminder.email && serviceReminderIsActive(normalized) && serviceEndAt;
+  if (!canSchedule) {
+    const cancelled = await cancelObsoleteServiceReminderSchedules(sessionToken, normalized.id, new Set(), schedules);
+    return { success:true, scheduled:0, cancelled, serviceEndAt };
+  }
+
+  const patient = await findRegisteredPatientForService(sessionToken, normalized);
+  const invitation = {
+    version:2,
+    id:`service:${normalized.id}`,
+    sessionToken,
+    patientKey:normalized.patientKey,
+    patientName:patient.name,
+    recipientEmail:patient.email,
+    quizId:`service-${normalized.id}`,
+    quizTitle:normalized.serviceName,
+    quizLinkId:'',
+    sendMode:'unique',
+    sentAt:new Date().toISOString(),
+    expiresAt:Date.parse(serviceEndAt) + 86400000
+  };
+  const quiz = { id:`service-${normalized.id}`, title:normalized.serviceName, questionSnapshots:[] };
+  const existingByBase = new Map();
+  schedules.filter(item => String(item?.scheduleKey || '').startsWith(`email-reminder:service_ending:${normalized.id}:`)).forEach(item => {
+    const key = String(item.scheduleKey || '');
+    const base = key.replace(/:rev-\d+$/, '');
+    const list = existingByBase.get(base) || [];
+    list.push(item);
+    existingByBase.set(base, list);
+  });
+  const jobs = [];
+  (serviceReminder.routine?.triggers || []).forEach((trigger, triggerIndex) => {
+    const reminderAt = reminderTriggerAt(serviceEndAt, trigger);
+    const timestamp = Date.parse(reminderAt);
+    if (!Number.isFinite(timestamp) || timestamp <= Date.now() + 11 * 60 * 1000 || timestamp > Date.now() + 180 * 86400000) return;
+    const baseKey = `email-reminder:service_ending:${normalized.id}:${serviceReminder.id}:${triggerIndex}:${reminderAt}`;
+    const sameBase = existingByBase.get(baseKey) || [];
+    const activeExisting = sameBase.find(item => !SERVICE_REMINDER_TERMINAL_STATUSES.has(String(item?.status || '').toLowerCase()));
+    const terminalExisting = sameBase.find(item => SERVICE_REMINDER_TERMINAL_STATUSES.has(String(item?.status || '').toLowerCase()));
+    const stableKey = activeExisting?.scheduleKey || (terminalExisting ? `${baseKey}:rev-${Date.now()}` : baseKey);
+    jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:normalized.id, serviceName:normalized.serviceName, scheduleKey:stableKey }));
+  });
+  const desiredKeys = new Set(jobs.map(item => item.scheduleKey));
+  const cancelled = await cancelObsoleteServiceReminderSchedules(sessionToken, normalized.id, desiredKeys, schedules);
+  if (!jobs.length) return { success:true, scheduled:0, cancelled, serviceEndAt };
+  const queued = await enqueueStoredScheduleBatch(sessionToken, jobs);
+  return { success:true, scheduled:queued.length, cancelled, serviceEndAt, schedules:queued };
+}
+
+async function sendQuestionnaireEmail
+({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template, reminder = null }) {
   const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const reminderEmail = reminder && reminder.active !== false && reminder.email !== false ? buildReminderEmail({ reminder, template:normalizedTemplate, patientName, quizTitle:quiz.title, expiresAt, accessToken, kind:'new_quiz' }) : null; const htmlContent = reminderEmail?.htmlContent || buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); const subject = reminderEmail?.subject || replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject, htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
 }
 
@@ -1314,10 +1427,10 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
       const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
       if (snapshot?.__emailReminder) {
         const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
-        const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
+        const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, scheduledAt, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
         const reminderProviderMessageId = usableText(reminderResult.messageId);
         if (!reminderProviderMessageId) throw new Error('O provedor não retornou o identificador do lembrete.');
-        const reminderStored = await markQueueSent(secret, schedule.id, reminderProviderMessageId);
+        const reminderStored = await markQueueProvider(secret, schedule.id, reminderProviderMessageId, 'scheduled');
         processed.push({ id:schedule.id, providerMessageId:reminderProviderMessageId, scheduledFor:scheduledAt, status:reminderStored.status, kind:snapshot.__emailReminder.kind });
         continue;
       }
@@ -1388,6 +1501,14 @@ export default async function handler(req, res) {
         console.error('Reminder test email error:', error.message);
         return json(res, 502, { success:false, message:'Não foi possível enviar o e-mail de teste. Tente novamente e, caso o problema se repita, entre em contato com o suporte.' });
       }
+    }
+
+    if (action === 'sync-service-reminder') {
+      const sessionToken = String(body.sessionToken || '');
+      if (!sessionToken) return json(res, 400, { success:false, message:'Não foi possível sincronizar o lembrete do serviço. Entre novamente no painel.' });
+      await requireAdmin(sessionToken);
+      const result = await scheduleServiceReminderJobs({ sessionToken, service:body.service });
+      return json(res, 200, result);
     }
 
     if (action === 'send') {
