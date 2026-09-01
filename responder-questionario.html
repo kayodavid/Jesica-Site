@@ -41,7 +41,7 @@
     textarea { min-height:120px; resize:vertical; } textarea:focus, input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(168,139,54,.14); }
     .unit { margin:8px 0 0; color:var(--muted); font-size:12px; }
     .linear-scale { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:7px; margin-top:12px; width:100%; }
-    .linear-scale label { display:grid; place-items:center; flex:1 1 36px; min-width:32px; max-width:52px; min-height:42px; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; transition:transform .16s,border-color .16s,background .16s; }
+    .linear-scale label { display:grid; place-items:center; flex:1 1 38px; min-width:34px; max-width:56px; min-height:42px; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; transition:transform .16s,border-color .16s,background .16s; }
     .linear-scale label:hover { border-color:rgba(168,139,54,.45); transform:translateY(-1px); }
     .linear-scale label:has(input:checked) { color:#fff; background:var(--gold); border-color:var(--gold); }
     .linear-scale input { position:absolute; opacity:0; pointer-events:none; }
@@ -71,7 +71,7 @@
     .clarification-card textarea { min-height:88px; margin-top:8px; background:#fff; }
     .clarification-card p { margin:7px 0 0; color:var(--muted); font-size:11px; line-height:1.5; }
     .hidden { display:none!important; }
-    @media (max-width:600px) { .shell { width:min(100% - 24px,760px); padding-top:20px; }.hero,.question-card { border-radius:16px; padding:20px; }.rich-text,.answer-area,.error { margin-left:0; }.question-image { max-width:100%; margin-left:0; }.submit-row { align-items:stretch; }.submit { width:100%; }.linear-scale { gap:6px; }.linear-scale label { flex:1 1 30px; min-width:28px; max-width:48px; min-height:38px; font-size:13px; } }
+    @media (max-width:600px) { .shell { width:min(100% - 24px,760px); padding-top:20px; }.hero,.question-card { border-radius:16px; padding:20px; }.rich-text,.answer-area,.error { margin-left:0; }.question-image { max-width:100%; margin-left:0; }.submit-row { align-items:stretch; }.submit { width:100%; }.linear-scale { gap:6px; }.linear-scale label { flex:1 1 calc(20% - 6px); min-width:34px; max-width:56px; min-height:38px; font-size:13px; } }
   </style>
 </head>
 <body>
