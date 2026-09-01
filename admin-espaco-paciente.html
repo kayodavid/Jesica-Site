@@ -1573,7 +1573,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const draw = () => { try { updateCounts(); const filtered = filterItems(); const size = Number(pageSize.value); const pages = Math.max(1, Math.ceil(filtered.length / size)); page = Math.min(page, pages); const visible = filtered.slice((page - 1) * size, page * size); const columns = tableColumns.filter(column => column.enabled); drawTableHead(); rows.innerHTML = ''; if (!visible.length) rows.innerHTML = `<tr><td colspan="${columns.length}" class="py-12 text-center text-sm text-gray-500">Nenhum paciente encontrado para estes filtros.</td></tr>`; visible.forEach(item => { const cells = columns.map(column => `<td>${columnData(item, column.id).html}</td>`).join(''); const row = document.createElement('tr'); row.innerHTML = cells; row.querySelector('.patient-name-button')?.addEventListener('click', () => openPatient(item)); rows.appendChild(row); }); pageInfo.textContent = `Página ${page} de ${pages}`; previous.disabled = page === 1; next.disabled = page === pages; } catch (error) { console.error('Não foi possível renderizar a tabela de pacientes.', error); rows.innerHTML = `<tr><td colspan="${Math.max(1, tableColumns.filter(column => column.enabled).length)}" class="py-12 text-center text-sm text-gray-500">Não foi possível atualizar a tabela agora. Tente recarregar a página.</td></tr>`; } };
       const exportCsv = () => { const columns = tableColumns.filter(column => column.enabled); const csvEscape = value => `"${String(value ?? '').replace(/"/g, '""')}"`; const content = [[...columns.map(column => column.title)], ...filterItems().map(item => columns.map(column => columnData(item, column.id).text))].map(row => row.map(csvEscape).join(';')).join('\r\n'); const url = URL.createObjectURL(new Blob([`\ufeff${content}`], { type:'text/csv;charset=utf-8;' })); const link = document.createElement('a'); link.href = url; link.download = `pacientes_${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url); return filterItems().length; };
       const openDrawer = async () => { await refreshFilterOptions(); syncDrawer(); overlay.classList.add('is-open'); drawer.classList.add('is-open'); overlay.setAttribute('aria-hidden','false'); drawer.setAttribute('aria-hidden','false'); };
-      const closeDrawer = () => { overlay.classList.remove('is-open'); drawer.classList.remove('is-open'); overlay.setAttribute('aria-hidden','true'); drawer.setAttribute('aria-hidden','true'); };
+      const closeDrawer = () => { closeCustomDropdown(); overlay.classList.remove('is-open'); drawer.classList.remove('is-open'); overlay.setAttribute('aria-hidden','true'); drawer.setAttribute('aria-hidden','true'); };
       const resetFilters = () => { Object.assign(filters, { lastFrom:'', lastTo:'', service:'', label:'', remaining:'', response:'', whatsapp:'' }); filter = 'ativos'; page = 1; setDirectoryTabs(); syncDrawer(); draw(); };
       const drawConfigRows = () => { configRows.innerHTML = ''; draftTableColumns.forEach((column, index) => { const row = document.createElement('article'); row.className = `patient-table-config-row${column.enabled ? '' : ' is-disabled'}`; const movable = !column.fixed; row.innerHTML = `<span class="patient-table-config-grip" aria-hidden="true">⋮⋮</span><div class="min-w-0"><p class="text-sm font-bold text-dark">${escape(column.title)}</p>${column.fixed ? '<p class="mt-0.5 text-[11px] font-semibold text-primary">Fixo</p>' : '<p class="mt-0.5 text-[11px] text-gray-500">Visível na tabela</p>'}</div><div class="flex items-center gap-2">${movable ? `<div class="patient-table-config-move"><button type="button" data-column-move="up" aria-label="Mover ${escape(column.title)} para cima" ${index <= 1 ? 'disabled' : ''}>↑</button><button type="button" data-column-move="down" aria-label="Mover ${escape(column.title)} para baixo" ${index === draftTableColumns.length - 1 ? 'disabled' : ''}>↓</button></div><label class="patient-table-config-switch" title="${column.enabled ? 'Ocultar coluna' : 'Exibir coluna'}"><input type="checkbox" data-column-enabled ${column.enabled ? 'checked' : ''}><span></span></label>` : '<span class="rounded-md bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary">Fixo</span>'}</div>`; row.querySelector('[data-column-enabled]')?.addEventListener('change', event => { column.enabled = event.target.checked; drawConfigRows(); }); row.querySelector('[data-column-move="up"]')?.addEventListener('click', () => { if (index <= 1) return; [draftTableColumns[index - 1], draftTableColumns[index]] = [draftTableColumns[index], draftTableColumns[index - 1]]; drawConfigRows(); }); row.querySelector('[data-column-move="down"]')?.addEventListener('click', () => { if (index >= draftTableColumns.length - 1) return; [draftTableColumns[index + 1], draftTableColumns[index]] = [draftTableColumns[index], draftTableColumns[index + 1]]; drawConfigRows(); }); configRows.appendChild(row); }); };
       const openTableConfig = () => { draftTableColumns = cloneColumns(tableColumns); drawConfigRows(); configOverlay.classList.add('is-open'); configDrawer.classList.add('is-open'); configOverlay.setAttribute('aria-hidden','false'); configDrawer.setAttribute('aria-hidden','false'); };
@@ -2363,34 +2363,101 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const customTrigger = document.getElementById('patient-link-select-trigger');
       const customTriggerContent = document.getElementById('patient-link-select-trigger-content');
       const customDropdown = document.getElementById('patient-link-select-dropdown');
-      const closeCustomDropdown = () => { customDropdown?.classList.add('hidden'); customTrigger?.setAttribute('aria-expanded','false'); };
-      customTrigger?.addEventListener('click', event => { event.stopPropagation(); const opening = customDropdown.classList.contains('hidden'); customDropdown.classList.toggle('hidden', !opening); customTrigger.setAttribute('aria-expanded', String(opening)); });
-      document.addEventListener('click', event => { if (!customDropdown?.contains(event.target) && !customTrigger?.contains(event.target)) closeCustomDropdown(); });
+      
+      const positionCustomDropdown = () => {
+        if (!customTrigger || !customDropdown || customDropdown.classList.contains('hidden')) return;
+        const rect = customTrigger.getBoundingClientRect();
+        const dropdownHeight = Math.min(260, customDropdown.scrollHeight || 260);
+        const spaceBelow = window.innerHeight - rect.bottom - 12;
+        const spaceAbove = rect.top - 12;
+        
+        customDropdown.style.position = 'fixed';
+        customDropdown.style.zIndex = '220';
+        customDropdown.style.width = `${Math.round(rect.width)}px`;
+        customDropdown.style.left = `${Math.round(rect.left)}px`;
+        
+        if (spaceBelow >= Math.min(160, dropdownHeight) || spaceBelow >= spaceAbove) {
+          customDropdown.style.top = `${Math.round(rect.bottom + 6)}px`;
+          customDropdown.style.maxHeight = `${Math.max(140, Math.min(260, spaceBelow))}px`;
+        } else {
+          const actualHeight = Math.min(dropdownHeight, Math.max(140, spaceAbove));
+          customDropdown.style.top = `${Math.round(rect.top - actualHeight - 6)}px`;
+          customDropdown.style.maxHeight = `${actualHeight}px`;
+        }
+      };
+
+      const closeCustomDropdown = () => {
+        customDropdown?.classList.add('hidden');
+        customTrigger?.setAttribute('aria-expanded','false');
+      };
+
+      customTrigger?.addEventListener('click', event => {
+        event.stopPropagation();
+        const opening = customDropdown.classList.contains('hidden');
+        if (opening) {
+          if (customDropdown.parentElement !== document.body) {
+            document.body.appendChild(customDropdown);
+          }
+          customDropdown.classList.remove('hidden');
+          positionCustomDropdown();
+          customTrigger.setAttribute('aria-expanded', 'true');
+        } else {
+          closeCustomDropdown();
+        }
+      });
+
+      window.addEventListener('resize', positionCustomDropdown);
+      window.addEventListener('scroll', positionCustomDropdown, true);
+      document.addEventListener('click', event => {
+        if (!customDropdown?.contains(event.target) && !customTrigger?.contains(event.target)) closeCustomDropdown();
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeCustomDropdown();
+      });
 
       const updateCustomSelect = (available, isService) => {
         select.innerHTML = '<option value="">Selecione uma opção</option>' + available.map(item => `<option value="${escape(item.id)}">${escape(item.name || item.title)}</option>`).join('');
         select.value = '';
         customTriggerContent.innerHTML = '<span class="text-gray-400 font-normal">Selecione uma opção</span>';
         
-        let optionsHtml = `<button type="button" data-custom-option="" class="flex w-full items-center gap-3 rounded-lg p-2 text-left transition hover:bg-primary/10"><span class="text-xs text-gray-500 font-normal">Selecione uma opção</span></button>`;
+        let optionsHtml = `
+          <button type="button" data-custom-option="" class="flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition hover:bg-primary/[.08]">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/5 text-xs text-gray-400">—</span>
+            <span class="text-xs text-gray-500 font-medium">Selecione uma opção</span>
+          </button>
+        `;
         
         available.forEach(item => {
           const id = item.id;
           const title = item.name || item.title || 'Sem título';
           let avatarMarkup = '';
+          let subtitle = '';
+          
           if (isService) {
             avatarMarkup = `<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">$</span>`;
+            subtitle = item.duration ? `${item.duration} dias · ${money(item.value)}` : 'Serviço';
           } else {
             const rawCover = String(item.coverImage || '').trim();
             const hasImage = /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=\s]+$/i.test(rawCover) || rawCover.startsWith('http') || rawCover.startsWith('/');
             if (hasImage) {
-              avatarMarkup = `<img src="${escape(rawCover)}" alt="Capa de ${escape(title)}" class="h-9 w-9 shrink-0 rounded-lg border border-primary/15 object-cover">`;
+              avatarMarkup = `<img src="${escape(rawCover)}" alt="Capa de ${escape(title)}" class="h-9 w-9 shrink-0 rounded-lg border border-primary/15 object-cover shadow-sm">`;
             } else {
               const token = escape((item.coverText || title).slice(0, 4));
               avatarMarkup = `<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/10 text-[10px] font-bold text-primary">${token}</span>`;
             }
+            const qCount = Array.isArray(item.questionIds) ? item.questionIds.length : 0;
+            subtitle = qCount ? `${qCount} pergunta${qCount === 1 ? '' : 's'}` : 'Questionário';
           }
-          optionsHtml += `<button type="button" data-custom-option="${escape(id)}" class="flex w-full items-center gap-3 rounded-lg p-2 text-left transition hover:bg-primary/10">${avatarMarkup}<span class="truncate text-xs font-bold text-dark">${escape(title)}</span></button>`;
+          
+          optionsHtml += `
+            <button type="button" data-custom-option="${escape(id)}" class="flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition hover:bg-primary/[.08] active:scale-[0.995]">
+              ${avatarMarkup}
+              <div class="min-w-0 flex-1">
+                <strong class="block truncate text-xs font-bold text-dark">${escape(title)}</strong>
+                <span class="block text-[11px] text-gray-500 mt-0.5">${escape(subtitle)}</span>
+              </div>
+            </button>
+          `;
         });
 
         customDropdown.innerHTML = optionsHtml;
@@ -2408,7 +2475,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
                 const rawCover = String(selectedItem.coverImage || '').trim();
                 const hasImage = /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=\s]+$/i.test(rawCover) || rawCover.startsWith('http') || rawCover.startsWith('/');
                 if (hasImage) {
-                  avatarMarkup = `<img src="${escape(rawCover)}" alt="Capa" class="h-7 w-7 shrink-0 rounded-md border border-primary/15 object-cover">`;
+                  avatarMarkup = `<img src="${escape(rawCover)}" alt="Capa" class="h-7 w-7 shrink-0 rounded-md border border-primary/15 object-cover shadow-sm">`;
                 } else {
                   const token = escape((selectedItem.coverText || selectedItem.title || 'Q').slice(0, 4));
                   avatarMarkup = `<span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-primary/15 bg-primary/10 text-[9px] font-bold text-primary">${token}</span>`;
