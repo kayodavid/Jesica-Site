@@ -293,7 +293,7 @@ function normalizeBrevoQuestionnaireEvents(events, invitations = []) {
   const storedInvitations = (Array.isArray(invitations) ? invitations : []).map(invitation => ({ ...invitation, email:String(invitation.recipientEmail || '').trim().toLowerCase(), timestamp:Date.parse(invitation.sentAt || '') })).filter(invitation => invitation.email && Number.isFinite(invitation.timestamp));
   const storedMessageIds = new Set(storedInvitations.map(invitation => String(invitation.providerMessageId || '').trim()).filter(Boolean));
   const tagsOf = item => { const source = item?.tags ?? item?.tag ?? []; return Array.isArray(source) ? source.map(value => String(value || '').toLowerCase()) : String(source || '').split(/[,;|]/).map(value => value.trim().toLowerCase()).filter(Boolean); };
-  const isStoredInvitationEvent = item => { const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || '').trim(); if (messageId && storedMessageIds.has(messageId)) return true; const email = String(item?.email || '').trim().toLowerCase(); const occurredAt = brevoEventTimestamp(item); return !!email && !!occurredAt && storedInvitations.some(invitation => invitation.email === email && Math.abs(invitation.timestamp - occurredAt) <= 7 * 86_400_000); };
+  const isStoredInvitationEvent = item => { const messageId = String(item?.['message-id'] || item?.messageId || item?.message_id || '').trim(); return messageId && storedMessageIds.has(messageId); };
   const grouped = new Map();
   (Array.isArray(events) ? events : []).forEach(item => {
     const subject = String(item?.subject || '');
