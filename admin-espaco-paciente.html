@@ -2452,7 +2452,6 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       deleteButton.addEventListener('click', async () => { const profile = activePatient?.profile; if (!profile?.id) return; if (!window.confirm('Deseja excluir apenas os dados cadastrais deste perfil? A conta de acesso do paciente não será removida.')) return; const result = await db.deletePatientProfile(profile.id); if (result?.success === false) { notify(result.message || 'Não foi possível excluir o cadastro.'); return; } activePatient.profile = { whatsapp:activePatient.whatsapp || activePatient.phone || '', phoneCountry:activePatient.phoneCountry || '', labels:[] }; notify('Dados cadastrais excluídos. A conta de acesso do paciente foi preservada.'); onBack(); });
       return { open, closeOptions, refreshRelations:() => Promise.all([relationManager.renderServices(), relationManager.renderQuizzes()]) };
     }
-    }
 
 
     function renderWhatsappAutomationManager(patients, notify) {
