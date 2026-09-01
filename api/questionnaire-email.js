@@ -1527,8 +1527,9 @@ export default async function handler(req, res) {
     if (action === 'worker') {
       const secret = workerSecretFromRequest(req, body);
       const expected = String(process.env.QUESTIONNAIRE_SCHEDULER_SECRET || '').trim();
-      if (!secret || !expected || secret !== expected) return json(res, 401, { success:false, message:'Worker não autorizado.' });
-      const workerId = String(req?.headers?.['x-worker-id'] || body.workerId || 'supabase-pg-cron');
+      const cronSecret = String(process.env.CRON_SECRET || '').trim();
+      if (!secret || (secret !== expected && (!cronSecret || secret !== cronSecret))) return json(res, 401, { success:false, message:'Worker não autorizado.' });
+      const workerId = String(req?.headers?.['x-worker-id'] || body.workerId || 'vercel-cron');
       const result = await processQuestionnaireQueue(secret, workerId);
       return json(res, 200, result);
     }
