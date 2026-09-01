@@ -1705,6 +1705,28 @@ export default async function handler(req, res) {
       return json(res, 200, { success:true, schedule:updated });
     }
 
+    if (action === 'cancel-link-schedules') {
+      const sessionToken = String(body.sessionToken || '');
+      const quizLinkId = String(body.quizLinkId || '').trim();
+      if (!sessionToken || !quizLinkId) return json(res, 400, { success:false, message:'Vínculo não identificado.' });
+      await requireAdmin(sessionToken);
+      const schedules = await listStoredSchedules(sessionToken, '', quizLinkId);
+      const activeSchedules = schedules.filter(item => !['cancelled', 'cancelado', 'sent', 'enviado', 'delivered', 'entregue'].includes(String(item.status).toLowerCase()));
+      const updatedSchedules = [];
+      for (const schedule of activeSchedules) {
+        if (schedule.providerMessageId && !['cancelled', 'cancelado', 'sent', 'enviado', 'failed', 'falha_de_agendamento'].includes(String(schedule.status).toLowerCase())) {
+          try { await cancelBrevoEmail(schedule.providerMessageId); } catch (e) { console.error('Brevo cancel error:', e.message); }
+        }
+        try {
+          const updated = await cancelStoredSchedule(sessionToken, schedule);
+          updatedSchedules.push(updated);
+        } catch (e) {
+          console.error('Cancel schedule error:', e.message);
+        }
+      }
+      return json(res, 200, { success:true, message:`Foram cancelados ${updatedSchedules.length} agendamentos.`, cancelled: updatedSchedules.length });
+    }
+
     if (action === 'reschedule-schedule') {
       const sessionToken = String(body.sessionToken || '');
       const scheduleId = String(body.scheduleId || '').trim();
