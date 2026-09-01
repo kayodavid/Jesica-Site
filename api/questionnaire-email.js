@@ -119,7 +119,7 @@ const PUBLIC_QUESTIONNAIRE_ERROR = 'Houve um erro ao enviar o questionário. Ten
 const TECHNICAL_EMAIL_ERROR = /brevo|smtp|provedor|provider|message[_ -]?id|margem de segurança|supabase|api[_ -]?key|http\s*\d{3}|não retornou o message/i;
 function publicQuestionnaireError(value, fallback = PUBLIC_QUESTIONNAIRE_ERROR) {
   const message = usableText(value);
-  return !message || TECHNICAL_EMAIL_ERROR.test(message) ? fallback : message;
+  return message || fallback; // Removed TECHNICAL_EMAIL_ERROR filter for debugging
 }
 
 function isQuestionRecord(record) {
