@@ -13,6 +13,9 @@ const EMAIL_QUIZ_CLICK_THEME = '__email_quiz_click__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
+const PLATFORM_PREFERENCES_THEME = '__platform_preferences__';
+const PLATFORM_PREFERENCES_SOURCE = 'platform-preferences://default';
+const EMOJI_SCALE_DISPLAY_MODES = new Set(['emoji-only', 'emoji-text', 'text-only']);
 const PATIENT_PROFILE_THEME = '__patient_profile__';
 const PATIENT_QUIZ_LINK_THEME = '__patient_quiz_link__';
 const PATIENT_SERVICE_LINK_THEME = '__patient_service_link__';
@@ -64,6 +67,10 @@ function replaceReminderTokens(value, values) { return String(value || '').repla
 
 async function getEmailTemplate(sessionToken) {
   try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === EMAIL_TEMPLATE_THEME || recordSource(item) === EMAIL_TEMPLATE_SOURCE); if (!record) return defaultEmailTemplate(); let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return normalizeEmailTemplate(data); } catch (error) { console.error('Email template load error:', error.message); return defaultEmailTemplate(); }
+}
+
+async function getPlatformPreferences(sessionToken) {
+  try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === PLATFORM_PREFERENCES_THEME || recordSource(item) === PLATFORM_PREFERENCES_SOURCE); if (!record) return {}; let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return data; } catch { return {}; }
 }
 
 async function callRpc(name, body) {
@@ -1780,7 +1787,9 @@ export default async function handler(req, res) {
         if (savedResponse) return json(res, 200, { state:'answered', patient_name:invitation.patientName, quiz_title:quiz.title, summary:savedResponse.summary || null });
         const progressRecord = records.find(record => isEmailQuizProgressRecord(record) && normalizeStoredProgress(record).invitationId === invitation.id);
         const savedProgress = progressRecord ? normalizeStoredProgress(progressRecord) : null;
-        return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString(), progress: savedProgress ? { totalQuestions:savedProgress.totalQuestions, answeredQuestions:savedProgress.answeredQuestions, updatedAt:savedProgress.updatedAt } : null });
+        const preferences = await getPlatformPreferences(invitation.sessionToken);
+        const emojiScaleDisplayMode = EMOJI_SCALE_DISPLAY_MODES.has(preferences?.emojiScaleDisplayMode) ? preferences.emojiScaleDisplayMode : 'emoji-text';
+        return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString(), progress: savedProgress ? { totalQuestions:savedProgress.totalQuestions, answeredQuestions:savedProgress.answeredQuestions, updatedAt:savedProgress.updatedAt } : null, emojiScaleDisplayMode });
       } catch (error) {
         return json(res, 200, { state: /expirado/i.test(error.message) ? 'expired' : 'invalid' });
       }
