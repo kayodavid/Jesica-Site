@@ -1452,7 +1452,7 @@ async function createBrevoScheduledQuestionnaire(args) {
 function validateQueueScheduledAt(value) {
   const timestamp = Date.parse(String(value || ''));
   if (!Number.isFinite(timestamp)) throw new Error('Informe uma data e um horário válidos para o envio.');
-  if (timestamp <= Date.now() + 30_000) throw new Error('O horário agendado precisa estar no futuro.');
+  if (timestamp < Date.now() + 3600_000) throw new Error('O agendamento requer uma margem de segurança de pelo menos 1 hora de antecedência.');
   if (timestamp > Date.now() + (180 * 24 * 60 * 60 * 1000)) throw new Error('O agendamento não pode ultrapassar 180 dias.');
   return new Date(timestamp).toISOString();
 }
