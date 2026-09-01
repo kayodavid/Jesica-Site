@@ -119,7 +119,7 @@ const PUBLIC_QUESTIONNAIRE_ERROR = 'Houve um erro ao enviar o questionário. Ten
 const TECHNICAL_EMAIL_ERROR = /brevo|smtp|provedor|provider|message[_ -]?id|margem de segurança|supabase|api[_ -]?key|http\s*\d{3}|não retornou o message/i;
 function publicQuestionnaireError(value, fallback = PUBLIC_QUESTIONNAIRE_ERROR) {
   const message = usableText(value);
-  return message || fallback; // Removed TECHNICAL_EMAIL_ERROR filter for debugging
+  return !message || TECHNICAL_EMAIL_ERROR.test(message) ? fallback : message;
 }
 
 function isQuestionRecord(record) {
@@ -1193,7 +1193,7 @@ function normalizeStoredSchedule(record, storage = 'legacy') {
     attemptCount: Number(data.attemptCount ?? data.attempt_count ?? 0),
     nextAttemptAt: usableText(data.nextAttemptAt || data.next_attempt_at),
     lastAttemptAt: usableText(data.lastAttemptAt || data.last_attempt_at),
-    errorMessage: publicQuestionnaireError(data.errorMessage || data.last_error),
+    errorMessage: (data.errorMessage || data.last_error) ? publicQuestionnaireError(data.errorMessage || data.last_error) : '',
     cancelledAt: usableText(data.cancelledAt || data.cancelled_at),
     finalFailureAt: usableText(data.finalFailureAt || data.final_failure_at),
     createdAt: usableText(data.createdAt || data.created_at) || record?.createdAt || record?.created_at || '',
@@ -1638,6 +1638,7 @@ export default async function handler(req, res) {
       if (entries.length > 32) {
         try {
           const result = await createQuestionnaireScheduleBatch({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, entries });
+          if (process.env.CRON_SECRET) { try { await processQuestionnaireQueue(process.env.CRON_SECRET, 'immediate-schedule-trigger-batch'); } catch (triggerError) { console.error('Immediate queue trigger failed:', triggerError.message); } }
           return json(res, 200, { success:true, schedules:result.schedules, failed:result.failed, message:result.message });
         } catch (error) {
           return json(res, 502, { success:false, message:publicQuestionnaireError(error.message, 'Houve um erro ao agendar o questionário. Tente novamente e, caso o problema se repita, entre em contato com o suporte.'), schedules:[], failed:[] });
@@ -1657,6 +1658,7 @@ export default async function handler(req, res) {
         }
       }
       if (!schedules.length && failed.length) return json(res, 502, { success:false, message:failed[0].message, schedules, failed });
+      if (process.env.CRON_SECRET) { try { await processQuestionnaireQueue(process.env.CRON_SECRET, 'immediate-schedule-trigger'); } catch (triggerError) { console.error('Immediate queue trigger failed:', triggerError.message); } }
       return json(res, 200, { success:true, schedules, failed, message:failed.length ? 'Alguns envios foram colocados na fila e outros precisam de revisão.' : 'Envios colocados na fila de agendamento.' });
     }
 
