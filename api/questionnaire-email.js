@@ -1465,52 +1465,88 @@ function workerSecretFromRequest(req, body = {}) {
 
 async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') {
   const finalized = await finalizeMissedQueueSchedules(secret);
-  const claimed = await claimQueueSchedules(secret, workerId, 20);
+  let totalClaimed = 0;
   const processed = [];
   const failed = [];
-  for (const schedule of claimed) {
-    const scheduledAt = new Date(schedule.scheduled_for).toISOString();
-    const expiresAt = new Date(schedule.expires_at).toISOString();
-    try {
-      const snapshot = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
-      const invitation = decryptInvitation(schedule.invitation_token);
-      const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
-      if (snapshot?.__emailReminder) {
-        const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
-        const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, scheduledAt, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
-        const reminderProviderMessageId = usableText(reminderResult.messageId);
-        if (!reminderProviderMessageId) throw new Error('O provedor não retornou o identificador do lembrete.');
-        const reminderStored = await markQueueProvider(secret, schedule.id, reminderProviderMessageId, 'scheduled');
-        processed.push({ id:schedule.id, providerMessageId:reminderProviderMessageId, scheduledFor:scheduledAt, status:reminderStored.status, kind:snapshot.__emailReminder.kind });
-        continue;
+  
+  while (true) {
+    const claimed = await claimQueueSchedules(secret, workerId, 50);
+    if (!claimed || claimed.length === 0) break;
+    totalClaimed += claimed.length;
+    
+    for (const schedule of claimed) {
+      const scheduledAt = new Date(schedule.scheduled_for).toISOString();
+      const expiresAt = new Date(schedule.expires_at).toISOString();
+      try {
+        const snapshot = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
+        const invitation = decryptInvitation(schedule.invitation_token);
+        const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
+        if (snapshot?.__emailReminder) {
+          const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
+          const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, scheduledAt, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
+          const reminderProviderMessageId = usableText(reminderResult.messageId);
+          if (!reminderProviderMessageId) throw new Error('O provedor não retornou o identificador do lembrete.');
+          const reminderStored = await markQueueProvider(secret, schedule.id, reminderProviderMessageId, 'scheduled');
+          processed.push({ id:schedule.id, providerMessageId:reminderProviderMessageId, scheduledFor:scheduledAt, status:reminderStored.status, kind:snapshot.__emailReminder.kind });
+          continue;
+        }
+        const quiz = snapshot;
+        if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
+        const reminders = Array.isArray(snapshot?.__emailReminders) ? snapshot.__emailReminders : await getReminderSettings(invitation.sessionToken);
+        const newQuizReminder = snapshot?.__emailNewQuizReminder || reminders.find(item => item.id === 'new_quiz');
+        try { await storeInvitation(invitation, quiz); } catch (historyError) { console.error('Queued invitation history error:', historyError.message); }
+        const brevoResult = await sendQuestionnaireEmail({
+          recipientEmail:schedule.recipient_email,
+          patientName:schedule.patient_name,
+          quiz,
+          accessToken:schedule.invitation_token,
+          expiresAt:Date.parse(expiresAt),
+          scheduledAt,
+          template,
+          reminder:newQuizReminder
+        });
+        const providerMessageId = usableText(brevoResult.messageId);
+        if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
+        const stored = await markQueueProvider(secret, schedule.id, providerMessageId, 'scheduled');
+        try { await storeInvitation({ ...invitation, providerMessageId }, quiz); } catch (historyError) { console.error('Queued provider id history error:', historyError.message); }
+        processed.push({ id:schedule.id, providerMessageId, scheduledFor:scheduledAt, status:stored.status });
+      } catch (error) {
+        const message = error?.message || 'Falha técnica ao preparar o envio do questionário.';
+        try { await markQueueFailure(secret, schedule.id, message, true); } catch (markError) { console.error('Queue failure persistence error:', markError.message); }
+        failed.push({ id:schedule.id, scheduledFor:scheduledAt, message:publicQuestionnaireError(message) });
       }
-      const quiz = snapshot;
-      if (!quiz?.id || !Array.isArray(quiz.questionSnapshots) || !quiz.questionSnapshots.length) throw new Error('A versão salva do questionário não está disponível.');
-      const reminders = Array.isArray(snapshot?.__emailReminders) ? snapshot.__emailReminders : await getReminderSettings(invitation.sessionToken);
-      const newQuizReminder = snapshot?.__emailNewQuizReminder || reminders.find(item => item.id === 'new_quiz');
-      try { await storeInvitation(invitation, quiz); } catch (historyError) { console.error('Queued invitation history error:', historyError.message); }
-      const brevoResult = await sendQuestionnaireEmail({
-        recipientEmail:schedule.recipient_email,
-        patientName:schedule.patient_name,
-        quiz,
-        accessToken:schedule.invitation_token,
-        expiresAt:Date.parse(expiresAt),
-        scheduledAt,
-        template,
-        reminder:newQuizReminder
-      });
-      const providerMessageId = usableText(brevoResult.messageId);
-      if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
-      const stored = await markQueueProvider(secret, schedule.id, providerMessageId, 'scheduled');
-      try { await storeInvitation({ ...invitation, providerMessageId }, quiz); } catch (historyError) { console.error('Queued provider id history error:', historyError.message); }
-      processed.push({ id:schedule.id, providerMessageId, scheduledFor:scheduledAt, status:stored.status });
-    } catch (error) {
-      const message = error?.message || 'Falha técnica ao preparar o envio do questionário.';
-      try { await markQueueFailure(secret, schedule.id, message, true); } catch (markError) { console.error('Queue failure persistence error:', markError.message); }
-      failed.push({ id:schedule.id, scheduledFor:scheduledAt, message:publicQuestionnaireError(message) });
     }
   }
-  return { success:true, finalized, claimed:claimed.length, processed, failed, workerId };
+
+  if (totalClaimed > 0) {
+    try {
+      const htmlContent = `
+        <div style="font-family: sans-serif; color: #333;">
+          <h2 style="color: #a88b36;">Relatório Diário de Agendamentos</h2>
+          <p>A automação (Cron) processou os e-mails da janela de 71 horas.</p>
+          <p><strong>${processed.length}</strong> e-mails foram inseridos com sucesso na Brevo.</p>
+          ${failed.length > 0 ? `<p style="color: #d9534f;"><strong>Atenção:</strong> ${failed.length} envios falharam ao serem adicionados.</p>` : ''}
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 0.9em; color: #666;">
+            <strong>Nota sobre pendentes:</strong><br/>
+            Os envios programados para prazos superiores a 71 horas permanecem pendentes e seguros no banco de dados. 
+            Eles serão automaticamente inseridos na Brevo pelas próximas execuções diárias, assim que entrarem na janela de 71 horas.
+          </p>
+        </div>
+      `;
+      await sendBrevoEmail({
+        to: { email: 'kayodavids@gmail.com', name: 'Kayo David' },
+        subject: `[Vercel Cron] Relatório de Envios - ${processed.length} adicionados na Brevo`,
+        htmlContent,
+        tags: ['cron-report'],
+        replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: 'Sistema de Agendamento' }
+      });
+    } catch (reportError) {
+      console.error('Failed to send report email:', reportError.message);
+    }
+  }
+
+  return { success:true, finalized, claimed:totalClaimed, processed, failed, workerId };
 }
 
 function requestBody(req) {
