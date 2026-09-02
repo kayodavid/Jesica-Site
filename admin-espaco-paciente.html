@@ -1368,15 +1368,47 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="text-xs font-semibold text-dark sm:col-span-2">Nome da marca<input id="email-template-brand-name" maxlength="100" class="email-template-field mt-1.5" type="text" placeholder="Jessica Melo Nutricionista"></label><label class="text-xs font-semibold text-dark sm:col-span-2">URL pública da logomarca<input id="email-template-logo-url" maxlength="1000" class="email-template-field mt-1.5" type="url" placeholder="https://.../minha-logomarca.png"><span class="mt-1 block text-[11px] font-normal text-gray-500">PNG, JPG ou WebP com URL acessível publicamente.</span><button id="email-template-use-site-logo" type="button" class="mt-2 text-xs font-bold text-primary underline underline-offset-2 hover:text-dark">Usar logomarca do site</button></label></div>
               <div class="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-primary/12 bg-primary/[.035] p-3"><label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs font-bold text-primary hover:bg-primary/5"><input id="email-template-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="sr-only">Escolher arquivo</label><button id="email-template-remove-logo" type="button" class="rounded-xl border border-primary/20 px-3 py-2 text-xs font-bold text-gray-600 hover:bg-primary/5">Remover logomarca</button><span id="email-template-logo-file-name" class="text-xs text-gray-500">Nenhum arquivo selecionado</span><img id="email-template-logo-preview" class="email-template-logo-preview hidden" alt="Prévia da logomarca selecionada"></div><label class="mt-3 flex items-start gap-2 rounded-2xl border border-primary/12 bg-primary/[.025] p-3 text-xs font-semibold text-dark"><input id="email-template-show-brand-name" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><span class="block">Exibir nome da marca junto à logomarca</span><span class="mt-1 block text-[11px] font-normal leading-relaxed text-gray-500">Desmarque para mostrar somente a logomarca no topo do e-mail. Essa opção fica disponível quando houver uma logomarca configurada.</span></span></label>
             </section>
-            <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Texto do Email</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Edite assunto, chamadas e mensagens. Os campos entre chaves são preenchidos automaticamente.</p></div><span class="email-section-number">02</span></div>
+            <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Texto do Email</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Edite assunto, chamadas e mensagens. Use as opções abaixo para personalizar automaticamente os dados de cada paciente.</p></div><span class="email-section-number">02</span></div>
               <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="text-xs font-semibold text-dark sm:col-span-2">Assunto do email<input id="email-template-subject" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Título principal<input id="email-template-title" maxlength="160" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Saudação<input id="email-template-greeting" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de apresentação<textarea id="email-template-intro" maxlength="500" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de orientação<textarea id="email-template-body" maxlength="700" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark">Texto do botão<input id="email-template-button" maxlength="80" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark">Aviso de prazo<input id="email-template-deadline" maxlength="260" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Rodapé<input id="email-template-footer" maxlength="260" class="email-template-field mt-1.5" type="text"></label></div>
               <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/[.035] p-4">
-                <div class="flex items-start gap-3"><span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span><div><h4 class="text-xs font-bold text-dark">Inserir informação automática</h4><p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo. O sistema insere o conteúdo automaticamente no ponto do cursor.</p></div></div>
+                <div class="flex items-start gap-3"><span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span><div><h4 class="text-xs font-bold text-dark">Inserir informação automática</h4><p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo para inserir no texto.</p></div></div>
                 <div class="mt-3 grid gap-3">
                   <label class="text-[11px] font-bold text-dark">Onde inserir<select id="email-template-token-target" class="email-template-field mt-1.5"><option value="subject">Assunto do email</option><option value="title">Título principal</option><option value="greeting">Saudação</option><option value="intro">Mensagem de apresentação</option><option value="body">Mensagem de orientação</option><option value="button">Texto do botão</option><option value="deadline">Aviso de prazo</option><option value="footer">Rodapé</option></select></label>
-                  <div><p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p><div id="email-template-token-options" class="mt-2 grid gap-2 sm:grid-cols-2"><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{primeiro_nome}" aria-label="Inserir Nome do paciente">Nome do paciente</button><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{questionario}" aria-label="Inserir Nome do questionário">Nome do questionário</button><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{prazo}" aria-label="Inserir Prazo de resposta">Prazo de resposta</button><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{ano}" aria-label="Inserir Ano do envio">Ano do envio</button></div></div>
+                  <div>
+                    <p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p>
+                    <div id="email-template-token-options" class="mt-2 grid gap-2 sm:grid-cols-2">
+                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{primeiro_nome}" aria-label="Inserir Primeiro nome do paciente">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👤</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs">Primeiro nome</span>
+                          <span class="block text-[10px] text-gray-500 font-normal">Ex.: Marina</span>
+                        </span>
+                      </button>
+                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{questionario}" aria-label="Inserir Nome do questionário">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">📋</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs">Nome do questionário</span>
+                          <span class="block text-[10px] text-gray-500 font-normal">Ex.: Acompanhamento semanal</span>
+                        </span>
+                      </button>
+                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{prazo}" aria-label="Inserir Prazo de resposta">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">⏰</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs">Prazo de resposta</span>
+                          <span class="block text-[10px] text-gray-500 font-normal">Ex.: 15 de setembro às 22:00</span>
+                        </span>
+                      </button>
+                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{ano}" aria-label="Inserir Ano do envio">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">📅</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs">Ano atual</span>
+                          <span class="block text-[10px] text-gray-500 font-normal">Ex.: 2026</span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <p class="mt-3 text-[10px] leading-relaxed text-gray-500"><strong class="text-dark">Como funciona:</strong> selecione o campo de destino e clique no nome da informação. A informação será preenchida automaticamente no momento do envio.</p>
+                <p class="mt-3 text-[11px] leading-relaxed text-gray-500">💡 <strong>Como funciona:</strong> Escolha onde deseja colocar a informação e clique no botão correspondente. Ao enviar o e-mail, a plataforma substitui automaticamente pelo dado real do paciente.</p>
               </div>
             </section>
             <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Cores da marca</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Ajuste os tons principais e acompanhe o resultado na prévia ao lado.</p></div><span class="email-section-number">03</span></div><div class="mt-4 grid gap-3 sm:grid-cols-3"><label class="email-color-field"><span>Cor de destaque</span><input id="email-template-primary-color" type="color" value="#a88b36"></label><label class="email-color-field"><span>Fundo externo</span><input id="email-template-background-color" type="color" value="#faf8f3"></label><label class="email-color-field"><span>Texto</span><input id="email-template-text-color" type="color" value="#3d3226"></label></div></section>
@@ -1444,7 +1476,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <h3 class="text-base font-bold text-dark">Mensagens do lembrete</h3>
-                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Edite a mensagem principal para e-mail e WhatsApp. As variáveis entre chaves são substituídas pelos dados do paciente.</p>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Edite a mensagem principal para e-mail e WhatsApp. Use as opções abaixo para personalizar automaticamente os dados de cada paciente.</p>
                 </div>
                 <span class="email-section-number">02</span>
               </div>
@@ -1467,7 +1499,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                   <span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span>
                   <div>
                     <h4 class="text-xs font-bold text-dark">Inserir informação automática</h4>
-                    <p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo para inserir no ponto do cursor.</p>
+                    <p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo para inserir no texto.</p>
                   </div>
                 </div>
                 <div class="mt-3 grid gap-3">
@@ -1481,16 +1513,53 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                   </label>
                   <div>
                     <p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p>
-                    <div id="reminder-customizer-token-options" class="mt-2 flex flex-wrap gap-2">
-                      <button type="button" class="reminder-token" data-reminder-custom-token="{primeiro_nome}">{primeiro_nome}</button>
-                      <button type="button" class="reminder-token" data-reminder-custom-token="{paciente}">{paciente}</button>
-                      <button type="button" class="reminder-token" data-reminder-custom-token="{questionario}">{questionario}</button>
-                      <button type="button" class="reminder-token" data-reminder-custom-token="{prazo}">{prazo}</button>
-                      <button type="button" class="reminder-token" data-reminder-custom-token="{dias_restantes}">{dias_restantes}</button>
-                      <button type="button" class="reminder-token" data-reminder-custom-token="{nutricionista}">{nutricionista}</button>
+                    <div id="reminder-customizer-token-options" class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{primeiro_nome}">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👤</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs truncate">Primeiro nome</span>
+                          <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Marina</span>
+                        </span>
+                      </button>
+                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{paciente}">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👤</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs truncate">Nome completo</span>
+                          <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Marina Alves</span>
+                        </span>
+                      </button>
+                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{questionario}">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">📋</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs truncate">Questionário</span>
+                          <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Acompanhamento semanal</span>
+                        </span>
+                      </button>
+                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{prazo}">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">⏰</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs truncate">Prazo de resposta</span>
+                          <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: 15 de setembro às 22:00</span>
+                        </span>
+                      </button>
+                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{dias_restantes}">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">⏳</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs truncate">Dias restantes</span>
+                          <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: 3 dias</span>
+                        </span>
+                      </button>
+                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{nutricionista}">
+                        <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👩‍⚕️</span>
+                        <span class="flex-1 min-w-0">
+                          <span class="block font-bold text-xs truncate">Nutricionista</span>
+                          <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Jessica Melo</span>
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
+                <p class="mt-3 text-[11px] leading-relaxed text-gray-500">💡 <strong>Como funciona:</strong> Escolha onde deseja colocar a informação e clique no botão correspondente. Ao fazer o envio real, o sistema preencherá esses dados automaticamente para cada paciente.</p>
               </div>
             </section>
 
@@ -1712,8 +1781,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const status = (message, tone = 'muted') => { const node = document.getElementById('email-template-form-status'); const saveState = document.getElementById('email-template-save-state'); if (node) { node.textContent = message || ''; node.className = message ? `text-xs font-semibold ${tone === 'error' ? 'text-red-600' : tone === 'success' ? 'text-emerald-700' : 'text-gray-500'}` : 'hidden'; } if (saveState) { saveState.textContent = message || 'Modelo carregado'; saveState.className = `inline-flex w-fit items-center rounded-full px-3 py-2 text-xs font-bold ${tone === 'error' ? 'bg-red-50 text-red-700' : tone === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-primary/10 text-primary'}`; } };
       const templateFromForm = () => ({ ...state, layout:form.querySelector('input[name="email-template-layout"]:checked')?.value || state.layout || 'classic', brandName:(input('brand-name')?.value || state.brandName || '').trim(), showBrandName:input('show-brand-name') ? input('show-brand-name').checked : (state.showBrandName !== false), logoUrl:(input('logo-url')?.value || state.logoUrl || '').trim(), logoDataUrl, subject:(input('subject')?.value || state.subject || '').trim(), title:(input('title')?.value || state.title || '').trim(), greeting:(input('greeting')?.value || state.greeting || '').trim(), intro:(input('intro')?.value || state.intro || '').trim(), body:(input('body')?.value || state.body || '').trim(), buttonText:(input('button')?.value || state.buttonText || '').trim(), deadlineText:(input('deadline')?.value || state.deadlineText || '').trim(), footerText:(input('footer')?.value || state.footerText || '').trim(), primaryColor:input('primary-color')?.value || state.primaryColor || '#a88b36', backgroundColor:input('background-color')?.value || state.backgroundColor || '#faf8f3', textColor:input('text-color')?.value || state.textColor || '#3d3226' });
       const syncBrandNameControl = () => { const toggle = input('show-brand-name'); if (!toggle) return; const hasLogo = Boolean(logoDataUrl || input('logo-url')?.value?.trim()); toggle.disabled = !hasLogo; if (!hasLogo) toggle.checked = true; }; const drawPreview = () => { syncBrandNameControl(); const preview = document.getElementById('email-template-preview'); if (preview) preview.innerHTML = emailPreviewHtml(templateFromForm()); };
-      const tokenTarget = document.getElementById('email-template-token-target'); const tokenOptions = document.getElementById('email-template-token-options');
-      const insertEmailToken = token => { const target = input(tokenTarget?.value || 'subject'); if (!target || !token) return; const start = Number.isInteger(target.selectionStart) ? target.selectionStart : target.value.length; const end = Number.isInteger(target.selectionEnd) ? target.selectionEnd : start; if (typeof target.setRangeText === 'function') target.setRangeText(token, start, end, 'end'); else target.value = `${target.value.slice(0, start)}${token}${target.value.slice(end)}`; target.focus(); target.dispatchEvent(new Event('input', { bubbles:true })); const tokenButton = tokenOptions?.querySelector(`[data-email-token="${token}"]`); const tokenLabel = tokenButton?.textContent?.trim() || 'informação'; const targetLabel = tokenTarget?.options?.[tokenTarget.selectedIndex]?.textContent || 'campo selecionado'; status(`${tokenLabel} inserido em ${targetLabel}.`, 'success'); };
+      const insertEmailToken = token => { const target = input(tokenTarget?.value || 'subject'); if (!target || !token) return; const start = Number.isInteger(target.selectionStart) ? target.selectionStart : target.value.length; const end = Number.isInteger(target.selectionEnd) ? target.selectionEnd : start; if (typeof target.setRangeText === 'function') target.setRangeText(token, start, end, 'end'); else target.value = `${target.value.slice(0, start)}${token}${target.value.slice(end)}`; target.focus(); target.dispatchEvent(new Event('input', { bubbles:true })); const tokenNames = { '{primeiro_nome}':'Primeiro nome', '{questionario}':'Nome do questionário', '{prazo}':'Prazo de resposta', '{ano}':'Ano atual' }; const tokenLabel = tokenNames[token] || 'Informação'; status(`"${tokenLabel}" inserido com sucesso.`, 'success'); };
       tokenOptions?.addEventListener('click', event => { const button = event.target.closest('[data-email-token]'); if (!button) return; insertEmailToken(button.dataset.emailToken); });
       const setForm = template => { state = { ...EMAIL_TEMPLATE_DEFAULTS, ...(template || {}) }; logoDataUrl = state.logoDataUrl || ''; if (input('brand-name')) input('brand-name').value = state.brandName; if (input('show-brand-name')) input('show-brand-name').checked = state.showBrandName !== false; if (input('logo-url')) input('logo-url').value = state.logoUrl; if (input('subject')) input('subject').value = state.subject; if (input('title')) input('title').value = state.title; if (input('greeting')) input('greeting').value = state.greeting; if (input('intro')) input('intro').value = state.intro; if (input('body')) input('body').value = state.body; if (input('button')) input('button').value = state.buttonText; if (input('deadline')) input('deadline').value = state.deadlineText; if (input('footer')) input('footer').value = state.footerText; if (input('primary-color')) input('primary-color').value = validEmailColor(state.primaryColor, '#a88b36'); if (input('background-color')) input('background-color').value = validEmailColor(state.backgroundColor, '#faf8f3'); if (input('text-color')) input('text-color').value = validEmailColor(state.textColor, '#3d3226'); form.querySelectorAll('input[name="email-template-layout"]').forEach(radio => { radio.checked = radio.value === state.layout; }); const logoPreview = document.getElementById('email-template-logo-preview'); const logoSrc = logoDataUrl || state.logoUrl; if (logoPreview) { if (logoSrc) { logoPreview.src = logoSrc.startsWith('/') ? `${window.location.origin}${logoSrc}` : logoSrc; logoPreview.classList.remove('hidden'); } else { logoPreview.removeAttribute('src'); logoPreview.classList.add('hidden'); } } const fileNameNode = document.getElementById('email-template-logo-file-name'); if (fileNameNode) fileNameNode.textContent = logoDataUrl ? 'Logomarca carregada' : state.logoUrl ? 'URL pública configurada' : 'Nenhum arquivo selecionado'; drawPreview(); };
       const refresh = async () => { status('Carregando modelo...'); const template = await db.getEmailTemplate(); setForm(template); status('Modelo carregado'); };
@@ -1886,6 +1954,15 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         });
       });
 
+      const reminderTokenNames = {
+        '{primeiro_nome}': 'Primeiro nome',
+        '{paciente}': 'Nome completo',
+        '{questionario}': 'Questionário',
+        '{prazo}': 'Prazo de resposta',
+        '{dias_restantes}': 'Dias restantes',
+        '{nutricionista}': 'Nutricionista'
+      };
+
       const insertToken = token => {
         const targetType = fields.tokenTarget?.value || 'message';
         let targetField = fields.message;
@@ -1898,7 +1975,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         else targetField.value = `${targetField.value.slice(0, start)}${token}${targetField.value.slice(end)}`;
         targetField.focus();
         targetField.dispatchEvent(new Event('input', { bubbles:true }));
-        setStatus(`Variável ${token} inserida.`, 'success');
+        const label = reminderTokenNames[token] || 'Informação';
+        setStatus(`"${label}" inserido com sucesso.`, 'success');
       };
 
       document.getElementById('reminder-customizer-token-options')?.addEventListener('click', event => {
