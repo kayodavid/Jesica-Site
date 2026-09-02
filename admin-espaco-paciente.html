@@ -1626,10 +1626,86 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             <section class="email-customizer-block">
               <div class="flex items-start justify-between gap-3">
                 <div>
+                  <h3 class="text-base font-bold text-dark">Cores da marca</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Ajuste os tons principais e acompanhe o resultado na prévia ao lado.</p>
+                </div>
+                <span class="email-section-number">04</span>
+              </div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <label class="email-color-field">
+                  <span>Cor de destaque</span>
+                  <input id="reminder-template-primary-color" type="color" value="#a88b36">
+                </label>
+                <label class="email-color-field">
+                  <span>Fundo externo</span>
+                  <input id="reminder-template-background-color" type="color" value="#faf8f3">
+                </label>
+                <label class="email-color-field">
+                  <span>Texto</span>
+                  <input id="reminder-template-text-color" type="color" value="#3d3226">
+                </label>
+              </div>
+            </section>
+
+            <section class="email-customizer-block">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-base font-bold text-dark">Escolha o estilo</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Oito composições responsivas, pensadas para manter a leitura bonita em celular e computador.</p>
+                </div>
+                <span class="email-section-number">05</span>
+              </div>
+              <div id="reminder-template-layout-options" class="email-layout-grid mt-4">
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="classic">
+                  <span class="email-layout-swatch layout-classic"><i></i><b></b><em></em></span>
+                  <span><strong>Clássico dourado</strong><small>Elegante e próximo do modelo atual.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="modern">
+                  <span class="email-layout-swatch layout-modern"><i></i><b></b><em></em></span>
+                  <span><strong>Moderno editorial</strong><small>Bloco assimétrico e chamada marcante.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="editorial">
+                  <span class="email-layout-swatch layout-editorial"><i></i><b></b><em></em></span>
+                  <span><strong>Editorial leve</strong><small>Tipografia sofisticada e mais espaço.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="soft">
+                  <span class="email-layout-swatch layout-soft"><i></i><b></b><em></em></span>
+                  <span><strong>Suave acolhedor</strong><small>Camadas claras e sensação de cuidado.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="midnight">
+                  <span class="email-layout-swatch layout-midnight"><i></i><b></b><em></em></span>
+                  <span><strong>Noturno premium</strong><small>Contraste sofisticado para destacar o convite.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="botanical">
+                  <span class="email-layout-swatch layout-botanical"><i></i><b></b><em></em></span>
+                  <span><strong>Botânico natural</strong><small>Verde sálvia e camadas leves para uma sensação fresca.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="terracotta">
+                  <span class="email-layout-swatch layout-terracotta"><i></i><b></b><em></em></span>
+                  <span><strong>Terracota contemporâneo</strong><small>Bloco quente com contraste acolhedor e personalidade.</small></span>
+                </label>
+                <label class="email-layout-option">
+                  <input type="radio" name="reminder-template-layout" value="minimal">
+                  <span class="email-layout-swatch layout-minimal"><i></i><b></b><em></em></span>
+                  <span><strong>Minimalista essencial</strong><small>Muito espaço, linhas finas e foco na mensagem.</small></span>
+                </label>
+              </div>
+            </section>
+
+            <section class="email-customizer-block">
+              <div class="flex items-start justify-between gap-3">
+                <div>
                   <h3 class="text-base font-bold text-dark">Testar envio</h3>
                   <p class="mt-1 text-xs leading-relaxed text-gray-500">Envie um e-mail de teste deste lembrete para um paciente cadastrado para validar o layout real.</p>
                 </div>
-                <span class="email-section-number">04</span>
+                <span class="email-section-number">06</span>
               </div>
               <div class="mt-3">
                 <button id="reminder-customizer-test-btn" type="button" class="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-white px-4 py-2.5 text-xs font-bold text-dark transition hover:border-primary hover:bg-primary/5">
@@ -1657,25 +1733,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <span class="rounded-full border border-primary/15 px-2.5 py-1 text-[10px] font-bold text-gray-500">Exemplo</span>
             </div>
 
-            <div class="mt-4 overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm">
-              <div class="bg-primary p-4 text-white">
-                <div id="reminder-preview-brand-header">
-                  <img id="reminder-preview-logo-img" class="hidden mb-2 max-h-12 max-w-[150px] object-contain" alt="Logomarca">
-                  <p id="reminder-preview-brand-name" class="text-[10px] font-black uppercase tracking-widest opacity-90">Jessica Melo Nutricionista</p>
-                </div>
-                <p id="reminder-preview-header-tag" class="mt-0.5 text-[9px] font-bold uppercase tracking-wider opacity-80">Lembrete: Novo Questionário</p>
-              </div>
-              <div class="p-5">
-                <p id="reminder-preview-subject-live" class="text-sm font-black text-dark">Seu questionário está pronto</p>
-                <div id="reminder-preview-message-live" class="mt-3 whitespace-pre-wrap text-xs leading-relaxed text-gray-700">Olá, Marina!</div>
-                <div id="reminder-preview-action-block" class="mt-5 pt-4 border-t border-primary/10">
-                  <div class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm pointer-events-none">
-                    Responder questionário
-                  </div>
-                  <p class="mt-2.5 text-[10px] leading-relaxed text-gray-400">O botão acima direciona o paciente diretamente para o questionário com respostas individuais seguras.</p>
-                </div>
-              </div>
-            </div>
+            <div id="reminder-email-preview" class="email-template-preview mt-4" aria-live="polite"></div>
 
             <div class="mt-4 rounded-2xl border border-[#d9e8dc] bg-[#f5fbf6] p-4 shadow-sm">
               <div class="flex items-center gap-2">
@@ -1814,6 +1872,46 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       else if (current.layout === 'minimal') inner = `<div style="background:#fff;padding:33px 29px;border-top:2px solid ${primary}"><div style="text-align:center">${logoCenter}</div><h1 style="margin:0 0 22px;text-align:center;color:${text};font-size:27px;line-height:1.16;font-weight:700">${title}</h1><p style="margin:0 0 20px;color:${text};font-weight:700">${greeting}</p>${p}</div>`;
       else inner = `<div style="background:${primary};color:#fff;padding:25px 28px">${logoLeft}${classicBrandMarkup}<h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="background:#fff;padding:28px;color:${text}"><p style="margin:0 0 20px;font-weight:700">${greeting}</p>${p}</div>`;
       const footerColor = current.layout === 'midnight' ? '#d4d8e0' : '#827766'; return `<div class="email-preview-frame" style="font-family:Arial,Helvetica,sans-serif;color:${text};background:${background};padding:14px 8px;line-height:1.6"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${['soft','botanical'].includes(current.layout) ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="margin:15px 0 0;text-align:center;color:${footerColor};font-size:11px;line-height:1.5">${footer}</p></div>`;
+    }
+    function reminderPreviewHtml(reminderItem = {}, template = EMAIL_TEMPLATE_DEFAULTS) {
+      const current = { ...EMAIL_TEMPLATE_DEFAULTS, ...(template || {}) };
+      const values = { firstName:'Marina', patient:'Marina Alves', quizTitle:'Acompanhamento semanal', deadline:'15 de setembro de 2026 às 23:59', daysRemaining:'3', questionnaireUrl:'#', nutritionist:'Jessica Melo', year:'2026' };
+      const isServiceEnding = reminderItem?.id === 'service_ending';
+      const primary = validEmailColor(current.primaryColor, EMAIL_TEMPLATE_DEFAULTS.primaryColor);
+      const background = validEmailColor(current.backgroundColor, EMAIL_TEMPLATE_DEFAULTS.backgroundColor);
+      const text = validEmailColor(current.textColor, EMAIL_TEMPLATE_DEFAULTS.textColor);
+      const brand = escapeEmailText(current.brandName);
+      const logoLeft = emailPreviewLogo(current, 'left');
+      const logoCenter = emailPreviewLogo(current, 'center');
+      const showBrandName = !Boolean(logoLeft || logoCenter) || current.showBrandName !== false;
+      const brandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:${primary};font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+      const softBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#7d73ad;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+      const midnightBrandMarkup = showBrandName ? `<p style="margin:0;color:#d4b76a;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+      const botanicalBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#557253;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+      const terracottaBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#a85f4d;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+      const classicBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p>` : '';
+
+      const title = escapeEmailText(reminderItem?.title || 'Lembrete');
+      const subject = escapeEmailText(replaceReminderTokens(reminderItem?.subject || 'Lembrete', values));
+      const message = escapeEmailText(replaceReminderTokens(reminderItem?.message || '', values)).replace(/\n/g, '<br>');
+      const button = isServiceEnding ? '' : 'Responder questionário';
+      const deadline = isServiceEnding ? '' : `Este questionário fica disponível até ${values.deadline}.`;
+      const footer = `© ${values.year} ${brand}. Todos os direitos reservados.`;
+
+      const p = `<p style="margin:0 0 17px;font-size:15px;font-weight:700;line-height:1.4">${subject}</p><p style="margin:0 0 24px;line-height:1.62">${message}</p>${button ? `<p style="margin:0 0 24px"><a href="#" style="display:inline-block;background:${primary};border-radius:${current.layout === 'modern' ? '999px' : '10px'};color:#fff;padding:13px 20px;text-decoration:none;font-weight:700">${button}</a></p>` : ''}${deadline ? `<p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">${deadline}</p>` : ''}`;
+
+      let inner = '';
+      if (current.layout === 'modern') inner = `<div style="border-left:7px solid ${primary};background:#fff;padding:28px 26px"><div style="margin-bottom:14px">${logoLeft}${brandMarkup}</div><h1 style="margin:0 0 24px;color:${text};font-size:25px;line-height:1.2">${title}</h1>${p}</div>`;
+      else if (current.layout === 'editorial') inner = `<div style="background:#fffdf8;padding:30px 27px;border-top:8px solid ${primary}">${logoCenter}<h1 style="margin:0 auto 24px;max-width:430px;text-align:center;color:${text};font-family:Georgia,serif;font-size:26px;font-weight:400;line-height:1.2">${title}</h1>${p}</div>`;
+      else if (current.layout === 'soft') inner = `<div style="background:linear-gradient(145deg,#fff,#f1effa);padding:28px;border-radius:24px;border:1px solid #ded9ef">${logoLeft}${softBrandMarkup}<h1 style="margin:0 0 22px;color:${text};font-size:24px;line-height:1.24">${title}</h1><div style="border-radius:16px;background:#fff;padding:21px;box-shadow:0 8px 22px rgba(77,67,112,.08)">${p}</div></div>`;
+      else if (current.layout === 'midnight') inner = `<div style="background:#202532;padding:30px 27px;color:#fff"><div style="padding-bottom:22px;border-bottom:1px solid rgba(212,183,106,.35)">${logoLeft}${midnightBrandMarkup}</div><h1 style="margin:0 0 24px;color:#fff;font-size:25px;line-height:1.2">${title}</h1><p style="margin:0 0 17px;font-size:15px;font-weight:700;color:#fff;line-height:1.4">${subject}</p><p style="margin:0 0 24px;color:#e7e8ed;line-height:1.62">${message}</p>${button ? `<p style="margin:0 0 24px"><a href="#" style="display:inline-block;background:#d4b76a;border-radius:10px;color:#202532;padding:13px 20px;text-decoration:none;font-weight:800">${button}</a></p>` : ''}${deadline ? `<p style="margin:0;color:#c5c9d2;font-size:12px;line-height:1.6">${deadline}</p>` : ''}</div>`;
+      else if (current.layout === 'botanical') inner = `<div style="background:#f1f7ef;padding:27px 25px;border-top:6px solid ${primary}"><div style="padding-bottom:18px;border-bottom:1px solid #cfddca">${logoLeft}${botanicalBrandMarkup}</div><div style="padding:22px 0 0 15px;border-left:3px solid ${primary}"><h1 style="margin:0 0 22px;color:${text};font-size:25px;line-height:1.2">${title}</h1><p style="margin:0 0 20px;color:${text};font-weight:700">${greeting}</p>${p}</div></div>`;
+      else if (current.layout === 'terracotta') inner = `<div style="background:#fff4ed;padding:28px 26px"><div style="background:${primary};color:#fff;margin:-28px -26px 25px;padding:18px 26px">${logoLeft}${terracottaBrandMarkup}</div><h1 style="margin:0 0 22px;color:${text};font-size:25px;line-height:1.2">${title}</h1>${p}</div>`;
+      else if (current.layout === 'minimal') inner = `<div style="background:#fff;padding:33px 29px;border-top:2px solid ${primary}"><div style="text-align:center">${logoCenter}</div><h1 style="margin:0 0 22px;text-align:center;color:${text};font-size:27px;line-height:1.16;font-weight:700">${title}</h1>${p}</div>`;
+      else inner = `<div style="background:${primary};color:#fff;padding:25px 28px">${logoLeft}${classicBrandMarkup}<h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="background:#fff;padding:28px;color:${text}">${p}</div>`;
+
+      const footerColor = current.layout === 'midnight' ? '#d4d8e0' : '#827766';
+      return `<div class="email-preview-frame" style="font-family:Arial,Helvetica,sans-serif;color:${text};background:${background};padding:14px 8px;line-height:1.6"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${['soft','botanical'].includes(current.layout) ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="margin:15px 0 0;text-align:center;color:${footerColor};font-size:11px;line-height:1.5">${footer}</p></div>`;
     }
     const WORKSPACE_TOPIC_ROUTES = { 'email-invitation-customizer': { hash:'workspace-email', label:'E-mail de Convite' }, 'reminders-customizer': { hash:'workspace-reminders', label:'Lembretes Automáticos' }, 'response-scale-customizer': { hash:'workspace-scale', label:'Exibição das Avaliações' } };
     const setWorkspaceTopicButtonState = (cardId, isPage) => { const card = document.getElementById(cardId); const button = card?.querySelector('[data-workspace-topic-button]'); if (!button) return; const label = button.querySelector('.workspace-card-toggle-label'); const onPage = Boolean(isPage); button.dataset.workspaceTopicPage = String(onPage); button.title = onPage ? 'Voltar para Personalizar Plataforma' : 'Abrir tópico'; button.setAttribute('aria-label', onPage ? 'Voltar para Personalizar Plataforma' : `Abrir ${WORKSPACE_TOPIC_ROUTES[cardId]?.label || 'tópico'}`); if (label) label.textContent = onPage ? 'Voltar para Personalizar Plataforma' : 'Abrir tópico'; };
@@ -2334,8 +2432,12 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         showBrandName: document.getElementById('reminder-template-show-brand-name'),
         useSiteLogoBtn: document.getElementById('reminder-template-use-site-logo'),
         removeLogoBtn: document.getElementById('reminder-template-remove-logo'),
-        previewBrandName: document.getElementById('reminder-preview-brand-name'),
-        previewLogoImg: document.getElementById('reminder-preview-logo-img')
+        primaryColor: document.getElementById('reminder-template-primary-color'),
+        backgroundColor: document.getElementById('reminder-template-background-color'),
+        textColor: document.getElementById('reminder-template-text-color'),
+        layoutInputs: document.querySelectorAll('input[name="reminder-template-layout"]'),
+        previewContainer: document.getElementById('reminder-email-preview'),
+        previewWhatsapp: document.getElementById('reminder-preview-whatsapp-live')
       };
 
       const setStatus = (message, tone = 'muted') => {
@@ -2370,30 +2472,32 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const messageRaw = (editors.message ? editors.message.getValue() : fields.message?.value) || item.message || '';
         const whatsappRaw = (editors.whatsapp ? editors.whatsapp.getValue() : fields.whatsapp?.value) || messageRaw;
 
-        const brand = (brandFields.brandName?.value || emailTemplate.brandName || 'Jessica Melo Nutricionista').trim();
-        const logoSrc = logoDataUrl || brandFields.logoUrl?.value || emailTemplate.logoUrl || '';
-        const showBrand = brandFields.showBrandName ? brandFields.showBrandName.checked : emailTemplate.showBrandName !== false;
+        const currentTemplate = {
+          ...emailTemplate,
+          brandName: (brandFields.brandName?.value || emailTemplate.brandName || 'Jessica Melo Nutricionista').trim(),
+          logoUrl: (brandFields.logoUrl?.value || emailTemplate.logoUrl || '').trim(),
+          logoDataUrl: logoDataUrl || '',
+          showBrandName: brandFields.showBrandName ? brandFields.showBrandName.checked : emailTemplate.showBrandName !== false,
+          primaryColor: brandFields.primaryColor?.value || emailTemplate.primaryColor || '#a88b36',
+          backgroundColor: brandFields.backgroundColor?.value || emailTemplate.backgroundColor || '#faf8f3',
+          textColor: brandFields.textColor?.value || emailTemplate.textColor || '#3d3226',
+          layout: document.querySelector('input[name="reminder-template-layout"]:checked')?.value || emailTemplate.layout || 'classic'
+        };
 
-        if (brandFields.previewBrandName) {
-          brandFields.previewBrandName.textContent = brand;
-          brandFields.previewBrandName.classList.toggle('hidden', Boolean(logoSrc && !showBrand));
-        }
-        if (brandFields.previewLogoImg) {
-          if (logoSrc) {
-            brandFields.previewLogoImg.src = logoSrc.startsWith('/') ? `${window.location.origin}${logoSrc}` : logoSrc;
-            brandFields.previewLogoImg.alt = brand;
-            brandFields.previewLogoImg.classList.remove('hidden');
-          } else {
-            brandFields.previewLogoImg.removeAttribute('src');
-            brandFields.previewLogoImg.classList.add('hidden');
-          }
-        }
+        const currentReminderData = {
+          ...item,
+          id: activeReminderId,
+          title: meta.title,
+          subject: subjectRaw,
+          message: messageRaw
+        };
 
-        if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
-        if (fields.previewSubject) fields.previewSubject.textContent = replaceSampleTokens(subjectRaw);
-        if (fields.previewMessage) fields.previewMessage.textContent = replaceSampleTokens(messageRaw);
-        if (fields.previewWhatsapp) fields.previewWhatsapp.textContent = replaceSampleTokens(whatsappRaw || 'A mensagem principal será reutilizada.');
-        if (fields.previewActionBlock) fields.previewActionBlock.classList.toggle('hidden', activeReminderId === 'service_ending');
+        if (brandFields.previewContainer) {
+          brandFields.previewContainer.innerHTML = reminderPreviewHtml(currentReminderData, currentTemplate);
+        }
+        if (brandFields.previewWhatsapp) {
+          brandFields.previewWhatsapp.textContent = replaceSampleTokens(whatsappRaw || 'A mensagem principal será reutilizada.');
+        }
       };
 
       const syncBrandFields = template => {
@@ -2402,6 +2506,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (brandFields.brandName) brandFields.brandName.value = emailTemplate.brandName || '';
         if (brandFields.logoUrl) brandFields.logoUrl.value = emailTemplate.logoUrl || '';
         if (brandFields.showBrandName) brandFields.showBrandName.checked = emailTemplate.showBrandName !== false;
+        if (brandFields.primaryColor) brandFields.primaryColor.value = emailTemplate.primaryColor || '#a88b36';
+        if (brandFields.backgroundColor) brandFields.backgroundColor.value = emailTemplate.backgroundColor || '#faf8f3';
+        if (brandFields.textColor) brandFields.textColor.value = emailTemplate.textColor || '#3d3226';
+        const activeLayout = emailTemplate.layout || 'classic';
+        brandFields.layoutInputs.forEach(input => {
+          input.checked = input.value === activeLayout;
+        });
         const logoSrc = logoDataUrl || emailTemplate.logoUrl;
         if (brandFields.logoPreview) {
           if (logoSrc) {
@@ -2552,6 +2663,11 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         drawPreview();
       });
 
+      brandFields.primaryColor?.addEventListener('input', drawPreview);
+      brandFields.backgroundColor?.addEventListener('input', drawPreview);
+      brandFields.textColor?.addEventListener('input', drawPreview);
+      brandFields.layoutInputs.forEach(input => input.addEventListener('change', drawPreview));
+
       form.addEventListener('input', drawPreview);
 
       fields.resetBtn?.addEventListener('click', () => {
@@ -2638,6 +2754,10 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const brandName = (brandFields.brandName?.value || emailTemplate.brandName || '').trim();
         const logoUrl = (brandFields.logoUrl?.value || emailTemplate.logoUrl || '').trim();
         const showBrandName = brandFields.showBrandName ? brandFields.showBrandName.checked : emailTemplate.showBrandName !== false;
+        const primaryColor = brandFields.primaryColor?.value || emailTemplate.primaryColor || '#a88b36';
+        const backgroundColor = brandFields.backgroundColor?.value || emailTemplate.backgroundColor || '#faf8f3';
+        const textColor = brandFields.textColor?.value || emailTemplate.textColor || '#3d3226';
+        const layout = document.querySelector('input[name="reminder-template-layout"]:checked')?.value || emailTemplate.layout || 'classic';
 
         if (fields.saveBtn) {
           fields.saveBtn.disabled = true;
@@ -2652,7 +2772,11 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             brandName: brandName || emailTemplate.brandName,
             logoUrl,
             logoDataUrl,
-            showBrandName
+            showBrandName,
+            primaryColor,
+            backgroundColor,
+            textColor,
+            layout
           })
         ]);
 
