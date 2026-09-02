@@ -476,6 +476,19 @@
     .reminder-token:hover { background:rgba(168,139,54,.14); border-color:rgba(168,139,54,.42); }
     .reminder-token:active { transform:scale(.97); }
     .reminder-message-field { min-height:8.5rem; resize:vertical; white-space:pre-wrap; }
+    .token-rich-editor { min-height:2.65rem; width:100%; border-radius:.75rem; border:1px solid rgba(168,139,54,.22); background-color:#fff; padding:.55rem .75rem; color:#3d3226; font-size:.78rem; line-height:1.65; white-space:pre-wrap; word-break:break-word; outline:none; transition:border-color .15s ease,box-shadow .15s ease,background-color .15s ease; cursor:text; }
+    .token-rich-editor:focus { border-color:#a88b36; box-shadow:0 0 0 3px rgba(168,139,54,.12); }
+    .token-rich-editor.is-drag-over { border-color:#a88b36 !important; background-color:rgba(168,139,54,.06) !important; box-shadow:0 0 0 3px rgba(168,139,54,.22) !important; }
+    .token-rich-editor[data-editor-type="textarea"] { min-height:6rem; resize:vertical; overflow-y:auto; }
+    .token-rich-editor:empty::before { content:attr(data-placeholder); color:#9ca3af; pointer-events:none; }
+    .token-chip { display:inline-flex; align-items:center; gap:.3rem; vertical-align:baseline; user-select:none; -webkit-user-select:none; margin:0 .18rem; padding:.14rem .45rem .14rem .4rem; border-radius:.5rem; background:#fff8e8; border:1px solid rgba(168,139,54,.4); color:#6a5216; font-size:.7rem; font-weight:700; line-height:1.35; box-shadow:0 1px 3px rgba(168,139,54,.1); cursor:default; }
+    .token-chip-icon { display:inline-flex; font-size:.75rem; line-height:1; }
+    .token-chip-label { font-weight:700; color:#5c4510; white-space:nowrap; }
+    .token-chip-remove { display:inline-flex; align-items:center; justify-content:center; width:.9rem; height:.9rem; border-radius:999px; margin-left:.15rem; font-size:.75rem; font-weight:900; line-height:1; color:#937424; background:rgba(168,139,54,.15); border:none; cursor:pointer; transition:background .15s ease,color .15s ease; padding:0; }
+    .token-chip-remove:hover { background:#a88b36; color:#fff; }
+    .token-palette-btn { cursor:grab; user-select:none; -webkit-user-select:none; }
+    .token-palette-btn:active { cursor:grabbing; }
+    .token-palette-btn.is-dragging { opacity:.45; transform:scale(.97); }
     .reminder-modal-overlay { position:fixed; inset:0; z-index:120; display:grid; place-items:center; padding:clamp(.5rem,2vw,1.5rem); background:rgba(23,24,29,.58); opacity:0; pointer-events:none; transition:opacity .2s ease; }
     .reminder-modal-overlay.is-open { opacity:1; pointer-events:auto; }
     .reminder-modal { display:flex; width:min(46rem,100%); height:min(90vh,56rem); max-height:calc(100vh - 3rem); min-height:0; flex-direction:column; overflow:hidden; border:1px solid rgba(255,255,255,.24); border-radius:1.35rem; background:#fff; box-shadow:0 28px 80px rgba(0,0,0,.3); transform:translateY(.7rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
@@ -1371,34 +1384,34 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Texto do Email</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Edite assunto, chamadas e mensagens. Use as opções abaixo para personalizar automaticamente os dados de cada paciente.</p></div><span class="email-section-number">02</span></div>
               <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="text-xs font-semibold text-dark sm:col-span-2">Assunto do email<input id="email-template-subject" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Título principal<input id="email-template-title" maxlength="160" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Saudação<input id="email-template-greeting" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de apresentação<textarea id="email-template-intro" maxlength="500" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de orientação<textarea id="email-template-body" maxlength="700" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark">Texto do botão<input id="email-template-button" maxlength="80" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark">Aviso de prazo<input id="email-template-deadline" maxlength="260" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Rodapé<input id="email-template-footer" maxlength="260" class="email-template-field mt-1.5" type="text"></label></div>
               <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/[.035] p-4">
-                <div class="flex items-start gap-3"><span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span><div><h4 class="text-xs font-bold text-dark">Inserir informação automática</h4><p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo para inserir no texto.</p></div></div>
+                <div class="flex items-start gap-3"><span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span><div><h4 class="text-xs font-bold text-dark">Inserir informação automática</h4><p class="mt-1 text-[11px] leading-relaxed text-gray-600">Arraste um bloco para o texto ou escolha onde deseja inserir e clique na opção abaixo.</p></div></div>
                 <div class="mt-3 grid gap-3">
-                  <label class="text-[11px] font-bold text-dark">Onde inserir<select id="email-template-token-target" class="email-template-field mt-1.5"><option value="subject">Assunto do email</option><option value="title">Título principal</option><option value="greeting">Saudação</option><option value="intro">Mensagem de apresentação</option><option value="body">Mensagem de orientação</option><option value="button">Texto do botão</option><option value="deadline">Aviso de prazo</option><option value="footer">Rodapé</option></select></label>
+                  <label class="text-[11px] font-bold text-dark">Onde inserir com clique<select id="email-template-token-target" class="email-template-field mt-1.5"><option value="subject">Assunto do email</option><option value="title">Título principal</option><option value="greeting">Saudação</option><option value="intro">Mensagem de apresentação</option><option value="body">Mensagem de orientação</option><option value="button">Texto do botão</option><option value="deadline">Aviso de prazo</option><option value="footer">Rodapé</option></select></label>
                   <div>
-                    <p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p>
+                    <p class="text-[11px] font-bold text-dark">Blocos disponíveis (arraste ou clique):</p>
                     <div id="email-template-token-options" class="mt-2 grid gap-2 sm:grid-cols-2">
-                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{primeiro_nome}" aria-label="Inserir Primeiro nome do paciente">
+                      <button type="button" draggable="true" class="email-template-token-choice token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-email-token="{primeiro_nome}" aria-label="Inserir Primeiro nome do paciente">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👤</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs">Primeiro nome</span>
                           <span class="block text-[10px] text-gray-500 font-normal">Ex.: Marina</span>
                         </span>
                       </button>
-                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{questionario}" aria-label="Inserir Nome do questionário">
+                      <button type="button" draggable="true" class="email-template-token-choice token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-email-token="{questionario}" aria-label="Inserir Nome do questionário">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">📋</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs">Nome do questionário</span>
                           <span class="block text-[10px] text-gray-500 font-normal">Ex.: Acompanhamento semanal</span>
                         </span>
                       </button>
-                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{prazo}" aria-label="Inserir Prazo de resposta">
+                      <button type="button" draggable="true" class="email-template-token-choice token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-email-token="{prazo}" aria-label="Inserir Prazo de resposta">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">⏰</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs">Prazo de resposta</span>
                           <span class="block text-[10px] text-gray-500 font-normal">Ex.: 15 de setembro às 22:00</span>
                         </span>
                       </button>
-                      <button type="button" class="email-template-token-choice flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-email-token="{ano}" aria-label="Inserir Ano do envio">
+                      <button type="button" draggable="true" class="email-template-token-choice token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-email-token="{ano}" aria-label="Inserir Ano do envio">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">📅</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs">Ano atual</span>
@@ -1408,7 +1421,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                     </div>
                   </div>
                 </div>
-                <p class="mt-3 text-[11px] leading-relaxed text-gray-500">💡 <strong>Como funciona:</strong> Escolha onde deseja colocar a informação e clique no botão correspondente. Ao enviar o e-mail, a plataforma substitui automaticamente pelo dado real do paciente.</p>
+                <p class="mt-3 text-[11px] leading-relaxed text-gray-500">💡 <strong>Dica:</strong> Você pode <strong>arrastar</strong> qualquer bloco acima diretamente para dentro do texto ou <strong>clicar</strong> nele para inserir onde estiver o cursor. No envio real, o sistema preencherá esses dados automaticamente para cada paciente.</p>
               </div>
             </section>
             <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Cores da marca</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Ajuste os tons principais e acompanhe o resultado na prévia ao lado.</p></div><span class="email-section-number">03</span></div><div class="mt-4 grid gap-3 sm:grid-cols-3"><label class="email-color-field"><span>Cor de destaque</span><input id="email-template-primary-color" type="color" value="#a88b36"></label><label class="email-color-field"><span>Fundo externo</span><input id="email-template-background-color" type="color" value="#faf8f3"></label><label class="email-color-field"><span>Texto</span><input id="email-template-text-color" type="color" value="#3d3226"></label></div></section>
@@ -1499,12 +1512,12 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                   <span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span>
                   <div>
                     <h4 class="text-xs font-bold text-dark">Inserir informação automática</h4>
-                    <p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo para inserir no texto.</p>
+                    <p class="mt-1 text-[11px] leading-relaxed text-gray-600">Arraste um bloco para o texto ou escolha onde deseja inserir e clique na opção abaixo.</p>
                   </div>
                 </div>
                 <div class="mt-3 grid gap-3">
                   <label class="text-[11px] font-bold text-dark">
-                    Onde inserir
+                    Onde inserir com clique
                     <select id="reminder-customizer-token-target" class="email-template-field mt-1.5">
                       <option value="message">Mensagem principal (E-mail)</option>
                       <option value="subject">Assunto do e-mail</option>
@@ -1512,44 +1525,44 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                     </select>
                   </label>
                   <div>
-                    <p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p>
+                    <p class="text-[11px] font-bold text-dark">Blocos disponíveis (arraste ou clique):</p>
                     <div id="reminder-customizer-token-options" class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{primeiro_nome}">
+                      <button type="button" draggable="true" class="reminder-custom-token-btn token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-reminder-custom-token="{primeiro_nome}">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👤</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs truncate">Primeiro nome</span>
                           <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Marina</span>
                         </span>
                       </button>
-                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{paciente}">
+                      <button type="button" draggable="true" class="reminder-custom-token-btn token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-reminder-custom-token="{paciente}">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👤</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs truncate">Nome completo</span>
                           <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Marina Alves</span>
                         </span>
                       </button>
-                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{questionario}">
+                      <button type="button" draggable="true" class="reminder-custom-token-btn token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-reminder-custom-token="{questionario}">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">📋</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs truncate">Questionário</span>
                           <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: Acompanhamento semanal</span>
                         </span>
                       </button>
-                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{prazo}">
+                      <button type="button" draggable="true" class="reminder-custom-token-btn token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-reminder-custom-token="{prazo}">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">⏰</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs truncate">Prazo de resposta</span>
                           <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: 15 de setembro às 22:00</span>
                         </span>
                       </button>
-                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{dias_restantes}">
+                      <button type="button" draggable="true" class="reminder-custom-token-btn token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-reminder-custom-token="{dias_restantes}">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">⏳</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs truncate">Dias restantes</span>
                           <span class="block text-[10px] text-gray-500 font-normal truncate">Ex.: 3 dias</span>
                         </span>
                       </button>
-                      <button type="button" class="reminder-custom-token-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5" data-reminder-custom-token="{nutricionista}">
+                      <button type="button" draggable="true" class="reminder-custom-token-btn token-palette-btn flex items-center gap-2.5 rounded-xl border border-primary/20 bg-white p-2.5 text-left text-xs font-semibold text-dark transition hover:border-primary hover:bg-primary/5 hover:shadow-xs" data-reminder-custom-token="{nutricionista}">
                         <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold">👩‍⚕️</span>
                         <span class="flex-1 min-w-0">
                           <span class="block font-bold text-xs truncate">Nutricionista</span>
@@ -1559,7 +1572,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                     </div>
                   </div>
                 </div>
-                <p class="mt-3 text-[11px] leading-relaxed text-gray-500">💡 <strong>Como funciona:</strong> Escolha onde deseja colocar a informação e clique no botão correspondente. Ao fazer o envio real, o sistema preencherá esses dados automaticamente para cada paciente.</p>
+                <p class="mt-3 text-[11px] leading-relaxed text-gray-500">💡 <strong>Dica:</strong> Você pode <strong>arrastar</strong> qualquer bloco acima diretamente para dentro do texto ou <strong>clicar</strong> nele para inserir onde estiver o cursor. No envio real, o sistema preencherá esses dados automaticamente para cada paciente.</p>
               </div>
             </section>
 
@@ -1775,15 +1788,387 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const refresh = async () => { setStatus('Carregando configuração...', 'muted'); const preferences = await db.getPlatformPreferences(); currentStyle = responseScaleStyleMeta(preferences?.responseScaleStyle).value; currentPatientMode = preferences?.emojiScaleDisplayMode || 'emoji-text'; try { localStorage.setItem('response-scale-style', currentStyle); } catch {} render(); setStatus(`Formato atual: ${responseScaleStyleMeta(currentStyle).label}.`, 'muted'); };
       render(); void refresh(); return { refresh };
     }
+    const TOKEN_DEFINITIONS = {
+      '{primeiro_nome}': { icon: '👤', label: 'Primeiro nome', example: 'Marina' },
+      '{paciente}': { icon: '👤', label: 'Nome completo', example: 'Marina Alves' },
+      '{questionario}': { icon: '📋', label: 'Questionário', example: 'Acompanhamento semanal' },
+      '{prazo}': { icon: '⏰', label: 'Prazo de resposta', example: '15 de setembro às 22:00' },
+      '{dias_restantes}': { icon: '⏳', label: 'Dias restantes', example: '3 dias' },
+      '{nutricionista}': { icon: '👩‍⚕️', label: 'Nutricionista', example: 'Jessica Melo' },
+      '{ano}': { icon: '📅', label: 'Ano atual', example: '2026' }
+    };
+
+    function createTokenChipElement(token) {
+      const def = TOKEN_DEFINITIONS[token] || { icon: '✦', label: token.replace(/[{}]/g, '') };
+      const chip = document.createElement('span');
+      chip.className = 'token-chip';
+      chip.contentEditable = 'false';
+      chip.dataset.token = token;
+      chip.title = `Informação automática: ${def.label}`;
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'token-chip-icon';
+      iconSpan.textContent = def.icon;
+      chip.appendChild(iconSpan);
+
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'token-chip-label';
+      labelSpan.textContent = def.label;
+      chip.appendChild(labelSpan);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'token-chip-remove';
+      removeBtn.title = `Remover ${def.label}`;
+      removeBtn.setAttribute('aria-label', `Remover ${def.label}`);
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const editor = chip.closest('.token-rich-editor');
+        chip.remove();
+        if (editor) editor.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      chip.appendChild(removeBtn);
+
+      return chip;
+    }
+
+    function parseTextToNodes(text) {
+      const fragment = document.createDocumentFragment();
+      const raw = String(text || '');
+      if (!raw) return fragment;
+
+      const tokenRegex = /(\{[a-zA-Z0-9_]+\})/g;
+      const parts = raw.split(tokenRegex);
+
+      parts.forEach(part => {
+        if (!part) return;
+        if (TOKEN_DEFINITIONS[part]) {
+          fragment.appendChild(createTokenChipElement(part));
+        } else {
+          const lines = part.split('\n');
+          lines.forEach((line, i) => {
+            if (i > 0) fragment.appendChild(document.createElement('br'));
+            if (line) fragment.appendChild(document.createTextNode(line));
+          });
+        }
+      });
+
+      return fragment;
+    }
+
+    function serializeEditorContent(editor) {
+      let result = '';
+      const walk = node => {
+        if (!node) return;
+        if (node.nodeType === Node.TEXT_NODE) {
+          result += node.textContent;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.classList?.contains('token-chip') && node.dataset.token) {
+            result += node.dataset.token;
+          } else if (node.tagName === 'BR') {
+            result += '\n';
+          } else if (node.tagName === 'DIV' || node.tagName === 'P') {
+            if (result.length > 0 && !result.endsWith('\n')) result += '\n';
+            node.childNodes.forEach(walk);
+          } else {
+            node.childNodes.forEach(walk);
+          }
+        }
+      };
+      editor.childNodes.forEach(walk);
+      return result;
+    }
+
+    function attachTokenRichEditor(targetInput, options = {}) {
+      if (!targetInput) return null;
+      if (targetInput.dataset.richEditorReady === 'true') {
+        const existingEditor = targetInput.previousElementSibling;
+        return {
+          editor: existingEditor,
+          input: targetInput,
+          setValue: text => {
+            existingEditor.innerHTML = '';
+            existingEditor.appendChild(parseTextToNodes(text));
+            targetInput.value = String(text || '');
+          },
+          getValue: () => serializeEditorContent(existingEditor),
+          insertToken: token => {
+            existingEditor.focus();
+            const sel = window.getSelection();
+            let range;
+            if (sel && sel.rangeCount > 0 && existingEditor.contains(sel.anchorNode)) {
+              range = sel.getRangeAt(0);
+              range.deleteContents();
+            } else {
+              range = document.createRange();
+              range.selectNodeContents(existingEditor);
+              range.collapse(false);
+            }
+            const chip = createTokenChipElement(token);
+            range.insertNode(chip);
+            range.setStartAfter(chip);
+            range.setEndAfter(chip);
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+            existingEditor.dispatchEvent(new Event('input', { bubbles: true }));
+          },
+          focus: () => existingEditor.focus()
+        };
+      }
+      targetInput.dataset.richEditorReady = 'true';
+      const isTextarea = targetInput.tagName === 'TEXTAREA';
+      const editor = document.createElement('div');
+      editor.className = 'token-rich-editor';
+      editor.contentEditable = 'true';
+      editor.spellcheck = false;
+      editor.dataset.editorType = isTextarea ? 'textarea' : 'input';
+      if (targetInput.id) editor.dataset.forInput = targetInput.id;
+      if (targetInput.placeholder) editor.dataset.placeholder = targetInput.placeholder;
+
+      targetInput.classList.add('hidden');
+      targetInput.before(editor);
+
+      let isUpdating = false;
+
+      const syncToInput = () => {
+        if (isUpdating) return;
+        isUpdating = true;
+        const val = serializeEditorContent(editor);
+        targetInput.value = val;
+        targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+        if (typeof options.onChange === 'function') options.onChange(val);
+        isUpdating = false;
+      };
+
+      const setValue = text => {
+        isUpdating = true;
+        editor.innerHTML = '';
+        editor.appendChild(parseTextToNodes(text));
+        targetInput.value = String(text || '');
+        isUpdating = false;
+      };
+
+      const getValue = () => serializeEditorContent(editor);
+
+      const insertTokenAtSelection = token => {
+        editor.focus();
+        const sel = window.getSelection();
+        let range;
+        if (sel && sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+          range = sel.getRangeAt(0);
+          range.deleteContents();
+        } else {
+          range = document.createRange();
+          range.selectNodeContents(editor);
+          range.collapse(false);
+        }
+        const chip = createTokenChipElement(token);
+        range.insertNode(chip);
+        range.setStartAfter(chip);
+        range.setEndAfter(chip);
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        syncToInput();
+      };
+
+      editor.addEventListener('input', () => syncToInput());
+
+      editor.addEventListener('paste', e => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        if (!text) return;
+        const fragment = parseTextToNodes(text);
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+          const range = sel.getRangeAt(0);
+          range.deleteContents();
+          range.insertNode(fragment);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else {
+          editor.appendChild(fragment);
+        }
+        syncToInput();
+      });
+
+      editor.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        editor.classList.add('is-drag-over');
+      });
+
+      editor.addEventListener('dragleave', e => {
+        if (!editor.contains(e.relatedTarget)) {
+          editor.classList.remove('is-drag-over');
+        }
+      });
+
+      editor.addEventListener('drop', e => {
+        e.preventDefault();
+        editor.classList.remove('is-drag-over');
+        const token = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('application/x-token');
+        if (!token || !TOKEN_DEFINITIONS[token]) return;
+
+        editor.focus();
+        let range;
+        if (document.caretRangeFromPoint) {
+          range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        } else if (document.caretPositionFromPoint) {
+          const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+          range = document.createRange();
+          range.setStart(pos.offsetNode, pos.offset);
+          range.collapse(true);
+        }
+
+        const sel = window.getSelection();
+        const chip = createTokenChipElement(token);
+        if (range && editor.contains(range.startContainer)) {
+          range.insertNode(chip);
+          range.setStartAfter(chip);
+          range.setEndAfter(chip);
+          if (sel) {
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        } else {
+          editor.appendChild(chip);
+        }
+        syncToInput();
+      });
+
+      if (!isTextarea) {
+        editor.addEventListener('keydown', e => {
+          if (e.key === 'Enter') e.preventDefault();
+        });
+      }
+
+      if (targetInput.value) setValue(targetInput.value);
+
+      return {
+        editor,
+        input: targetInput,
+        setValue,
+        getValue,
+        insertToken: insertTokenAtSelection,
+        focus: () => editor.focus()
+      };
+    }
+
+    function initPaletteDraggables() {
+      document.querySelectorAll('.token-palette-btn').forEach(btn => {
+        if (btn.dataset.dragReady === 'true') return;
+        btn.dataset.dragReady = 'true';
+        btn.setAttribute('draggable', 'true');
+        btn.addEventListener('dragstart', e => {
+          const token = btn.dataset.reminderCustomToken || btn.dataset.emailToken;
+          if (!token) return;
+          e.dataTransfer.setData('text/plain', token);
+          e.dataTransfer.setData('application/x-token', token);
+          e.dataTransfer.effectAllowed = 'copy';
+          btn.classList.add('is-dragging');
+        });
+        btn.addEventListener('dragend', () => {
+          btn.classList.remove('is-dragging');
+        });
+      });
+    }
+
     function renderEmailTemplateCustomizer(showToast) {
       const form = document.getElementById('email-template-form'); if (!form) return { refresh:async () => {} };
       const input = suffix => document.getElementById(`email-template-${suffix}`); let state = { ...EMAIL_TEMPLATE_DEFAULTS }; let logoDataUrl = '';
       const status = (message, tone = 'muted') => { const node = document.getElementById('email-template-form-status'); const saveState = document.getElementById('email-template-save-state'); if (node) { node.textContent = message || ''; node.className = message ? `text-xs font-semibold ${tone === 'error' ? 'text-red-600' : tone === 'success' ? 'text-emerald-700' : 'text-gray-500'}` : 'hidden'; } if (saveState) { saveState.textContent = message || 'Modelo carregado'; saveState.className = `inline-flex w-fit items-center rounded-full px-3 py-2 text-xs font-bold ${tone === 'error' ? 'bg-red-50 text-red-700' : tone === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-primary/10 text-primary'}`; } };
-      const templateFromForm = () => ({ ...state, layout:form.querySelector('input[name="email-template-layout"]:checked')?.value || state.layout || 'classic', brandName:(input('brand-name')?.value || state.brandName || '').trim(), showBrandName:input('show-brand-name') ? input('show-brand-name').checked : (state.showBrandName !== false), logoUrl:(input('logo-url')?.value || state.logoUrl || '').trim(), logoDataUrl, subject:(input('subject')?.value || state.subject || '').trim(), title:(input('title')?.value || state.title || '').trim(), greeting:(input('greeting')?.value || state.greeting || '').trim(), intro:(input('intro')?.value || state.intro || '').trim(), body:(input('body')?.value || state.body || '').trim(), buttonText:(input('button')?.value || state.buttonText || '').trim(), deadlineText:(input('deadline')?.value || state.deadlineText || '').trim(), footerText:(input('footer')?.value || state.footerText || '').trim(), primaryColor:input('primary-color')?.value || state.primaryColor || '#a88b36', backgroundColor:input('background-color')?.value || state.backgroundColor || '#faf8f3', textColor:input('text-color')?.value || state.textColor || '#3d3226' });
-      const syncBrandNameControl = () => { const toggle = input('show-brand-name'); if (!toggle) return; const hasLogo = Boolean(logoDataUrl || input('logo-url')?.value?.trim()); toggle.disabled = !hasLogo; if (!hasLogo) toggle.checked = true; }; const drawPreview = () => { syncBrandNameControl(); const preview = document.getElementById('email-template-preview'); if (preview) preview.innerHTML = emailPreviewHtml(templateFromForm()); };
-      const insertEmailToken = token => { const target = input(tokenTarget?.value || 'subject'); if (!target || !token) return; const start = Number.isInteger(target.selectionStart) ? target.selectionStart : target.value.length; const end = Number.isInteger(target.selectionEnd) ? target.selectionEnd : start; if (typeof target.setRangeText === 'function') target.setRangeText(token, start, end, 'end'); else target.value = `${target.value.slice(0, start)}${token}${target.value.slice(end)}`; target.focus(); target.dispatchEvent(new Event('input', { bubbles:true })); const tokenNames = { '{primeiro_nome}':'Primeiro nome', '{questionario}':'Nome do questionário', '{prazo}':'Prazo de resposta', '{ano}':'Ano atual' }; const tokenLabel = tokenNames[token] || 'Informação'; status(`"${tokenLabel}" inserido com sucesso.`, 'success'); };
+
+      const syncBrandNameControl = () => { const toggle = input('show-brand-name'); if (!toggle) return; const hasLogo = Boolean(logoDataUrl || input('logo-url')?.value?.trim()); toggle.disabled = !hasLogo; if (!hasLogo) toggle.checked = true; };
+      const drawPreview = () => { syncBrandNameControl(); const preview = document.getElementById('email-template-preview'); if (preview) preview.innerHTML = emailPreviewHtml(templateFromForm()); };
+
+      const editors = {
+        subject: attachTokenRichEditor(input('subject'), { onChange: drawPreview }),
+        title: attachTokenRichEditor(input('title'), { onChange: drawPreview }),
+        greeting: attachTokenRichEditor(input('greeting'), { onChange: drawPreview }),
+        intro: attachTokenRichEditor(input('intro'), { onChange: drawPreview }),
+        body: attachTokenRichEditor(input('body'), { onChange: drawPreview }),
+        button: attachTokenRichEditor(input('button'), { onChange: drawPreview }),
+        deadline: attachTokenRichEditor(input('deadline'), { onChange: drawPreview }),
+        footer: attachTokenRichEditor(input('footer'), { onChange: drawPreview })
+      };
+
+      const templateFromForm = () => ({
+        ...state,
+        layout: form.querySelector('input[name="email-template-layout"]:checked')?.value || state.layout || 'classic',
+        brandName: (input('brand-name')?.value || state.brandName || '').trim(),
+        showBrandName: input('show-brand-name') ? input('show-brand-name').checked : (state.showBrandName !== false),
+        logoUrl: (input('logo-url')?.value || state.logoUrl || '').trim(),
+        logoDataUrl,
+        subject: (editors.subject ? editors.subject.getValue() : input('subject')?.value || state.subject || '').trim(),
+        title: (editors.title ? editors.title.getValue() : input('title')?.value || state.title || '').trim(),
+        greeting: (editors.greeting ? editors.greeting.getValue() : input('greeting')?.value || state.greeting || '').trim(),
+        intro: (editors.intro ? editors.intro.getValue() : input('intro')?.value || state.intro || '').trim(),
+        body: (editors.body ? editors.body.getValue() : input('body')?.value || state.body || '').trim(),
+        buttonText: (editors.button ? editors.button.getValue() : input('button')?.value || state.buttonText || '').trim(),
+        deadlineText: (editors.deadline ? editors.deadline.getValue() : input('deadline')?.value || state.deadlineText || '').trim(),
+        footerText: (editors.footer ? editors.footer.getValue() : input('footer')?.value || state.footerText || '').trim(),
+        primaryColor: input('primary-color')?.value || state.primaryColor || '#a88b36',
+        backgroundColor: input('background-color')?.value || state.backgroundColor || '#faf8f3',
+        textColor: input('text-color')?.value || state.textColor || '#3d3226'
+      });
+
+      const tokenTarget = document.getElementById('email-template-token-target');
+      const tokenOptions = document.getElementById('email-template-token-options');
+
+      const insertEmailToken = token => {
+        const targetKey = tokenTarget?.value || 'subject';
+        const targetEditor = editors[targetKey];
+        if (targetEditor) {
+          targetEditor.insertToken(token);
+        }
+        const tokenNames = { '{primeiro_nome}':'Primeiro nome', '{questionario}':'Nome do questionário', '{prazo}':'Prazo de resposta', '{ano}':'Ano atual' };
+        const tokenLabel = tokenNames[token] || 'Informação';
+        status(`"${tokenLabel}" inserido com sucesso.`, 'success');
+      };
+
       tokenOptions?.addEventListener('click', event => { const button = event.target.closest('[data-email-token]'); if (!button) return; insertEmailToken(button.dataset.emailToken); });
-      const setForm = template => { state = { ...EMAIL_TEMPLATE_DEFAULTS, ...(template || {}) }; logoDataUrl = state.logoDataUrl || ''; if (input('brand-name')) input('brand-name').value = state.brandName; if (input('show-brand-name')) input('show-brand-name').checked = state.showBrandName !== false; if (input('logo-url')) input('logo-url').value = state.logoUrl; if (input('subject')) input('subject').value = state.subject; if (input('title')) input('title').value = state.title; if (input('greeting')) input('greeting').value = state.greeting; if (input('intro')) input('intro').value = state.intro; if (input('body')) input('body').value = state.body; if (input('button')) input('button').value = state.buttonText; if (input('deadline')) input('deadline').value = state.deadlineText; if (input('footer')) input('footer').value = state.footerText; if (input('primary-color')) input('primary-color').value = validEmailColor(state.primaryColor, '#a88b36'); if (input('background-color')) input('background-color').value = validEmailColor(state.backgroundColor, '#faf8f3'); if (input('text-color')) input('text-color').value = validEmailColor(state.textColor, '#3d3226'); form.querySelectorAll('input[name="email-template-layout"]').forEach(radio => { radio.checked = radio.value === state.layout; }); const logoPreview = document.getElementById('email-template-logo-preview'); const logoSrc = logoDataUrl || state.logoUrl; if (logoPreview) { if (logoSrc) { logoPreview.src = logoSrc.startsWith('/') ? `${window.location.origin}${logoSrc}` : logoSrc; logoPreview.classList.remove('hidden'); } else { logoPreview.removeAttribute('src'); logoPreview.classList.add('hidden'); } } const fileNameNode = document.getElementById('email-template-logo-file-name'); if (fileNameNode) fileNameNode.textContent = logoDataUrl ? 'Logomarca carregada' : state.logoUrl ? 'URL pública configurada' : 'Nenhum arquivo selecionado'; drawPreview(); };
+      initPaletteDraggables();
+
+      const setForm = template => {
+        state = { ...EMAIL_TEMPLATE_DEFAULTS, ...(template || {}) };
+        logoDataUrl = state.logoDataUrl || '';
+        if (input('brand-name')) input('brand-name').value = state.brandName;
+        if (input('show-brand-name')) input('show-brand-name').checked = state.showBrandName !== false;
+        if (input('logo-url')) input('logo-url').value = state.logoUrl;
+        editors.subject?.setValue(state.subject);
+        editors.title?.setValue(state.title);
+        editors.greeting?.setValue(state.greeting);
+        editors.intro?.setValue(state.intro);
+        editors.body?.setValue(state.body);
+        editors.button?.setValue(state.buttonText);
+        editors.deadline?.setValue(state.deadlineText);
+        editors.footer?.setValue(state.footerText);
+        if (input('primary-color')) input('primary-color').value = validEmailColor(state.primaryColor, '#a88b36');
+        if (input('background-color')) input('background-color').value = validEmailColor(state.backgroundColor, '#faf8f3');
+        if (input('text-color')) input('text-color').value = validEmailColor(state.textColor, '#3d3226');
+        form.querySelectorAll('input[name="email-template-layout"]').forEach(radio => { radio.checked = radio.value === state.layout; });
+        const logoPreview = document.getElementById('email-template-logo-preview');
+        const logoSrc = logoDataUrl || state.logoUrl;
+        if (logoPreview) {
+          if (logoSrc) {
+            logoPreview.src = logoSrc.startsWith('/') ? `${window.location.origin}${logoSrc}` : logoSrc;
+            logoPreview.classList.remove('hidden');
+          } else {
+            logoPreview.removeAttribute('src');
+            logoPreview.classList.add('hidden');
+          }
+        }
+        const fileNameNode = document.getElementById('email-template-logo-file-name');
+        if (fileNameNode) fileNameNode.textContent = logoDataUrl ? 'Logomarca carregada' : state.logoUrl ? 'URL pública configurada' : 'Nenhum arquivo selecionado';
+        drawPreview();
+      };
       const refresh = async () => { status('Carregando modelo...'); const template = await db.getEmailTemplate(); setForm(template); status('Modelo carregado'); };
       form.addEventListener('input', drawPreview); form.querySelectorAll('input[name="email-template-layout"]').forEach(radio => radio.addEventListener('change', drawPreview)); input('show-brand-name')?.addEventListener('change', drawPreview);
       input('logo-file')?.addEventListener('change', event => { const file = event.target.files?.[0]; if (!file) return; if (!/^image\/(png|jpe?g|webp|gif|svg\+xml)$/i.test(file.type) || file.size > 500000) { status('Escolha uma imagem PNG, JPG, WebP, GIF ou SVG de até 500 KB.', 'error'); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => { logoDataUrl = String(reader.result || ''); const preview = document.getElementById('email-template-logo-preview'); if (preview) { preview.src = logoDataUrl; preview.classList.remove('hidden'); } const fileNameNode = document.getElementById('email-template-logo-file-name'); if (fileNameNode) fileNameNode.textContent = file.name; status('Logomarca pronta para salvar'); drawPreview(); }; reader.readAsDataURL(file); });
@@ -1905,14 +2290,34 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       const getCurrentReminder = () => reminders.find(r => r.id === activeReminderId) || (typeof DEFAULT_REMINDERS !== 'undefined' ? DEFAULT_REMINDERS.find(r => r.id === activeReminderId) : {}) || {};
 
+      const drawPreview = () => {
+        const item = getCurrentReminder();
+        const meta = reminderTitles[activeReminderId] || { title: item.title || 'Lembrete' };
+        const subjectRaw = (editors.subject ? editors.subject.getValue() : fields.subject?.value) || item.subject || 'Lembrete';
+        const messageRaw = (editors.message ? editors.message.getValue() : fields.message?.value) || item.message || '';
+        const whatsappRaw = (editors.whatsapp ? editors.whatsapp.getValue() : fields.whatsapp?.value) || messageRaw;
+
+        if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
+        if (fields.previewSubject) fields.previewSubject.textContent = replaceSampleTokens(subjectRaw);
+        if (fields.previewMessage) fields.previewMessage.textContent = replaceSampleTokens(messageRaw);
+        if (fields.previewWhatsapp) fields.previewWhatsapp.textContent = replaceSampleTokens(whatsappRaw || 'A mensagem principal será reutilizada.');
+        if (fields.previewActionBlock) fields.previewActionBlock.classList.toggle('hidden', activeReminderId === 'service_ending');
+      };
+
+      const editors = {
+        subject: attachTokenRichEditor(fields.subject, { onChange: drawPreview }),
+        message: attachTokenRichEditor(fields.message, { onChange: drawPreview }),
+        whatsapp: attachTokenRichEditor(fields.whatsapp, { onChange: drawPreview })
+      };
+
       const syncActiveFields = () => {
         const item = getCurrentReminder();
         const meta = reminderTitles[activeReminderId] || { title: item.title || 'Lembrete', detail: item.detail || '' };
         if (fields.title) fields.title.textContent = meta.title;
         if (fields.detail) fields.detail.textContent = meta.detail;
-        if (fields.subject) fields.subject.value = item.subject || '';
-        if (fields.message) fields.message.value = item.message || '';
-        if (fields.whatsapp) fields.whatsapp.value = item.whatsappMessage || '';
+        editors.subject?.setValue(item.subject || '');
+        editors.message?.setValue(item.message || '');
+        editors.whatsapp?.setValue(item.whatsappMessage || '');
         if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
         document.querySelectorAll('[data-reminder-tab]').forEach(t => {
           const isActive = t.dataset.reminderTab === activeReminderId;
@@ -1922,27 +2327,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         drawPreview();
       };
 
-      const drawPreview = () => {
-        const item = getCurrentReminder();
-        const meta = reminderTitles[activeReminderId] || { title: item.title || 'Lembrete' };
-        const subjectRaw = fields.subject?.value || item.subject || 'Lembrete';
-        const messageRaw = fields.message?.value || item.message || '';
-        const whatsappRaw = fields.whatsapp?.value || messageRaw;
-
-        if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
-        if (fields.previewSubject) fields.previewSubject.textContent = replaceSampleTokens(subjectRaw);
-        if (fields.previewMessage) fields.previewMessage.textContent = replaceSampleTokens(messageRaw);
-        if (fields.previewWhatsapp) fields.previewWhatsapp.textContent = replaceSampleTokens(whatsappRaw || 'A mensagem principal será reutilizada.');
-        if (fields.previewActionBlock) fields.previewActionBlock.classList.toggle('hidden', activeReminderId === 'service_ending');
-      };
-
       document.querySelectorAll('[data-reminder-tab]').forEach(tab => {
         tab.addEventListener('click', () => {
           const currentItem = getCurrentReminder();
           if (currentItem) {
-            currentItem.subject = fields.subject?.value || currentItem.subject;
-            currentItem.message = fields.message?.value || currentItem.message;
-            currentItem.whatsappMessage = fields.whatsapp?.value || currentItem.whatsappMessage;
+            currentItem.subject = (editors.subject ? editors.subject.getValue() : fields.subject?.value) || currentItem.subject;
+            currentItem.message = (editors.message ? editors.message.getValue() : fields.message?.value) || currentItem.message;
+            currentItem.whatsappMessage = (editors.whatsapp ? editors.whatsapp.getValue() : fields.whatsapp?.value) || currentItem.whatsappMessage;
           }
           activeReminderId = tab.dataset.reminderTab;
           document.querySelectorAll('[data-reminder-tab]').forEach(t => {
@@ -1965,16 +2356,10 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       const insertToken = token => {
         const targetType = fields.tokenTarget?.value || 'message';
-        let targetField = fields.message;
-        if (targetType === 'subject') targetField = fields.subject;
-        else if (targetType === 'whatsapp') targetField = fields.whatsapp;
-        if (!targetField || !token) return;
-        const start = Number.isInteger(targetField.selectionStart) ? targetField.selectionStart : targetField.value.length;
-        const end = Number.isInteger(targetField.selectionEnd) ? targetField.selectionEnd : start;
-        if (typeof targetField.setRangeText === 'function') targetField.setRangeText(token, start, end, 'end');
-        else targetField.value = `${targetField.value.slice(0, start)}${token}${targetField.value.slice(end)}`;
-        targetField.focus();
-        targetField.dispatchEvent(new Event('input', { bubbles:true }));
+        const targetEditor = editors[targetType] || editors.message;
+        if (targetEditor) {
+          targetEditor.insertToken(token);
+        }
         const label = reminderTokenNames[token] || 'Informação';
         setStatus(`"${label}" inserido com sucesso.`, 'success');
       };
@@ -1984,15 +2369,16 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (!btn) return;
         insertToken(btn.dataset.reminderCustomToken);
       });
+      initPaletteDraggables();
 
       form.addEventListener('input', drawPreview);
 
       fields.resetBtn?.addEventListener('click', () => {
         const defaultItem = typeof DEFAULT_REMINDERS !== 'undefined' ? DEFAULT_REMINDERS.find(r => r.id === activeReminderId) : null;
         if (!defaultItem) return;
-        if (fields.subject) fields.subject.value = defaultItem.subject || '';
-        if (fields.message) fields.message.value = defaultItem.message || '';
-        if (fields.whatsapp) fields.whatsapp.value = defaultItem.whatsappMessage || '';
+        editors.subject?.setValue(defaultItem.subject || '');
+        editors.message?.setValue(defaultItem.message || '');
+        editors.whatsapp?.setValue(defaultItem.whatsappMessage || '');
         drawPreview();
         setStatus('Modelo padrão restaurado. Salve para aplicar.', 'muted');
       });
@@ -2002,9 +2388,9 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const currentData = {
           id: activeReminderId,
           title: item.title || (reminderTitles[activeReminderId]?.title || 'Lembrete'),
-          subject: fields.subject?.value?.trim() || item.subject,
-          message: fields.message?.value?.trim() || item.message,
-          whatsappMessage: fields.whatsapp?.value?.trim() || item.whatsappMessage
+          subject: (editors.subject ? editors.subject.getValue() : fields.subject?.value || item.subject || '').trim(),
+          message: (editors.message ? editors.message.getValue() : fields.message?.value || item.message || '').trim(),
+          whatsappMessage: (editors.whatsapp ? editors.whatsapp.getValue() : fields.whatsapp?.value || item.whatsappMessage || '').trim()
         };
         if (!currentData.subject || !currentData.message) {
           setStatus('Preencha o assunto e a mensagem antes de enviar o teste.', 'error');
@@ -2048,9 +2434,9 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       form.addEventListener('submit', async event => {
         event.preventDefault();
-        const subject = fields.subject?.value?.trim();
-        const message = fields.message?.value?.trim();
-        const whatsapp = fields.whatsapp?.value?.trim();
+        const subject = (editors.subject ? editors.subject.getValue() : fields.subject?.value || '').trim();
+        const message = (editors.message ? editors.message.getValue() : fields.message?.value || '').trim();
+        const whatsapp = (editors.whatsapp ? editors.whatsapp.getValue() : fields.whatsapp?.value || '').trim();
         if (!subject || !message) {
           setStatus('Preencha o assunto e a mensagem principal.', 'error');
           return;
