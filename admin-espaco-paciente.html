@@ -1382,7 +1382,16 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <div class="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-primary/12 bg-primary/[.035] p-3"><label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs font-bold text-primary hover:bg-primary/5"><input id="email-template-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="sr-only">Escolher arquivo</label><button id="email-template-remove-logo" type="button" class="rounded-xl border border-primary/20 px-3 py-2 text-xs font-bold text-gray-600 hover:bg-primary/5">Remover logomarca</button><span id="email-template-logo-file-name" class="text-xs text-gray-500">Nenhum arquivo selecionado</span><img id="email-template-logo-preview" class="email-template-logo-preview hidden" alt="Prévia da logomarca selecionada"></div><label class="mt-3 flex items-start gap-2 rounded-2xl border border-primary/12 bg-primary/[.025] p-3 text-xs font-semibold text-dark"><input id="email-template-show-brand-name" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><span class="block">Exibir nome da marca junto à logomarca</span><span class="mt-1 block text-[11px] font-normal leading-relaxed text-gray-500">Desmarque para mostrar somente a logomarca no topo do e-mail. Essa opção fica disponível quando houver uma logomarca configurada.</span></span></label>
             </section>
             <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Texto do Email</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Edite assunto, chamadas e mensagens. Use as opções abaixo para personalizar automaticamente os dados de cada paciente.</p></div><span class="email-section-number">02</span></div>
-              <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="text-xs font-semibold text-dark sm:col-span-2">Assunto do email<input id="email-template-subject" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Título principal<input id="email-template-title" maxlength="160" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Saudação<input id="email-template-greeting" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de apresentação<textarea id="email-template-intro" maxlength="500" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de orientação<textarea id="email-template-body" maxlength="700" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark">Texto do botão<input id="email-template-button" maxlength="80" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark">Aviso de prazo<input id="email-template-deadline" maxlength="260" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Rodapé<input id="email-template-footer" maxlength="260" class="email-template-field mt-1.5" type="text"></label></div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                <div class="text-xs font-semibold text-dark sm:col-span-2"><span class="block mb-1">Assunto do email</span><input id="email-template-subject" maxlength="180" class="email-template-field" type="text"></div>
+                <div class="text-xs font-semibold text-dark sm:col-span-2"><span class="block mb-1">Título principal</span><input id="email-template-title" maxlength="160" class="email-template-field" type="text"></div>
+                <div class="text-xs font-semibold text-dark sm:col-span-2"><span class="block mb-1">Saudação</span><input id="email-template-greeting" maxlength="180" class="email-template-field" type="text"></div>
+                <div class="text-xs font-semibold text-dark sm:col-span-2"><span class="block mb-1">Mensagem de apresentação</span><textarea id="email-template-intro" maxlength="500" rows="3" class="email-template-field resize-y"></textarea></div>
+                <div class="text-xs font-semibold text-dark sm:col-span-2"><span class="block mb-1">Mensagem de orientação</span><textarea id="email-template-body" maxlength="700" rows="3" class="email-template-field resize-y"></textarea></div>
+                <div class="text-xs font-semibold text-dark"><span class="block mb-1">Texto do botão</span><input id="email-template-button" maxlength="80" class="email-template-field" type="text"></div>
+                <div class="text-xs font-semibold text-dark"><span class="block mb-1">Aviso de prazo</span><input id="email-template-deadline" maxlength="260" class="email-template-field" type="text"></div>
+                <div class="text-xs font-semibold text-dark sm:col-span-2"><span class="block mb-1">Rodapé</span><input id="email-template-footer" maxlength="260" class="email-template-field" type="text"></div>
+              </div>
               <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/[.035] p-4">
                 <div class="flex items-start gap-3"><span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span><div><h4 class="text-xs font-bold text-dark">Inserir informação automática</h4><p class="mt-1 text-[11px] leading-relaxed text-gray-600">Arraste um bloco para o texto ou escolha onde deseja inserir e clique na opção abaixo.</p></div></div>
                 <div class="mt-3 grid gap-3">
@@ -1478,10 +1487,10 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                 <span class="email-section-number">01</span>
               </div>
               <div class="mt-4 grid gap-3">
-                <label class="text-xs font-semibold text-dark">
-                  Assunto do e-mail
-                  <input id="reminder-customizer-subject" maxlength="180" class="email-template-field mt-1.5" type="text" placeholder="Ex.: Seu questionário está pronto" required>
-                </label>
+                <div class="text-xs font-semibold text-dark">
+                  <span class="block mb-1">Assunto do e-mail</span>
+                  <input id="reminder-customizer-subject" maxlength="180" class="email-template-field" type="text" placeholder="Ex.: Seu questionário está pronto" required>
+                </div>
               </div>
             </section>
 
@@ -1494,17 +1503,17 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                 <span class="email-section-number">02</span>
               </div>
               <div class="mt-4 grid gap-3">
-                <label class="text-xs font-semibold text-dark">
-                  Mensagem principal (E-mail)
-                  <textarea id="reminder-customizer-message" maxlength="1200" rows="4" class="email-template-field mt-1.5 resize-y" placeholder="Escreva a mensagem que o paciente receberá por e-mail." required></textarea>
-                </label>
-                <label class="text-xs font-semibold text-dark">
-                  <span class="flex items-center justify-between gap-2">
+                <div class="text-xs font-semibold text-dark">
+                  <span class="block mb-1">Mensagem principal (E-mail)</span>
+                  <textarea id="reminder-customizer-message" maxlength="1200" rows="4" class="email-template-field resize-y" placeholder="Escreva a mensagem que o paciente receberá por e-mail." required></textarea>
+                </div>
+                <div class="text-xs font-semibold text-dark">
+                  <span class="flex items-center justify-between gap-2 mb-1">
                     <span>Mensagem para WhatsApp</span>
                     <span class="font-normal text-gray-500 text-[11px]">opcional</span>
                   </span>
-                  <textarea id="reminder-customizer-whatsapp" maxlength="1200" rows="3" class="email-template-field mt-1.5 resize-y" placeholder="Se ficar em branco, a mensagem principal será reutilizada."></textarea>
-                </label>
+                  <textarea id="reminder-customizer-whatsapp" maxlength="1200" rows="3" class="email-template-field resize-y" placeholder="Se ficar em branco, a mensagem principal será reutilizada."></textarea>
+                </div>
               </div>
 
               <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/[.035] p-4">
@@ -1816,19 +1825,27 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       labelSpan.textContent = def.label;
       chip.appendChild(labelSpan);
 
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
+      const removeBtn = document.createElement('span');
+      removeBtn.setAttribute('role', 'button');
+      removeBtn.setAttribute('tabindex', '-1');
       removeBtn.className = 'token-chip-remove';
       removeBtn.title = `Remover ${def.label}`;
       removeBtn.setAttribute('aria-label', `Remover ${def.label}`);
       removeBtn.textContent = '×';
-      removeBtn.addEventListener('click', e => {
+
+      const handleRemove = e => {
         e.preventDefault();
         e.stopPropagation();
         const editor = chip.closest('.token-rich-editor');
         chip.remove();
         if (editor) editor.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+
+      removeBtn.addEventListener('mousedown', e => {
+        e.preventDefault();
+        e.stopPropagation();
       });
+      removeBtn.addEventListener('click', handleRemove);
       chip.appendChild(removeBtn);
 
       return chip;
