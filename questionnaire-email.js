@@ -1227,7 +1227,7 @@ async function scheduleServiceReminderJobs({ sessionToken, service }) {
 
 async function sendQuestionnaireEmail
 ({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template, reminder = null }) {
-  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(expiresAt)); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const reminderEmail = reminder && reminder.active !== false && reminder.email !== false ? buildReminderEmail({ reminder, template:normalizedTemplate, patientName, quizTitle:quiz.title, expiresAt, accessToken, kind:'new_quiz' }) : null; const htmlContent = reminderEmail?.htmlContent || buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); const subject = reminderEmail?.subject || replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject, htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
+  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = formatReminderDeadline(expiresAt); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const reminderEmail = reminder && reminder.active !== false && reminder.email !== false ? buildReminderEmail({ reminder, template:normalizedTemplate, patientName, quizTitle:quiz.title, expiresAt, accessToken, kind:'new_quiz' }) : null; const htmlContent = reminderEmail?.htmlContent || buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); const subject = reminderEmail?.subject || replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject, htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
 }
 
 async function sendResponseReceipt({ invitation, quiz, answers, summary }) {
@@ -1517,8 +1517,12 @@ function localDateTimeToIso(date, time) {
 
 function responseDeadline(scheduledAt, amount, unit) {
   const numericAmount = Math.max(1, Math.min(Number(amount || 2), 60));
-  const multiplier = unit === 'hours' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
-  return new Date(Date.parse(scheduledAt) + (numericAmount * multiplier)).toISOString();
+  const startTimestamp = Date.parse(scheduledAt);
+  if (!Number.isFinite(startTimestamp)) return '';
+  const startDateKey = localDateFromTimestamp(startTimestamp);
+  const targetDays = unit === 'hours' ? Math.max(1, Math.round(numericAmount / 24)) : numericAmount;
+  const targetDateKey = addDateKey(startDateKey, targetDays);
+  return localDateTimeToIso(targetDateKey, '23:59');
 }
 
 async function createBrevoScheduledQuestionnaire(args) {
@@ -1712,12 +1716,14 @@ export default async function handler(req, res) {
       const recipientEmail = String(body.recipientEmail || '').trim().toLowerCase();
       const quizId = String(body?.quiz?.id || body.quizId || '').trim();
       const quizLinkId = String(body.quizLinkId || '').trim();
-      const requestedSendMode = normalizeEmailSendMode(body.sendMode);
-      const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 7), 7));
+      const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 7), 60));
       if (!sessionToken || !patientKey || !validEmail(recipientEmail) || !quizId) return json(res, 400, { success: false, message: 'Não foi possível preparar o convite. Confira o paciente, o e-mail e o questionário.' });
       await requireAdmin(sessionToken);
       const quiz = await loadQuiz(sessionToken, quizId);
-      const expiresAt = Date.now() + (expiresInDays * 24 * 60 * 60 * 1000);
+      const todayKey = localDateFromTimestamp(Date.now());
+      const targetDateKey = addDateKey(todayKey, expiresInDays);
+      const expiresAtIso = localDateTimeToIso(targetDateKey, '23:59');
+      const expiresAt = Date.parse(expiresAtIso) || (Date.now() + (expiresInDays * 24 * 60 * 60 * 1000));
       const sentAt = new Date().toISOString();
       const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, quizLinkId, sendMode:requestedSendMode || 'unique', sentAt, expiresAt };
       const accessToken = encryptInvitation(invitation);
