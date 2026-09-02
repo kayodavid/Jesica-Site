@@ -478,14 +478,15 @@
     .reminder-message-field { min-height:8.5rem; resize:vertical; white-space:pre-wrap; }
     .reminder-modal-overlay { position:fixed; inset:0; z-index:120; display:grid; place-items:center; padding:clamp(.5rem,2vw,1.5rem); background:rgba(23,24,29,.58); opacity:0; pointer-events:none; transition:opacity .2s ease; }
     .reminder-modal-overlay.is-open { opacity:1; pointer-events:auto; }
-    .reminder-modal { display:flex; width:min(70rem,100%); height:min(94vh,64rem); max-height:calc(100vh - 3rem); min-height:0; flex-direction:column; overflow:hidden; border:1px solid rgba(255,255,255,.24); border-radius:1.35rem; background:#fff; box-shadow:0 28px 80px rgba(0,0,0,.3); transform:translateY(.7rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
-    @supports (height:100dvh) { .reminder-modal { height:min(94dvh,64rem); max-height:calc(100dvh - 3rem); } }
+    .reminder-modal { display:flex; width:min(46rem,100%); height:min(90vh,56rem); max-height:calc(100vh - 3rem); min-height:0; flex-direction:column; overflow:hidden; border:1px solid rgba(255,255,255,.24); border-radius:1.35rem; background:#fff; box-shadow:0 28px 80px rgba(0,0,0,.3); transform:translateY(.7rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
+    @supports (height:100dvh) { .reminder-modal { height:min(90dvh,56rem); max-height:calc(100dvh - 3rem); } }
     .reminder-modal-overlay.is-open .reminder-modal { transform:translateY(0) scale(1); }
     .reminder-modal-header { flex:none; border-bottom:1px solid rgba(168,139,54,.14); background:linear-gradient(135deg,#fff 0%,#faf8f3 100%); padding:1.2rem clamp(1rem,3vw,1.75rem); }
     .reminder-modal > #reminder-config-form { min-height:0; flex:1 1 0; display:flex; flex-direction:column; }
     .reminder-modal-icon { display:inline-flex; height:2.75rem; width:2.75rem; flex:none; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.22); border-radius:1rem; background:rgba(168,139,54,.09); color:#9a7a20; box-shadow:0 8px 20px rgba(168,139,54,.1); }
-    .reminder-modal-body { min-height:0; height:0; flex:1 1 0; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; display:grid; grid-template-columns:minmax(0,1.22fr) minmax(19rem,.78fr); gap:1.25rem; padding:clamp(1rem,3vw,1.5rem); background:#fbfaf8; }
+    .reminder-modal-body { min-height:0; height:0; flex:1 1 0; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; display:grid; grid-template-columns:1fr; gap:1.25rem; padding:clamp(1rem,3vw,1.5rem); background:#fbfaf8; }
     .reminder-modal-main { min-width:0; display:grid; align-content:start; gap:1rem; }
+    .reminder-tab-btn.active { border-color:#a88b36 !important; background:#a88b36 !important; color:#fff !important; box-shadow:0 4px 12px rgba(168,139,54,.25); }
     .reminder-section { border:1px solid rgba(168,139,54,.14); border-radius:1.05rem; background:#fff; padding:clamp(1rem,2.4vw,1.25rem); box-shadow:0 8px 22px rgba(87,67,37,.035); }
     .reminder-section-heading { display:flex; align-items:flex-start; gap:.7rem; }
     .reminder-section-number { display:inline-flex; height:1.7rem; width:1.7rem; flex:none; align-items:center; justify-content:center; border-radius:.65rem; background:#f1ebdc; color:#856b25; font-size:.7rem; font-weight:900; }
@@ -1169,10 +1170,10 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                     <span id="reminder-modal-status" class="reminder-status">Ativo</span>
                   </div>
                   <h2 id="reminder-modal-title" class="mt-1 truncate text-lg font-black text-dark sm:text-xl">Configurar lembrete</h2>
-                  <p id="reminder-modal-subtitle" class="mt-1 text-xs leading-relaxed text-gray-500">Defina quando e como o paciente será avisado.</p>
+                  <p id="reminder-modal-subtitle" class="mt-1 text-xs leading-relaxed text-gray-500">Defina os gatilhos e a rotina de disparos deste lembrete.</p>
                 </div>
               </div>
-              <div class="flex shrink-0 items-center gap-2"><button id="reminder-test-email" type="button" class="directory-tool !h-9 !w-9 text-primary" title="Enviar email teste" aria-label="Enviar email teste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 8V4h12v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v6H6z"/><path d="M17 12h.01"/></svg></button><button id="reminder-modal-close" type="button" class="directory-tool !h-9 !w-9 shrink-0" aria-label="Fechar configuração">×</button></div>
+              <div class="flex shrink-0 items-center gap-2"><button id="reminder-modal-close" type="button" class="directory-tool !h-9 !w-9 shrink-0" aria-label="Fechar configuração">×</button></div>
             </div>
           </header>
           <form id="reminder-config-form">
@@ -1225,37 +1226,18 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
                   </div>
                 </section>
 
-                <section class="reminder-section">
-                  <div class="reminder-section-heading"><span class="reminder-section-number">03</span><div><h3 class="text-sm font-black text-dark">Modelo de mensagem</h3><p class="mt-1 text-[11px] leading-relaxed text-gray-500">Personalize o conteúdo que será usado nos canais configurados.</p></div></div>
-                  <label class="mt-4 block text-xs font-bold text-dark" for="reminder-subject">Assunto do e-mail<input id="reminder-subject" class="send-filter-field mt-2" maxlength="180" placeholder="Ex.: Seu questionário está pronto" required></label>
-                  <label class="mt-3 block text-xs font-bold text-dark" for="reminder-message">Mensagem principal<textarea id="reminder-message" class="send-filter-field reminder-message-field mt-2" maxlength="1200" placeholder="Escreva a mensagem que o paciente receberá." required></textarea></label>
-                  <p class="mt-2 text-[11px] leading-relaxed text-gray-500">As variáveis serão substituídas pelos dados do paciente no momento do envio.</p>
-                  <label class="mt-3 block text-xs font-bold text-dark" for="reminder-whatsapp-message"><span class="flex items-center justify-between gap-2"><span>Mensagem para WhatsApp</span><span class="font-normal text-gray-500">opcional</span></span><textarea id="reminder-whatsapp-message" class="send-filter-field reminder-message-field mt-2" maxlength="1200" placeholder="Se ficar em branco, a mensagem principal será reutilizada."></textarea></label>
-                </section>
-
-                <section class="reminder-section">
-                  <div class="flex flex-wrap items-start justify-between gap-3"><div><h3 class="text-xs font-black text-dark">Variáveis disponíveis</h3><p class="mt-1 text-[11px] leading-relaxed text-gray-500">Clique em uma variável para inseri-la no campo de mensagem selecionado.</p></div><span class="text-[10px] font-bold text-gray-400">Atalhos de personalização</span></div>
-                  <div class="mt-3 flex flex-wrap gap-2" id="reminder-variable-buttons"><button type="button" class="reminder-token" data-reminder-token="{primeiro_nome}">{primeiro_nome}</button><button type="button" class="reminder-token" data-reminder-token="{paciente}">{paciente}</button><button type="button" class="reminder-token" data-reminder-token="{questionario}">{questionario}</button><button type="button" class="reminder-token" data-reminder-token="{prazo}">{prazo}</button><button type="button" class="reminder-token" data-reminder-token="{dias_restantes}">{dias_restantes}</button><button type="button" class="reminder-token" data-reminder-token="{link_questionario}">{link_questionario}</button><button type="button" class="reminder-token" data-reminder-token="{nutricionista}">{nutricionista}</button></div>
-                </section>
-                <p id="reminder-form-status" class="hidden text-xs font-semibold" role="status" aria-live="polite"></p>
-              </div>
-
-              <aside class="reminder-template-preview reminder-preview-sticky rounded-2xl p-4 sm:p-5">
-                <div class="flex items-start justify-between gap-3"><div><p class="text-[10px] font-black uppercase tracking-[.18em] text-primary">Prévia em tempo real</p><p class="mt-1 text-[11px] leading-relaxed text-gray-500">Veja como o conteúdo ficará com dados de exemplo.</p></div><span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary" aria-hidden="true">✦</span></div>
-                <div class="mt-4 rounded-xl border border-primary/10 bg-white p-4 shadow-sm">
-                  <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-primary"></span><p class="text-[10px] font-black uppercase tracking-wider text-gray-400">E-mail</p></div>
-                  <p id="reminder-preview-subject" class="mt-3 text-sm font-black leading-snug text-dark">Seu questionário está pronto</p>
-                  <div id="reminder-preview-message" class="mt-3 whitespace-pre-wrap text-xs leading-relaxed text-gray-600">Olá, Marina!</div>
-                  <div class="mt-4 pt-3 border-t border-primary/10">
-                    <div class="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm pointer-events-none">
-                      Responder questionário
+                <div class="rounded-2xl border border-primary/20 bg-primary/[.04] p-4 text-xs">
+                  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <strong class="text-dark block font-bold text-sm">Personalização do texto do lembrete</strong>
+                      <span class="text-gray-500 text-xs block mt-0.5">O assunto, a mensagem e o layout deste e-mail podem ser personalizados na tela exclusiva de lembretes no Workspace.</span>
                     </div>
-                    <p class="mt-2 text-[10px] leading-relaxed text-gray-400">O paciente receberá este botão destacado para acessar o questionário diretamente.</p>
+                    <a href="#workspace-reminders" id="reminder-modal-to-workspace" class="inline-flex items-center gap-1.5 shrink-0 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-white transition hover:bg-dark">Personalizar texto →</a>
                   </div>
                 </div>
-                <div class="mt-3 rounded-xl border border-[#d9e8dc] bg-[#f5fbf6] p-4 shadow-sm"><div class="flex items-center gap-2"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#d9e8dc] text-[10px] text-[#3a8b51]">↗</span><p class="text-[10px] font-black uppercase tracking-wider text-[#4e805b]">WhatsApp</p></div><p id="reminder-preview-whatsapp" class="mt-3 whitespace-pre-wrap text-xs leading-relaxed text-gray-600">A mensagem principal será reutilizada.</p></div>
-                <div class="mt-4 rounded-xl border border-primary/10 bg-white/70 p-3"><p class="text-[10px] leading-relaxed text-gray-500"><strong class="text-dark">Sobre os canais:</strong> a tela WhatsApp continua controlando quais lembretes ficam habilitados nesse canal. Aqui você personaliza a rotina e o conteúdo.</p></div>
-              </aside>
+
+                <p id="reminder-form-status" class="hidden text-xs font-semibold" role="status" aria-live="polite"></p>
+              </div>
             </div>
             <footer class="reminder-modal-footer"><p class="hidden text-[11px] text-gray-500 sm:block">Suas alterações ficam salvas na configuração deste lembrete.</p><div class="reminder-modal-footer-actions"><button id="reminder-form-cancel" type="button" class="rounded-xl border border-primary/20 px-4 py-2.5 text-xs font-black text-dark transition hover:bg-primary/10">Cancelar</button><button type="submit" class="rounded-xl bg-primary px-4 py-2.5 text-xs font-black text-white transition hover:bg-dark">Salvar configuração</button></div></footer>
           </form>
@@ -1317,7 +1299,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
           <h2 class="text-lg font-bold text-dark">Opções de personalização</h2>
           <p class="mt-1 text-xs text-gray-500">Selecione um card abaixo para acessar e editar as configurações correspondentes.</p>
         </div>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <button type="button" data-workspace-card="email" class="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[.02] hover:shadow-md">
             <div>
               <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-xl text-primary transition-transform group-hover:scale-110">
@@ -1325,6 +1307,20 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               </div>
               <h3 class="mt-4 text-base font-bold text-dark group-hover:text-primary">Personalizar email de questionário</h3>
               <p class="mt-2 text-xs leading-relaxed text-gray-500">Crie uma experiência com a sua identidade para os emails que informam sobre novos formulários.</p>
+            </div>
+            <div class="mt-6 flex items-center gap-1 text-xs font-bold text-primary">
+              <span>Acessar personalização</span>
+              <span class="transition-transform group-hover:translate-x-1">→</span>
+            </div>
+          </button>
+
+          <button type="button" data-workspace-card="reminders" class="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[.02] hover:shadow-md">
+            <div>
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-xl text-primary transition-transform group-hover:scale-110">
+                <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <h3 class="mt-4 text-base font-bold text-dark group-hover:text-primary">Personalizar emails de lembrete</h3>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">Defina o assunto, mensagens e textos dos lembretes automáticos enviados por e-mail e WhatsApp.</p>
             </div>
             <div class="mt-6 flex items-center gap-1 text-xs font-bold text-primary">
               <span>Acessar personalização</span>
@@ -1388,6 +1384,178 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             <footer class="flex flex-col gap-3 border-t border-primary/10 pt-5 sm:flex-row sm:items-center sm:justify-between"><button id="email-template-reset" type="button" class="rounded-xl border border-primary/20 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10">Restaurar modelo padrão</button><div class="flex items-center gap-2"><p id="email-template-form-status" class="hidden text-xs font-semibold" role="status"></p><button id="email-template-save" type="submit" class="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white transition hover:bg-dark">Salvar personalização</button></div></footer>
           </form>
           <aside class="email-template-preview-panel"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-primary">Prévia em tempo real</p><h3 class="mt-1 text-lg font-bold text-dark">Assim o paciente verá o convite</h3></div><span class="rounded-full border border-primary/15 px-2.5 py-1 text-[10px] font-bold text-gray-500">Exemplo</span></div><div id="email-template-preview" class="email-template-preview mt-4" aria-live="polite"></div><p class="mt-3 text-[11px] leading-relaxed text-gray-500">A prévia usa um paciente e um questionário de exemplo. O envio real substitui esses dados automaticamente.</p></aside>
+        </div>
+      </section>
+
+      <section id="reminders-customizer" class="email-customizer workspace-module-topic workspace-overview-topic panel-card rounded-3xl p-4 sm:p-5 shadow-sm hidden">
+        <header class="workspace-module-topic-header flex flex-col gap-3 border-b border-primary/10 pb-3 lg:flex-row lg:items-start lg:justify-between">
+          <div class="workspace-module-topic-lead">
+            <span class="workspace-module-topic-icon" aria-hidden="true">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </span>
+            <div class="workspace-module-topic-copy">
+              <p class="text-xs font-bold uppercase tracking-[.18em] text-primary">Comunicação com pacientes</p>
+              <h2 class="mt-1">
+                <button type="button" class="workspace-topic-card-title" data-workspace-topic-button="reminders-customizer" aria-label="Abrir Personalizar emails de lembrete">Personalizar emails de lembrete</button>
+              </h2>
+              <p class="mt-1 max-w-3xl text-sm text-gray-500">Personalize o assunto e as mensagens dos lembretes automáticos. As alterações valem para os próximos disparos nos canais configurados.</p>
+            </div>
+          </div>
+          <div class="workspace-topic-actions" aria-label="Ações da página">
+            <button type="button" class="workspace-back-button" data-workspace-back="workspace" title="Voltar para Personalizar Plataforma" aria-label="Voltar para Personalizar Plataforma">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 12H5m6-6-6 6 6 6"/></svg>
+              <span>Voltar</span>
+            </button>
+            <button type="button" class="workspace-info-button" data-workspace-info="reminders" title="Como funciona esta página" aria-label="Como funciona a personalização de lembretes">i</button>
+          </div>
+        </header>
+
+        <div class="mt-5 flex flex-wrap gap-2 border-b border-primary/10 pb-4" role="tablist" aria-label="Lembretes disponíveis">
+          <button type="button" data-reminder-tab="new_quiz" role="tab" aria-selected="true" class="reminder-tab-btn active inline-flex items-center gap-2 rounded-xl border border-primary bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm transition">
+            <span>✨ Novo Questionário</span>
+          </button>
+          <button type="button" data-reminder-tab="service_ending" role="tab" aria-selected="false" class="reminder-tab-btn inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-bold text-dark transition hover:border-primary hover:bg-primary/5">
+            <span>⏳ Serviço Finalizando</span>
+          </button>
+          <button type="button" data-reminder-tab="response_due" role="tab" aria-selected="false" class="reminder-tab-btn inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-bold text-dark transition hover:border-primary hover:bg-primary/5">
+            <span>⏰ Prazo de Resposta</span>
+          </button>
+        </div>
+
+        <div class="mt-5 grid gap-6 2xl:grid-cols-[minmax(0,1.04fr)_minmax(24rem,.96fr)]">
+          <form id="reminders-customizer-form" class="space-y-5" novalidate>
+            <section class="email-customizer-block">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 id="reminder-customizer-item-title" class="text-base font-bold text-dark">Lembrete: Novo Questionário</h3>
+                  <p id="reminder-customizer-item-detail" class="mt-1 text-xs leading-relaxed text-gray-500">Disparado quando um questionário é criado ou aberto para o paciente.</p>
+                </div>
+                <span class="email-section-number">01</span>
+              </div>
+              <div class="mt-4 grid gap-3">
+                <label class="text-xs font-semibold text-dark">
+                  Assunto do e-mail
+                  <input id="reminder-customizer-subject" maxlength="180" class="email-template-field mt-1.5" type="text" placeholder="Ex.: Seu questionário está pronto" required>
+                </label>
+              </div>
+            </section>
+
+            <section class="email-customizer-block">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-base font-bold text-dark">Mensagens do lembrete</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Edite a mensagem principal para e-mail e WhatsApp. As variáveis entre chaves são substituídas pelos dados do paciente.</p>
+                </div>
+                <span class="email-section-number">02</span>
+              </div>
+              <div class="mt-4 grid gap-3">
+                <label class="text-xs font-semibold text-dark">
+                  Mensagem principal (E-mail)
+                  <textarea id="reminder-customizer-message" maxlength="1200" rows="4" class="email-template-field mt-1.5 resize-y" placeholder="Escreva a mensagem que o paciente receberá por e-mail." required></textarea>
+                </label>
+                <label class="text-xs font-semibold text-dark">
+                  <span class="flex items-center justify-between gap-2">
+                    <span>Mensagem para WhatsApp</span>
+                    <span class="font-normal text-gray-500 text-[11px]">opcional</span>
+                  </span>
+                  <textarea id="reminder-customizer-whatsapp" maxlength="1200" rows="3" class="email-template-field mt-1.5 resize-y" placeholder="Se ficar em branco, a mensagem principal será reutilizada."></textarea>
+                </label>
+              </div>
+
+              <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/[.035] p-4">
+                <div class="flex items-start gap-3">
+                  <span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span>
+                  <div>
+                    <h4 class="text-xs font-bold text-dark">Inserir informação automática</h4>
+                    <p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo para inserir no ponto do cursor.</p>
+                  </div>
+                </div>
+                <div class="mt-3 grid gap-3">
+                  <label class="text-[11px] font-bold text-dark">
+                    Onde inserir
+                    <select id="reminder-customizer-token-target" class="email-template-field mt-1.5">
+                      <option value="message">Mensagem principal (E-mail)</option>
+                      <option value="subject">Assunto do e-mail</option>
+                      <option value="whatsapp">Mensagem para WhatsApp</option>
+                    </select>
+                  </label>
+                  <div>
+                    <p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p>
+                    <div id="reminder-customizer-token-options" class="mt-2 flex flex-wrap gap-2">
+                      <button type="button" class="reminder-token" data-reminder-custom-token="{primeiro_nome}">{primeiro_nome}</button>
+                      <button type="button" class="reminder-token" data-reminder-custom-token="{paciente}">{paciente}</button>
+                      <button type="button" class="reminder-token" data-reminder-custom-token="{questionario}">{questionario}</button>
+                      <button type="button" class="reminder-token" data-reminder-custom-token="{prazo}">{prazo}</button>
+                      <button type="button" class="reminder-token" data-reminder-custom-token="{dias_restantes}">{dias_restantes}</button>
+                      <button type="button" class="reminder-token" data-reminder-custom-token="{nutricionista}">{nutricionista}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="email-customizer-block">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-base font-bold text-dark">Testar envio</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Envie um e-mail de teste deste lembrete para um paciente cadastrado para validar o layout real.</p>
+                </div>
+                <span class="email-section-number">03</span>
+              </div>
+              <div class="mt-3">
+                <button id="reminder-customizer-test-btn" type="button" class="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-white px-4 py-2.5 text-xs font-bold text-dark transition hover:border-primary hover:bg-primary/5">
+                  <svg class="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 8V4h12v4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 14h12v6H6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 12h.01"/></svg>
+                  <span>Enviar e-mail teste deste lembrete</span>
+                </button>
+              </div>
+            </section>
+
+            <footer class="flex flex-col gap-3 border-t border-primary/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <button id="reminder-customizer-reset" type="button" class="rounded-xl border border-primary/20 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10">Restaurar padrão deste lembrete</button>
+              <div class="flex items-center gap-2">
+                <p id="reminder-customizer-form-status" class="hidden text-xs font-semibold" role="status"></p>
+                <button id="reminder-customizer-save" type="submit" class="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white transition hover:bg-dark">Salvar personalização</button>
+              </div>
+            </footer>
+          </form>
+
+          <aside class="email-template-preview-panel">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-[.16em] text-primary">Prévia em tempo real</p>
+                <h3 class="mt-1 text-lg font-bold text-dark">Assim o paciente verá o lembrete</h3>
+              </div>
+              <span class="rounded-full border border-primary/15 px-2.5 py-1 text-[10px] font-bold text-gray-500">Exemplo</span>
+            </div>
+
+            <div class="mt-4 overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm">
+              <div class="bg-primary p-4 text-white">
+                <p class="text-[10px] font-black uppercase tracking-widest opacity-90">Jessica Melo Nutricionista</p>
+                <p id="reminder-preview-header-tag" class="mt-0.5 text-[9px] font-bold uppercase tracking-wider opacity-80">Lembrete: Novo Questionário</p>
+              </div>
+              <div class="p-5">
+                <p id="reminder-preview-subject-live" class="text-sm font-black text-dark">Seu questionário está pronto</p>
+                <div id="reminder-preview-message-live" class="mt-3 whitespace-pre-wrap text-xs leading-relaxed text-gray-700">Olá, Marina!</div>
+                <div class="mt-5 pt-4 border-t border-primary/10">
+                  <div class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm pointer-events-none">
+                    Responder questionário
+                  </div>
+                  <p class="mt-2.5 text-[10px] leading-relaxed text-gray-400">O botão acima direciona o paciente diretamente para o questionário com respostas individuais seguras.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-2xl border border-[#d9e8dc] bg-[#f5fbf6] p-4 shadow-sm">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#d9e8dc] text-[10px] text-[#3a8b51]">↗</span>
+                <p class="text-[10px] font-black uppercase tracking-wider text-[#4e805b]">Prévia para WhatsApp</p>
+              </div>
+              <div class="mt-3 rounded-xl bg-white p-3 border border-[#e1ede4] shadow-xs">
+                <p id="reminder-preview-whatsapp-live" class="whitespace-pre-wrap text-xs leading-relaxed text-gray-700">Olá, Marina! ...</p>
+              </div>
+            </div>
+            <p class="mt-3 text-[11px] leading-relaxed text-gray-500">A prévia usa dados de exemplo (Marina Alves). O envio real substitui os dados automaticamente pelo nome e questionário do paciente.</p>
+          </aside>
         </div>
       </section>
 
@@ -1515,11 +1683,11 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       else inner = `<div style="background:${primary};color:#fff;padding:25px 28px">${logoLeft}${classicBrandMarkup}<h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="background:#fff;padding:28px;color:${text}"><p style="margin:0 0 20px;font-weight:700">${greeting}</p>${p}</div>`;
       const footerColor = current.layout === 'midnight' ? '#d4d8e0' : '#827766'; return `<div class="email-preview-frame" style="font-family:Arial,Helvetica,sans-serif;color:${text};background:${background};padding:14px 8px;line-height:1.6"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${['soft','botanical'].includes(current.layout) ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="margin:15px 0 0;text-align:center;color:${footerColor};font-size:11px;line-height:1.5">${footer}</p></div>`;
     }
-    const WORKSPACE_TOPIC_ROUTES = { 'email-invitation-customizer': { hash:'workspace-email', label:'Personalizar email' }, 'response-scale-customizer': { hash:'workspace-scale', label:'Formato da escala' } };
+    const WORKSPACE_TOPIC_ROUTES = { 'email-invitation-customizer': { hash:'workspace-email', label:'Personalizar email' }, 'reminders-customizer': { hash:'workspace-reminders', label:'Personalizar emails de lembrete' }, 'response-scale-customizer': { hash:'workspace-scale', label:'Formato da escala' } };
     const setWorkspaceTopicButtonState = (cardId, isPage) => { const card = document.getElementById(cardId); const button = card?.querySelector('[data-workspace-topic-button]'); if (!button) return; const label = button.querySelector('.workspace-card-toggle-label'); const onPage = Boolean(isPage); button.dataset.workspaceTopicPage = String(onPage); button.title = onPage ? 'Voltar para Personalizar Plataforma' : 'Abrir tópico'; button.setAttribute('aria-label', onPage ? 'Voltar para Personalizar Plataforma' : `Abrir ${WORKSPACE_TOPIC_ROUTES[cardId]?.label || 'tópico'}`); if (label) label.textContent = onPage ? 'Voltar para Personalizar Plataforma' : 'Abrir tópico'; };
-    const WORKSPACE_INFO_CONTENT = { email:{ title:'Personalizar email de questionário', intro:'Nesta página você define a aparência e o conteúdo do e-mail que informa ao paciente que um questionário está disponível.', sections:[{ title:'O que pode ser configurado', items:['Identidade visual: nome da marca, logomarca e exibição do nome junto à logo.','Texto do Email: assunto, título, saudação, mensagens, botão, prazo e rodapé.','Informações automáticas: insira o nome do paciente, questionário, prazo de resposta ou ano do envio usando as chaves disponíveis.','Cores e estilo: escolha as cores da marca e uma das composições de e-mail.'] },{ title:'Como aplicar', items:['Edite os campos desejados e acompanhe a prévia em tempo real.','Escolha um estilo para atualizar a composição visual.','Clique em “Salvar personalização” para aplicar a configuração aos envios imediatos e agendados.'] }] }, scale:{ title:'Escolha o formato da escala', intro:'Nesta página você escolhe como as avaliações das respostas serão apresentadas no histórico, nos detalhes e nos relatórios.', sections:[{ title:'Como funciona', items:['A escala mantém cinco níveis de avaliação, de -2 a 2.','Escolha entre os formatos disponíveis, como estrelas, símbolos ou outros modelos visuais.','A prévia mostra como a avaliação aparecerá para o usuário.'] },{ title:'Como aplicar', items:['Selecione o formato desejado.','Clique em “Salvar formato” para aplicar a escolha na plataforma.','O interruptor Números/Visual nas tabelas continua permitindo alternar a exibição dos valores quando essa opção estiver disponível.'] }] } };
+    const WORKSPACE_INFO_CONTENT = { email:{ title:'Personalizar email de questionário', intro:'Nesta página você define a aparência e o conteúdo do e-mail que informa ao paciente que um questionário está disponível.', sections:[{ title:'O que pode ser configurado', items:['Identidade visual: nome da marca, logomarca e exibição do nome junto à logo.','Texto do Email: assunto, título, saudação, mensagens, botão, prazo e rodapé.','Informações automáticas: insira o nome do paciente, questionário, prazo de resposta ou ano do envio usando as chaves disponíveis.','Cores e estilo: escolha as cores da marca e uma das composições de e-mail.'] },{ title:'Como aplicar', items:['Edite os campos desejados e acompanhe a prévia em tempo real.','Escolha um estilo para atualizar a composição visual.','Clique em “Salvar personalização” para aplicar a configuração aos envios imediatos e agendados.'] }] }, reminders:{ title:'Personalizar emails de lembrete', intro:'Nesta página você personaliza o assunto e as mensagens dos lembretes automáticos enviados por e-mail e WhatsApp.', sections:[{ title:'Lembretes disponíveis', items:['Novo Questionário: enviado quando o questionário é disponibilizado ao paciente.','Serviço Finalizando: avisa o paciente quando o acompanhamento estiver perto de encerrar.','Prazo de Resposta: lembra o paciente sobre a data limite para responder.'] },{ title:'O que pode ser configurado', items:['Assunto do e-mail para cada tipo de lembrete.','Mensagem principal (com direcionamento ao botão de resposta).','Mensagem para WhatsApp (opcional).','Inserção dinâmica de variáveis como {primeiro_nome}, {questionario}, {prazo}, etc.'] },{ title:'Como testar e aplicar', items:['Use o botão “Enviar e-mail teste” para validar o recebimento com dados de um paciente cadastrado.','Clique em “Salvar personalização” para gravar as alterações que serão utilizadas nos próximos envios.'] }] }, scale:{ title:'Escolha o formato da escala', intro:'Nesta página você escolhe como as avaliações das respostas serão apresentadas no histórico, nos detalhes e nos relatórios.', sections:[{ title:'Como funciona', items:['A escala mantém cinco níveis de avaliação, de -2 a 2.','Escolha entre os formatos disponíveis, como estrelas, símbolos ou outros modelos visuais.','A prévia mostra como a avaliação aparecerá para o usuário.'] },{ title:'Como aplicar', items:['Selecione o formato desejado.','Clique em “Salvar formato” para aplicar a escolha na plataforma.','O interruptor Números/Visual nas tabelas continua permitindo alternar a exibição dos valores quando essa opção estiver disponível.'] }] } };
     function initWorkspaceInfoGuide() { const overlay = document.getElementById('workspace-info-overlay'); const dialog = document.getElementById('workspace-info-dialog'); const body = document.getElementById('workspace-info-body'); const title = document.getElementById('workspace-info-title'); const close = document.getElementById('workspace-info-close'); if (!overlay || !dialog || !body || !title || !close || overlay.dataset.ready === 'true') return; overlay.dataset.ready = 'true'; let lastTrigger = null; const closeGuide = () => { overlay.classList.remove('is-open'); overlay.setAttribute('aria-hidden','true'); document.body.classList.remove('workspace-info-open'); if (lastTrigger && document.body.contains(lastTrigger)) window.setTimeout(() => lastTrigger.focus(), 0); }; const renderGuide = key => { const content = WORKSPACE_INFO_CONTENT[key] || WORKSPACE_INFO_CONTENT.email; title.textContent = content.title; body.innerHTML = `<p>${content.intro}</p>${content.sections.map(section => `<h3>${section.title}</h3><ul>${section.items.map(item => `<li>${item}</li>`).join('')}</ul>`).join('')}`; overlay.classList.add('is-open'); overlay.setAttribute('aria-hidden','false'); document.body.classList.add('workspace-info-open'); window.setTimeout(() => close.focus(), 0); }; document.querySelectorAll('[data-workspace-info]').forEach(button => button.addEventListener('click', () => { lastTrigger = button; renderGuide(button.dataset.workspaceInfo); })); document.querySelectorAll('[data-workspace-back]').forEach(button => button.addEventListener('click', () => { if (window.location.hash !== '#workspace') window.location.hash = '#workspace'; else requestSidebarHashRoute({ scroll:true }); })); close.addEventListener('click', closeGuide); overlay.addEventListener('click', event => { if (event.target === overlay) closeGuide(); }); document.addEventListener('keydown', event => { if (event.key === 'Escape' && overlay.classList.contains('is-open')) closeGuide(); }); }
-    function initWorkspaceTopicCards() { const workspace = document.getElementById('workspace'); if (!workspace || workspace.dataset.workspaceCardsReady === 'true') return; workspace.dataset.workspaceCardsReady = 'true'; const icon = '<svg class="workspace-card-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>'; const createToggle = (card, expanded) => { const topic = WORKSPACE_TOPIC_ROUTES[card.id]; if (topic) { const button = card.querySelector('[data-workspace-topic-button]'); if (!button) return null; button.addEventListener('click', () => { const isPage = button.dataset.workspaceTopicPage === 'true'; const targetHash = isPage ? 'workspace' : topic.hash; if (window.location.hash !== `#${targetHash}`) window.location.hash = targetHash; else requestSidebarHashRoute({ scroll:true }); }); setWorkspaceTopicButtonState(card.id, false); return null; } const button = document.createElement('button'); button.type = 'button'; button.className = 'workspace-card-toggle'; button.innerHTML = `${icon}<span class="workspace-card-toggle-label"></span>`; const label = button.querySelector('.workspace-card-toggle-label'); const setExpanded = next => { const isExpanded = Boolean(next); card.classList.toggle('is-collapsed', !isExpanded); button.setAttribute('aria-expanded', String(isExpanded)); button.setAttribute('aria-controls', `${card.id}-body`); button.title = isExpanded ? 'Fechar tópico' : 'Abrir tópico'; if (label) label.textContent = isExpanded ? 'Fechar tópico' : 'Abrir tópico'; try { localStorage.setItem(`workspace-card:${card.id}`, isExpanded ? 'open' : 'closed'); } catch {} }; button.addEventListener('click', () => setExpanded(card.classList.contains('is-collapsed'))); setExpanded(expanded); return button; }; const prepare = (card, header, bodyNodes, defaultOpen = true, subcard = false) => { if (!card || !header || card.dataset.workspaceCardReady === 'true') return; card.dataset.workspaceCardReady = 'true'; card.classList.add(subcard ? 'workspace-subtopic-card' : 'workspace-topic-card'); header.classList.add(subcard ? 'workspace-subtopic-card-header' : 'workspace-topic-card-header'); const body = document.createElement('div'); body.id = `${card.id}-body`; body.dataset.workspaceCardBody = 'true'; body.className = subcard ? 'workspace-subtopic-card-body' : 'workspace-topic-card-body'; bodyNodes.forEach(node => body.appendChild(node)); const stored = (() => { try { return localStorage.getItem(`workspace-card:${card.id}`); } catch { return null; } })(); const expanded = stored === 'closed' ? false : defaultOpen; const topic = WORKSPACE_TOPIC_ROUTES[card.id]; const toggle = createToggle(card, topic ? false : expanded); if (toggle) header.appendChild(toggle); if (topic) card.classList.add('is-collapsed'); card.appendChild(body); }; const cardIds = ['email-invitation-customizer','response-scale-customizer']; cardIds.forEach(id => { const card = document.getElementById(id); if (!card) return; let header = card.firstElementChild; let bodyNodes; if (id === 'configuracoes') { const headerNodes = Array.from(card.children).slice(0, 3); header = document.createElement('div'); headerNodes[0]?.before(header); headerNodes.forEach(node => header.appendChild(node)); bodyNodes = Array.from(card.children).slice(1); } else { bodyNodes = Array.from(card.children).slice(1); } prepare(card, header, bodyNodes, true); }); document.querySelectorAll('#email-template-form > .email-customizer-block').forEach((card, index) => { const header = card.firstElementChild; const bodyNodes = Array.from(card.children).slice(1); prepare(card, header, bodyNodes, index === 0, true); }); }
+    function initWorkspaceTopicCards() { const workspace = document.getElementById('workspace'); if (!workspace || workspace.dataset.workspaceCardsReady === 'true') return; workspace.dataset.workspaceCardsReady = 'true'; const icon = '<svg class="workspace-card-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>'; const createToggle = (card, expanded) => { const topic = WORKSPACE_TOPIC_ROUTES[card.id]; if (topic) { const button = card.querySelector('[data-workspace-topic-button]'); if (!button) return null; button.addEventListener('click', () => { const isPage = button.dataset.workspaceTopicPage === 'true'; const targetHash = isPage ? 'workspace' : topic.hash; if (window.location.hash !== `#${targetHash}`) window.location.hash = targetHash; else requestSidebarHashRoute({ scroll:true }); }); setWorkspaceTopicButtonState(card.id, false); return null; } const button = document.createElement('button'); button.type = 'button'; button.className = 'workspace-card-toggle'; button.innerHTML = `${icon}<span class="workspace-card-toggle-label"></span>`; const label = button.querySelector('.workspace-card-toggle-label'); const setExpanded = next => { const isExpanded = Boolean(next); card.classList.toggle('is-collapsed', !isExpanded); button.setAttribute('aria-expanded', String(isExpanded)); button.setAttribute('aria-controls', `${card.id}-body`); button.title = isExpanded ? 'Fechar tópico' : 'Abrir tópico'; if (label) label.textContent = isExpanded ? 'Fechar tópico' : 'Abrir tópico'; try { localStorage.setItem(`workspace-card:${card.id}`, isExpanded ? 'open' : 'closed'); } catch {} }; button.addEventListener('click', () => setExpanded(card.classList.contains('is-collapsed'))); setExpanded(expanded); return button; }; const prepare = (card, header, bodyNodes, defaultOpen = true, subcard = false) => { if (!card || !header || card.dataset.workspaceCardReady === 'true') return; card.dataset.workspaceCardReady = 'true'; card.classList.add(subcard ? 'workspace-subtopic-card' : 'workspace-topic-card'); header.classList.add(subcard ? 'workspace-subtopic-card-header' : 'workspace-topic-card-header'); const body = document.createElement('div'); body.id = `${card.id}-body`; body.dataset.workspaceCardBody = 'true'; body.className = subcard ? 'workspace-subtopic-card-body' : 'workspace-topic-card-body'; bodyNodes.forEach(node => body.appendChild(node)); const stored = (() => { try { return localStorage.getItem(`workspace-card:${card.id}`); } catch { return null; } })(); const expanded = stored === 'closed' ? false : defaultOpen; const topic = WORKSPACE_TOPIC_ROUTES[card.id]; const toggle = createToggle(card, topic ? false : expanded); if (toggle) header.appendChild(toggle); if (topic) card.classList.add('is-collapsed'); card.appendChild(body); }; const cardIds = ['email-invitation-customizer','reminders-customizer','response-scale-customizer']; cardIds.forEach(id => { const card = document.getElementById(id); if (!card) return; let header = card.firstElementChild; let bodyNodes; if (id === 'configuracoes') { const headerNodes = Array.from(card.children).slice(0, 3); header = document.createElement('div'); headerNodes[0]?.before(header); headerNodes.forEach(node => header.appendChild(node)); bodyNodes = Array.from(card.children).slice(1); } else { bodyNodes = Array.from(card.children).slice(1); } prepare(card, header, bodyNodes, true); }); document.querySelectorAll('#email-template-form > .email-customizer-block, #reminders-customizer-form > .email-customizer-block').forEach((card, index) => { const header = card.firstElementChild; const bodyNodes = Array.from(card.children).slice(1); prepare(card, header, bodyNodes, index === 0, true); }); }
     function renderResponseScaleCustomizer(showToast) {
       const optionsNode = document.getElementById('response-scale-style-options'); const previewNode = document.getElementById('response-scale-preview'); const saveButton = document.getElementById('response-scale-save'); const stateNode = document.getElementById('response-scale-save-state'); const statusNode = document.getElementById('response-scale-form-status'); if (!optionsNode || !previewNode || !saveButton) return { refresh:async () => {} };
       let currentStyle = getStoredResponseScaleStyle();
@@ -1556,6 +1724,293 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       document.getElementById('email-template-reset')?.addEventListener('click', () => { setForm(EMAIL_TEMPLATE_DEFAULTS); status('Modelo padrão carregado. Salve para aplicar.', 'muted'); });
       form.addEventListener('submit', async event => { event.preventDefault(); const saveButton = document.getElementById('email-template-save'); const template = templateFromForm(); saveButton.disabled = true; saveButton.textContent = 'Salvando...'; const result = await db.saveEmailTemplate(template); saveButton.disabled = false; saveButton.textContent = 'Salvar personalização'; if (!result.success) { status(result.message || 'Não foi possível salvar a personalização.', 'error'); return; } state = result.template || template; status(result.localOnly ? 'Salvo neste dispositivo; sincronização pendente.' : 'Personalização salva com sucesso.', 'success'); showToast(result.localOnly ? 'Modelo salvo localmente.' : 'Modelo de email salvo.'); });
       void refresh(); return { refresh };
+    }
+    let reminderTestConfirmModal = null;
+    function askReminderTestConfirmation(patients) {
+      if (!reminderTestConfirmModal) {
+        reminderTestConfirmModal = document.createElement('div');
+        reminderTestConfirmModal.id = 'reminder-test-confirm-modal';
+        reminderTestConfirmModal.className = 'fixed inset-0 z-[145] hidden items-center justify-center bg-dark/40 p-4 backdrop-blur-[2px]';
+        reminderTestConfirmModal.innerHTML = `<div role="dialog" aria-modal="true" aria-labelledby="reminder-test-confirm-title" aria-describedby="reminder-test-confirm-description" class="w-full max-w-md overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-2xl"><header class="flex items-start justify-between gap-4 border-b border-primary/10 p-5"><div class="flex items-center gap-3"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true"><svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8V4h12v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v6H6z"/><path d="M17 12h.01"/></svg></span><div><p class="text-[11px] font-semibold uppercase tracking-[.16em] text-primary">Enviar email teste</p><h2 id="reminder-test-confirm-title" class="mt-1 text-lg font-bold text-dark">Confirmar envio?</h2></div></div><button type="button" data-reminder-test-confirm-close class="directory-tool !h-8 !w-8" aria-label="Fechar confirmação">×</button></header><div class="p-5"><p id="reminder-test-confirm-description" class="text-sm leading-relaxed text-dark">Selecione o paciente cadastrado que deverá receber o e-mail de teste deste lembrete:</p><label class="mt-3 block text-xs font-bold text-dark">Paciente destinatário<select data-reminder-test-patient class="mt-2 w-full rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-sm font-semibold text-dark"><option value="">Carregando pacientes...</option></select></label><p data-reminder-test-confirm-recipient class="mt-3 break-all rounded-xl border border-primary/15 bg-primary/[.04] px-4 py-3 text-sm font-bold text-primary">Selecione um paciente para continuar.</p><p class="mt-3 rounded-xl border border-primary/10 bg-primary/[.035] px-3 py-2.5 text-xs leading-relaxed text-gray-500">O envio será identificado como teste. Nenhum agendamento será criado e o questionário não será contabilizado como enviado.</p></div><footer class="flex justify-end gap-2 border-t border-primary/10 bg-light p-4"><button type="button" data-reminder-test-confirm-cancel class="rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-bold text-dark hover:bg-primary/10">Cancelar</button><button type="button" data-reminder-test-confirm-accept class="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-dark">Enviar teste</button></footer></div>`;
+        document.body.appendChild(reminderTestConfirmModal);
+      }
+      return new Promise(resolve => {
+        const modal = reminderTestConfirmModal;
+        const accept = modal.querySelector('[data-reminder-test-confirm-accept]');
+        const cancel = modal.querySelector('[data-reminder-test-confirm-cancel]');
+        const close = modal.querySelector('[data-reminder-test-confirm-close]');
+        const select = modal.querySelector('[data-reminder-test-patient]');
+        const recipient = modal.querySelector('[data-reminder-test-confirm-recipient]');
+        const escapeHtml = v => String(v ?? '').replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[c]);
+
+        select.innerHTML = `<option value="">Selecione um paciente...</option>${patients.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)} — ${escapeHtml(p.email)}</option>`).join('')}`;
+        const selectedPatient = () => patients[Number(select.value)];
+        const syncSelection = () => {
+          const p = selectedPatient();
+          recipient.textContent = p ? `${p.name} — ${p.email}` : 'Selecione um paciente para continuar.';
+          accept.disabled = !p;
+        };
+        const finish = confirmed => {
+          const p = selectedPatient();
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          accept.removeEventListener('click', acceptHandler);
+          cancel.removeEventListener('click', cancelHandler);
+          close.removeEventListener('click', cancelHandler);
+          select.removeEventListener('change', selectionHandler);
+          modal.removeEventListener('click', backdropHandler);
+          document.removeEventListener('keydown', escapeHandler);
+          resolve(confirmed ? p : null);
+        };
+        const acceptHandler = () => finish(true);
+        const cancelHandler = () => finish(false);
+        const selectionHandler = () => syncSelection();
+        const backdropHandler = e => { if (e.target === modal) finish(false); };
+        const escapeHandler = e => { if (e.key === 'Escape') finish(false); };
+
+        accept.addEventListener('click', acceptHandler);
+        cancel.addEventListener('click', cancelHandler);
+        close.addEventListener('click', cancelHandler);
+        select.addEventListener('change', selectionHandler);
+        modal.addEventListener('click', backdropHandler);
+        document.addEventListener('keydown', escapeHandler);
+        accept.disabled = true;
+        syncSelection();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => select.focus(), 40);
+      });
+    }
+    function renderRemindersCustomizer(showToast) {
+      const form = document.getElementById('reminders-customizer-form');
+      if (!form) return { refresh: async () => {} };
+
+      let reminders = [];
+      let activeReminderId = 'new_quiz';
+
+      const reminderTitles = {
+        new_quiz: { title: 'Lembrete: Novo Questionário', detail: 'Disparado quando um questionário é criado ou aberto para o paciente.' },
+        service_ending: { title: 'Lembrete: Serviço Finalizando', detail: 'Disparado dias antes do encerramento do acompanhamento contratado.' },
+        response_due: { title: 'Lembrete: Prazo de Resposta', detail: 'Disparado antes do vencimento do prazo para responder o questionário.' }
+      };
+
+      const fields = {
+        title: document.getElementById('reminder-customizer-item-title'),
+        detail: document.getElementById('reminder-customizer-item-detail'),
+        subject: document.getElementById('reminder-customizer-subject'),
+        message: document.getElementById('reminder-customizer-message'),
+        whatsapp: document.getElementById('reminder-customizer-whatsapp'),
+        tokenTarget: document.getElementById('reminder-customizer-token-target'),
+        status: document.getElementById('reminder-customizer-form-status'),
+        saveBtn: document.getElementById('reminder-customizer-save'),
+        resetBtn: document.getElementById('reminder-customizer-reset'),
+        testBtn: document.getElementById('reminder-customizer-test-btn'),
+        previewHeaderTag: document.getElementById('reminder-preview-header-tag'),
+        previewSubject: document.getElementById('reminder-preview-subject-live'),
+        previewMessage: document.getElementById('reminder-preview-message-live'),
+        previewWhatsapp: document.getElementById('reminder-preview-whatsapp-live')
+      };
+
+      const setStatus = (message, tone = 'muted') => {
+        if (!fields.status) return;
+        fields.status.textContent = message || '';
+        fields.status.className = message ? `text-xs font-semibold ${tone === 'error' ? 'text-red-600' : tone === 'success' ? 'text-emerald-700' : 'text-gray-500'}` : 'hidden';
+      };
+
+      const sampleValues = {
+        '{primeiro_nome}': 'Marina',
+        '{paciente}': 'Marina Alves',
+        '{questionario}': 'Acompanhamento semanal',
+        '{prazo}': '15 de setembro de 2026',
+        '{dias_restantes}': '3',
+        '{nutricionista}': 'Jessica Melo'
+      };
+
+      const replaceSampleTokens = text => {
+        let result = String(text || '');
+        Object.entries(sampleValues).forEach(([token, val]) => {
+          result = result.split(token).join(val);
+        });
+        return result;
+      };
+
+      const getCurrentReminder = () => reminders.find(r => r.id === activeReminderId) || (typeof DEFAULT_REMINDERS !== 'undefined' ? DEFAULT_REMINDERS.find(r => r.id === activeReminderId) : {}) || {};
+
+      const syncActiveFields = () => {
+        const item = getCurrentReminder();
+        const meta = reminderTitles[activeReminderId] || { title: item.title || 'Lembrete', detail: item.detail || '' };
+        if (fields.title) fields.title.textContent = meta.title;
+        if (fields.detail) fields.detail.textContent = meta.detail;
+        if (fields.subject) fields.subject.value = item.subject || '';
+        if (fields.message) fields.message.value = item.message || '';
+        if (fields.whatsapp) fields.whatsapp.value = item.whatsappMessage || '';
+        if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
+        drawPreview();
+      };
+
+      const drawPreview = () => {
+        const item = getCurrentReminder();
+        const meta = reminderTitles[activeReminderId] || { title: item.title || 'Lembrete' };
+        const subjectRaw = fields.subject?.value || item.subject || 'Lembrete';
+        const messageRaw = fields.message?.value || item.message || '';
+        const whatsappRaw = fields.whatsapp?.value || messageRaw;
+
+        if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
+        if (fields.previewSubject) fields.previewSubject.textContent = replaceSampleTokens(subjectRaw);
+        if (fields.previewMessage) fields.previewMessage.textContent = replaceSampleTokens(messageRaw);
+        if (fields.previewWhatsapp) fields.previewWhatsapp.textContent = replaceSampleTokens(whatsappRaw || 'A mensagem principal será reutilizada.');
+      };
+
+      document.querySelectorAll('[data-reminder-tab]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const currentItem = getCurrentReminder();
+          if (currentItem) {
+            currentItem.subject = fields.subject?.value || currentItem.subject;
+            currentItem.message = fields.message?.value || currentItem.message;
+            currentItem.whatsappMessage = fields.whatsapp?.value || currentItem.whatsappMessage;
+          }
+          activeReminderId = tab.dataset.reminderTab;
+          document.querySelectorAll('[data-reminder-tab]').forEach(t => {
+            const isActive = t.dataset.reminderTab === activeReminderId;
+            t.classList.toggle('active', isActive);
+            t.setAttribute('aria-selected', String(isActive));
+          });
+          syncActiveFields();
+        });
+      });
+
+      const insertToken = token => {
+        const targetType = fields.tokenTarget?.value || 'message';
+        let targetField = fields.message;
+        if (targetType === 'subject') targetField = fields.subject;
+        else if (targetType === 'whatsapp') targetField = fields.whatsapp;
+        if (!targetField || !token) return;
+        const start = Number.isInteger(targetField.selectionStart) ? targetField.selectionStart : targetField.value.length;
+        const end = Number.isInteger(targetField.selectionEnd) ? targetField.selectionEnd : start;
+        if (typeof targetField.setRangeText === 'function') targetField.setRangeText(token, start, end, 'end');
+        else targetField.value = `${targetField.value.slice(0, start)}${token}${targetField.value.slice(end)}`;
+        targetField.focus();
+        targetField.dispatchEvent(new Event('input', { bubbles:true }));
+        setStatus(`Variável ${token} inserida.`, 'success');
+      };
+
+      document.getElementById('reminder-customizer-token-options')?.addEventListener('click', event => {
+        const btn = event.target.closest('[data-reminder-custom-token]');
+        if (!btn) return;
+        insertToken(btn.dataset.reminderCustomToken);
+      });
+
+      form.addEventListener('input', drawPreview);
+
+      fields.resetBtn?.addEventListener('click', () => {
+        const defaultItem = typeof DEFAULT_REMINDERS !== 'undefined' ? DEFAULT_REMINDERS.find(r => r.id === activeReminderId) : null;
+        if (!defaultItem) return;
+        if (fields.subject) fields.subject.value = defaultItem.subject || '';
+        if (fields.message) fields.message.value = defaultItem.message || '';
+        if (fields.whatsapp) fields.whatsapp.value = defaultItem.whatsappMessage || '';
+        drawPreview();
+        setStatus('Modelo padrão restaurado. Salve para aplicar.', 'muted');
+      });
+
+      fields.testBtn?.addEventListener('click', async () => {
+        const item = getCurrentReminder();
+        const currentData = {
+          id: activeReminderId,
+          title: item.title || (reminderTitles[activeReminderId]?.title || 'Lembrete'),
+          subject: fields.subject?.value?.trim() || item.subject,
+          message: fields.message?.value?.trim() || item.message,
+          whatsappMessage: fields.whatsapp?.value?.trim() || item.whatsappMessage
+        };
+        if (!currentData.subject || !currentData.message) {
+          setStatus('Preencha o assunto e a mensagem antes de enviar o teste.', 'error');
+          return;
+        }
+        if (fields.testBtn) fields.testBtn.disabled = true;
+        setStatus('Carregando pacientes com e-mail...');
+        let patients = [];
+        try {
+          patients = (await db.getPatientProfiles()).map(p => ({
+            id: String(p?.id || '').trim(),
+            name: String(p?.name || 'Paciente').trim() || 'Paciente',
+            email: String(p?.email || '').trim().toLowerCase()
+          })).filter(p => p.id && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+        } catch {}
+        if (!patients.length) {
+          setStatus('Nenhum paciente cadastrado com e-mail válido foi encontrado.', 'error');
+          if (fields.testBtn) fields.testBtn.disabled = false;
+          return;
+        }
+        const selectedPatient = await askReminderTestConfirmation(patients);
+        if (!selectedPatient) {
+          if (fields.testBtn) fields.testBtn.disabled = false;
+          return;
+        }
+        setStatus('Enviando e-mail de teste…');
+        try {
+          const result = await db.sendReminderTestEmail(currentData, selectedPatient);
+          if (result?.success === false) {
+            setStatus(result.message || 'Não foi possível enviar o e-mail de teste.', 'error');
+            return;
+          }
+          setStatus(`E-mail de teste enviado para ${result.recipientEmail || selectedPatient.email}.`, 'success');
+          showToast(`E-mail de teste enviado para ${result.recipientEmail || selectedPatient.email}.`);
+        } catch {
+          setStatus('Não foi possível enviar o e-mail de teste.', 'error');
+        } finally {
+          if (fields.testBtn) fields.testBtn.disabled = false;
+        }
+      });
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const subject = fields.subject?.value?.trim();
+        const message = fields.message?.value?.trim();
+        const whatsapp = fields.whatsapp?.value?.trim();
+        if (!subject || !message) {
+          setStatus('Preencha o assunto e a mensagem principal.', 'error');
+          return;
+        }
+        reminders = reminders.map(item => {
+          if (item.id === activeReminderId) {
+            return {
+              ...item,
+              subject,
+              message,
+              whatsappMessage: whatsapp,
+              updatedAt: new Date().toISOString()
+            };
+          }
+          return item;
+        });
+
+        if (fields.saveBtn) {
+          fields.saveBtn.disabled = true;
+          fields.saveBtn.textContent = 'Salvando...';
+        }
+        setStatus('Salvando personalização dos lembretes...');
+        const result = await db.saveReminderSettings(reminders);
+        if (fields.saveBtn) {
+          fields.saveBtn.disabled = false;
+          fields.saveBtn.textContent = 'Salvar personalização';
+        }
+        if (result?.success === false) {
+          setStatus(result.message || 'Não foi possível salvar a personalização.', 'error');
+          return;
+        }
+        reminders = result.reminders || reminders;
+        setStatus(result.localOnly ? 'Salvo neste dispositivo; sincronização pendente.' : 'Personalização salva com sucesso.', 'success');
+        showToast(result.localOnly ? 'Personalização salva localmente.' : 'Personalização dos lembretes salva.');
+      });
+
+      const refresh = async () => {
+        setStatus('Carregando lembretes...');
+        reminders = await db.getReminderSettings();
+        syncActiveFields();
+        setStatus('');
+      };
+
+      void refresh();
+      return { refresh };
     }
     function getMonthSummary(calendar) {
       let a = 0, t = 0, h = 0, active = 0, last = 0;
@@ -2495,18 +2950,14 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
     }
 
     function renderRemindersManager(notify = () => {}) {
-      const rows = document.getElementById('reminders-table-rows'); const overlay = document.getElementById('reminder-modal-overlay'); if (overlay && overlay.parentElement !== document.body) document.body.appendChild(overlay); const form = document.getElementById('reminder-config-form'); const fields = { id:document.getElementById('reminder-config-id'), label:document.getElementById('reminder-label'), detail:document.getElementById('reminder-detail'), active:document.getElementById('reminder-active'), normalHours:document.getElementById('reminder-normal-hours'), subject:document.getElementById('reminder-subject'), message:document.getElementById('reminder-message'), whatsapp:document.getElementById('reminder-whatsapp-message'), status:document.getElementById('reminder-form-status'), previewSubject:document.getElementById('reminder-preview-subject'), previewMessage:document.getElementById('reminder-preview-message'), previewWhatsapp:document.getElementById('reminder-preview-whatsapp'), modalStatus:document.getElementById('reminder-modal-status'), suggestedText:document.getElementById('reminder-routine-suggested-text'), suggestedMeta:document.getElementById('reminder-routine-suggested-meta'), suggestedMode:document.getElementById('reminder-routine-suggested'), customMode:document.getElementById('reminder-routine-custom'), customPanel:document.getElementById('reminder-routine-custom-panel'), triggers:document.getElementById('reminder-routine-triggers') }; let reminders = []; let lastFocusedMessageField = fields.message; let activeRoutine = null; let activeReminder = null; const testButton = document.getElementById('reminder-test-email'); const testConfirmModal = document.createElement('div'); testConfirmModal.id = 'reminder-test-confirm-modal'; testConfirmModal.className = 'fixed inset-0 z-[145] hidden items-center justify-center bg-dark/40 p-4 backdrop-blur-[2px]'; testConfirmModal.innerHTML = `<div role="dialog" aria-modal="true" aria-labelledby="reminder-test-confirm-title" aria-describedby="reminder-test-confirm-description" class="w-full max-w-md overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-2xl"><header class="flex items-start justify-between gap-4 border-b border-primary/10 p-5"><div class="flex items-center gap-3"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true"><svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8V4h12v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v6H6z"/><path d="M17 12h.01"/></svg></span><div><p class="text-[11px] font-semibold uppercase tracking-[.16em] text-primary">Enviar email teste</p><h2 id="reminder-test-confirm-title" class="mt-1 text-lg font-bold text-dark">Confirmar envio?</h2></div></div><button type="button" data-reminder-test-confirm-close class="directory-tool !h-8 !w-8" aria-label="Fechar confirmação">×</button></header><div class="p-5"><p id="reminder-test-confirm-description" class="text-sm leading-relaxed text-dark">Selecione o paciente cadastrado que deverá receber o e-mail de teste:</p><label class="mt-3 block text-xs font-bold text-dark">Paciente destinatário<select data-reminder-test-patient class="mt-2 w-full rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-sm font-semibold text-dark"><option value="">Carregando pacientes...</option></select></label><p data-reminder-test-confirm-recipient class="mt-3 break-all rounded-xl border border-primary/15 bg-primary/[.04] px-4 py-3 text-sm font-bold text-primary">Selecione um paciente para continuar.</p><p class="mt-3 rounded-xl border border-primary/10 bg-primary/[.035] px-3 py-2.5 text-xs leading-relaxed text-gray-500">O envio será identificado como teste. Nenhum agendamento será criado e o questionário não será contabilizado como enviado.</p></div><footer class="flex justify-end gap-2 border-t border-primary/10 bg-light p-4"><button type="button" data-reminder-test-confirm-cancel class="rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-bold text-dark hover:bg-primary/10">Cancelar</button><button type="button" data-reminder-test-confirm-accept class="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-dark">Enviar teste</button></footer></div>`; document.body.appendChild(testConfirmModal);
+      const rows = document.getElementById('reminders-table-rows'); const overlay = document.getElementById('reminder-modal-overlay'); if (overlay && overlay.parentElement !== document.body) document.body.appendChild(overlay); const form = document.getElementById('reminder-config-form'); const fields = { id:document.getElementById('reminder-config-id'), label:document.getElementById('reminder-label'), detail:document.getElementById('reminder-detail'), active:document.getElementById('reminder-active'), normalHours:document.getElementById('reminder-normal-hours'), status:document.getElementById('reminder-form-status'), modalStatus:document.getElementById('reminder-modal-status'), suggestedText:document.getElementById('reminder-routine-suggested-text'), suggestedMeta:document.getElementById('reminder-routine-suggested-meta'), suggestedMode:document.getElementById('reminder-routine-suggested'), customMode:document.getElementById('reminder-routine-custom'), customPanel:document.getElementById('reminder-routine-custom-panel'), triggers:document.getElementById('reminder-routine-triggers') }; let reminders = []; let activeRoutine = null; let activeReminder = null;
       const escape = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
-      const sampleValues = { '{primeiro_nome}':'Marina', '{paciente}':'Marina Alves', '{questionario}':'Acompanhamento semanal', '{prazo}':'15 de setembro de 2026', '{dias_restantes}':'3', '{link_questionario}':'https://jessicamelonutri.com.br/responder-questionario', '{nutricionista}':'Jessica Melo' };
-      const replaceTokens = value => String(value ?? '').replace(/\{[^}]+\}/g, token => sampleValues[token] || token);
-      const previewHtml = value => escape(replaceTokens(value)).replace(/\n/g, '<br>');
       const routineContext = reminder => ({ new_quiz:{ before:'da criação ou abertura do questionário', after:'da criação ou abertura do questionário', immediate:'a criação ou abertura do questionário', meta:'a criação ou abertura do questionário' }, service_ending:{ before:'do fim do acompanhamento', after:'do fim do acompanhamento', immediate:'o fim do acompanhamento', meta:'o fim do acompanhamento' }, response_due:{ before:'do fim do prazo de resposta', after:'do fim do prazo de resposta', immediate:'o fim do prazo de resposta', meta:'o fim do prazo de resposta' } }[reminder?.id] || { before:'do evento configurado', after:'do evento configurado', immediate:'o evento configurado', meta:'o evento configurado' }); const unitLabel = (value, amount) => ({ minutes:amount === 1 ? 'minuto' : 'minutos', hours:amount === 1 ? 'hora' : 'horas', days:amount === 1 ? 'dia' : 'dias' }[value] || 'horas'); const triggerPhrase = (trigger, reminder = activeReminder) => { const offset = Math.max(0, Number(trigger?.offset) || 0); const event = routineContext(reminder); if (offset === 0 && trigger?.relation !== 'before') return `imediatamente após ${event.immediate}`; return `${offset} ${unitLabel(trigger?.unit, offset)} ${trigger?.relation === 'after' ? 'depois' : 'antes'} ${event[trigger?.relation === 'after' ? 'after' : 'before']}${trigger?.time ? `, às ${trigger.time}` : ''}`; };
       const summaryFromTriggers = (reminder, triggers) => { const phrases = triggers.map(trigger => triggerPhrase(trigger, reminder)); if (!phrases.length) return 'Nenhum disparo configurado.'; return `${phrases.length === 1 ? 'Disparo' : 'Disparos'}: ${phrases.join(phrases.length === 2 ? ' e ' : ', ')}.`; };
       const cloneTriggers = value => (Array.isArray(value) ? value : []).map(trigger => ({ offset:Number(trigger?.offset) || 0, unit:['minutes','hours','days'].includes(trigger?.unit) ? trigger.unit : 'hours', relation:['before','after'].includes(trigger?.relation) ? trigger.relation : 'before', time:/^([01]\d|2[0-3]):[0-5]\d$/.test(String(trigger?.time || '')) ? String(trigger.time) : '' }));
       const currentMode = () => fields.customMode.checked ? 'custom' : 'suggested';
       const closeModal = () => { overlay.classList.remove('is-open'); overlay.setAttribute('aria-hidden','true'); activeReminder = null; activeRoutine = null; };
-      const showStatus = (message, tone = 'neutral') => { fields.status.textContent = message; fields.status.className = message ? `text-xs font-semibold ${tone === 'error' ? 'text-red-600' : tone === 'success' ? 'text-emerald-700' : 'text-primary'}` : 'hidden text-xs font-semibold'; }; const closeTestConfirmModal = () => { testConfirmModal.classList.add('hidden'); testConfirmModal.classList.remove('flex'); }; const askReminderTestConfirmation = patients => new Promise(resolve => { const accept = testConfirmModal.querySelector('[data-reminder-test-confirm-accept]'); const cancel = testConfirmModal.querySelector('[data-reminder-test-confirm-cancel]'); const close = testConfirmModal.querySelector('[data-reminder-test-confirm-close]'); const select = testConfirmModal.querySelector('[data-reminder-test-patient]'); const recipient = testConfirmModal.querySelector('[data-reminder-test-confirm-recipient]'); select.innerHTML = `<option value="">Selecione um paciente...</option>${patients.map((patient, index) => `<option value="${index}">${escape(patient.name)} — ${escape(patient.email)}</option>`).join('')}`; const selectedPatient = () => patients[Number(select.value)]; const syncSelection = () => { const patient = selectedPatient(); recipient.textContent = patient ? `${patient.name} — ${patient.email}` : 'Selecione um paciente para continuar.'; accept.disabled = !patient; }; const finish = confirmed => { const patient = selectedPatient(); closeTestConfirmModal(); accept.removeEventListener('click', acceptHandler); cancel.removeEventListener('click', cancelHandler); close.removeEventListener('click', cancelHandler); select.removeEventListener('change', selectionHandler); testConfirmModal.removeEventListener('click', backdropHandler); document.removeEventListener('keydown', escapeHandler); resolve(confirmed ? patient : null); }; const acceptHandler = () => finish(true); const cancelHandler = () => finish(false); const selectionHandler = () => syncSelection(); const backdropHandler = event => { if (event.target === testConfirmModal) finish(false); }; const escapeHandler = event => { if (event.key === 'Escape') finish(false); }; accept.addEventListener('click', acceptHandler); cancel.addEventListener('click', cancelHandler); close.addEventListener('click', cancelHandler); select.addEventListener('change', selectionHandler); testConfirmModal.addEventListener('click', backdropHandler); document.addEventListener('keydown', escapeHandler); accept.disabled = true; syncSelection(); testConfirmModal.classList.remove('hidden'); testConfirmModal.classList.add('flex'); setTimeout(() => select.focus(), 40); }); const sendReminderTest = async () => { const subject = fields.subject.value.trim(); const message = fields.message.value.trim(); if (!subject || !message) { showStatus('Preencha o assunto e a mensagem antes de enviar o teste.', 'error'); return; } testButton.disabled = true; testButton.setAttribute('aria-busy', 'true'); showStatus('Carregando pacientes com e-mail...'); let patients = []; try { patients = (await db.getPatientProfiles()).map(patient => ({ id:String(patient?.id || '').trim(), name:String(patient?.name || 'Paciente').trim() || 'Paciente', email:String(patient?.email || '').trim().toLowerCase() })).filter(patient => patient.id && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(patient.email)).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')); } catch {} if (!patients.length) { showStatus('Nenhum paciente cadastrado com e-mail válido foi encontrado.', 'error'); testButton.disabled = false; testButton.removeAttribute('aria-busy'); return; } const selectedPatient = await askReminderTestConfirmation(patients); if (!selectedPatient) { testButton.disabled = false; testButton.removeAttribute('aria-busy'); return; } showStatus('Enviando e-mail de teste…'); try { const result = await db.sendReminderTestEmail({ id:fields.id.value, title:fields.label.value.trim(), subject, message }, selectedPatient); if (result?.success === false) { showStatus(result.message || 'Não foi possível enviar o e-mail de teste.', 'error'); return; } showStatus(`E-mail de teste enviado para ${result.recipientEmail || selectedPatient.email}.`, 'success'); notify(`E-mail de teste enviado para ${result.recipientEmail || selectedPatient.email}.`); } catch { showStatus('Não foi possível enviar o e-mail de teste. Tente novamente e, caso o problema se repita, entre em contato com o suporte.', 'error'); } finally { testButton.disabled = false; testButton.removeAttribute('aria-busy'); } };
-      const syncPreview = () => { const subject = fields.subject.value.trim() || 'Seu questionário está pronto'; const message = fields.message.value.trim() || 'Escreva a mensagem para visualizar a prévia.'; const whatsapp = fields.whatsapp.value.trim() || message; fields.previewSubject.textContent = replaceTokens(subject); fields.previewMessage.innerHTML = previewHtml(message); fields.previewWhatsapp.innerHTML = previewHtml(whatsapp); };
+      const showStatus = (message, tone = 'neutral') => { fields.status.textContent = message; fields.status.className = message ? `text-xs font-semibold ${tone === 'error' ? 'text-red-600' : tone === 'success' ? 'text-emerald-700' : 'text-primary'}` : 'hidden text-xs font-semibold'; };
       const syncHeaderStatus = () => { const isActive = fields.active.checked; fields.modalStatus.textContent = isActive ? 'Ativo' : 'Inativo'; fields.modalStatus.className = `reminder-status${isActive ? '' : ' is-off'}`; };
       const readTriggerRows = () => Array.from(fields.triggers.querySelectorAll('[data-trigger-row]')).map(row => ({ offset:Math.max(0, Math.min(5256000, Math.round(Number(row.querySelector('[data-trigger-field="offset"]')?.value) || 0))), unit:row.querySelector('[data-trigger-field="unit"]')?.value || 'hours', relation:row.querySelector('[data-trigger-field="relation"]')?.value || 'before', time:row.querySelector('[data-trigger-field="time"]')?.value || '' }));
       const syncRoutineSummary = () => { if (!activeReminder || currentMode() !== 'custom') return; const triggers = readTriggerRows(); fields.detail.value = summaryFromTriggers(activeReminder, triggers); };
@@ -2514,11 +2965,11 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const setMode = mode => { const custom = mode === 'custom'; fields.customMode.checked = custom; fields.suggestedMode.checked = !custom; fields.customPanel.classList.toggle('hidden', !custom); if (custom) { if (!fields.triggers.querySelector('[data-trigger-row]')) drawTriggers(activeRoutine?.triggers || activeRoutine?.suggestedTriggers || []); syncRoutineSummary(); } else if (activeRoutine) { drawTriggers(activeRoutine.suggestedTriggers); fields.detail.value = activeRoutine.suggestedSummary || summaryFromTriggers(activeReminder, activeRoutine.suggestedTriggers); } };
       const useSuggested = () => { if (!activeRoutine || !activeReminder) return; activeRoutine.mode = 'suggested'; activeRoutine.triggers = cloneTriggers(activeRoutine.suggestedTriggers); fields.detail.value = activeRoutine.suggestedSummary || summaryFromTriggers(activeReminder, activeRoutine.suggestedTriggers); drawTriggers(activeRoutine.suggestedTriggers); setMode('suggested'); showStatus('Sugestão aplicada. Salve para confirmar.', 'success'); };
       const addTrigger = () => { const current = readTriggerRows(); if (current.length >= 8) { showStatus('Você pode configurar até 8 disparos nesta regra.', 'error'); return; } current.push({ offset:1, unit:'hours', relation:'before', time:'' }); setMode('custom'); drawTriggers(current); syncRoutineSummary(); const last = fields.triggers.querySelector('[data-trigger-row]:last-child [data-trigger-field="offset"]'); last?.focus(); };
-      const draw = () => { rows.innerHTML = ''; reminders.forEach(reminder => { const routine = reminder.routine || {}; const routineLabel = routine.mode === 'custom' ? 'Rotina personalizada' : 'Sugestão aplicada'; const routineSummary = routine.mode === 'custom' ? (routine.summary || reminder.detail) : (routine.suggestedSummary || reminder.detail); const row = document.createElement('tr'); row.innerHTML = `<td><button type="button" class="reminder-title-button text-sm font-black text-dark" title="Ver modelo da mensagem">${escape(reminder.title)}</button><p class="mt-1 text-xs leading-relaxed text-gray-500">${escape(routineSummary)}</p><div class="mt-2 flex flex-wrap items-center gap-2"><span class="reminder-channel">${escape(routineLabel)}</span><span class="text-[10px] font-bold text-gray-400">${escape((routine.triggers || []).length)} ${(routine.triggers || []).length === 1 ? 'disparo' : 'disparos'}</span></div></td><td><span class="reminder-status ${reminder.active ? '' : 'is-off'}">${reminder.active ? 'Ativo' : 'Inativo'}</span></td><td><div class="flex justify-end gap-2"><button type="button" class="question-action quiz-schedule reminder-settings" title="Configurar lembrete" aria-label="Configurar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>`; row.querySelectorAll('.reminder-title-button, .reminder-settings').forEach(button => button.addEventListener('click', () => openModal(reminder))); rows.appendChild(row); }); };
-      const openModal = reminder => { activeReminder = reminder; const routine = reminder.routine || {}; activeRoutine = { mode:routine.mode === 'custom' ? 'custom' : 'suggested', summary:routine.summary || reminder.detail || '', suggestedSummary:routine.suggestedSummary || reminder.detail || '', suggestedTriggers:cloneTriggers(routine.suggestedTriggers || routine.triggers), triggers:cloneTriggers(routine.triggers || routine.suggestedTriggers) }; fields.id.value = reminder.id; fields.label.value = reminder.title || ''; fields.detail.value = reminder.detail || activeRoutine.summary || activeRoutine.suggestedSummary || ''; fields.active.checked = reminder.active !== false; fields.normalHours.checked = reminder.normalHoursOnly !== false; fields.subject.value = reminder.subject || ''; fields.message.value = reminder.message || ''; fields.whatsapp.value = reminder.whatsappMessage || ''; fields.suggestedText.textContent = activeRoutine.suggestedSummary || summaryFromTriggers(reminder, activeRoutine.suggestedTriggers); fields.suggestedMeta.textContent = `Você poderá alterar quantidade, unidade, relação com ${routineContext(reminder).meta} e horário.`; lastFocusedMessageField = fields.message; showStatus(''); syncHeaderStatus(); drawTriggers(activeRoutine.triggers); setMode(activeRoutine.mode); syncPreview(); document.getElementById('reminder-modal-subtitle').textContent = 'Ajuste a rotina e o conteúdo sem perder o modelo atual.'; overlay.classList.add('is-open'); overlay.setAttribute('aria-hidden','false'); window.setTimeout(() => fields.subject.focus(), 30); };
+      const draw = () => { rows.innerHTML = ''; reminders.forEach(reminder => { const routine = reminder.routine || {}; const routineLabel = routine.mode === 'custom' ? 'Rotina personalizada' : 'Sugestão aplicada'; const routineSummary = routine.mode === 'custom' ? (routine.summary || reminder.detail) : (routine.suggestedSummary || reminder.detail); const row = document.createElement('tr'); row.innerHTML = `<td><button type="button" class="reminder-title-button text-sm font-black text-dark" title="Configurar rotina de disparos">${escape(reminder.title)}</button><p class="mt-1 text-xs leading-relaxed text-gray-500">${escape(routineSummary)}</p><div class="mt-2 flex flex-wrap items-center gap-2"><span class="reminder-channel">${escape(routineLabel)}</span><span class="text-[10px] font-bold text-gray-400">${escape((routine.triggers || []).length)} ${(routine.triggers || []).length === 1 ? 'disparo' : 'disparos'}</span></div></td><td><span class="reminder-status ${reminder.active ? '' : 'is-off'}">${reminder.active ? 'Ativo' : 'Inativo'}</span></td><td><div class="flex justify-end gap-2"><button type="button" class="question-action quiz-schedule reminder-settings" title="Configurar lembrete" aria-label="Configurar lembrete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></td>`; row.querySelectorAll('.reminder-title-button, .reminder-settings').forEach(button => button.addEventListener('click', () => openModal(reminder))); rows.appendChild(row); }); };
+      const openModal = reminder => { activeReminder = reminder; const routine = reminder.routine || {}; activeRoutine = { mode:routine.mode === 'custom' ? 'custom' : 'suggested', summary:routine.summary || reminder.detail || '', suggestedSummary:routine.suggestedSummary || reminder.detail || '', suggestedTriggers:cloneTriggers(routine.suggestedTriggers || routine.triggers), triggers:cloneTriggers(routine.triggers || routine.suggestedTriggers) }; fields.id.value = reminder.id; fields.label.value = reminder.title || ''; fields.detail.value = reminder.detail || activeRoutine.summary || activeRoutine.suggestedSummary || ''; fields.active.checked = reminder.active !== false; fields.normalHours.checked = reminder.normalHoursOnly !== false; fields.suggestedText.textContent = activeRoutine.suggestedSummary || summaryFromTriggers(reminder, activeRoutine.suggestedTriggers); fields.suggestedMeta.textContent = `Você poderá alterar quantidade, unidade, relação com ${routineContext(reminder).meta} e horário.`; showStatus(''); syncHeaderStatus(); drawTriggers(activeRoutine.triggers); setMode(activeRoutine.mode); document.getElementById('reminder-modal-subtitle').textContent = 'Defina os gatilhos e a rotina de disparos deste lembrete.'; overlay.classList.add('is-open'); overlay.setAttribute('aria-hidden','false'); window.setTimeout(() => fields.label.focus(), 30); };
       const refresh = async () => { rows.innerHTML = (function(cols,rowCount){var pairs=[['45%','90%'],['30%','70%'],['55%','80%'],['40%','65%'],['60%','85%'],['35%','75%']];var out='';for(var r=0;r<rowCount;r++){var cells='';for(var c=0;c<cols;c++){var pair=pairs[(r*cols+c)%pairs.length];cells+='<td><span class="table-skeleton-bone" style="width:'+pair[r%2]+'"></span></td>';}out+='<tr class="table-skeleton-row" aria-hidden="true">'+cells+'</tr>';}return out;})(3,5); reminders = await db.getReminderSettings(); draw(); };
-      [fields.message, fields.whatsapp].forEach(field => field.addEventListener('focus', () => { lastFocusedMessageField = field; })); [fields.subject, fields.message, fields.whatsapp].forEach(field => field.addEventListener('input', syncPreview)); fields.active.addEventListener('change', syncHeaderStatus); fields.suggestedMode.addEventListener('change', () => setMode('suggested')); fields.customMode.addEventListener('change', () => setMode('custom')); document.getElementById('reminder-use-suggested').addEventListener('click', useSuggested); document.getElementById('reminder-add-trigger').addEventListener('click', addTrigger); document.querySelectorAll('[data-reminder-token]').forEach(button => button.addEventListener('click', () => { const field = lastFocusedMessageField || fields.message; const start = field.selectionStart ?? field.value.length; const end = field.selectionEnd ?? field.value.length; field.value = `${field.value.slice(0, start)}${button.dataset.reminderToken}${field.value.slice(end)}`; field.focus(); field.setSelectionRange(start + button.dataset.reminderToken.length, start + button.dataset.reminderToken.length); syncPreview(); }));
-      testButton?.addEventListener('click', sendReminderTest); document.getElementById('reminder-modal-close').addEventListener('click', closeModal); document.getElementById('reminder-form-cancel').addEventListener('click', closeModal); overlay.addEventListener('click', event => { if (event.target === overlay) closeModal(); }); form.addEventListener('submit', async event => { event.preventDefault(); const subject = fields.subject.value.trim(); const message = fields.message.value.trim(); const mode = currentMode(); const triggers = mode === 'custom' ? readTriggerRows() : cloneTriggers(activeRoutine?.suggestedTriggers || []); if (!fields.label.value.trim() || !fields.detail.value.trim() || !subject || !message) { showStatus('Preencha o nome, o resumo, o assunto e a mensagem principal.', 'error'); return; } if (!triggers.length) { showStatus('Adicione ao menos um disparo à rotina.', 'error'); return; } const id = fields.id.value; const routine = { mode, summary:fields.detail.value.trim(), suggestedSummary:activeRoutine?.suggestedSummary || fields.detail.value.trim(), suggestedTriggers:cloneTriggers(activeRoutine?.suggestedTriggers || triggers), triggers:cloneTriggers(triggers) }; reminders = reminders.map(item => item.id === id ? { ...item, title:fields.label.value.trim(), detail:fields.detail.value.trim(), active:fields.active.checked, normalHoursOnly:fields.normalHours.checked, subject, message, whatsappMessage:fields.whatsapp.value.trim(), routine, updatedAt:new Date().toISOString() } : item); showStatus('Salvando configuração…'); const result = await db.saveReminderSettings(reminders); if (result?.success === false) { showStatus(result.message || 'Não foi possível salvar a configuração.', 'error'); return; } closeModal(); draw(); notify(result.localOnly ? 'Configuração salva neste dispositivo; sincronização pendente.' : 'Configuração de lembrete salva com sucesso.'); }); return { refresh };
+      fields.active.addEventListener('change', syncHeaderStatus); fields.suggestedMode.addEventListener('change', () => setMode('suggested')); fields.customMode.addEventListener('change', () => setMode('custom')); document.getElementById('reminder-use-suggested').addEventListener('click', useSuggested); document.getElementById('reminder-add-trigger').addEventListener('click', addTrigger);
+      document.getElementById('reminder-modal-close').addEventListener('click', closeModal); document.getElementById('reminder-form-cancel').addEventListener('click', closeModal); document.getElementById('reminder-modal-to-workspace')?.addEventListener('click', () => { closeModal(); }); overlay.addEventListener('click', event => { if (event.target === overlay) closeModal(); }); form.addEventListener('submit', async event => { event.preventDefault(); const mode = currentMode(); const triggers = mode === 'custom' ? readTriggerRows() : cloneTriggers(activeRoutine?.suggestedTriggers || []); if (!fields.label.value.trim() || !fields.detail.value.trim()) { showStatus('Preencha o nome e o resumo da regra.', 'error'); return; } if (!triggers.length) { showStatus('Adicione ao menos um disparo à rotina.', 'error'); return; } const id = fields.id.value; const routine = { mode, summary:fields.detail.value.trim(), suggestedSummary:activeRoutine?.suggestedSummary || fields.detail.value.trim(), suggestedTriggers:cloneTriggers(activeRoutine?.suggestedTriggers || triggers), triggers:cloneTriggers(triggers) }; reminders = reminders.map(item => item.id === id ? { ...item, title:fields.label.value.trim(), detail:fields.detail.value.trim(), active:fields.active.checked, normalHoursOnly:fields.normalHours.checked, routine, updatedAt:new Date().toISOString() } : item); showStatus('Salvando configuração…'); const result = await db.saveReminderSettings(reminders); if (result?.success === false) { showStatus(result.message || 'Não foi possível salvar a configuração.', 'error'); return; } closeModal(); draw(); notify(result.localOnly ? 'Configuração salva neste dispositivo; sincronização pendente.' : 'Configuração de lembrete salva com sucesso.'); }); return { refresh };
     }
     function renderPatientRelationManager({ getPatient, notify, openQuizSchedule, openQuizLinkDrawer, openPatientQuizzes }) {
       const overlay = document.getElementById('patient-link-overlay'); const drawer = document.getElementById('patient-link-drawer'); const form = document.getElementById('patient-link-form'); const select = document.getElementById('patient-link-select'); const serviceRows = document.getElementById('patient-service-rows'); const quizRows = document.getElementById('patient-quiz-rows'); const serviceFields = document.getElementById('patient-link-service-fields'); const quizFields = document.getElementById('patient-link-quiz-fields'); let services = []; let quizzes = []; let serviceLinks = []; let quizLinks = [];
@@ -2803,7 +3254,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       engagementReportController = safeRenderController(() => renderEngagementReport(patients), 'o relatório de engajamento');
       transactionReportController = safeRenderController(() => renderTransactionReport(), 'o relatório de transações');
       document.addEventListener('patient-services-updated', () => { void refreshDashboard(); void pendingReviewController?.refresh?.(); void transactionReportController?.refresh?.(); });
-      let servicesManagerController, questionsManagerController, quizzesManagerController, quizScheduleController, remindersManagerController, whatsappAutomationController, emailTemplateController, responseScaleController;
+      let servicesManagerController, questionsManagerController, quizzesManagerController, quizScheduleController, remindersManagerController, remindersCustomizerController, whatsappAutomationController, emailTemplateController, responseScaleController;
       const ADMIN_VIEW_IDS = ADMIN_ROUTE_VIEW_IDS;
       const setActiveNavigation = key => document.querySelectorAll('[data-admin-nav]').forEach(item => item.classList.toggle('is-active', item.dataset.adminNav === key));
       const activateAdminView = (viewId, navKey, { includeDashboard = false, scroll = true } = {}) => {
@@ -2833,12 +3284,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (!workspace) return;
         const cardsContainer = document.getElementById('workspace-cards');
         const heading = workspace.querySelector('.workspace-section-heading');
-        const targetId = topic === 'email' ? 'email-invitation-customizer' : topic === 'scale' ? 'response-scale-customizer' : topic === 'question-scale' ? 'question-scale-customizer' : '';
+        const targetId = topic === 'email' ? 'email-invitation-customizer' : topic === 'reminders' ? 'reminders-customizer' : topic === 'scale' ? 'response-scale-customizer' : topic === 'question-scale' ? 'question-scale-customizer' : '';
 
+        const workspaceSubcards = ['email-invitation-customizer', 'reminders-customizer', 'response-scale-customizer', 'question-scale-customizer'];
         if (!targetId) {
           if (heading) heading.classList.remove('hidden');
           if (cardsContainer) cardsContainer.classList.remove('hidden');
-          ['email-invitation-customizer', 'response-scale-customizer', 'question-scale-customizer'].forEach(cardId => {
+          workspaceSubcards.forEach(cardId => {
             const card = document.getElementById(cardId);
             if (card) {
               card.classList.add('hidden');
@@ -2848,7 +3300,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         } else {
           if (heading) heading.classList.add('hidden');
           if (cardsContainer) cardsContainer.classList.add('hidden');
-          ['email-invitation-customizer', 'response-scale-customizer', 'question-scale-customizer'].forEach(cardId => {
+          workspaceSubcards.forEach(cardId => {
             const card = document.getElementById(cardId);
             if (card) {
               const visible = card.id === targetId;
@@ -2861,10 +3313,10 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           });
         }
       };
-      const showWorkspace = () => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode('cards'); runAdminViewTask(() => Promise.all([emailTemplateController?.refresh?.(), responseScaleController?.refresh?.()]), 'a personalização da plataforma'); };
-      const showWorkspaceTopic = topic => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode(topic); const task = topic === 'email' ? emailTemplateController?.refresh?.() : topic === 'scale' ? responseScaleController?.refresh?.() : Promise.resolve(); runAdminViewTask(() => task, topic === 'email' ? 'a personalização do email' : topic === 'scale' ? 'o formato da escala' : 'a personalização das perguntas'); };
-      const openAdminHashRoute = async ({ hash } = {}) => { const routes = { inicio:showHome, 'patient-directory':showDirectory, 'pending-review':showPendingReviews, 'send-report':showSendReport, 'response-report':showResponseReport, 'engagement-report':showEngagementReport, 'transaction-report':showTransactionReport, configuracoes:showServicesManager, 'questions-manager':showQuestionsManager, 'quizzes-manager':showQuizzesManager, 'reminders-manager':showRemindersManager, 'whatsapp-automations':showWhatsappAutomations, 'quiz-schedule':() => showQuizSchedule(window.__activeQuizSchedule || null), workspace:showWorkspace, 'workspace-email':() => showWorkspaceTopic('email'), 'workspace-scale':() => showWorkspaceTopic('scale'), 'workspace-question-scale':() => showWorkspaceTopic('question-scale') }; const open = routes[hash] || showHome; open(); };
-      document.querySelectorAll('[data-workspace-card]').forEach(button => { button.addEventListener('click', () => { const card = button.dataset.workspaceCard; if (card === 'email') window.location.hash = 'workspace-email'; else if (card === 'scale') window.location.hash = 'workspace-scale'; else if (card === 'question-scale') window.location.hash = 'workspace-question-scale'; }); });
+      const showWorkspace = () => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode('cards'); runAdminViewTask(() => Promise.all([emailTemplateController?.refresh?.(), remindersCustomizerController?.refresh?.(), responseScaleController?.refresh?.()]), 'a personalização da plataforma'); };
+      const showWorkspaceTopic = topic => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode(topic); const task = topic === 'email' ? emailTemplateController?.refresh?.() : topic === 'reminders' ? remindersCustomizerController?.refresh?.() : topic === 'scale' ? responseScaleController?.refresh?.() : Promise.resolve(); runAdminViewTask(() => task, topic === 'email' ? 'a personalização do email' : topic === 'reminders' ? 'a personalização dos lembretes' : topic === 'scale' ? 'o formato da escala' : 'a personalização das perguntas'); };
+      const openAdminHashRoute = async ({ hash } = {}) => { const routes = { inicio:showHome, 'patient-directory':showDirectory, 'pending-review':showPendingReviews, 'send-report':showSendReport, 'response-report':showResponseReport, 'engagement-report':showEngagementReport, 'transaction-report':showTransactionReport, configuracoes:showServicesManager, 'questions-manager':showQuestionsManager, 'quizzes-manager':showQuizzesManager, 'reminders-manager':showRemindersManager, 'whatsapp-automations':showWhatsappAutomations, 'quiz-schedule':() => showQuizSchedule(window.__activeQuizSchedule || null), workspace:showWorkspace, 'workspace-email':() => showWorkspaceTopic('email'), 'workspace-reminders':() => showWorkspaceTopic('reminders'), 'workspace-scale':() => showWorkspaceTopic('scale'), 'workspace-question-scale':() => showWorkspaceTopic('question-scale') }; const open = routes[hash] || showHome; open(); };
+      document.querySelectorAll('[data-workspace-card]').forEach(button => { button.addEventListener('click', () => { const card = button.dataset.workspaceCard; if (card === 'email') window.location.hash = 'workspace-email'; else if (card === 'reminders') window.location.hash = 'workspace-reminders'; else if (card === 'scale') window.location.hash = 'workspace-scale'; else if (card === 'question-scale') window.location.hash = 'workspace-question-scale'; }); });
       document.addEventListener('admin-sidebar-route', event => { void openAdminHashRoute(event.detail); });
       window.setTimeout(() => { const pending = window.__adminPendingHashRoute; if (pending) void openAdminHashRoute(pending); else requestSidebarHashRoute(); }, 0);
       document.querySelectorAll('[data-dashboard-action]').forEach(button => button.addEventListener('click', () => { if (button.dataset.dashboardAction === 'patients') { showDirectory(); return; } if (button.dataset.dashboardAction === 'finished') { showDirectory(); patientDirectoryController.setStatusFilter('finalizados'); return; } if (button.dataset.dashboardAction === 'pending') { showPendingReviews(); return; } if (button.dataset.dashboardAction === 'engagement') { showEngagementReport(); return; } if (button.dataset.dashboardAction === 'transactions') { showTransactionReport(); return; } const targets = { reports:'workspace' }; document.getElementById(targets[button.dataset.dashboardAction])?.scrollIntoView({ behavior:'smooth', block:'start' }); }));
@@ -2906,6 +3358,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       quizScheduleController = renderQuizSchedule(showToast);
       document.addEventListener('open-quiz-schedule', event => { window.__activeQuizSchedule = event.detail?.quiz || null; window.location.hash = 'quiz-schedule'; showQuizSchedule(window.__activeQuizSchedule); });
       remindersManagerController = renderRemindersManager(showToast);
+      remindersCustomizerController = renderRemindersCustomizer(showToast);
       emailTemplateController = renderEmailTemplateCustomizer(showToast);
       responseScaleController = renderResponseScaleCustomizer(showToast);
       document.addEventListener('response-scale-style-updated', () => { void responseReportController?.refreshScale?.(); void questionsManagerController?.refresh?.(); });
