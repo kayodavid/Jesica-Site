@@ -13,6 +13,8 @@ const EMAIL_QUIZ_CLICK_THEME = '__email_quiz_click__';
 const EMAIL_QUIZ_SCHEDULE_THEME = '__email_quiz_schedule__';
 const EMAIL_TEMPLATE_THEME = '__email_quiz_template__';
 const EMAIL_TEMPLATE_SOURCE = 'email-quiz-template://default';
+const REMINDER_TEMPLATE_THEME = '__patient_reminder_email_template__';
+const REMINDER_TEMPLATE_SOURCE = 'reminder-email://template';
 const PLATFORM_PREFERENCES_THEME = '__platform_preferences__';
 const PLATFORM_PREFERENCES_SOURCE = 'platform-preferences://default';
 const EMOJI_SCALE_DISPLAY_MODES = new Set(['emoji-only', 'emoji-text', 'text-only']);
@@ -75,6 +77,10 @@ function replaceReminderTokens(value, values) { return String(value || '').repla
 
 async function getEmailTemplate(sessionToken) {
   try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === EMAIL_TEMPLATE_THEME || recordSource(item) === EMAIL_TEMPLATE_SOURCE); if (!record) return defaultEmailTemplate(); let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return normalizeEmailTemplate(data); } catch (error) { console.error('Email template load error:', error.message); return defaultEmailTemplate(); }
+}
+
+async function getReminderTemplate(sessionToken) {
+  try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === REMINDER_TEMPLATE_THEME || recordSource(item) === REMINDER_TEMPLATE_SOURCE); if (!record) return defaultEmailTemplate(); let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return normalizeEmailTemplate(data); } catch (error) { console.error('Reminder template load error:', error.message); return defaultEmailTemplate(); }
 }
 
 async function getPlatformPreferences(sessionToken) {
@@ -1127,8 +1133,8 @@ async function cancelResponseDueReminders(invitation) {
 }
 
 function buildReminderQueueEntry
-({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '', scheduleKey = '' }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:scheduleKey || `email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
-function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) {
+({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '', scheduleKey = '', reminderTemplate = null }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:scheduleKey || `email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailTemplate:reminderTemplate || null, __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
+function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '', reminderTemplate = null }) {
   const jobs = [];
   const now = Date.now() + 11 * 60 * 1000;
   const responseReminder = reminders.find(item => item.id === 'response_due');
@@ -1138,7 +1144,7 @@ function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, 
       const reminderAt = reminderTriggerAt(expiresAt, trigger, normalHours);
       const timestamp = Date.parse(reminderAt);
       if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return;
-      jobs.push(buildReminderQueueEntry({ reminder:responseReminder, kind:'response_due', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt, referenceAt:expiresAt, contextId:invitation.id, parentScheduleKey }));
+      jobs.push(buildReminderQueueEntry({ reminder:responseReminder, kind:'response_due', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt, referenceAt:expiresAt, contextId:invitation.id, parentScheduleKey, reminderTemplate }));
     });
   }
   const serviceReminder = reminders.find(item => item.id === 'service_ending');
@@ -1151,7 +1157,7 @@ function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, 
         const reminderAt = reminderTriggerAt(serviceEndAt, trigger, normalHours);
         const timestamp = Date.parse(reminderAt);
         if (!Number.isFinite(timestamp) || timestamp <= now || timestamp > Date.now() + 180 * 86400000) return;
-        jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:service.id || `${service.startDate}:${service.duration}`, serviceName:service.serviceName, parentScheduleKey }));
+        jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, accessToken, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:service.id || `${service.startDate}:${service.duration}`, serviceName:service.serviceName, parentScheduleKey, reminderTemplate }));
       });
     });
   }
@@ -1160,8 +1166,9 @@ function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, 
 
 async function scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) {
   const reminders = await getReminderSettings(sessionToken);
+  const reminderTemplate = await getReminderTemplate(sessionToken);
   const records = await listStoredQuestionnaireRecords(sessionToken);
-  const jobs = buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey });
+  const jobs = buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey, reminderTemplate });
   if (!jobs.length) return [];
   await enqueueStoredScheduleBatch(sessionToken, jobs);
   return jobs;
@@ -1169,8 +1176,9 @@ async function scheduleReminderJobs({ sessionToken, invitation, quiz, accessToke
 
 async function scheduleReminderJobsBatch({ sessionToken, prepared }) {
   const reminders = await getReminderSettings(sessionToken);
+  const reminderTemplate = await getReminderTemplate(sessionToken);
   const records = await listStoredQuestionnaireRecords(sessionToken);
-  const jobs = (Array.isArray(prepared) ? prepared : []).flatMap(item => buildReminderJobs({ reminders, records, invitation:item.invitation, quiz:item.quiz, accessToken:item.accessToken, scheduledAt:item.scheduledAt || item.scheduledFor, expiresAt:item.expiresAt, parentScheduleKey:item.scheduleKey }));
+  const jobs = (Array.isArray(prepared) ? prepared : []).flatMap(item => buildReminderJobs({ reminders, records, invitation:item.invitation, quiz:item.quiz, accessToken:item.accessToken, scheduledAt:item.scheduledAt || item.scheduledFor, expiresAt:item.expiresAt, parentScheduleKey:item.scheduleKey, reminderTemplate }));
   if (!jobs.length) return [];
   await enqueueStoredScheduleBatch(sessionToken, jobs);
   return jobs;
@@ -1180,6 +1188,7 @@ async function scheduleServiceReminderJobs({ sessionToken, service }) {
   const normalized = normalizeServiceReminderInput(service);
   if (!normalized.id || !normalized.patientKey) throw new Error('O vínculo de serviço não possui uma identificação válida.');
   const reminders = await getReminderSettings(sessionToken);
+  const reminderTemplate = await getReminderTemplate(sessionToken);
   const serviceReminder = reminders.find(item => item.id === 'service_ending');
   const schedules = await listStoredSchedules(sessionToken);
   const serviceEndAt = serviceReminderEndAt(normalized);
@@ -1224,7 +1233,7 @@ async function scheduleServiceReminderJobs({ sessionToken, service }) {
     const activeExisting = sameBase.find(item => !SERVICE_REMINDER_TERMINAL_STATUSES.has(String(item?.status || '').toLowerCase()));
     const terminalExisting = sameBase.find(item => SERVICE_REMINDER_TERMINAL_STATUSES.has(String(item?.status || '').toLowerCase()));
     const stableKey = activeExisting?.scheduleKey || (terminalExisting ? `${baseKey}:rev-${Date.now()}` : baseKey);
-    jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:normalized.id, serviceName:normalized.serviceName, scheduleKey:stableKey }));
+    jobs.push(buildReminderQueueEntry({ reminder:serviceReminder, kind:'service_ending', trigger, triggerIndex, invitation, quiz, scheduledAt:reminderAt, expiresAt:reminderAt, referenceAt:serviceEndAt, contextId:normalized.id, serviceName:normalized.serviceName, scheduleKey:stableKey, reminderTemplate }));
   });
   const desiredKeys = new Set(jobs.map(item => item.scheduleKey));
   const cancelled = await cancelObsoleteServiceReminderSchedules(sessionToken, normalized.id, desiredKeys, schedules);
@@ -1234,8 +1243,8 @@ async function scheduleServiceReminderJobs({ sessionToken, service }) {
 }
 
 async function sendQuestionnaireEmail
-({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template, reminder = null }) {
-  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = formatReminderDeadline(expiresAt); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const reminderEmail = reminder && reminder.active !== false && reminder.email !== false ? buildReminderEmail({ reminder, template:normalizedTemplate, patientName, quizTitle:quiz.title, expiresAt, accessToken, kind:'new_quiz' }) : null; const htmlContent = reminderEmail?.htmlContent || buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); const subject = reminderEmail?.subject || replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }); return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject, htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:normalizedTemplate.brandName } });
+({ recipientEmail, patientName, quiz, accessToken, expiresAt, scheduledAt, template, reminder = null, reminderTemplate = null }) {
+  const questionnaireUrl = `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}`; const deadline = formatReminderDeadline(expiresAt); const firstName = String(patientName || '').trim().split(/\s+/)[0] || 'Olá'; const normalizedTemplate = normalizeEmailTemplate(template); const normalizedReminderTemplate = normalizeEmailTemplate(reminderTemplate || template); const reminderEmail = reminder && reminder.active !== false && reminder.email !== false ? buildReminderEmail({ reminder, template:normalizedReminderTemplate, patientName, quizTitle:quiz.title, expiresAt, accessToken, kind:'new_quiz' }) : null; const htmlContent = reminderEmail?.htmlContent || buildInvitationEmail({ template:normalizedTemplate, firstName, quizTitle:quiz.title, deadline, questionnaireUrl }); const subject = reminderEmail?.subject || replaceEmailTokens(normalizedTemplate.subject, { firstName, quizTitle:quiz.title, deadline, year:new Date().getFullYear() }); const brandName = reminderEmail ? normalizedReminderTemplate.brandName : normalizedTemplate.brandName; return sendBrevoEmail({ to:{ email:recipientEmail, name:patientName }, subject, htmlContent, scheduledAt, tags:['questionnaire','patient-questionnaire'], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:brandName || 'Jessica Melo Nutricionista' } });
 }
 
 async function sendResponseReceipt({ invitation, quiz, answers, summary }) {
@@ -1435,7 +1444,8 @@ async function createQuestionnaireSchedule({ sessionToken, patientKey, patientNa
   const accessToken = encryptInvitation(invitation);
   const snapshotReminders = await getReminderSettings(sessionToken);
   const snapshotTemplate = await getEmailTemplate(sessionToken);
-  const queueQuizSnapshot = { ...quiz, __emailTemplate:snapshotTemplate, __emailReminders:snapshotReminders, __emailNewQuizReminder:snapshotReminders.find(item => item.id === 'new_quiz') };
+  const snapshotReminderTemplate = await getReminderTemplate(sessionToken);
+  const queueQuizSnapshot = { ...quiz, __emailTemplate:snapshotTemplate, __emailReminderTemplate:snapshotReminderTemplate, __emailReminders:snapshotReminders, __emailNewQuizReminder:snapshotReminders.find(item => item.id === 'new_quiz') };
   const schedule = await enqueueStoredSchedule(sessionToken, {
     scheduleKey,
     patientKey,
@@ -1457,6 +1467,7 @@ async function createQuestionnaireSchedule({ sessionToken, patientKey, patientNa
 async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, patientName, recipientEmail, quizLinkId, quiz, entries }) {
   const snapshotReminders = await getReminderSettings(sessionToken);
   const snapshotTemplate = await getEmailTemplate(sessionToken);
+  const snapshotReminderTemplate = await getReminderTemplate(sessionToken);
   const prepared = entries.map((entry, index) => {
     const scheduledAt = validateQueueScheduledAt(entry.scheduledAt || localDateTimeToIso(entry.date, entry.time));
     const expiresAt = responseDeadline(scheduledAt, entry.responseAmount, entry.responseUnit);
@@ -1485,7 +1496,7 @@ async function createQuestionnaireScheduleBatch({ sessionToken, patientKey, pati
       quizLinkId:quizLinkId || '',
       quizId:quiz.id,
       quizTitle:quiz.title,
-      quizSnapshot:{ ...quiz, __emailTemplate:snapshotTemplate, __emailReminders:snapshotReminders, __emailNewQuizReminder:snapshotReminders.find(item => item.id === 'new_quiz') },
+      quizSnapshot:{ ...quiz, __emailTemplate:snapshotTemplate, __emailReminderTemplate:snapshotReminderTemplate, __emailReminders:snapshotReminders, __emailNewQuizReminder:snapshotReminders.find(item => item.id === 'new_quiz') },
       invitationToken:encryptInvitation(invitation),
       scheduledFor:scheduledAt,
       scheduledAt,
@@ -1504,12 +1515,13 @@ async function listSchedulesWithProviderStatus(sessionToken, patientKey = '', qu
   return Promise.all(schedules.map(async schedule => {
     if (!schedule.providerMessageId || !['agendado_na_brevo', 'scheduled', 'queued', 'pending'].includes(String(schedule.status).toLowerCase())) return schedule;
     try {
-      const provider = await getBrevoEmailStatus(schedule.providerMessageId);
-      const providerStatus = usableText(provider.status || provider.messageStatus || provider.event);
-      const mapped = scheduleStatusFromProvider(providerStatus, schedule.status);
-      return { ...schedule, providerStatus, status: schedule.storage === 'queue' ? ({ scheduled:'agendado_na_brevo', sent:'enviado', failed:'falha_de_agendamento', cancelled:'cancelado' }[mapped] || mapped) : mapped };
-    } catch (error) {
-      console.error('Brevo schedule status error:', error.message);
+      const live = await getBrevoScheduledEmail(schedule.providerMessageId);
+      if (!live || live.status === 'not_found') {
+        const cancelled = await markQueueCancelled(sessionToken, schedule.id, 'Cancelado diretamente no provedor de envio.');
+        return { ...schedule, status:cancelled.status || 'cancelado' };
+      }
+      return schedule;
+    } catch {
       return schedule;
     }
   })).then(items => items.sort((a, b) => new Date(a.scheduledFor || 0) - new Date(b.scheduledFor || 0)));
@@ -1568,7 +1580,13 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
       try {
         const snapshot = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
         const invitation = decryptInvitation(schedule.invitation_token);
-        const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
+        const isReminder = Boolean(snapshot?.__emailReminder);
+        const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object'
+          ? snapshot.__emailTemplate
+          : (isReminder ? await getReminderTemplate(invitation.sessionToken) : await getEmailTemplate(invitation.sessionToken));
+        const reminderTemplate = snapshot?.__emailReminderTemplate && typeof snapshot.__emailReminderTemplate === 'object'
+          ? snapshot.__emailReminderTemplate
+          : await getReminderTemplate(invitation.sessionToken);
         if (snapshot?.__emailReminder) {
           if (snapshot.__emailReminder.kind === 'response_due') {
             const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
@@ -1601,8 +1619,8 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
             }
           }
 
-          const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
-          const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, scheduledAt, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
+          const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template:reminderTemplate, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
+          const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, scheduledAt, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:reminderTemplate.brandName || template.brandName } });
           const reminderProviderMessageId = usableText(reminderResult.messageId);
           if (!reminderProviderMessageId) throw new Error('O provedor não retornou o identificador do lembrete.');
           const reminderStored = await markQueueProvider(secret, schedule.id, reminderProviderMessageId, 'scheduled');
@@ -1622,7 +1640,8 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
           expiresAt:Date.parse(expiresAt),
           scheduledAt,
           template,
-          reminder:newQuizReminder
+          reminder:newQuizReminder,
+          reminderTemplate
         });
         const providerMessageId = usableText(brevoResult.messageId);
         if (!providerMessageId) throw new Error('A Brevo não retornou o messageId do agendamento.');
@@ -1699,7 +1718,7 @@ export default async function handler(req, res) {
       const patient = await findRegisteredPatientForTest(sessionToken, patientKey, requestedEmail);
       if (!patient) return json(res, 400, { success:false, message:'O paciente selecionado não foi encontrado ou não possui o e-mail informado no cadastro.' });
       const reminder = body.reminder && typeof body.reminder === 'object' ? body.reminder : {};
-      const template = await getStoredEmailTemplate(sessionToken);
+      const template = await getReminderTemplate(sessionToken);
       const { subject, htmlContent } = buildReminderTestEmail({ reminder, template, patientName:patient.name });
       try {
         await sendBrevoEmail({ to:{ email:patient.email, name:patient.name }, subject, htmlContent, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName || 'Jessica Melo Nutricionista' }, tags:['reminder-test','questionnaire-test'] });
@@ -1737,9 +1756,10 @@ export default async function handler(req, res) {
       const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, quizLinkId, sendMode:requestedSendMode || 'unique', sentAt, expiresAt };
       const accessToken = encryptInvitation(invitation);
       const template = await getEmailTemplate(sessionToken);
+      const reminderTemplate = await getReminderTemplate(sessionToken);
       const reminders = await getReminderSettings(sessionToken);
       const newQuizReminder = reminders.find(item => item.id === 'new_quiz');
-      const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template, reminder:newQuizReminder });
+      const brevoResult = await sendQuestionnaireEmail({ recipientEmail, patientName, quiz, accessToken, expiresAt, template, reminder:newQuizReminder, reminderTemplate });
       await storeInvitation({ ...invitation, providerMessageId:brevoResult.messageId || '' }, quiz);
       try { await scheduleReminderJobs({ sessionToken, invitation, quiz, accessToken, scheduledAt:sentAt, expiresAt:new Date(expiresAt).toISOString() }); } catch (reminderError) { console.error('Immediate reminder scheduling error:', reminderError.message); }
       return json(res, 200, { success: true, message: 'Questionário enviado por e-mail.', expiresAt: new Date(expiresAt).toISOString(), providerMessageId: brevoResult.messageId || null });

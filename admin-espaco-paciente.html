@@ -2786,7 +2786,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
         const [resultReminders, resultTemplate] = await Promise.all([
           db.saveReminderSettings(reminders),
-          db.saveEmailTemplate({
+          db.saveReminderTemplate({
             ...emailTemplate,
             brandName: brandName || emailTemplate.brandName,
             logoUrl,
@@ -2820,7 +2820,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         setStatus('Carregando lembretes...');
         const [loadedReminders, loadedTemplate] = await Promise.all([
           db.getReminderSettings(),
-          db.getEmailTemplate()
+          db.getReminderTemplate()
         ]);
         reminders = loadedReminders;
         syncBrandFields(loadedTemplate);
