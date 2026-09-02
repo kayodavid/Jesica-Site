@@ -1060,6 +1060,58 @@ async function cancelObsoleteServiceReminderSchedules(sessionToken, serviceId, d
   return cancelled;
 }
 
+async function cancelResponseDueReminders(invitation) {
+  if (!invitation?.sessionToken) return 0;
+  let schedules = [];
+  try {
+    schedules = await listStoredSchedules(invitation.sessionToken, invitation.patientKey);
+  } catch (error) {
+    console.error('Failed to list schedules for reminder cancellation:', error.message);
+    return 0;
+  }
+  const invitationId = String(invitation.id || '').trim().toLowerCase();
+  const quizId = String(invitation.quizId || '').trim().toLowerCase();
+  const patientKey = String(invitation.patientKey || '').trim().toLowerCase();
+  const recipientEmail = String(invitation.recipientEmail || '').trim().toLowerCase();
+
+  const candidates = (Array.isArray(schedules) ? schedules : []).filter(schedule => {
+    const status = String(schedule?.status || '').toLowerCase();
+    if (SERVICE_REMINDER_TERMINAL_STATUSES.has(status)) return false;
+    const scheduleKey = String(schedule?.scheduleKey || '').toLowerCase();
+    const snapshot = schedule?.quizSnapshot && typeof schedule.quizSnapshot === 'object' ? schedule.quizSnapshot : {};
+    const emailReminder = snapshot.__emailReminder || {};
+
+    const isResponseDue = emailReminder.kind === 'response_due' || scheduleKey.startsWith('email-reminder:response_due:');
+    if (!isResponseDue) return false;
+
+    const matchesInvitation = invitationId && (
+      scheduleKey.includes(`:${invitationId}:`) ||
+      String(emailReminder.contextId || '').toLowerCase() === invitationId ||
+      String(emailReminder.originalInvitationId || '').toLowerCase() === invitationId
+    );
+    const matchesPatientQuiz = (
+      (String(schedule.patientKey || '').toLowerCase() === patientKey || String(schedule.recipientEmail || '').toLowerCase() === recipientEmail) &&
+      (String(schedule.quizId || '').toLowerCase() === quizId || String(emailReminder.quizId || '').toLowerCase() === quizId)
+    );
+
+    return matchesInvitation || matchesPatientQuiz;
+  });
+
+  let cancelled = 0;
+  for (const schedule of candidates) {
+    if (schedule.providerMessageId) {
+      try { await cancelBrevoEmail(schedule.providerMessageId); } catch (err) { console.error('Brevo cancel error for reminder:', err.message); }
+    }
+    try {
+      await cancelStoredSchedule(invitation.sessionToken, schedule);
+      cancelled += 1;
+    } catch (err) {
+      console.error('Database schedule cancel error for reminder:', err.message);
+    }
+  }
+  return cancelled;
+}
+
 function buildReminderQueueEntry
 ({ reminder, kind, trigger, triggerIndex, invitation, quiz, accessToken = '', scheduledAt, expiresAt, referenceAt = '', contextId, serviceName = '', parentScheduleKey = '', scheduleKey = '' }) { const normalizedQuiz = quiz && typeof quiz === 'object' ? quiz : {}; const jobId = `${kind}:${reminder.id}:${contextId}:${triggerIndex}:${scheduledAt}`; const queueExpiresTimestamp = Math.max(Date.parse(expiresAt || '') || 0, Date.parse(scheduledAt) + 86400000); const reminderInvitation = encryptInvitation({ version:2, id:`${invitation.id}:reminder:${jobId}`, sessionToken:invitation.sessionToken, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, expiresAt:queueExpiresTimestamp, reminder:true }); return { scheduleKey:scheduleKey || `email-reminder:${jobId}`, patientKey:invitation.patientKey, patientName:invitation.patientName, recipientEmail:invitation.recipientEmail, quizLinkId:invitation.quizLinkId || '', quizId:normalizedQuiz.id || `reminder-${contextId}`, quizTitle:normalizedQuiz.title || reminder.title, quizSnapshot:{ id:normalizedQuiz.id || `reminder-${contextId}`, title:normalizedQuiz.title || reminder.title, questionSnapshots:[], __emailReminder:{ version:1, kind, reminder, triggerIndex, contextId, serviceName, parentScheduleKey, referenceAt:referenceAt || expiresAt, questionnaireAccessToken:accessToken || '', quizId:normalizedQuiz.id || '', quizTitle:normalizedQuiz.title || '' } }, invitationToken:reminderInvitation, scheduledFor:scheduledAt, expiresAt:new Date(queueExpiresTimestamp).toISOString() }; }
 function buildReminderJobs({ reminders, records, invitation, quiz, accessToken, scheduledAt, expiresAt, parentScheduleKey = '' }) {
@@ -1497,6 +1549,37 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
         const invitation = decryptInvitation(schedule.invitation_token);
         const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
         if (snapshot?.__emailReminder) {
+          if (snapshot.__emailReminder.kind === 'response_due') {
+            const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+            const contextId = String(snapshot.__emailReminder.contextId || snapshot.__emailReminder.originalInvitationId || '').trim().toLowerCase();
+            const patientKey = String(schedule.patient_key || invitation.patientKey || '').trim().toLowerCase();
+            const recipientEmail = String(schedule.recipient_email || invitation.recipientEmail || '').trim().toLowerCase();
+            const quizId = String(schedule.quiz_id || snapshot.__emailReminder.quizId || '').trim().toLowerCase();
+
+            const isAlreadyAnswered = records.some(record => {
+              if (!isEmailQuizResponseRecord(record)) return false;
+              const source = recordSource(record).toLowerCase();
+              if (contextId && source === `email-quiz-response://${contextId}`) return true;
+              const data = parseStoredRecord(record);
+              if (contextId && String(data.invitationId || '').toLowerCase() === contextId) return true;
+              const resPatientKey = String(data.patientKey || '').toLowerCase();
+              const resEmail = String(data.recipientEmail || '').toLowerCase();
+              const resQuizId = String(data.quizId || '').toLowerCase();
+              const matchPatient = (patientKey && resPatientKey === patientKey) || (recipientEmail && resEmail === recipientEmail);
+              return matchPatient && quizId && resQuizId === quizId;
+            });
+
+            if (isAlreadyAnswered) {
+              console.log(`[Queue Worker] Lembrete de prazo ignorado: questionário já respondido para ${schedule.patient_name || schedule.recipient_email}`);
+              await cancelStoredSchedule(invitation.sessionToken, normalizeQueueSchedule(schedule));
+              if (schedule.provider_message_id) {
+                try { await cancelBrevoEmail(schedule.provider_message_id); } catch {}
+              }
+              processed.push({ id:schedule.id, status:'cancelled', reason:'already_answered', kind:'response_due' });
+              continue;
+            }
+          }
+
           const reminderEmail = buildReminderEmail({ reminder:snapshot.__emailReminder.reminder, template, patientName:schedule.patient_name, quizTitle:snapshot.__emailReminder.quizTitle || schedule.quiz_title, expiresAt:snapshot.__emailReminder.referenceAt || Date.parse(expiresAt), accessToken:snapshot.__emailReminder.questionnaireAccessToken || '', kind:snapshot.__emailReminder.kind });
           const reminderResult = await sendBrevoEmail({ to:{ email:schedule.recipient_email, name:schedule.patient_name }, subject:reminderEmail.subject, htmlContent:reminderEmail.htmlContent, scheduledAt, tags:['questionnaire-reminder', snapshot.__emailReminder.kind], replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName } });
           const reminderProviderMessageId = usableText(reminderResult.messageId);
@@ -1822,6 +1905,7 @@ export default async function handler(req, res) {
       const responseSummary = calculateResponseSummary(quiz, normalizedAnswers, body.responseSummary || {});
       const saved = await storeResponse(invitation, quiz, normalizedAnswers, responseSummary);
       if (!saved) return json(res, 200, { success: false, reason: 'already_answered' });
+      try { await cancelResponseDueReminders(invitation); } catch (cancelError) { console.error('Questionnaire response cancel reminders error:', cancelError.message); }
       try { await sendResponseReceipt({ invitation, quiz, answers:normalizedAnswers, summary: responseSummary }); } catch (error) { console.error('Questionnaire response receipt error:', error.message); }
       return json(res, 200, { success: true, quiz_title: quiz.title, summary: responseSummary });
     }
