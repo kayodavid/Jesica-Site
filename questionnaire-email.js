@@ -40,8 +40,10 @@ function validEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
 }
 
+const SITE_DEFAULT_LOGO_URL = 'https://jessicamelonutri.com.br/assets/images/logo_sem_fundo.png';
+
 function defaultEmailTemplate() {
-  return { version:1, id:'default', layout:'classic', logoUrl:'', logoDataUrl:'', brandName:'Jessica Melo Nutricionista', showBrandName:true, preheader:'Novo questionário disponível', title:'Novo questionário disponível', greeting:'Olá, {primeiro_nome}!', intro:'A Dra. Jessica preparou o questionário {questionario} para acompanhar o seu cuidado nutricional.', body:'Reserve alguns minutos para responder. Suas respostas serão enviadas de forma segura para o acompanhamento profissional.', buttonText:'Responder questionário', deadlineText:'Este convite é individual e fica disponível até {prazo}.', footerText:'© {ano} Jessica Melo Nutricionista. Todos os direitos reservados.', subject:'Questionário disponível — {questionario}', primaryColor:'#a88b36', backgroundColor:'#faf8f3', textColor:'#3d3226' };
+  return { version:1, id:'default', layout:'classic', logoUrl:SITE_DEFAULT_LOGO_URL, logoDataUrl:'', brandName:'Jessica Melo Nutricionista', showBrandName:true, preheader:'Novo questionário disponível', title:'Novo questionário disponível', greeting:'Olá, {primeiro_nome}!', intro:'A Dra. Jessica preparou o questionário {questionario} para acompanhar o seu cuidado nutricional.', body:'Reserve alguns minutos para responder. Suas respostas serão enviadas de forma segura para o acompanhamento profissional.', buttonText:'Responder questionário', deadlineText:'Este convite é individual e fica disponível até {prazo}.', footerText:'© {ano} Jessica Melo Nutricionista. Todos os direitos reservados.', subject:'Questionário disponível — {questionario}', primaryColor:'#a88b36', backgroundColor:'#faf8f3', textColor:'#3d3226' };
 }
 
 function normalizeEmailTemplate(value) {
@@ -53,9 +55,15 @@ function normalizeEmailTemplate(value) {
 }
 
 function emailAssetUrl(value) {
-  const raw = String(value || '').trim(); if (!raw) return '';
-  if (/^data:image\/(?:png|jpe?g|webp|gif|svg\+xml);base64,[a-z0-9+/=\s]+$/i.test(raw) && raw.length <= 700000) return raw;
-  try { const parsed = new URL(raw, 'https://jessicamelonutri.com.br'); if (!['http:','https:'].includes(parsed.protocol)) return ''; return parsed.href; } catch { return ''; }
+  const raw = String(value || '').trim();
+  if (!raw || raw.startsWith('data:')) return SITE_DEFAULT_LOGO_URL;
+  try {
+    const parsed = new URL(raw, 'https://jessicamelonutri.com.br');
+    if (!['http:', 'https:'].includes(parsed.protocol)) return SITE_DEFAULT_LOGO_URL;
+    return parsed.href;
+  } catch {
+    return SITE_DEFAULT_LOGO_URL;
+  }
 }
 
 function replaceEmailTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{ano\}/g, values.year); }
