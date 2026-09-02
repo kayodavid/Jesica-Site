@@ -545,6 +545,337 @@
     .reminder-switch span { width:.92rem; height:.92rem; margin:.14rem; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.15); transition:transform .16s ease; }
     .reminder-switch:has(input:checked) { background:#2f71e5; }
     .reminder-switch:has(input:checked) span { transform:translateX(.9rem); }
+    html[data-patient-theme='black'] .reminders-manager,
+    body[data-patient-theme='black'] .reminders-manager {
+      background: #20232b !important;
+      border-color: #434a59 !important;
+      color: #f7f8fb !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager .text-dark,
+    body[data-patient-theme='black'] .reminders-manager .text-dark {
+      color: #f7f8fb !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager .text-gray-500,
+    html[data-patient-theme='black'] .reminders-manager .text-gray-400,
+    body[data-patient-theme='black'] .reminders-manager .text-gray-500,
+    body[data-patient-theme='black'] .reminders-manager .text-gray-400 {
+      color: #cbd2df !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager .reminder-title-button,
+    body[data-patient-theme='black'] .reminders-manager .reminder-title-button {
+      color: #f7f8fb !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager .reminder-title-button:hover,
+    body[data-patient-theme='black'] .reminders-manager .reminder-title-button:hover {
+      color: #f0d37a !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager .reminder-channel,
+    body[data-patient-theme='black'] .reminders-manager .reminder-channel {
+      background: #2c303c !important;
+      color: #d5d9e2 !important;
+      border: 1px solid #484f60 !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager .reminder-channel.is-off,
+    body[data-patient-theme='black'] .reminders-manager .reminder-channel.is-off {
+      color: #858e9d !important;
+      opacity: .6 !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager button.question-action.reminder-settings,
+    body[data-patient-theme='black'] .reminders-manager button.question-action.reminder-settings {
+      background-color: #17181d !important;
+      border-color: #596171 !important;
+      color: #e3e6ec !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager button.question-action.reminder-settings:hover,
+    body[data-patient-theme='black'] .reminders-manager button.question-action.reminder-settings:hover {
+      background-color: #242831 !important;
+      border-color: #d4b76a !important;
+      color: #ffe5a0 !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager table thead th,
+    body[data-patient-theme='black'] .reminders-manager table thead th {
+      background: #2a2e3a !important;
+      color: #f0db9b !important;
+      border-color: #434a59 !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager table td,
+    body[data-patient-theme='black'] .reminders-manager table td {
+      border-color: rgba(255,255,255,.08) !important;
+      color: #cbd2df !important;
+    }
+    html[data-patient-theme='black'] .reminders-manager table tbody tr:hover,
+    body[data-patient-theme='black'] .reminders-manager table tbody tr:hover {
+      background: rgba(212,183,106,.09) !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-overlay,
+    body[data-patient-theme='black'] .reminder-modal-overlay {
+      background: rgba(10, 11, 15, 0.78) !important;
+      backdrop-filter: blur(4px);
+    }
+    html[data-patient-theme='black'] .reminder-modal,
+    body[data-patient-theme='black'] .reminder-modal {
+      background: #20232b !important;
+      border: 1px solid #4a5264 !important;
+      box-shadow: 0 28px 80px rgba(0,0,0,.65) !important;
+      color: #f7f8fb !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-header,
+    body[data-patient-theme='black'] .reminder-modal-header {
+      background: #292d37 !important;
+      border-bottom: 1px solid #434a59 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-icon,
+    body[data-patient-theme='black'] .reminder-modal-icon {
+      background: rgba(212,183,106,.15) !important;
+      border: 1px solid rgba(212,183,106,.32) !important;
+      color: #f0d37a !important;
+      box-shadow: 0 6px 16px rgba(0,0,0,.25) !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .text-dark,
+    body[data-patient-theme='black'] .reminder-modal .text-dark {
+      color: #f7f8fb !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .text-gray-500,
+    html[data-patient-theme='black'] .reminder-modal .text-gray-400,
+    html[data-patient-theme='black'] .reminder-modal .text-gray-600,
+    body[data-patient-theme='black'] .reminder-modal .text-gray-500,
+    body[data-patient-theme='black'] .reminder-modal .text-gray-400,
+    body[data-patient-theme='black'] .reminder-modal .text-gray-600 {
+      color: #cbd2df !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .text-primary,
+    body[data-patient-theme='black'] .reminder-modal .text-primary {
+      color: #f0d37a !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal #reminder-modal-close,
+    body[data-patient-theme='black'] .reminder-modal #reminder-modal-close {
+      background: #303541 !important;
+      color: #f7f8fb !important;
+      border-color: #555e72 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal #reminder-modal-close:hover,
+    body[data-patient-theme='black'] .reminder-modal #reminder-modal-close:hover {
+      background: #3a3f4c !important;
+      border-color: #d4b76a !important;
+      color: #ffe5a0 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .reminder-status,
+    html[data-patient-theme='black'] .reminder-status,
+    body[data-patient-theme='black'] .reminder-modal .reminder-status,
+    body[data-patient-theme='black'] .reminder-status {
+      background: #173e2a !important;
+      color: #86efac !important;
+      border: 1px solid #23543e !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .reminder-status.is-off,
+    html[data-patient-theme='black'] .reminder-status.is-off,
+    body[data-patient-theme='black'] .reminder-modal .reminder-status.is-off,
+    body[data-patient-theme='black'] .reminder-status.is-off {
+      background: #2e323d !important;
+      color: #a6adb9 !important;
+      border: 1px solid #454c5c !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-body,
+    body[data-patient-theme='black'] .reminder-modal-body {
+      background: #1a1c23 !important;
+    }
+    html[data-patient-theme='black'] .reminder-section-number,
+    body[data-patient-theme='black'] .reminder-section-number {
+      background: #353a47 !important;
+      color: #f0d37a !important;
+      border: 1px solid #4d5567 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .send-filter-field,
+    html[data-patient-theme='black'] .reminder-modal input,
+    html[data-patient-theme='black'] .reminder-modal textarea,
+    html[data-patient-theme='black'] .reminder-modal select,
+    body[data-patient-theme='black'] .reminder-modal .send-filter-field,
+    body[data-patient-theme='black'] .reminder-modal input,
+    body[data-patient-theme='black'] .reminder-modal textarea,
+    body[data-patient-theme='black'] .reminder-modal select {
+      background: #252833 !important;
+      color: #f8f9fc !important;
+      border-color: #4d5567 !important;
+      color-scheme: dark !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .send-filter-field:focus,
+    html[data-patient-theme='black'] .reminder-modal input:focus,
+    html[data-patient-theme='black'] .reminder-modal textarea:focus,
+    html[data-patient-theme='black'] .reminder-modal select:focus,
+    body[data-patient-theme='black'] .reminder-modal .send-filter-field:focus,
+    body[data-patient-theme='black'] .reminder-modal input:focus,
+    body[data-patient-theme='black'] .reminder-modal textarea:focus,
+    body[data-patient-theme='black'] .reminder-modal select:focus {
+      border-color: #f0d37a !important;
+      box-shadow: 0 0 0 3px rgba(240,211,122,.18) !important;
+      outline: none !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .send-filter-field::placeholder,
+    html[data-patient-theme='black'] .reminder-modal input::placeholder,
+    html[data-patient-theme='black'] .reminder-modal textarea::placeholder,
+    body[data-patient-theme='black'] .reminder-modal .send-filter-field::placeholder,
+    body[data-patient-theme='black'] .reminder-modal input::placeholder,
+    body[data-patient-theme='black'] .reminder-modal textarea::placeholder {
+      color: #8b94a5 !important;
+      opacity: 1 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal select option,
+    body[data-patient-theme='black'] .reminder-modal select option {
+      background: #252833 !important;
+      color: #f8f9fc !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .reminder-switch,
+    body[data-patient-theme='black'] .reminder-modal .reminder-switch {
+      background: #4b5263 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .reminder-switch:has(input:checked),
+    body[data-patient-theme='black'] .reminder-modal .reminder-switch:has(input:checked) {
+      background: #2563eb !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal label:has(> #reminder-active),
+    html[data-patient-theme='black'] .reminder-modal label:has(.reminder-switch),
+    body[data-patient-theme='black'] .reminder-modal label:has(> #reminder-active),
+    body[data-patient-theme='black'] .reminder-modal label:has(.reminder-switch) {
+      background: #252833 !important;
+      border-color: #444b5b !important;
+    }
+    html[data-patient-theme='black'] .reminder-suggestion,
+    body[data-patient-theme='black'] .reminder-suggestion {
+      background: linear-gradient(135deg, #2b2e3a 0%, #242732 100%) !important;
+      border: 1px solid rgba(212,183,106,.32) !important;
+      box-shadow: 0 4px 14px rgba(0,0,0,.25) !important;
+    }
+    html[data-patient-theme='black'] .reminder-suggestion-badge,
+    body[data-patient-theme='black'] .reminder-suggestion-badge {
+      background: rgba(212,183,106,.2) !important;
+      color: #f5dc93 !important;
+      border: 1px solid rgba(212,183,106,.35) !important;
+    }
+    html[data-patient-theme='black'] #reminder-use-suggested,
+    body[data-patient-theme='black'] #reminder-use-suggested {
+      background: #343846 !important;
+      border-color: #5c6477 !important;
+      color: #f0d37a !important;
+    }
+    html[data-patient-theme='black'] #reminder-use-suggested:hover,
+    body[data-patient-theme='black'] #reminder-use-suggested:hover {
+      background: rgba(212,183,106,.22) !important;
+      border-color: #d4b76a !important;
+      color: #fff !important;
+    }
+    html[data-patient-theme='black'] .reminder-mode-option,
+    body[data-patient-theme='black'] .reminder-mode-option {
+      background: #242732 !important;
+      border: 1px solid #434a59 !important;
+    }
+    html[data-patient-theme='black'] .reminder-mode-option:hover,
+    body[data-patient-theme='black'] .reminder-mode-option:hover {
+      background: #2a2e3b !important;
+      border-color: #5d667a !important;
+    }
+    html[data-patient-theme='black'] .reminder-mode-option:has(input:checked),
+    body[data-patient-theme='black'] .reminder-mode-option:has(input:checked) {
+      background: #332f22 !important;
+      border-color: #d4b76a !important;
+      box-shadow: 0 0 0 2px rgba(212,183,106,.22) !important;
+    }
+    html[data-patient-theme='black'] #reminder-routine-custom-panel,
+    body[data-patient-theme='black'] #reminder-routine-custom-panel {
+      background: #222530 !important;
+      border: 1px solid #434a59 !important;
+    }
+    html[data-patient-theme='black'] #reminder-add-trigger,
+    body[data-patient-theme='black'] #reminder-add-trigger {
+      background: #2e323e !important;
+      border-color: #525b6c !important;
+      color: #f0d37a !important;
+    }
+    html[data-patient-theme='black'] #reminder-add-trigger:hover,
+    body[data-patient-theme='black'] #reminder-add-trigger:hover {
+      background: #383d4c !important;
+      border-color: #d4b76a !important;
+      color: #fff !important;
+    }
+    html[data-patient-theme='black'] .reminder-trigger-row,
+    body[data-patient-theme='black'] .reminder-trigger-row {
+      background: #282b36 !important;
+      border: 1px solid #434a59 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15) !important;
+    }
+    html[data-patient-theme='black'] .reminder-trigger-index,
+    body[data-patient-theme='black'] .reminder-trigger-index {
+      background: #383d4c !important;
+      color: #f0d37a !important;
+      border: 1px solid #525a6b !important;
+    }
+    html[data-patient-theme='black'] .reminder-trigger-fields input,
+    html[data-patient-theme='black'] .reminder-trigger-fields select,
+    body[data-patient-theme='black'] .reminder-trigger-fields input,
+    body[data-patient-theme='black'] .reminder-trigger-fields select {
+      background: #1e212b !important;
+      color: #f8f9fc !important;
+      border-color: #4d5567 !important;
+    }
+    html[data-patient-theme='black'] .reminder-trigger-row button[data-remove-trigger],
+    body[data-patient-theme='black'] .reminder-trigger-row button[data-remove-trigger] {
+      color: #fca5a5 !important;
+    }
+    html[data-patient-theme='black'] .reminder-trigger-row button[data-remove-trigger]:hover,
+    body[data-patient-theme='black'] .reminder-trigger-row button[data-remove-trigger]:hover {
+      background: rgba(239,68,68,.18) !important;
+      color: #ef4444 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .cursor-pointer:has(#reminder-normal-hours),
+    body[data-patient-theme='black'] .reminder-modal .cursor-pointer:has(#reminder-normal-hours) {
+      background: #242732 !important;
+      border-color: #434a59 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal .cursor-pointer:has(#reminder-normal-hours):hover,
+    body[data-patient-theme='black'] .reminder-modal .cursor-pointer:has(#reminder-normal-hours):hover {
+      border-color: #5d667a !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal div:has(> div > #reminder-modal-to-workspace),
+    body[data-patient-theme='black'] .reminder-modal div:has(> div > #reminder-modal-to-workspace) {
+      background: rgba(212,183,106,.1) !important;
+      border-color: rgba(212,183,106,.26) !important;
+    }
+    html[data-patient-theme='black'] #reminder-modal-to-workspace,
+    body[data-patient-theme='black'] #reminder-modal-to-workspace {
+      background: #d4b76a !important;
+      color: #1a1c23 !important;
+      font-weight: 800 !important;
+    }
+    html[data-patient-theme='black'] #reminder-modal-to-workspace:hover,
+    body[data-patient-theme='black'] #reminder-modal-to-workspace:hover {
+      background: #e4c874 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-footer,
+    body[data-patient-theme='black'] .reminder-modal-footer {
+      background: #292d37 !important;
+      border-top: 1px solid #434a59 !important;
+    }
+    html[data-patient-theme='black'] #reminder-form-cancel,
+    body[data-patient-theme='black'] #reminder-form-cancel {
+      border-color: #525b6c !important;
+      background: transparent !important;
+      color: #cbd2df !important;
+    }
+    html[data-patient-theme='black'] #reminder-form-cancel:hover,
+    body[data-patient-theme='black'] #reminder-form-cancel:hover {
+      background: #343846 !important;
+      color: #fff !important;
+      border-color: #d4b76a !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-footer button[type='submit'],
+    body[data-patient-theme='black'] .reminder-modal-footer button[type='submit'] {
+      background: #d4b76a !important;
+      color: #1a1c23 !important;
+      font-weight: 900 !important;
+    }
+    html[data-patient-theme='black'] .reminder-modal-footer button[type='submit']:hover,
+    body[data-patient-theme='black'] .reminder-modal-footer button[type='submit']:hover {
+      background: #e4c874 !important;
+    }
     .patient-registration-overlay { position:fixed; inset:0; z-index:79; background:rgba(23,24,29,.32); opacity:0; pointer-events:none; transition:opacity .2s ease; }
     .patient-registration-overlay.is-open { opacity:1; pointer-events:auto; }
     .patient-registration-modal { position:fixed; top:0; right:0; display:flex; width:min(28rem,100vw); height:100vh; flex-direction:column; overflow:hidden; border-radius:0; background:#fff; box-shadow:-18px 0 42px rgba(0,0,0,.16); transform:translateX(105%); transition:transform .24s cubic-bezier(.23,1,.32,1); }
