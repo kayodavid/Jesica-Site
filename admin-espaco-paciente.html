@@ -1249,8 +1249,156 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
       </section>
 
       <section id="workspace" class="hidden workspace-page-layout mt-5">
-      <div class="workspace-section-heading"><div><p class="text-[10px] font-bold uppercase tracking-[.18em] text-primary">Personalização da plataforma</p><h2>Organize a experiência do paciente</h2><p class="workspace-section-description">Configure a comunicação e a forma como as avaliações serão apresentadas. Abra cada tópico para editar seus detalhes.</p></div></div>
-      <section id="email-invitation-customizer" class="email-customizer workspace-module-topic workspace-overview-topic panel-card rounded-3xl p-4 sm:p-5 shadow-sm">
+      <div class="workspace-section-heading"><div><p class="text-[10px] font-bold uppercase tracking-[.18em] text-primary">Personalização da plataforma</p><h2>Organize a experiência do paciente</h2><p class="workspace-section-description">Configure a comunicação, a forma como as avaliações serão apresentadas e a personalização de perguntas. Selecione uma categoria abaixo para editar.</p></div></div>
+
+      <div id="workspace-cards" class="mt-5">
+        <div class="mb-6">
+          <h2 class="text-lg font-bold text-dark">Opções de personalização</h2>
+          <p class="mt-1 text-xs text-gray-500">Selecione um card abaixo para acessar e editar as configurações correspondentes.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <button type="button" data-workspace-card="email" class="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[.02] hover:shadow-md">
+            <div>
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-xl text-primary transition-transform group-hover:scale-110">
+                <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="m4 7 8 6 8-6"/></svg>
+              </div>
+              <h3 class="mt-4 text-base font-bold text-dark group-hover:text-primary">Personalizar email de questionário</h3>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">Crie uma experiência com a sua identidade para os emails que informam sobre novos formulários.</p>
+            </div>
+            <div class="mt-6 flex items-center gap-1 text-xs font-bold text-primary">
+              <span>Acessar personalização</span>
+              <span class="transition-transform group-hover:translate-x-1">→</span>
+            </div>
+          </button>
+
+          <button type="button" data-workspace-card="scale" class="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[.02] hover:shadow-md">
+            <div>
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-xl text-primary transition-transform group-hover:scale-110">
+                <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
+              </div>
+              <h3 class="mt-4 text-base font-bold text-dark group-hover:text-primary">Formato da escala de avaliação (Respostas)</h3>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">Defina como a avaliação de cada resposta será apresentada no histórico, nos detalhes e nos relatórios.</p>
+            </div>
+            <div class="mt-6 flex items-center gap-1 text-xs font-bold text-primary">
+              <span>Acessar formato</span>
+              <span class="transition-transform group-hover:translate-x-1">→</span>
+            </div>
+          </button>
+
+          <button type="button" data-workspace-card="question-scale" class="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[.02] hover:shadow-md">
+            <div>
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-xl text-primary transition-transform group-hover:scale-110">
+                <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <h3 class="mt-4 text-base font-bold text-dark group-hover:text-primary">Personalização das perguntas do questionário: ESCALA DE AVALIAÇÃO</h3>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">Configure as preferências e os padrões para perguntas categorizadas em Escala de Avaliação.</p>
+            </div>
+            <div class="mt-6 flex items-center gap-1 text-xs font-bold text-primary">
+              <span>Acessar personalização</span>
+              <span class="transition-transform group-hover:translate-x-1">→</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <section id="email-invitation-customizer" class="email-customizer workspace-module-topic workspace-overview-topic panel-card rounded-3xl p-4 sm:p-5 shadow-sm hidden">
+        <header class="workspace-module-topic-header flex flex-col gap-3 border-b border-primary/10 pb-3 lg:flex-row lg:items-start lg:justify-between">
+          <div class="workspace-module-topic-lead"><span class="workspace-module-topic-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="m4 7 8 6 8-6"/></svg></span><div class="workspace-module-topic-copy"><p class="text-xs font-bold uppercase tracking-[.18em] text-primary">Comunicação com pacientes</p><h2 class="mt-1"><button type="button" class="workspace-topic-card-title" data-workspace-topic-button="email-invitation-customizer" aria-label="Abrir Personalizar email">Personalizar email de questionário</button></h2><p class="mt-1 max-w-3xl text-sm text-gray-500">Crie uma experiência com a sua identidade para os emails que informam sobre novos formulários. A alteração vale para os envios imediatos e agendados.</p></div></div><div class="workspace-topic-actions" aria-label="Ações da página"><button type="button" class="workspace-back-button" data-workspace-back="workspace-email" title="Voltar para Personalizar Plataforma" aria-label="Voltar para Personalizar Plataforma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 12H5m6-6-6 6 6 6"/></svg><span>Voltar</span></button><button type="button" class="workspace-info-button" data-workspace-info="email" title="Como funciona esta página" aria-label="Como funciona a personalização de e-mail">i</button></div>
+        </header>
+        <div class="mt-5 grid gap-6 2xl:grid-cols-[minmax(0,1.04fr)_minmax(24rem,.96fr)]">
+          <form id="email-template-form" class="space-y-5" novalidate>
+            <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Identidade visual</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Substitua o nome exibido no topo pela sua logomarca. Para maior compatibilidade com caixas de entrada, você pode informar uma URL pública da imagem.</p></div><span class="email-section-number">01</span></div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="text-xs font-semibold text-dark sm:col-span-2">Nome da marca<input id="email-template-brand-name" maxlength="100" class="email-template-field mt-1.5" type="text" placeholder="Jessica Melo Nutricionista"></label><label class="text-xs font-semibold text-dark sm:col-span-2">URL pública da logomarca<input id="email-template-logo-url" maxlength="1000" class="email-template-field mt-1.5" type="url" placeholder="https://.../minha-logomarca.png"><span class="mt-1 block text-[11px] font-normal text-gray-500">PNG, JPG ou WebP com URL acessível publicamente.</span><button id="email-template-use-site-logo" type="button" class="mt-2 text-xs font-bold text-primary underline underline-offset-2 hover:text-dark">Usar logomarca do site</button></label></div>
+              <div class="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-primary/12 bg-primary/[.035] p-3"><label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs font-bold text-primary hover:bg-primary/5"><input id="email-template-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="sr-only">Escolher arquivo</label><button id="email-template-remove-logo" type="button" class="rounded-xl border border-primary/20 px-3 py-2 text-xs font-bold text-gray-600 hover:bg-primary/5">Remover logomarca</button><span id="email-template-logo-file-name" class="text-xs text-gray-500">Nenhum arquivo selecionado</span><img id="email-template-logo-preview" class="email-template-logo-preview hidden" alt="Prévia da logomarca selecionada"></div><label class="mt-3 flex items-start gap-2 rounded-2xl border border-primary/12 bg-primary/[.025] p-3 text-xs font-semibold text-dark"><input id="email-template-show-brand-name" type="checkbox" class="mt-0.5 h-4 w-4 accent-primary" checked><span><span class="block">Exibir nome da marca junto à logomarca</span><span class="mt-1 block text-[11px] font-normal leading-relaxed text-gray-500">Desmarque para mostrar somente a logomarca no topo do e-mail. Essa opção fica disponível quando houver uma logomarca configurada.</span></span></label>
+            </section>
+            <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Texto do Email</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Edite assunto, chamadas e mensagens. Os campos entre chaves são preenchidos automaticamente.</p></div><span class="email-section-number">02</span></div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="text-xs font-semibold text-dark sm:col-span-2">Assunto do email<input id="email-template-subject" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Título principal<input id="email-template-title" maxlength="160" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Saudação<input id="email-template-greeting" maxlength="180" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de apresentação<textarea id="email-template-intro" maxlength="500" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark sm:col-span-2">Mensagem de orientação<textarea id="email-template-body" maxlength="700" rows="3" class="email-template-field mt-1.5 resize-y"></textarea></label><label class="text-xs font-semibold text-dark">Texto do botão<input id="email-template-button" maxlength="80" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark">Aviso de prazo<input id="email-template-deadline" maxlength="260" class="email-template-field mt-1.5" type="text"></label><label class="text-xs font-semibold text-dark sm:col-span-2">Rodapé<input id="email-template-footer" maxlength="260" class="email-template-field mt-1.5" type="text"></label></div>
+              <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/[.035] p-4">
+                <div class="flex items-start gap-3"><span class="inline-flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-primary/10 text-sm text-primary" aria-hidden="true">✦</span><div><h4 class="text-xs font-bold text-dark">Inserir informação automática</h4><p class="mt-1 text-[11px] leading-relaxed text-gray-600">Escolha onde a informação deve aparecer e clique em uma opção abaixo. O sistema insere o conteúdo automaticamente no ponto do cursor.</p></div></div>
+                <div class="mt-3 grid gap-3">
+                  <label class="text-[11px] font-bold text-dark">Onde inserir<select id="email-template-token-target" class="email-template-field mt-1.5"><option value="subject">Assunto do email</option><option value="title">Título principal</option><option value="greeting">Saudação</option><option value="intro">Mensagem de apresentação</option><option value="body">Mensagem de orientação</option><option value="button">Texto do botão</option><option value="deadline">Aviso de prazo</option><option value="footer">Rodapé</option></select></label>
+                  <div><p class="text-[11px] font-bold text-dark">Qual informação deseja inserir?</p><div id="email-template-token-options" class="mt-2 grid gap-2 sm:grid-cols-2"><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{primeiro_nome}" aria-label="Inserir Nome do paciente">Nome do paciente</button><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{questionario}" aria-label="Inserir Nome do questionário">Nome do questionário</button><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{prazo}" aria-label="Inserir Prazo de resposta">Prazo de resposta</button><button type="button" class="email-template-token-choice rounded-xl border border-primary/20 bg-white px-3 py-2.5 text-left text-[11px] font-bold text-dark transition hover:border-primary hover:bg-primary/10" data-email-token="{ano}" aria-label="Inserir Ano do envio">Ano do envio</button></div></div>
+                </div>
+                <p class="mt-3 text-[10px] leading-relaxed text-gray-500"><strong class="text-dark">Como funciona:</strong> selecione o campo de destino e clique no nome da informação. A informação será preenchida automaticamente no momento do envio.</p>
+              </div>
+            </section>
+            <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Cores da marca</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Ajuste os tons principais e acompanhe o resultado na prévia ao lado.</p></div><span class="email-section-number">03</span></div><div class="mt-4 grid gap-3 sm:grid-cols-3"><label class="email-color-field"><span>Cor de destaque</span><input id="email-template-primary-color" type="color" value="#a88b36"></label><label class="email-color-field"><span>Fundo externo</span><input id="email-template-background-color" type="color" value="#faf8f3"></label><label class="email-color-field"><span>Texto</span><input id="email-template-text-color" type="color" value="#3d3226"></label></div></section>
+            <section class="email-customizer-block"><div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-dark">Escolha o estilo</h3><p class="mt-1 text-xs leading-relaxed text-gray-500">Oito composições responsivas, pensadas para manter a leitura bonita em celular e computador.</p></div><span class="email-section-number">04</span></div><div id="email-template-layout-options" class="email-layout-grid mt-4"><label class="email-layout-option"><input type="radio" name="email-template-layout" value="classic"><span class="email-layout-swatch layout-classic"><i></i><b></b><em></em></span><span><strong>Clássico dourado</strong><small>Elegante e próximo do modelo atual.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="modern"><span class="email-layout-swatch layout-modern"><i></i><b></b><em></em></span><span><strong>Moderno editorial</strong><small>Bloco assimétrico e chamada marcante.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="editorial"><span class="email-layout-swatch layout-editorial"><i></i><b></b><em></em></span><span><strong>Editorial leve</strong><small>Tipografia sofisticada e mais espaço.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="soft"><span class="email-layout-swatch layout-soft"><i></i><b></b><em></em></span><span><strong>Suave acolhedor</strong><small>Camadas claras e sensação de cuidado.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="midnight"><span class="email-layout-swatch layout-midnight"><i></i><b></b><em></em></span><span><strong>Noturno premium</strong><small>Contraste sofisticado para destacar o convite.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="botanical"><span class="email-layout-swatch layout-botanical"><i></i><b></b><em></em></span><span><strong>Botânico natural</strong><small>Verde sálvia e camadas leves para uma sensação fresca.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="terracotta"><span class="email-layout-swatch layout-terracotta"><i></i><b></b><em></em></span><span><strong>Terracota contemporâneo</strong><small>Bloco quente com contraste acolhedor e personalidade.</small></span></label><label class="email-layout-option"><input type="radio" name="email-template-layout" value="minimal"><span class="email-layout-swatch layout-minimal"><i></i><b></b><em></em></span><span><strong>Minimalista essencial</strong><small>Muito espaço, linhas finas e foco na mensagem.</small></span></label></div></section>
+            <footer class="flex flex-col gap-3 border-t border-primary/10 pt-5 sm:flex-row sm:items-center sm:justify-between"><button id="email-template-reset" type="button" class="rounded-xl border border-primary/20 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10">Restaurar modelo padrão</button><div class="flex items-center gap-2"><p id="email-template-form-status" class="hidden text-xs font-semibold" role="status"></p><button id="email-template-save" type="submit" class="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white transition hover:bg-dark">Salvar personalização</button></div></footer>
+          </form>
+          <aside class="email-template-preview-panel"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-primary">Prévia em tempo real</p><h3 class="mt-1 text-lg font-bold text-dark">Assim o paciente verá o convite</h3></div><span class="rounded-full border border-primary/15 px-2.5 py-1 text-[10px] font-bold text-gray-500">Exemplo</span></div><div id="email-template-preview" class="email-template-preview mt-4" aria-live="polite"></div><p class="mt-3 text-[11px] leading-relaxed text-gray-500">A prévia usa um paciente e um questionário de exemplo. O envio real substitui esses dados automaticamente.</p></aside>
+        </div>
+      </section>
+
+      <section id="response-scale-customizer" class="workspace-module-topic workspace-overview-topic panel-card rounded-3xl p-4 sm:p-5 shadow-sm hidden">
+        <header class="workspace-module-topic-header flex flex-col gap-3 border-b border-primary/10 pb-3 lg:flex-row lg:items-start lg:justify-between">
+          <div class="workspace-module-topic-lead"><span class="workspace-module-topic-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg></span><div class="workspace-module-topic-copy"><p class="text-xs font-bold uppercase tracking-[.18em] text-primary">Avaliação das respostas</p><h2 class="mt-1"><button type="button" class="workspace-topic-card-title" data-workspace-topic-button="response-scale-customizer" aria-label="Abrir Formato da escala">Escolha o formato da escala</button></h2><p class="mt-1 max-w-3xl text-sm text-gray-500">Defina como a avaliação de cada resposta será apresentada no histórico, nos detalhes e nos relatórios. A escala mantém cinco níveis, de -2 a 2.</p></div></div><div class="workspace-topic-actions" aria-label="Ações da página"><button type="button" class="workspace-back-button" data-workspace-back="workspace-scale" title="Voltar para Personalizar Plataforma" aria-label="Voltar para Personalizar Plataforma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 12H5m6-6-6 6 6 6"/></svg><span>Voltar</span></button><button type="button" class="workspace-info-button" data-workspace-info="scale" title="Como funciona esta página" aria-label="Como funciona o formato da escala">i</button></div>
+        </header>
+        <div class="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1.18fr)_minmax(18rem,.82fr)]">
+          <div>
+            <div id="response-scale-style-options" class="response-scale-choice-grid" role="radiogroup" aria-label="Formatos da escala de avaliação"></div>
+            
+            <div class="mt-6 border-t border-primary/10 pt-5">
+              <label class="block text-xs font-bold uppercase tracking-[.16em] text-primary">Exibição para o Paciente ao Responder</label>
+              <p class="mt-1 text-xs text-gray-500">Escolha como as perguntas categorizadas em Escala de Avaliação serão apresentadas no questionário para o paciente.</p>
+              <div id="patient-emoji-scale-mode-options" class="mt-3 grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Modo de exibição das escalas de avaliação no questionário">
+                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-primary/15 bg-white p-3.5 transition hover:border-primary/40 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <input type="radio" name="patient-emoji-scale-mode" value="emoji-text" class="mt-0.5 text-primary focus:ring-primary">
+                  <span class="text-xs">
+                    <strong class="block font-bold text-dark">Emoji + Texto</strong>
+                    <span class="mt-0.5 block text-gray-500">Exibe a expressão gráfica com a legenda descritiva.</span>
+                  </span>
+                </label>
+                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-primary/15 bg-white p-3.5 transition hover:border-primary/40 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <input type="radio" name="patient-emoji-scale-mode" value="emoji-only" class="mt-0.5 text-primary focus:ring-primary">
+                  <span class="text-xs">
+                    <strong class="block font-bold text-dark">Apenas Emoji</strong>
+                    <span class="mt-0.5 block text-gray-500">Botões visuais compactos com as expressões.</span>
+                  </span>
+                </label>
+                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-primary/15 bg-white p-3.5 transition hover:border-primary/40 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <input type="radio" name="patient-emoji-scale-mode" value="text-only" class="mt-0.5 text-primary focus:ring-primary">
+                  <span class="text-xs">
+                    <strong class="block font-bold text-dark">Apenas Texto</strong>
+                    <span class="mt-0.5 block text-gray-500">Botões de opções em formato de lista legível.</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 border-t border-primary/10 pt-4 sm:flex-row sm:items-center sm:justify-between"><p id="response-scale-form-status" class="text-xs font-semibold text-gray-500" role="status" aria-live="polite">Selecione um formato e salve para aplicar.</p><button id="response-scale-save" type="button" class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white transition hover:bg-dark">Salvar formato</button></div>
+          </div>
+          <aside class="response-scale-preview-panel"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-primary">Prévia da escala</p><h3 class="mt-1 text-lg font-bold text-dark">Assim a avaliação aparecerá</h3></div><span class="rounded-full border border-primary/15 px-2.5 py-1 text-[10px] font-bold text-gray-500">-2 a 2</span></div><div id="response-scale-preview" class="mt-4" aria-live="polite"></div><p class="mt-3 text-[11px] leading-relaxed text-gray-500">O interruptor Números/Visual do histórico continua disponível. Esta configuração define apenas o formato visual.</p></aside>
+        </div>
+      </section>
+
+      <section id="question-scale-customizer" class="workspace-module-topic workspace-overview-topic panel-card rounded-3xl p-4 sm:p-5 shadow-sm hidden">
+        <header class="workspace-module-topic-header flex flex-col gap-3 border-b border-primary/10 pb-3 lg:flex-row lg:items-start lg:justify-between">
+          <div class="workspace-module-topic-lead">
+            <span class="workspace-module-topic-icon" aria-hidden="true">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </span>
+            <div class="workspace-module-topic-copy">
+              <p class="text-xs font-bold uppercase tracking-[.18em] text-primary">Perguntas do questionário</p>
+              <h2 class="mt-1"><button type="button" class="workspace-topic-card-title">Personalização das perguntas do questionário: ESCALA DE AVALIAÇÃO</button></h2>
+              <p class="mt-1 max-w-3xl text-sm text-gray-500">Configure as preferências e os padrões para perguntas categorizadas em Escala de Avaliação.</p>
+            </div>
+          </div>
+          <div class="workspace-topic-actions" aria-label="Ações da página">
+            <button type="button" class="workspace-back-button" data-workspace-back="workspace" title="Voltar para Personalizar Plataforma" aria-label="Voltar para Personalizar Plataforma">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 12H5m6-6-6 6 6 6"/></svg>
+              <span>Voltar</span>
+            </button>
+          </div>
+        </header>
+        <div class="mt-6 rounded-2xl border border-dashed border-primary/20 bg-primary/[.02] p-8 text-center">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <h3 class="mt-3 text-base font-bold text-dark">Personalização das perguntas: ESCALA DE AVALIAÇÃO</h3>
+          <p class="mt-2 text-xs leading-relaxed text-gray-500 max-w-md mx-auto">Este card está pronto. As configurações específicas serão implementadas nesta seção.</p>
+        </div>
+      </section>
         <header class="workspace-module-topic-header flex flex-col gap-3 border-b border-primary/10 pb-3 lg:flex-row lg:items-start lg:justify-between">
           <div class="workspace-module-topic-lead"><span class="workspace-module-topic-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="m4 7 8 6 8-6"/></svg></span><div class="workspace-module-topic-copy"><p class="text-xs font-bold uppercase tracking-[.18em] text-primary">Comunicação com pacientes</p><h2 class="mt-1"><button type="button" class="workspace-topic-card-title" data-workspace-topic-button="email-invitation-customizer" aria-label="Abrir Personalizar email">Personalizar email de questionário</button></h2><p class="mt-1 max-w-3xl text-sm text-gray-500">Crie uma experiência com a sua identidade para os emails que informam sobre novos formulários. A alteração vale para os envios imediatos e agendados.</p></div></div><div class="workspace-topic-actions" aria-label="Ações da página"><button type="button" class="workspace-back-button" data-workspace-back="workspace-email" title="Voltar para Personalizar Plataforma" aria-label="Voltar para Personalizar Plataforma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 12H5m6-6-6 6 6 6"/></svg><span>Voltar</span></button><button type="button" class="workspace-info-button" data-workspace-info="email" title="Como funciona esta página" aria-label="Como funciona a personalização de e-mail">i</button></div>
         </header>
@@ -2682,8 +2830,43 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const showQuizSchedule = quiz => { activateAdminView('quiz-schedule', 'questionarios'); const selectedQuiz = quiz || window.__activeQuizSchedule || null; runAdminViewTask(async () => { await quizScheduleController?.open?.(selectedQuiz); const pending = window.__pendingLinkedSchedule; if (!pending) return; window.__pendingLinkedSchedule = null; await quizScheduleController?.openSchedule?.(pending.link, pending.patient, pending.quiz || selectedQuiz); }, 'os pacientes vinculados'); };
       const showRemindersManager = () => { activateAdminView('reminders-manager', 'lembretes'); runAdminViewTask(() => remindersManagerController?.refresh?.(), 'os lembretes'); };
       const showWhatsappAutomations = () => { activateAdminView('whatsapp-automations', 'whatsapp-automations'); runAdminViewTask(() => whatsappAutomationController?.refresh?.(), 'as automações de WhatsApp'); };
-      const setWorkspaceTopicMode = topic => { const workspace = document.getElementById('workspace'); if (!workspace) return; const targetId = topic === 'email' ? 'email-invitation-customizer' : topic === 'scale' ? 'response-scale-customizer' : ''; Array.from(workspace.children).forEach(child => { const visible = !targetId || child.id === targetId; child.classList.toggle('hidden', !visible); child.style.display = visible ? '' : 'none'; }); ['email-invitation-customizer','response-scale-customizer'].forEach(cardId => { const card = document.getElementById(cardId); if (!card) return; const isPage = cardId === targetId; if (isPage) card.classList.remove('is-collapsed'); else card.classList.add('is-collapsed'); setWorkspaceTopicButtonState(cardId, isPage); }); if (!targetId) ['email-invitation-customizer','response-scale-customizer'].forEach(cardId => { const card = document.getElementById(cardId); if (!card) return; card.classList.add('is-collapsed'); }); }; const showWorkspace = () => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode('all'); runAdminViewTask(() => Promise.all([emailTemplateController?.refresh?.(), responseScaleController?.refresh?.()]), 'a personalização do email e da escala'); }; const showWorkspaceTopic = topic => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode(topic); const task = topic === 'email' ? emailTemplateController?.refresh?.() : responseScaleController?.refresh?.(); runAdminViewTask(() => task, topic === 'email' ? 'a personalização do email' : 'o formato da escala'); };
-      const openAdminHashRoute = async ({ hash } = {}) => { const routes = { inicio:showHome, 'patient-directory':showDirectory, 'pending-review':showPendingReviews, 'send-report':showSendReport, 'response-report':showResponseReport, 'engagement-report':showEngagementReport, 'transaction-report':showTransactionReport, configuracoes:showServicesManager, 'questions-manager':showQuestionsManager, 'quizzes-manager':showQuizzesManager, 'reminders-manager':showRemindersManager, 'whatsapp-automations':showWhatsappAutomations, 'quiz-schedule':() => showQuizSchedule(window.__activeQuizSchedule || null), workspace:showWorkspace, 'workspace-email':() => showWorkspaceTopic('email'), 'workspace-scale':() => showWorkspaceTopic('scale') }; const open = routes[hash] || showHome; open(); };
+      const setWorkspaceTopicMode = topic => {
+        const workspace = document.getElementById('workspace');
+        if (!workspace) return;
+        const cardsContainer = document.getElementById('workspace-cards');
+        const heading = workspace.querySelector('.workspace-section-heading');
+        const targetId = topic === 'email' ? 'email-invitation-customizer' : topic === 'scale' ? 'response-scale-customizer' : topic === 'question-scale' ? 'question-scale-customizer' : '';
+
+        if (!targetId) {
+          if (heading) heading.classList.remove('hidden');
+          if (cardsContainer) cardsContainer.classList.remove('hidden');
+          ['email-invitation-customizer', 'response-scale-customizer', 'question-scale-customizer'].forEach(cardId => {
+            const card = document.getElementById(cardId);
+            if (card) {
+              card.classList.add('hidden');
+              card.style.display = 'none';
+            }
+          });
+        } else {
+          if (heading) heading.classList.add('hidden');
+          if (cardsContainer) cardsContainer.classList.add('hidden');
+          ['email-invitation-customizer', 'response-scale-customizer', 'question-scale-customizer'].forEach(cardId => {
+            const card = document.getElementById(cardId);
+            if (card) {
+              const visible = card.id === targetId;
+              card.classList.toggle('hidden', !visible);
+              card.style.display = visible ? '' : 'none';
+              if (visible) card.classList.remove('is-collapsed');
+              else card.classList.add('is-collapsed');
+              setWorkspaceTopicButtonState(cardId, visible);
+            }
+          });
+        }
+      };
+      const showWorkspace = () => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode('cards'); runAdminViewTask(() => Promise.all([emailTemplateController?.refresh?.(), responseScaleController?.refresh?.()]), 'a personalização da plataforma'); };
+      const showWorkspaceTopic = topic => { activateAdminView('workspace', 'area-paciente'); setWorkspaceTopicMode(topic); const task = topic === 'email' ? emailTemplateController?.refresh?.() : topic === 'scale' ? responseScaleController?.refresh?.() : Promise.resolve(); runAdminViewTask(() => task, topic === 'email' ? 'a personalização do email' : topic === 'scale' ? 'o formato da escala' : 'a personalização das perguntas'); };
+      const openAdminHashRoute = async ({ hash } = {}) => { const routes = { inicio:showHome, 'patient-directory':showDirectory, 'pending-review':showPendingReviews, 'send-report':showSendReport, 'response-report':showResponseReport, 'engagement-report':showEngagementReport, 'transaction-report':showTransactionReport, configuracoes:showServicesManager, 'questions-manager':showQuestionsManager, 'quizzes-manager':showQuizzesManager, 'reminders-manager':showRemindersManager, 'whatsapp-automations':showWhatsappAutomations, 'quiz-schedule':() => showQuizSchedule(window.__activeQuizSchedule || null), workspace:showWorkspace, 'workspace-email':() => showWorkspaceTopic('email'), 'workspace-scale':() => showWorkspaceTopic('scale'), 'workspace-question-scale':() => showWorkspaceTopic('question-scale') }; const open = routes[hash] || showHome; open(); };
+      document.querySelectorAll('[data-workspace-card]').forEach(button => { button.addEventListener('click', () => { const card = button.dataset.workspaceCard; if (card === 'email') window.location.hash = 'workspace-email'; else if (card === 'scale') window.location.hash = 'workspace-scale'; else if (card === 'question-scale') window.location.hash = 'workspace-question-scale'; }); });
       document.addEventListener('admin-sidebar-route', event => { void openAdminHashRoute(event.detail); });
       window.setTimeout(() => { const pending = window.__adminPendingHashRoute; if (pending) void openAdminHashRoute(pending); else requestSidebarHashRoute(); }, 0);
       document.querySelectorAll('[data-dashboard-action]').forEach(button => button.addEventListener('click', () => { if (button.dataset.dashboardAction === 'patients') { showDirectory(); return; } if (button.dataset.dashboardAction === 'finished') { showDirectory(); patientDirectoryController.setStatusFilter('finalizados'); return; } if (button.dataset.dashboardAction === 'pending') { showPendingReviews(); return; } if (button.dataset.dashboardAction === 'engagement') { showEngagementReport(); return; } if (button.dataset.dashboardAction === 'transactions') { showTransactionReport(); return; } const targets = { reports:'workspace' }; document.getElementById(targets[button.dataset.dashboardAction])?.scrollIntoView({ behavior:'smooth', block:'start' }); }));
