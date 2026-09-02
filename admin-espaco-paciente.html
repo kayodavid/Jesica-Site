@@ -485,9 +485,9 @@
     .reminder-modal > #reminder-config-form { min-height:0; flex:1 1 0; display:flex; flex-direction:column; }
     .reminder-modal-icon { display:inline-flex; height:2.75rem; width:2.75rem; flex:none; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.22); border-radius:1rem; background:rgba(168,139,54,.09); color:#9a7a20; box-shadow:0 8px 20px rgba(168,139,54,.1); }
     .reminder-modal-body { min-height:0; height:0; flex:1 1 0; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; display:grid; grid-template-columns:1fr; gap:1.25rem; padding:clamp(1rem,3vw,1.5rem); background:#fbfaf8; }
-    .reminder-modal-main { min-width:0; display:grid; align-content:start; gap:1rem; }
-    .reminder-tab-btn.active { border-color:#a88b36 !important; background:#a88b36 !important; color:#fff !important; box-shadow:0 4px 12px rgba(168,139,54,.25); }
-    .reminder-section { border:1px solid rgba(168,139,54,.14); border-radius:1.05rem; background:#fff; padding:clamp(1rem,2.4vw,1.25rem); box-shadow:0 8px 22px rgba(87,67,37,.035); }
+    .reminder-tab-btn { border:1px solid rgba(168,139,54,.2) !important; background:#fff !important; color:#3d3226 !important; }
+    .reminder-tab-btn:hover { border-color:#a88b36 !important; background:rgba(168,139,54,.06) !important; }
+    .reminder-tab-btn.active { border-color:#a88b36 !important; background:#a88b36 !important; color:#fff !important; box-shadow:0 4px 12px rgba(168,139,54,.25) !important; }
     .reminder-section-heading { display:flex; align-items:flex-start; gap:.7rem; }
     .reminder-section-number { display:inline-flex; height:1.7rem; width:1.7rem; flex:none; align-items:center; justify-content:center; border-radius:.65rem; background:#f1ebdc; color:#856b25; font-size:.7rem; font-weight:900; }
     .reminder-mode-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
@@ -1411,13 +1411,13 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
         </header>
 
         <div class="mt-5 flex flex-wrap gap-2 border-b border-primary/10 pb-4" role="tablist" aria-label="Lembretes disponíveis">
-          <button type="button" data-reminder-tab="new_quiz" role="tab" aria-selected="true" class="reminder-tab-btn active inline-flex items-center gap-2 rounded-xl border border-primary bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-sm transition">
+          <button type="button" data-reminder-tab="new_quiz" role="tab" aria-selected="true" class="reminder-tab-btn active inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition">
             <span>✨ Novo Questionário</span>
           </button>
-          <button type="button" data-reminder-tab="service_ending" role="tab" aria-selected="false" class="reminder-tab-btn inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-bold text-dark transition hover:border-primary hover:bg-primary/5">
+          <button type="button" data-reminder-tab="service_ending" role="tab" aria-selected="false" class="reminder-tab-btn inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition">
             <span>⏳ Serviço Finalizando</span>
           </button>
-          <button type="button" data-reminder-tab="response_due" role="tab" aria-selected="false" class="reminder-tab-btn inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-bold text-dark transition hover:border-primary hover:bg-primary/5">
+          <button type="button" data-reminder-tab="response_due" role="tab" aria-selected="false" class="reminder-tab-btn inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition">
             <span>⏰ Prazo de Resposta</span>
           </button>
         </div>
@@ -1536,7 +1536,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <div class="p-5">
                 <p id="reminder-preview-subject-live" class="text-sm font-black text-dark">Seu questionário está pronto</p>
                 <div id="reminder-preview-message-live" class="mt-3 whitespace-pre-wrap text-xs leading-relaxed text-gray-700">Olá, Marina!</div>
-                <div class="mt-5 pt-4 border-t border-primary/10">
+                <div id="reminder-preview-action-block" class="mt-5 pt-4 border-t border-primary/10">
                   <div class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm pointer-events-none">
                     Responder questionário
                   </div>
@@ -1808,7 +1808,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         previewHeaderTag: document.getElementById('reminder-preview-header-tag'),
         previewSubject: document.getElementById('reminder-preview-subject-live'),
         previewMessage: document.getElementById('reminder-preview-message-live'),
-        previewWhatsapp: document.getElementById('reminder-preview-whatsapp-live')
+        previewWhatsapp: document.getElementById('reminder-preview-whatsapp-live'),
+        previewActionBlock: document.getElementById('reminder-preview-action-block')
       };
 
       const setStatus = (message, tone = 'muted') => {
@@ -1845,6 +1846,11 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (fields.message) fields.message.value = item.message || '';
         if (fields.whatsapp) fields.whatsapp.value = item.whatsappMessage || '';
         if (fields.previewHeaderTag) fields.previewHeaderTag.textContent = meta.title;
+        document.querySelectorAll('[data-reminder-tab]').forEach(t => {
+          const isActive = t.dataset.reminderTab === activeReminderId;
+          t.classList.toggle('active', isActive);
+          t.setAttribute('aria-selected', String(isActive));
+        });
         drawPreview();
       };
 
@@ -1859,6 +1865,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (fields.previewSubject) fields.previewSubject.textContent = replaceSampleTokens(subjectRaw);
         if (fields.previewMessage) fields.previewMessage.textContent = replaceSampleTokens(messageRaw);
         if (fields.previewWhatsapp) fields.previewWhatsapp.textContent = replaceSampleTokens(whatsappRaw || 'A mensagem principal será reutilizada.');
+        if (fields.previewActionBlock) fields.previewActionBlock.classList.toggle('hidden', activeReminderId === 'service_ending');
       };
 
       document.querySelectorAll('[data-reminder-tab]').forEach(tab => {
