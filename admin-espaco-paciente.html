@@ -53,8 +53,8 @@
     .admin-layout-container { width:100%; max-width:none; padding:0; }
     .admin-shell { display:grid; min-height:calc(100vh - 4.05rem); grid-template-columns:16.5rem minmax(0, 1fr); gap:0; align-items:stretch; background:#faf8f3; }
     .admin-sidebar { position:fixed; top:4.05rem; left:0; z-index:30; display:flex; width:16.5rem; height:calc(100vh - 4.05rem); min-height:calc(100vh - 4.05rem); max-height:calc(100vh - 4.05rem); flex-direction:column; overflow:hidden; padding:1.2rem .85rem 1.15rem; border:0; border-right:1px solid rgba(168,139,54,.16); border-radius:0; background:#fffdf7; box-shadow:none; }
-    .admin-content { min-width:0; padding:1.25rem 1.5rem 3.5rem 1.15rem; background:#faf8f3; }
-    .admin-content > * { width:100%; }
+    .admin-content { min-width:0; padding:1.25rem; background:#faf8f3; box-sizing:border-box; }
+    .admin-content > * { width:100%; box-sizing:border-box; }
     .admin-sidebar.schedule-drawer-obscured, body.has-open-drawer .admin-sidebar { filter:blur(4px) brightness(0.85) !important; opacity:.45 !important; pointer-events:none !important; transition:filter .22s ease, opacity .22s ease !important; } body[data-patient-theme='black'].has-open-drawer .admin-sidebar, body[data-patient-theme='black'] .admin-sidebar.schedule-drawer-obscured { filter:blur(4px) brightness(0.65) !important; opacity:.4 !important; } .admin-sidebar-menu { display:flex; min-height:0; flex:1 1 auto; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; padding-right:.3rem; scrollbar-width:thin; scrollbar-color:#b39a5a #eee7d8; -ms-overflow-style:auto; }
     .admin-sidebar-menu::-webkit-scrollbar { width:8px; height:8px; display:block; background:#eee7d8; }
     .admin-sidebar-menu::-webkit-scrollbar-track, .admin-sidebar-menu::-webkit-scrollbar-track-piece { background:#eee7d8; }
@@ -1314,7 +1314,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
       body > nav { position:fixed !important; top:0; right:0; left:0; z-index:40; display:flex; height:4.05rem; min-height:4.05rem; align-items:center; }
       #admin-main { position:fixed; top:4.05rem; right:0; bottom:0; left:0; z-index:50; height:auto; min-height:0; margin:0; overflow:hidden; }
       #admin-layout-container, #admin-layout-container .admin-shell { height:100%; min-height:0; }
-      .admin-content { position:fixed; top:4.05rem; right:0; bottom:0; left:18rem; width:auto; height:auto; min-height:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; }
+      .admin-content { position:fixed; top:4.05rem; right:0; bottom:0; left:16.5rem; width:auto; height:auto; min-height:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding:1.25rem; }
     }
     @media (max-width:1023px) {
       html, body { height:auto; min-height:100%; overflow-x:hidden; overflow-y:auto; }
