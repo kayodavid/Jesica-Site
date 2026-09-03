@@ -1650,31 +1650,73 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
     }
   }
 
-  if (totalClaimed > 0) {
+  if (true) {
     try {
+      // Obter o relatório completo via RPC
+      const reportValue = await callRpc('app_questionnaire_schedule_daily_report', { p_secret: secret });
+      const report = Array.isArray(reportValue) ? reportValue[0] : reportValue || {};
+      
+      const sentLast24h = report.sent_last_24h || 0;
+      const scheduledNext24h = report.scheduled_next_24h || 0;
+      const scheduledFuture = report.scheduled_future || 0;
+      const failedRecent = report.failed_recent || [];
+      const recipientEmail = report.recipient_email || 'kayodavids@gmail.com';
+      
+      const failedItemsHtml = failedRecent.length > 0 
+        ? failedRecent.map(f => `<li><strong>${f.patient_name || f.recipient_email}</strong>: ${f.last_error || 'Falha técnica'}</li>`).join('')
+        : '';
+      
+      const failedSectionHtml = failedRecent.length > 0
+        ? `<div style="margin-top: 20px; padding: 15px; border-left: 4px solid #d9534f; background-color: #fdf7f7;">
+            <p style="color: #d9534f; font-weight: bold; margin: 0 0 10px 0;">${failedRecent.length} envios recentes falharam e precisam de atenção:</p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.9em; color: #555;">
+              ${failedItemsHtml}
+            </ul>
+           </div>`
+        : '';
+
       const htmlContent = `
-        <div style="font-family: sans-serif; color: #333;">
-          <h2 style="color: #a88b36;">Relatório Diário de Agendamentos</h2>
-          <p>A automação (Cron) processou os e-mails da janela de 71 horas.</p>
-          <p><strong>${processed.length}</strong> e-mails foram inseridos com sucesso na Brevo.</p>
-          ${failed.length > 0 ? `<p style="color: #d9534f;"><strong>Atenção:</strong> ${failed.length} envios falharam ao serem adicionados.</p>` : ''}
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 0.9em; color: #666;">
-            <strong>Nota sobre pendentes:</strong><br/>
-            Os envios programados para prazos superiores a 71 horas permanecem pendentes e seguros no banco de dados. 
-            Eles serão automaticamente inseridos na Brevo pelas próximas execuções diárias, assim que entrarem na janela de 71 horas.
+        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+          <h2 style="color: #a88b36; margin-bottom: 5px;">Relatório Diário da Plataforma</h2>
+          <p style="margin-top: 0; color: #666; font-size: 0.9em;">Resumo dos envios programados e atividades recentes.</p>
+          
+          <div style="margin: 25px 0; display: flex; flex-wrap: wrap; gap: 15px;">
+            <div style="flex: 1; min-width: 120px; padding: 15px; background: #faf8f3; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+              <span style="display: block; font-size: 2em; font-weight: bold; color: #a88b36;">${sentLast24h}</span>
+              <span style="font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.5px;">Enviados nas<br/>últimas 24h</span>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px; padding: 15px; background: #faf8f3; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+              <span style="display: block; font-size: 2em; font-weight: bold; color: #a88b36;">${scheduledNext24h}</span>
+              <span style="font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.5px;">Programados para<br/>hoje</span>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px; padding: 15px; background: #faf8f3; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+              <span style="display: block; font-size: 2em; font-weight: bold; color: #a88b36;">${scheduledFuture}</span>
+              <span style="font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.5px;">Na fila para os<br/>próximos dias</span>
+            </div>
+          </div>
+
+          <p><strong>${processed.length}</strong> novos e-mails foram processados hoje e adicionados à Brevo com sucesso.</p>
+          
+          ${failedSectionHtml}
+          
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+          <p style="font-size: 0.85em; color: #888;">
+            Este é um e-mail automático enviado pela sua plataforma. Você pode alterar quem recebe este relatório na área "Personalizar Plataforma" no painel.
           </p>
         </div>
       `;
+
       await sendBrevoEmail({
-        to: { email: 'kayodavids@gmail.com', name: 'Kayo David' },
-        subject: `[Vercel Cron] Relatório de Envios - ${processed.length} adicionados na Brevo`,
+        to: { email: recipientEmail, name: 'Administrador' },
+        subject: `[Plataforma] Resumo Diário - ${sentLast24h} enviados e ${scheduledNext24h} programados`,
         htmlContent,
-        tags: ['cron-report'],
-        replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: 'Sistema de Agendamento' }
+        tags: ['cron-report', 'daily-summary'],
+        replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: 'Sistema' }
       });
     } catch (reportError) {
-      console.error('Failed to send report email:', reportError.message);
+      console.error('Failed to send daily report email:', reportError.message);
     }
   }
 

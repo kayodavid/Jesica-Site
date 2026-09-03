@@ -569,3 +569,68 @@ grant execute on function public.app_questionnaire_schedule_mark_status(text, uu
 --   $$
 -- );
 -- select jobid, jobname, schedule, active from cron.job where jobname = 'jessica-questionnaire-scheduler';
+
+create or replace function public.app_questionnaire_schedule_daily_report(p_secret text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as 
+declare
+  v_report jsonb;
+  v_sent_last_24h int;
+  v_scheduled_next_24h int;
+  v_scheduled_future int;
+  v_failed_recent jsonb;
+  v_prefs jsonb;
+  v_email text;
+begin
+  perform public.app_questionnaire_schedule_worker_assert(p_secret);
+  
+  select count(*) into v_sent_last_24h
+  from public.questionnaire_schedules
+  where status in ('enviado', 'entregue')
+    and sent_at >= now() - interval '24 hours';
+    
+  select count(*) into v_scheduled_next_24h
+  from public.questionnaire_schedules
+  where status in ('agendado_na_brevo', 'aguardando_brevo', 'tentando_agendar')
+    and scheduled_for >= now()
+    and scheduled_for < now() + interval '24 hours';
+    
+  select count(*) into v_scheduled_future
+  from public.questionnaire_schedules
+  where status in ('agendado_na_brevo', 'aguardando_brevo', 'tentando_agendar')
+    and scheduled_for >= now() + interval '24 hours';
+    
+  select coalesce(jsonb_agg(
+    jsonb_build_object(
+      'id', id,
+      'patient_name', patient_name,
+      'recipient_email', recipient_email,
+      'scheduled_for', scheduled_for,
+      'last_error', last_error
+    ) order by updated_at desc
+  ), '[]'::jsonb) into v_failed_recent
+  from public.questionnaire_schedules
+  where status = 'falha_de_agendamento'
+    and updated_at >= now() - interval '24 hours';
+    
+  select description::jsonb into v_prefs
+  from public.videos
+  where theme = '__platform_preferences__' or video_url = '__platform_preferences__'
+  limit 1;
+  
+  v_email := coalesce(v_prefs ->> 'dailyReportEmail', 'kayodavids@gmail.com');
+    
+  v_report := jsonb_build_object(
+    'sent_last_24h', v_sent_last_24h,
+    'scheduled_next_24h', v_scheduled_next_24h,
+    'scheduled_future', v_scheduled_future,
+    'failed_recent', v_failed_recent,
+    'recipient_email', v_email
+  );
+  
+  return v_report;
+end;
+;
