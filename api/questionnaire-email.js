@@ -87,21 +87,64 @@ async function getPlatformPreferences(sessionToken) {
   try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === PLATFORM_PREFERENCES_THEME || recordSource(item) === PLATFORM_PREFERENCES_SOURCE); if (!record) return {}; let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return data; } catch { return {}; }
 }
 
+const _serverRpcCache = new Map();
+const _serverRpcInFlight = new Map();
+const SERVER_RPC_CACHE_TTL = 15000;
+
+function invalidateServerRpcCache() {
+  _serverRpcCache.clear();
+  _serverRpcInFlight.clear();
+}
+
 async function callRpc(name, body) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  const text = await response.text();
-  let value = text;
-  try { value = text ? JSON.parse(text) : null; } catch {}
-  if (!response.ok) throw new Error(typeof value === 'string' ? value : (value?.message || `Supabase RPC ${response.status}`));
-  return value;
+  const isRead = name.startsWith('app_list_') || name.startsWith('app_get_');
+  const isWrite = name.startsWith('app_add_') || name.startsWith('app_update_') || name.startsWith('app_delete_') || name.startsWith('app_upsert_') || name.startsWith('app_save_') || name.startsWith('app_questionnaire_schedule_enqueue') || name.startsWith('app_questionnaire_schedule_claim');
+
+  if (isWrite) {
+    invalidateServerRpcCache();
+  }
+
+  const cacheKey = `${name}:${JSON.stringify(body)}`;
+
+  if (isRead) {
+    const cached = _serverRpcCache.get(cacheKey);
+    if (cached && (Date.now() - cached.time < SERVER_RPC_CACHE_TTL)) {
+      return cached.data;
+    }
+    if (_serverRpcInFlight.has(cacheKey)) {
+      return _serverRpcInFlight.get(cacheKey);
+    }
+  }
+
+  const exec = async () => {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    const text = await response.text();
+    let value = text;
+    try { value = text ? JSON.parse(text) : null; } catch {}
+    if (!response.ok) throw new Error(typeof value === 'string' ? value : (value?.message || `Supabase RPC ${response.status}`));
+    if (isRead) {
+      _serverRpcCache.set(cacheKey, { data: value, time: Date.now() });
+    }
+    return value;
+  };
+
+  if (isRead) {
+    const promise = exec().finally(() => {
+      _serverRpcInFlight.delete(cacheKey);
+    });
+    _serverRpcInFlight.set(cacheKey, promise);
+    return promise;
+  }
+
+  return exec();
 }
 
 async function requireAdmin(sessionToken) {

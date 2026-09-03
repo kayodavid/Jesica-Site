@@ -65,20 +65,64 @@ const DEFAULT_PATIENT_CALCULATORS = [
   { id: 'builtin-waist-height', calculator_type: 'waist_height', title: 'Relação Cintura/Estatura', description: 'Calcule a relação entre a circunferência da cintura e a sua altura.', published: true }
 ];
 
+const _rpcReadCache = new Map();
+const _rpcInFlight = new Map();
+const RPC_CACHE_TTL = 30000; // 30 segundos de cache para leituras repetidas
+
+function invalidateRpcCache() {
+  _rpcReadCache.clear();
+  _rpcInFlight.clear();
+}
+
 async function rpc(name, body = {}) {
-  const request = (url) => fetch(url, {
-    method: 'POST',
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  let response;
-  try { response = await request(`${SUPABASE_URL}/rest/v1/rpc/${name}`); } catch {}
-  if (!response || !response.ok) {
-    response = await fetch('/api/rpc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, body }) });
+  const isRead = name.startsWith('app_list_') || name.startsWith('app_get_') || name.startsWith('app_current_');
+  const isWrite = name.startsWith('app_add_') || name.startsWith('app_update_') || name.startsWith('app_delete_') || name.startsWith('app_upsert_') || name.startsWith('app_save_');
+
+  if (isWrite) {
+    invalidateRpcCache();
   }
-  if (!response.ok) throw new Error(await response.text());
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
+
+  const cacheKey = `${name}:${JSON.stringify(body)}`;
+
+  if (isRead) {
+    const cached = _rpcReadCache.get(cacheKey);
+    if (cached && (Date.now() - cached.time < RPC_CACHE_TTL)) {
+      return cached.data;
+    }
+    if (_rpcInFlight.has(cacheKey)) {
+      return _rpcInFlight.get(cacheKey);
+    }
+  }
+
+  const exec = async () => {
+    const request = (url) => fetch(url, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    let response;
+    try { response = await request(`${SUPABASE_URL}/rest/v1/rpc/${name}`); } catch {}
+    if (!response || !response.ok) {
+      response = await fetch('/api/rpc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, body }) });
+    }
+    if (!response.ok) throw new Error(await response.text());
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+    if (isRead) {
+      _rpcReadCache.set(cacheKey, { data, time: Date.now() });
+    }
+    return data;
+  };
+
+  if (isRead) {
+    const promise = exec().finally(() => {
+      _rpcInFlight.delete(cacheKey);
+    });
+    _rpcInFlight.set(cacheKey, promise);
+    return promise;
+  }
+
+  return exec();
 }
 
 function token() { return localStorage.getItem('jessicamelo_token') || ''; }
