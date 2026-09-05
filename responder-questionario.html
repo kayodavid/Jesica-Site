@@ -316,7 +316,7 @@
 
     function slideCover(step,si){
       const{quiz,invitation}=step.data;const total=state.steps.filter(s=>s.type==='question').length;
-      return '<div class="slide-inner"><div class="cover-card"><p class="cover-eyebrow">Acompanhamento nutricional</p><h1 class="cover-title">'+esc(quiz.title||invitation.quiz_title||'Questionário')+'</h1>'+(quiz.description?'<p class="cover-desc">'+esc(quiz.description)+'</p>':'')+'<div class="cover-meta"><span class="cover-badge">◷ Disponível até '+esc(dateFmt(invitation.expires_at))+'</span><span class="cover-badge">📋 '+total+' pergunta'+(total===1?'':'s')+'</span></div><div class="cover-start-wrap"><button class="btn-start" id="btn-cover-start">Começar questionário <span aria-hidden="true">→</span></button><span class="cover-count">Responda com calma, uma pergunta por vez.</span></div></div></div>';
+      return '<div class="slide-inner"><div class="cover-card"><p class="cover-eyebrow">Ferramentas Nutricionais</p><h1 class="cover-title">'+esc(quiz.title||invitation.quiz_title||'Questionário')+'</h1>'+(quiz.description?'<p class="cover-desc">'+esc(quiz.description)+'</p>':'')+'<div class="cover-meta"><span class="cover-badge">◷ Disponível até '+esc(dateFmt(invitation.expires_at))+'</span><span class="cover-badge">📋 '+total+' pergunta'+(total===1?'':'s')+'</span></div><div class="cover-start-wrap"><button class="btn-start" id="btn-cover-start">Começar questionário <span aria-hidden="true">→</span></button><span class="cover-count">Responda com calma, uma pergunta por vez.</span></div></div></div>';
     }
     function slideContext(step,si){
       const b=step.data;const title=usable(b?.title);const rawBody=usable(b?.bodyHtml)||usable(b?.body);
