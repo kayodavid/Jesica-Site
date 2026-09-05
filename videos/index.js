@@ -14,11 +14,12 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
   if (!(await db.hasPatientAccess('videos', session.email))) { window.location.href = '/paciente.html'; return; }
 
   const settings = await db.getContentOrderSettings();
-  const videos = await db.getPublishedVideos();
+  const rawVideos = await db.getPublishedVideos();
+  const videos = rawVideos.filter(v => v && !String(v.theme || '').startsWith('__') && !String(v.theme || '').startsWith('Calculadoras'));
   const rawSections = await db.getSections();
   const byName = (a, b) => String(a.title || a.name || '').localeCompare(String(b.title || b.name || ''), 'pt-BR', { sensitivity: 'base' });
   const byRecent = (a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0);
-  const groups = videos.reduce((result, video) => { const name = video.theme || 'Geral'; (result[name] ||= []).push(video); return result; }, {});
+  const groups = videos.reduce((result, video) => { const name = (video.theme || 'Geral').trim(); if (!name.startsWith('__') && !name.startsWith('Calculadoras')) { (result[name] ||= []).push(video); } return result; }, {});
   Object.values(groups).forEach(list => list.sort(settings.video_content_order === 'alpha' ? byName : byRecent));
   const sectionMap = new Map((Array.isArray(rawSections) ? rawSections : []).map(section => [section.name || section, section]));
   Object.keys(groups).forEach(name => { if (!sectionMap.has(name)) sectionMap.set(name, { name, cover_image: '' }); });
