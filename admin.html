@@ -590,7 +590,7 @@
     }
 
     function renderVideoCards() {
-      const filtered = selectedVideoFolder ? videoCache.filter(video => (video.theme || 'Geral') === selectedVideoFolder) : videoCache;
+      const filtered = selectedVideoFolder ? videoCache.filter(video => String(video.theme || 'Geral').trim().toLowerCase() === String(selectedVideoFolder).trim().toLowerCase()) : videoCache;
       const title = document.getElementById('selected-video-folder'); const count = document.getElementById('video-count-label');
       if (title) title.textContent = selectedVideoFolder || 'Todos os vídeos';
       if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? 'vídeo' : 'vídeos'}`;
@@ -665,7 +665,7 @@
     function operationFailed(result) { return !result || result.success === false; }
 
     function renderEbookCards() {
-      const filtered = selectedEbookFolder ? ebookCache.filter(book => (book.theme || 'Geral') === selectedEbookFolder) : ebookCache;
+      const filtered = selectedEbookFolder ? ebookCache.filter(book => String(book.theme || 'Geral').trim().toLowerCase() === String(selectedEbookFolder).trim().toLowerCase()) : ebookCache;
       const title = document.getElementById('selected-ebook-folder'); const count = document.getElementById('ebook-count-label');
       if (title) title.textContent = selectedEbookFolder || 'Todos os eBooks';
       if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? 'eBook' : 'eBooks'}`;
