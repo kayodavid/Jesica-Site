@@ -1,15 +1,21 @@
 -- =========================================================================
--- SCRIPT DEFINITIVO PARA RESTAURAR E EXIBIR OS VÍDEOS EDUCATIVOS
--- Execute no SQL Editor do Supabase
+-- SCRIPT CORRETIVO PARA REATIVAR TODOS OS VÍDEOS EDUCATIVOS
+-- Execute este script no SQL Editor do Supabase
 -- =========================================================================
 
--- 1. Ativar todos os vídeos educativos reais (Geral, Perda de Peso, Hipertrofia, etc.)
+-- 1. Ativar (published = true) todos os vídeos legítimos (Geral, Perda de Peso, Hipertrofia, etc.)
 UPDATE public.educational_videos 
 SET published = true 
-WHERE theme NOT LIKE '\_\_%' 
-  AND theme NOT LIKE 'Calculadoras%';
+WHERE LEFT(COALESCE(theme, ''), 2) != '__' 
+  AND LEFT(COALESCE(theme, ''), 12) != 'Calculadoras';
 
--- 2. Dropar e recriar a função app_list_videos garantindo retorno para pacientes e público
+-- 2. Garantir que registros internos fiquem despublicados (published = false)
+UPDATE public.educational_videos 
+SET published = false 
+WHERE LEFT(COALESCE(theme, ''), 2) = '__' 
+   OR LEFT(COALESCE(theme, ''), 12) = 'Calculadoras';
+
+-- 3. Dropar e recriar a função app_list_videos usando LEFT() para não conflitar com wildcard SQL
 DROP FUNCTION IF EXISTS public.app_list_videos(text);
 DROP FUNCTION IF EXISTS public.app_list_videos();
 
@@ -36,8 +42,8 @@ BEGIN
     RETURN QUERY 
       SELECT * FROM public.educational_videos 
       WHERE published = true 
-        AND theme NOT LIKE '\_\_%' 
-        AND theme NOT LIKE 'Calculadoras%'
+        AND LEFT(COALESCE(theme, ''), 2) != '__' 
+        AND LEFT(COALESCE(theme, ''), 12) != 'Calculadoras'
       ORDER BY created_at DESC; 
   END IF; 
 END; 
