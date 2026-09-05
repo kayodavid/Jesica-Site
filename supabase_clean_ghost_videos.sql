@@ -1,8 +1,5 @@
 -- =========================================================================
--- SCRIPT DE LIMPEZA E PROTEÇÃO DA BIBLIOTECA DE VÍDEOS EDUCATIVOS
--- Execute este script no SQL Editor do Supabase para:
--- 1. Excluir os registros de questionários/cliques que entraram como vídeos
--- 2. Garantir que o paciente só visualize vídeos reais (Geral, Perda de Peso, etc.)
+-- SCRIPT DE LIMPEZA E PROTEÇÃO DA BIBLIOTECA DE VÍDEOS EDUCATIVOS (COM DROP)
 -- =========================================================================
 
 -- 1. Deletar todos os registros de rastreamento de questionários da tabela de vídeos
@@ -29,7 +26,9 @@ WHERE theme LIKE '\_\_%'
    OR embed_url LIKE 'service://%'
    OR embed_url LIKE 'platform-preferences://%';
 
--- 3. Atualizar a função app_list_videos para que o perfil 'patient' NUNCA receba temas de sistema
+-- 3. Dropar e recriar a função app_list_videos
+DROP FUNCTION IF EXISTS public.app_list_videos(text);
+
 CREATE OR REPLACE FUNCTION public.app_list_videos(p_token text)
 RETURNS SETOF public.educational_videos 
 LANGUAGE plpgsql 
@@ -57,7 +56,10 @@ BEGIN
 END; 
 $$;
 
--- 4. Atualizar a função app_add_video para que inserções internas nunca fiquem publicadas
+-- 4. Dropar e recriar a função app_add_video
+DROP FUNCTION IF EXISTS public.app_add_video(text, text, text, text, text, text, text, text);
+DROP FUNCTION IF EXISTS public.app_add_video;
+
 CREATE OR REPLACE FUNCTION public.app_add_video(
   p_token text,
   p_title text,
