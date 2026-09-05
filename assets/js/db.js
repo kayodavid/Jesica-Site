@@ -1,4 +1,4 @@
-const SUPABASE_URL = 'https://mcsilxhgwbxtvydytcx.supabase.co';
+const SUPABASE_URL = 'https://mcsilxhgwbxtvydytjcx.supabase.co';
 import { decodeCalculatorContent, encodeCalculatorContent } from './calculator-engine.js';
 
 const SUPABASE_KEY = 'sb_publishable_PKWZS9Za2vfbGCvKNcquow_zuymCA72';
