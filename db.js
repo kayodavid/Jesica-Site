@@ -231,6 +231,17 @@ export function applyPatientTheme() {
   document.documentElement.dataset.patientTheme = theme;
   document.documentElement.style.colorScheme = theme === 'black' ? 'dark' : 'light';
   document.body.dataset.patientTheme = theme;
+  document.querySelectorAll('#theme-toggle, .theme-switch-pill').forEach(button => {
+    if (!button.dataset.themeBound) {
+      button.dataset.themeBound = 'true';
+      button.addEventListener('click', togglePatientTheme);
+    }
+  });
+  const userEl = document.getElementById('user-display-name');
+  if (userEl && (!userEl.textContent || userEl.textContent.trim() === 'Paciente')) {
+    const session = currentSession();
+    if (session && session.name) userEl.textContent = session.name;
+  }
   document.querySelectorAll('[data-theme-toggle]').forEach(button => {
     const isBlack = theme === 'black';
     button.innerHTML = isBlack

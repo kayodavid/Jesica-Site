@@ -63,15 +63,74 @@
     .player-dialog { width:min(92vw, 980px); max-height:calc(100dvh - 2rem); display:flex; flex-direction:column; }
     .player-stage { width:100%; aspect-ratio:16/9; max-height:calc(100dvh - 7.5rem); min-height:0; }
     @media (max-width:640px) { .player-dialog { width:calc(100vw - 1rem); max-height:calc(100dvh - 1rem); } .player-stage { max-height:calc(100dvh - 6rem); } }
+  
+    .admin-top-nav { background:rgba(255,255,255,.88); border-bottom:1px solid rgba(168,139,54,.18); }
+    .admin-top-name { color:#3d3226; font-weight:700; font-size:.84rem; }
+    .admin-top-link { display:inline-flex; align-items:center; gap:.45rem; color:#3d3226; font-size:.78rem; font-weight:600; text-decoration:none; transition:color .16s ease, transform .16s ease; cursor:pointer; background:none; border:none; padding:0; }
+    .admin-top-link:hover { color:#a88b36; transform:translateY(-1px); }
+    .admin-top-divider { width:1px; height:1.1rem; background:rgba(168,139,54,.25); flex-shrink:0; }
+    .admin-sun-icon { color:#a88b36; width:1rem; height:1rem; flex-shrink:0; }
+    .admin-moon-icon { color:#857865; width:1rem; height:1rem; flex-shrink:0; }
+    .theme-switch-pill { position:relative; display:inline-flex; align-items:center; width:2.35rem; height:1.28rem; padding:2px; border-radius:999px; background-color:#3d3226; border:none; cursor:pointer; outline:none; transition:background-color .2s ease; flex-shrink:0; }
+    .theme-switch-pill:hover { background-color:#282017; }
+    .theme-switch-pill:focus-visible { outline:2px solid #a88b36; outline-offset:2px; }
+    .theme-switch-knob { display:block; width:.98rem; height:.98rem; border-radius:999px; background-color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.28); transform:translateX(0); transition:transform .2s cubic-bezier(.23,1,.32,1); }
+    body[data-patient-theme='black'] .admin-top-nav, html[data-patient-theme='black'] .admin-top-nav { background:#1e222b; border-color:rgba(255,255,255,.09); }
+    body[data-patient-theme='black'] .admin-top-name, html[data-patient-theme='black'] .admin-top-name { color:#f7f8fb; }
+    body[data-patient-theme='black'] .admin-top-link, html[data-patient-theme='black'] .admin-top-link { color:#e3e7ee; }
+    body[data-patient-theme='black'] .admin-top-link:hover, html[data-patient-theme='black'] .admin-top-link:hover { color:#f0d37a; }
+    body[data-patient-theme='black'] .admin-top-divider, html[data-patient-theme='black'] .admin-top-divider { background:rgba(255,255,255,.14); }
+    body[data-patient-theme='black'] .admin-sun-icon, html[data-patient-theme='black'] .admin-sun-icon { color:#8b93a0; }
+    body[data-patient-theme='black'] .admin-moon-icon, html[data-patient-theme='black'] .admin-moon-icon { color:#f0d37a; }
+    body[data-patient-theme='black'] .theme-switch-pill, html[data-patient-theme='black'] .theme-switch-pill { background-color:#a88b36; }
+    body[data-patient-theme='black'] .theme-switch-knob, html[data-patient-theme='black'] .theme-switch-knob { transform:translateX(1.05rem); background-color:#fff; }
   </style>
   <script type="module" crossorigin src="/videos/index.js"></script>
   
 </head>
 <body class="bg-dark text-white min-h-screen">
-  <header class="h-16 bg-[#1d1e24] border-b border-white/5 flex items-center justify-between px-4 sm:px-7 sticky top-0 z-40">
-    <div class="flex items-center gap-2 sm:gap-3"><button id="mobile-sidebar-btn" class="lg:hidden text-white text-2xl" aria-label="Abrir seções">☰</button><a href="/paciente.html" class="block"><img data-patient-logo src="/assets/images/Logomarca_nobg_branco.png" class="w-32 sm:w-40 h-auto max-h-10 object-contain" alt="Jessica Melo Nutricionista"></a><button id="initial-menu-btn" type="button" class="inline-flex items-center gap-2 rounded-lg border-0 bg-transparent px-2 py-1.5 text-xs text-muted hover:bg-white/10 hover:text-white transition-all" aria-label="Nutrição em Foco" title="Nutrição em Foco"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><rect x="3" y="5" width="13" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="m16 10 5-3v10l-5-3"/></svg><span>Nutrição em Foco</span></button></div>
-    <div class="flex items-center gap-2 sm:gap-4"><a href="/paciente.html" class="bg-white/10 hover:bg-orange hover:text-dark px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all">Menu principal</a><button data-theme-toggle type="button" class="bg-white/10 hover:bg-orange hover:text-dark w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema"></button><button id="logout-btn" class="bg-white/10 hover:bg-white/20 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all">Sair</button></div>
-  </header>
+    <nav class="admin-top-nav backdrop-blur-md py-2.5 shadow-sm sticky top-0 z-40">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="mobile-sidebar-btn" class="lg:hidden admin-top-link text-lg px-1.5 py-1" aria-label="Abrir seções">☰</button>
+        <a href="/paciente.html"><img data-patient-logo src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista"></a>
+      </div>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <span id="user-display-name" class="admin-top-name hidden sm:inline">Paciente</span>
+        
+        <div class="flex items-center gap-1.5">
+          <svg class="admin-sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" stroke-width="1.8"/>
+            <path stroke-linecap="round" stroke-width="1.8" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <button id="theme-toggle" type="button" class="theme-switch-pill" role="switch" aria-label="Alternar tema">
+            <span class="theme-switch-knob"></span>
+          </button>
+          <svg class="admin-moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+          </svg>
+        </div>
+
+        <div class="admin-top-divider"></div>
+
+        <a href="/paciente.html" class="admin-top-link">
+          <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          <span class="hidden sm:inline">Menu principal</span>
+        </a>
+
+        <div class="admin-top-divider"></div>
+
+        <button id="logout-btn" type="button" class="admin-top-link">
+          <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+  </nav>
   <div class="flex min-h-[calc(100vh-4.75rem)] patient-shell library-frame">
     <aside id="sidebar" class="fixed lg:sticky top-[76px] left-0 z-30 w-72 h-[calc(100vh-4.75rem)] bg-[#202126] border-r border-white/5 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto scrollbar">
       <div class="patient-sidebar"><p class="text-[11px] font-bold text-muted uppercase tracking-[0.22em] mb-2">Minha biblioteca</p><p class="text-xs text-muted mb-5">Escolha um tema para começar</p><nav id="theme-nav" class="space-y-2"></nav></div>

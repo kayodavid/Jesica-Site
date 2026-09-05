@@ -64,21 +64,58 @@
     body[data-patient-theme='black'] .video-folder-btn.is-active { color:#fff; }
     body[data-patient-theme='black'] .compact-video-card { background:rgba(34,36,43,.92); border-color:rgba(212,183,106,.16); }
     @media (max-width: 767px) { .video-folder-shell { grid-template-columns:1fr; } .video-folder-nav { display:flex; overflow-x:auto; gap:.35rem; padding:.5rem; } .video-folder-btn { min-width:150px; } }
+  
+    .admin-top-nav { background:rgba(255,255,255,.88); border-bottom:1px solid rgba(168,139,54,.18); }
+    .admin-top-name { color:#3d3226; font-weight:700; font-size:.84rem; }
+    .admin-top-link { display:inline-flex; align-items:center; gap:.45rem; color:#3d3226; font-size:.78rem; font-weight:600; text-decoration:none; transition:color .16s ease, transform .16s ease; cursor:pointer; background:none; border:none; padding:0; }
+    .admin-top-link:hover { color:#a88b36; transform:translateY(-1px); }
+    .admin-top-divider { width:1px; height:1.1rem; background:rgba(168,139,54,.25); flex-shrink:0; }
+    .admin-sun-icon { color:#a88b36; width:1rem; height:1rem; flex-shrink:0; }
+    .admin-moon-icon { color:#857865; width:1rem; height:1rem; flex-shrink:0; }
+    .theme-switch-pill { position:relative; display:inline-flex; align-items:center; width:2.35rem; height:1.28rem; padding:2px; border-radius:999px; background-color:#3d3226; border:none; cursor:pointer; outline:none; transition:background-color .2s ease; flex-shrink:0; }
+    .theme-switch-pill:hover { background-color:#282017; }
+    .theme-switch-pill:focus-visible { outline:2px solid #a88b36; outline-offset:2px; }
+    .theme-switch-knob { display:block; width:.98rem; height:.98rem; border-radius:999px; background-color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.28); transform:translateX(0); transition:transform .2s cubic-bezier(.23,1,.32,1); }
+    body[data-patient-theme='black'] .admin-top-nav, html[data-patient-theme='black'] .admin-top-nav { background:#1e222b; border-color:rgba(255,255,255,.09); }
+    body[data-patient-theme='black'] .admin-top-name, html[data-patient-theme='black'] .admin-top-name { color:#f7f8fb; }
+    body[data-patient-theme='black'] .admin-top-link, html[data-patient-theme='black'] .admin-top-link { color:#e3e7ee; }
+    body[data-patient-theme='black'] .admin-top-link:hover, html[data-patient-theme='black'] .admin-top-link:hover { color:#f0d37a; }
+    body[data-patient-theme='black'] .admin-top-divider, html[data-patient-theme='black'] .admin-top-divider { background:rgba(255,255,255,.14); }
+    body[data-patient-theme='black'] .admin-sun-icon, html[data-patient-theme='black'] .admin-sun-icon { color:#8b93a0; }
+    body[data-patient-theme='black'] .admin-moon-icon, html[data-patient-theme='black'] .admin-moon-icon { color:#f0d37a; }
+    body[data-patient-theme='black'] .theme-switch-pill, html[data-patient-theme='black'] .theme-switch-pill { background-color:#a88b36; }
+    body[data-patient-theme='black'] .theme-switch-knob, html[data-patient-theme='black'] .theme-switch-knob { transform:translateX(1.05rem); background-color:#fff; }
   </style>
 </head>
 
 <body class="bg-gradient-to-br from-[#ede0b9] via-[#faf8f3] to-[#f5e6c8] min-h-screen flex flex-col justify-between">
   <!-- Nav header -->
-  <nav class="bg-white/80 backdrop-blur-md border-b border-white/40 fixed w-full top-0 z-50 py-3 shadow-sm">
+    <nav class="admin-top-nav backdrop-blur-md py-2.5 shadow-sm sticky top-0 z-40">
     <div class="container mx-auto px-4 flex justify-between items-center">
-      <a href="/index.html" class="transform hover:scale-105 transition-transform duration-300">
-        <img data-patient-logo src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista">
-      </a>
-      <div class="flex items-center gap-4">
-        <span class="text-sm font-semibold text-dark">Dra. Jessica Melo</span>
-        <button data-theme-toggle id="theme-toggle" type="button" class="bg-primary/10 hover:bg-primary hover:text-white text-primary w-9 h-9 p-0 rounded-full inline-flex items-center justify-center transition-all" aria-label="Alternar tema" title="Alternar tema"></button>
-        <button id="logout-btn" class="bg-dark/10 hover:bg-dark hover:text-white text-dark px-4 py-2 rounded-xl text-sm font-medium transition-all">
-          Sair
+      <a href="/admin.html"><img data-patient-logo src="/assets/images/logo_sem_fundo.png" class="w-28 sm:w-36" alt="Jessica Melo Nutricionista"></a>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <span class="admin-top-name hidden sm:inline">Dra. Jessica Melo</span>
+        
+        <div class="flex items-center gap-1.5">
+          <svg class="admin-sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" stroke-width="1.8"/>
+            <path stroke-linecap="round" stroke-width="1.8" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <button id="theme-toggle" type="button" class="theme-switch-pill" role="switch" aria-label="Alternar tema">
+            <span class="theme-switch-knob"></span>
+          </button>
+          <svg class="admin-moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+          </svg>
+        </div>
+
+        <div class="admin-top-divider"></div>
+
+        <button id="logout-btn" type="button" class="admin-top-link">
+          <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span>Sair</span>
         </button>
       </div>
     </div>
