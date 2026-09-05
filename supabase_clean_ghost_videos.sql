@@ -1,20 +1,19 @@
 -- =========================================================================
--- SCRIPT DE RESTAURAÇÃO E EXIBIÇÃO DOS VÍDEOS EDUCATIVOS
--- Execute este script no SQL Editor do Supabase para:
--- 1. Ativar (published = true) todos os vídeos legítimos (Geral, Perda de Peso, Hipertrofia, etc.)
--- 2. Garantir que a função app_list_videos entregue os vídeos tanto para admin quanto para pacientes
+-- SCRIPT DEFINITIVO PARA RESTAURAR E EXIBIR OS VÍDEOS EDUCATIVOS
+-- Execute no SQL Editor do Supabase
 -- =========================================================================
 
--- 1. Ativar todos os vídeos educativos legítimos cadastrados pelo administrador
+-- 1. Ativar todos os vídeos educativos reais (Geral, Perda de Peso, Hipertrofia, etc.)
 UPDATE public.educational_videos 
 SET published = true 
 WHERE theme NOT LIKE '\_\_%' 
   AND theme NOT LIKE 'Calculadoras%';
 
--- 2. Dropar e recriar a função app_list_videos sem restrições excessivas
+-- 2. Dropar e recriar a função app_list_videos garantindo retorno para pacientes e público
 DROP FUNCTION IF EXISTS public.app_list_videos(text);
+DROP FUNCTION IF EXISTS public.app_list_videos();
 
-CREATE OR REPLACE FUNCTION public.app_list_videos(p_token text)
+CREATE OR REPLACE FUNCTION public.app_list_videos(p_token text DEFAULT NULL)
 RETURNS SETOF public.educational_videos 
 LANGUAGE plpgsql 
 SECURITY DEFINER 
@@ -23,14 +22,17 @@ AS $$
 DECLARE 
   r text; 
 BEGIN 
-  SELECT role INTO r FROM public.app_current_user(p_token); 
+  IF p_token IS NOT NULL AND p_token != '' THEN
+    SELECT role INTO r FROM public.app_current_user(p_token); 
+  END IF;
   
   IF r = 'admin' THEN 
+    -- Administrador vê tudo para gerenciamento
     RETURN QUERY 
       SELECT * FROM public.educational_videos 
       ORDER BY created_at DESC; 
   ELSE 
-    -- Pacientes ou visualização autenticada: retorna os vídeos publicados reais
+    -- Paciente ou visualização padrão: sempre entrega todos os vídeos educativos publicados
     RETURN QUERY 
       SELECT * FROM public.educational_videos 
       WHERE published = true 
