@@ -3580,7 +3580,25 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const activeLinksFor = item => serviceLinks.filter(link => { if (link.patientKey !== patientKey(item.patient) || link.status === 'expired') return false; const end = serviceEndDate(link); return !end || end.getTime() >= today.getTime(); });
       const latestLinkFor = item => [...activeLinksFor(item)].sort((a,b) => String(b.startDate || '').localeCompare(String(a.startDate || '')))[0] || null;
       const allLinksFor = item => serviceLinks.filter(link => link.patientKey === patientKey(item.patient));
-      const isFinishedPatient = item => { const links = allLinksFor(item); if (!links.length) return false; return links.every(link => { const status = String(link.status || '').toLocaleLowerCase('pt-BR'); if (['expired', 'finished', 'finalized', 'finalizado', 'concluido', 'concluído', 'cancelled', 'canceled'].includes(status)) return true; const end = serviceEndDate(link); return Boolean(end && end.getTime() < today.getTime()); }); };
+      const patientStatus = item => String(item.patient?.profile?.status || item.patient?.status || 'active').trim().toLowerCase();
+      const isFinishedPatient = item => {
+        const pStatus = patientStatus(item);
+        if (pStatus === 'finished') return true;
+        if (pStatus === 'inactive') return false;
+        const links = allLinksFor(item);
+        if (!links.length) return false;
+        return links.every(link => {
+          const status = String(link.status || '').toLocaleLowerCase('pt-BR');
+          if (['expired', 'finished', 'finalized', 'finalizado', 'concluido', 'concluído', 'cancelled', 'canceled'].includes(status)) return true;
+          const end = serviceEndDate(link);
+          return Boolean(end && end.getTime() < today.getTime());
+        });
+      };
+      const isInactivePatient = item => patientStatus(item) === 'inactive';
+      const isActivePatient = item => {
+        const pStatus = patientStatus(item);
+        return pStatus === 'active' && !isFinishedPatient(item);
+      };
       const lastActivityDate = item => item.summary?.last ? localDateKey(new Date(now.getFullYear(), now.getMonth(), Number(item.summary.last))) : '';
       const formatFriendlyLastActivity = item => { const lastRaw = lastActivityDate(item); if (!lastRaw) return 'Sem atividade'; const [year, month, day] = lastRaw.split('-').map(Number); const activityDate = new Date(year, month - 1, day); const diffDays = Math.round((today.getTime() - activityDate.getTime()) / 86400000); if (diffDays === 0) return 'Hoje'; if (diffDays === 1) return 'Ontem'; return activityDate.toLocaleDateString('pt-BR'); };
       const setDirectoryTabs = () => document.querySelectorAll('[data-patient-filter]').forEach(tab => { const active = tab.dataset.patientFilter === filter; tab.classList.toggle('is-active', active); tab.setAttribute('aria-selected', String(active)); });
@@ -3590,19 +3608,54 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const getChoice = name => drawer.querySelector(`[data-patient-filter-${name}].is-active`)?.dataset[`patientFilter${name[0].toUpperCase()}${name.slice(1)}`] || '';
       const refreshFilterOptions = async () => { const [links, services] = await Promise.all([db.getPatientServiceLinks(), db.getServices()]); serviceLinks = links; const serviceValue = filters.service; const labelValue = filters.label; const activeServices = services.filter(service => service.active !== false); serviceSelect.innerHTML = `<option value="">Selecione uma opção</option>${activeServices.map(service => `<option value="${escape(service.id)}">${escape(service.name)}</option>`).join('')}`; const labels = [...new Set(items.flatMap(item => item.patient.profile?.labels || []))].sort((a,b) => String(a).localeCompare(String(b), 'pt-BR')); labelSelect.innerHTML = `<option value="">Selecione as etiquetas</option>${labels.map(label => `<option value="${escape(label)}">${escape(label)}</option>`).join('')}`; if ([...serviceSelect.options].some(option => option.value === serviceValue)) serviceSelect.value = serviceValue; if ([...labelSelect.options].some(option => option.value === labelValue)) labelSelect.value = labelValue; };
       const updateCounts = () => {
+        const inactive = items.filter(isInactivePatient);
         const finished = items.filter(isFinishedPatient);
-        const active = items.filter(item => !isFinishedPatient(item));
+        const active = items.filter(isActivePatient);
         const onTrack = active.filter(item => { const link = latestLinkFor(item); return Boolean(link); });
         const pendingCount = getPendingQuestionnaireResponses(dashboardResponseReviews).length;
         document.getElementById('tab-active-count').textContent = active.length;
         document.getElementById('tab-finished-count').textContent = finished.length;
-        document.getElementById('tab-inactive-count').textContent = 0;
+        document.getElementById('tab-inactive-count').textContent = inactive.length;
         document.getElementById('tab-all-count').textContent = items.length;
         const statActive = document.getElementById('patient-stat-active-count'); if (statActive) statActive.textContent = active.length;
         const statOnTrack = document.getElementById('patient-stat-ontrack-count'); if (statOnTrack) statOnTrack.textContent = onTrack.length || active.length;
         const statPending = document.getElementById('patient-stat-pending-quizzes-count'); if (statPending) statPending.textContent = pendingCount;
       };
-      const filterItems = () => { const query = search.value.trim().toLocaleLowerCase('pt-BR'); const statusItems = items.filter(item => { const pStatus = item.patient.status || 'active'; const isInactive = pStatus === 'inactive'; const isFinished = pStatus === 'finished' || (pStatus === 'active' && isFinishedPatient(item)); const isActive = pStatus === 'active' && !isFinishedPatient(item); if (filter === 'finalizados') return isFinished; if (filter === 'inativos') return isInactive; if (filter === 'ativos') return isActive; return true; }); return statusItems.filter(item => { const patient = item.patient; if (!`${patient.name || ''} ${patient.email || ''} ${patient.profile?.whatsapp || ''}`.toLocaleLowerCase('pt-BR').includes(query)) return false; const activity = lastActivityDate(item); if (filters.lastFrom && (!activity || activity < filters.lastFrom)) return false; if (filters.lastTo && (!activity || activity > filters.lastTo)) return false; const links = activeLinksFor(item); if (filters.service && !links.some(link => link.serviceId === filters.service)) return false; if (filters.label && !(patient.profile?.labels || []).includes(filters.label)) return false; if (filters.remaining) { const limit = Number(filters.remaining); const hasRemaining = links.some(link => { const end = serviceEndDate(link); if (!end) return false; const days = Math.ceil((end.getTime() - today.getTime()) / 86400000); return days >= 0 && days <= limit; }); if (!hasRemaining) return false; } const response = Number(item.responsePercent || 0); if (filters.response && response > Number(filters.response)) return false; const hasWhatsApp = Boolean(patient.profile?.whatsapp || patient.whatsapp || patient.phone || patient.phoneNumber); if (filters.whatsapp === 'confirmed' && !hasWhatsApp) return false; if (filters.whatsapp === 'pending' && hasWhatsApp) return false; return true; }); };
+      const filterItems = () => {
+        const query = search.value.trim().toLocaleLowerCase('pt-BR');
+        const statusItems = items.filter(item => {
+          if (filter === 'finalizados') return isFinishedPatient(item);
+          if (filter === 'inativos') return isInactivePatient(item);
+          if (filter === 'ativos') return isActivePatient(item);
+          return true;
+        });
+        return statusItems.filter(item => {
+          const patient = item.patient;
+          if (!`${patient.name || ''} ${patient.email || ''} ${patient.profile?.whatsapp || ''}`.toLocaleLowerCase('pt-BR').includes(query)) return false;
+          const activity = lastActivityDate(item);
+          if (filters.lastFrom && (!activity || activity < filters.lastFrom)) return false;
+          if (filters.lastTo && (!activity || activity > filters.lastTo)) return false;
+          const links = activeLinksFor(item);
+          if (filters.service && !links.some(link => link.serviceId === filters.service)) return false;
+          if (filters.label && !(patient.profile?.labels || []).includes(filters.label)) return false;
+          if (filters.remaining) {
+            const limit = Number(filters.remaining);
+            const hasRemaining = links.some(link => {
+              const end = serviceEndDate(link);
+              if (!end) return false;
+              const days = Math.ceil((end.getTime() - today.getTime()) / 86400000);
+              return days >= 0 && days <= limit;
+            });
+            if (!hasRemaining) return false;
+          }
+          const response = Number(item.responsePercent || 0);
+          if (filters.response && response > Number(filters.response)) return false;
+          const hasWhatsApp = Boolean(patient.profile?.whatsapp || patient.whatsapp || patient.phone || patient.phoneNumber);
+          if (filters.whatsapp === 'confirmed' && !hasWhatsApp) return false;
+          if (filters.whatsapp === 'pending' && hasWhatsApp) return false;
+          return true;
+        });
+      };
       const openPatient = async item => { document.getElementById('patient-directory').classList.add('hidden'); document.getElementById('inicio').classList.add('hidden'); document.getElementById('inicio-dashboard').classList.add('hidden'); document.getElementById('patient-selection-area').classList.remove('hidden'); await activatePatient(item.index); };
       const columnData = (item, id) => {
         const patient = item.patient;
@@ -4785,7 +4838,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       backToMenuButton?.addEventListener('click', showCardsMenu);
       const handleTopBack = () => { if (contentView && !contentView.classList.contains('hidden')) showCardsMenu(); else onBack(); };
       document.getElementById('patient-profile-back').addEventListener('click', handleTopBack); document.getElementById('patient-profile-close').addEventListener('click', onBack); document.getElementById('patient-profile-cancel').addEventListener('click', () => { if (activePatient) fill(activePatient); });
-      form.addEventListener('submit', async event => { event.preventDefault(); if (!activePatient) return; if (!labels.length) { options.classList.remove('hidden'); picker.classList.add('is-open'); trigger.setAttribute('aria-expanded','true'); trigger.focus(); return; } const phoneCountry = selectedPhoneCountry(); const whatsapp = phoneSelector?.getNumber?.() || phoneInput.value.trim(); const profile = { id:document.getElementById('patient-profile-id').value, createdAt:document.getElementById('patient-profile-created-at').value, name:document.getElementById('patient-profile-full-name').value.trim(), whatsapp, phoneCountry, email:document.getElementById('patient-profile-email').value.trim(), document:document.getElementById('patient-profile-document').value.trim(), status:document.getElementById('patient-profile-user-status').value, birthDate:document.getElementById('patient-profile-birth-date').value, gender:document.getElementById('patient-profile-gender').value, notes:document.getElementById('patient-profile-notes').value.trim(), labels }; const status = document.getElementById('patient-profile-status'); status.textContent = 'Salvando edições...'; status.className = 'mt-4 text-xs font-semibold text-primary'; const result = await db.savePatientProfile(profile); if (result?.success === false) { status.textContent = result.message || 'Não foi possível salvar as edições.'; status.className = 'mt-4 text-xs font-semibold text-red-600'; return; } const saved = result.profile || profile; activePatient.name = saved.name; activePatient.email = saved.email || activePatient.email; activePatient.profile = saved; await fill(activePatient); status.textContent = 'Edições salvas com sucesso.'; status.className = 'mt-4 text-xs font-semibold text-green-600'; notify('Dados cadastrais atualizados com sucesso.'); });
+      form.addEventListener('submit', async event => { event.preventDefault(); if (!activePatient) return; if (!labels.length) { options.classList.remove('hidden'); picker.classList.add('is-open'); trigger.setAttribute('aria-expanded','true'); trigger.focus(); return; } const phoneCountry = selectedPhoneCountry(); const whatsapp = phoneSelector?.getNumber?.() || phoneInput.value.trim(); const profile = { id:document.getElementById('patient-profile-id').value, createdAt:document.getElementById('patient-profile-created-at').value, name:document.getElementById('patient-profile-full-name').value.trim(), whatsapp, phoneCountry, email:document.getElementById('patient-profile-email').value.trim(), document:document.getElementById('patient-profile-document').value.trim(), status:document.getElementById('patient-profile-user-status').value, birthDate:document.getElementById('patient-profile-birth-date').value, gender:document.getElementById('patient-profile-gender').value, notes:document.getElementById('patient-profile-notes').value.trim(), labels }; const status = document.getElementById('patient-profile-status'); status.textContent = 'Salvando edições...'; status.className = 'mt-4 text-xs font-semibold text-primary'; const result = await db.savePatientProfile(profile); if (result?.success === false) { status.textContent = result.message || 'Não foi possível salvar as edições.'; status.className = 'mt-4 text-xs font-semibold text-red-600'; return; } const saved = result.profile || profile; activePatient.name = saved.name; activePatient.email = saved.email || activePatient.email; activePatient.status = saved.status; activePatient.profile = saved; await fill(activePatient); status.textContent = 'Edições salvas com sucesso.'; status.className = 'mt-4 text-xs font-semibold text-green-600'; notify('Dados cadastrais atualizados com sucesso.'); });
       deleteButton.addEventListener('click', async () => { const profile = activePatient?.profile; if (!profile?.id) return; if (!window.confirm('Deseja excluir apenas os dados cadastrais deste perfil? A conta de acesso do paciente não será removida.')) return; const result = await db.deletePatientProfile(profile.id); if (result?.success === false) { notify(result.message || 'Não foi possível excluir o cadastro.'); return; } activePatient.profile = { whatsapp:activePatient.whatsapp || activePatient.phone || '', phoneCountry:activePatient.phoneCountry || '', labels:[] }; notify('Dados cadastrais excluídos. A conta de acesso do paciente foi preservada.'); onBack(); });
       return { open, closeOptions, refreshRelations:() => Promise.all([relationManager.renderServices(), relationManager.renderQuizzes()]) };
     }
@@ -4873,7 +4926,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const profilePhone = profile => String(profile?.whatsapp || profile?.phone || profile?.phoneNumber || '').replace(/\D/g, '');
       const patientPhone = patient => profilePhone(patient?.profile) || String(patient?.whatsapp || patient?.phone || patient?.phoneNumber || '').replace(/\D/g, '');
       const sameDirectoryPatient = (first, second) => { if (!first || !second) return false; const firstProfile = first.profile || {}; const secondProfile = second.profile || {}; const firstId = String(firstProfile.id || first.id || '').trim().toLowerCase(); const secondId = String(secondProfile.id || second.id || '').trim().toLowerCase(); if (firstId && secondId && firstId === secondId) return true; const firstEmail = normalizedEmail(firstProfile.email || first.email); const secondEmail = normalizedEmail(secondProfile.email || second.email); if (firstEmail && secondEmail) return firstEmail === secondEmail; const firstName = normalizedName(firstProfile.name || first.name); const secondName = normalizedName(secondProfile.name || second.name); const firstDigits = patientPhone(first); const secondDigits = patientPhone(second); return Boolean(firstName && secondName && firstName === secondName && firstDigits && secondDigits && firstDigits === secondDigits); };
-      const mergeDirectoryPatients = source => { const merged = []; (Array.isArray(source) ? source : []).forEach(patient => { const index = merged.findIndex(item => sameDirectoryPatient(item, patient)); if (index < 0) { merged.push(patient); return; } const previous = merged[index]; const choose = (primary, fallback) => String(primary ?? '').trim() ? primary : fallback; const profile = { ...(previous.profile || {}), ...(patient.profile || {}) }; ['id','name','whatsapp','phoneCountry','email','notes','gender','birthDate','document','createdAt','updatedAt'].forEach(key => { profile[key] = choose(previous.profile?.[key], patient.profile?.[key]); }); profile.labels = [...new Set([...(previous.profile?.labels || []), ...(patient.profile?.labels || [])])]; merged[index] = { ...previous, ...patient, id:previous.id || patient.id, name:choose(previous.name, patient.name), email:choose(previous.email, patient.email), whatsapp:choose(previous.whatsapp, patient.whatsapp), phone:choose(previous.phone, patient.phone), phoneNumber:choose(previous.phoneNumber, patient.phoneNumber), phoneCountry:choose(previous.phoneCountry, patient.phoneCountry), profile }; }); return merged; };
+      const mergeDirectoryPatients = source => { const merged = []; (Array.isArray(source) ? source : []).forEach(patient => { const index = merged.findIndex(item => sameDirectoryPatient(item, patient)); if (index < 0) { merged.push(patient); return; } const previous = merged[index]; const choose = (primary, fallback) => String(primary ?? '').trim() ? primary : fallback; const profile = { ...(previous.profile || {}), ...(patient.profile || {}) }; ['id','name','whatsapp','phoneCountry','email','notes','gender','birthDate','document','status','createdAt','updatedAt'].forEach(key => { profile[key] = choose(previous.profile?.[key], patient.profile?.[key]); }); profile.labels = [...new Set([...(previous.profile?.labels || []), ...(patient.profile?.labels || [])])]; merged[index] = { ...previous, ...patient, id:previous.id || patient.id, name:choose(previous.name, patient.name), email:choose(previous.email, patient.email), whatsapp:choose(previous.whatsapp, patient.whatsapp), phone:choose(previous.phone, patient.phone), phoneNumber:choose(previous.phoneNumber, patient.phoneNumber), phoneCountry:choose(previous.phoneCountry, patient.phoneCountry), profile }; }); return merged; };
       const profileFor = patient => { const patientEmail = normalizedEmail(patient.email); const patientName = normalizedName(patient.name); const patientDigits = String(patient.whatsapp || patient.phone || patient.phoneNumber || '').replace(/\D/g, ''); return profiles.find(profile => patientEmail && normalizedEmail(profile.email) === patientEmail) || profiles.find(profile => patientName && normalizedName(profile.name) === patientName && patientDigits && profilePhone(profile) === patientDigits) || profiles.find(profile => patientName && !patientDigits && normalizedName(profile.name) === patientName) || { whatsapp:patient.whatsapp || patient.phone || patient.phoneNumber || '', phoneCountry:patient.phoneCountry || patient.phone_country || patient.countryCode || '', labels:[] }; };
       const registeredDirectoryPatients = mergeDirectoryPatients(registeredPatients.map(patient => { const profile = profileFor(patient) || null; return { ...patient, name:profile?.name || patient.name, profile, labelDefinitions:patientLabelDefinitions }; }));
       const patients = [...registeredDirectoryPatients, ...profiles.filter(profile => !registeredDirectoryPatients.some(patient => sameDirectoryPatient(patient, { name:profile.name, email:profile.email || '', role:'patient', profile }))).map(profile => ({ name:profile.name, email:profile.email || '', role:'patient', profile, labelDefinitions:patientLabelDefinitions }))];
