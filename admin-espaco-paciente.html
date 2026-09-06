@@ -1715,13 +1715,19 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <select id="scheduled-sends-filter-status" class="rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
-              <option value="active_future">Ativos futuros (todos)</option>
-              <option value="agendado_na_brevo">Agendados no Brevo</option>
+              <option value="active_and_sent">Envios ativos e realizados</option>
+              <option value="future_only">Apenas futuros programados</option>
+              <option value="agendado_na_brevo">Agendados no Brevo (futuros)</option>
               <option value="aguardando_brevo">Fila da plataforma</option>
               <option value="pausado">Pausados</option>
-              <option value="all">Todos (incluindo cancelados)</option>
+              <option value="delivered">Entregues</option>
+              <option value="opened">Lidos</option>
+              <option value="clicked">Clicados</option>
+              <option value="responded">Respondidos</option>
+              <option value="failed">Não entregues</option>
               <option value="cancelado">Cancelados</option>
-              <option value="falha_de_agendamento">Falha de agendamento</option>
+              <option value="falha_de_agendamento">Falhas de agendamento</option>
+              <option value="all">Todos os envios</option>
             </select>
             <select id="scheduled-sends-filter-mode" class="rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
               <option value="">Todos os modos</option>
@@ -4263,6 +4269,10 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       let rawSchedules = [];
       let cachedQuizLinks = [];
+      let cachedReportEvents = [];
+      let eventsByMessageId = new Map();
+      let eventsByScheduleKey = new Map();
+      let eventsByRecipient = new Map();
       let loading = false;
       const sortState = { key:'scheduledFor', direction:'asc' };
 
@@ -4273,6 +4283,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       const escape = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
       const normalized = value => String(value || '').trim().toLowerCase();
+      const cleanId = id => String(id || '').replace(/[<>]/g, '').trim().toLowerCase();
 
       const sendModeLabels = {
         unique: 'Envio Único',
@@ -4328,7 +4339,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         return `${datePart} às ${timePart}`;
       };
 
-      const formatRelativeBadge = isoString => {
+      const formatRelativeBadge = (isoString, isSent = false) => {
         if (!isoString) return '';
         const date = new Date(isoString);
         if (Number.isNaN(date.getTime())) return '';
@@ -4336,35 +4347,202 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         const targetDay = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
         const diffDays = Math.round((targetDay - startOfToday) / (24 * 60 * 60 * 1000));
+        if (isSent) {
+          if (diffDays === 0) return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Enviado hoje</span>';
+          if (diffDays === -1) return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Enviado ontem</span>';
+          if (diffDays < -1) return `<span class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600">Enviado há ${Math.abs(diffDays)} dias</span>`;
+          return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Enviado</span>';
+        }
         if (diffDays < 0) return '<span class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-500">Passado</span>';
         if (diffDays === 0) return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Hoje</span>';
         if (diffDays === 1) return '<span class="inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">Amanhã</span>';
         return `<span class="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Em ${diffDays} dias</span>`;
       };
 
-      const formatStatusBadge = status => {
-        const norm = normalized(status);
-        if (norm === 'agendado_na_brevo') {
-          return '<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700" title="Confirmado e agendado no Brevo"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Agendado no Brevo</span>';
+      const formatReportStatus = event => {
+        if (!event) return null;
+        if (event.failed) {
+          return {
+            key: 'failed',
+            label: 'Não entregue',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#fae8e7] px-2.5 py-1 text-[11px] font-bold text-[#b44b48]" title="A mensagem não pôde ser entregue. Verifique os dados de contato do paciente."><span class="h-1.5 w-1.5 rounded-full bg-[#b44b48]"></span>Não entregue</span>',
+            isSent: true
+          };
         }
-        if (norm === 'aguardando_brevo') {
-          return '<span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700" title="Na fila da plataforma aguardando a janela de envio"><span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>Fila da plataforma</span>';
+        if (event.respondedAt || event.responseStatus === 'responded' || event.status === 'responded') {
+          return {
+            key: 'responded',
+            label: 'Respondido',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#f3edda] px-2.5 py-1 text-[11px] font-bold text-[#8b6d1e]" title="O paciente respondeu todo o questionário."><span class="h-1.5 w-1.5 rounded-full bg-[#8b6d1e]"></span>Respondido</span>',
+            isSent: true
+          };
         }
-        if (norm === 'pausado') {
-          return '<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700" title="Envio suspenso temporariamente"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>Pausado</span>';
+        if (event.clickedAt || event.status === 'clicked') {
+          return {
+            key: 'clicked',
+            label: 'Clicado',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eef8ef] px-2.5 py-1 text-[11px] font-bold text-[#2f8b54]" title="O paciente clicou no link que foi enviado dentro da mensagem."><span class="h-1.5 w-1.5 rounded-full bg-[#2f8b54]"></span>Clicado</span>',
+            isSent: true
+          };
         }
+        if (event.openedAt || event.status === 'opened') {
+          return {
+            key: 'opened',
+            label: 'Lido',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#e6f3e9] px-2.5 py-1 text-[11px] font-bold text-[#377255]" title="O paciente visualizou a mensagem."><span class="h-1.5 w-1.5 rounded-full bg-[#377255]"></span>Lido</span>',
+            isSent: true
+          };
+        }
+        return {
+          key: 'delivered',
+          label: 'Entregue',
+          badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eaf1f8] px-2.5 py-1 text-[11px] font-bold text-[#47708d]" title="A mensagem chegou com sucesso ao paciente."><span class="h-1.5 w-1.5 rounded-full bg-[#47708d]"></span>Entregue</span>',
+          isSent: true
+        };
+      };
+
+      const findMatchingReportEvent = schedule => {
+        const mId = cleanId(schedule?.providerMessageId || schedule?.provider_message_id);
+        if (mId && eventsByMessageId.has(mId)) return eventsByMessageId.get(mId);
+
+        const schedKey = String(schedule?.scheduleKey || schedule?.schedule_key || '').trim();
+        if (schedKey && eventsByScheduleKey.has(schedKey)) return eventsByScheduleKey.get(schedKey);
+
+        const recipient = String(schedule?.recipientEmail || schedule?.recipient_email || '').trim().toLowerCase();
+        const candidates = eventsByRecipient.get(recipient) || [];
+        if (candidates.length) {
+          const schedTime = new Date(schedule?.scheduledFor || 0).getTime();
+          const quizId = String(schedule?.quizId || schedule?.quiz_id || '').trim().toLowerCase();
+          const sorted = candidates
+            .filter(ev => {
+              if (!quizId) return true;
+              const evQuiz = String(ev?.quizId || '').trim().toLowerCase();
+              return !evQuiz || evQuiz === quizId;
+            })
+            .map(ev => ({ ev, diff: Math.abs(new Date(ev.sentAt || 0).getTime() - schedTime) }))
+            .sort((a, b) => a.diff - b.diff);
+
+          if (sorted.length && sorted[0].diff < 4 * 60 * 60 * 1000) {
+            return sorted[0].ev;
+          }
+        }
+        return null;
+      };
+
+      const resolveScheduleStatus = schedule => {
+        const norm = normalized(schedule?.status);
+        const schedTime = Date.parse(schedule?.scheduledFor || '');
+        const isPast = Number.isFinite(schedTime) && schedTime <= Date.now();
+
+        // Se o envio é FUTURO, mantém exatamente como está
+        if (!isPast) {
+          if (norm === 'agendado_na_brevo') {
+            return {
+              key: 'agendado_na_brevo',
+              label: 'Agendado no Brevo',
+              badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700" title="Confirmado e agendado no Brevo"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Agendado no Brevo</span>',
+              isSent: false
+            };
+          }
+          if (norm === 'aguardando_brevo') {
+            return {
+              key: 'aguardando_brevo',
+              label: 'Fila da plataforma',
+              badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700" title="Na fila da plataforma aguardando a janela de envio"><span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>Fila da plataforma</span>',
+              isSent: false
+            };
+          }
+          if (norm === 'pausado') {
+            return {
+              key: 'pausado',
+              label: 'Pausado',
+              badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700" title="Envio suspenso temporariamente"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>Pausado</span>',
+              isSent: false
+            };
+          }
+          if (['cancelled', 'cancelado'].includes(norm)) {
+            return {
+              key: 'cancelado',
+              label: 'Cancelado',
+              badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-bold text-gray-500" title="Agendamento cancelado"><span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>Cancelado</span>',
+              isSent: false
+            };
+          }
+          if (['failed', 'falha_de_agendamento'].includes(norm)) {
+            return {
+              key: 'falha_de_agendamento',
+              label: 'Falha de agendamento',
+              badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-700" title="Falha ao programar envio"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>Falha de agendamento</span>',
+              isSent: false
+            };
+          }
+          return {
+            key: norm,
+            label: schedule?.status || 'Pendente',
+            badgeHtml: `<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-2.5 py-1 text-[11px] font-bold text-gray-600">${escape(schedule?.status)}</span>`,
+            isSent: false
+          };
+        }
+
+        // Tempo PASSADO:
         if (['cancelled', 'cancelado'].includes(norm)) {
-          return '<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-bold text-gray-500" title="Agendamento cancelado"><span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>Cancelado</span>';
+          const matched = findMatchingReportEvent(schedule);
+          if (matched && (matched.deliveredAt || matched.openedAt || matched.clickedAt || matched.respondedAt)) {
+            return formatReportStatus(matched);
+          }
+          return {
+            key: 'cancelado',
+            label: 'Cancelado',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-bold text-gray-500" title="Agendamento cancelado"><span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>Cancelado</span>',
+            isSent: false
+          };
         }
+
         if (['failed', 'falha_de_agendamento'].includes(norm)) {
-          return '<span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-700" title="Falha ao programar envio"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>Falha de agendamento</span>';
+          return {
+            key: 'falha_de_agendamento',
+            label: 'Falha de agendamento',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-700" title="Falha ao programar envio"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>Falha de agendamento</span>',
+            isSent: false
+          };
         }
-        return `<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-2.5 py-1 text-[11px] font-bold text-gray-600">${escape(status)}</span>`;
+
+        if (norm === 'pausado') {
+          return {
+            key: 'pausado',
+            label: 'Pausado',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700" title="Envio pausado antes do horário previsto"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>Pausado</span>',
+            isSent: false
+          };
+        }
+
+        // Envio no passado disparado: busca status real do relatório pós-envio
+        const matched = findMatchingReportEvent(schedule);
+        if (matched) {
+          return formatReportStatus(matched);
+        }
+
+        // Se estava agendado no Brevo / enviado e o momento já passou, foi transmitido com sucesso
+        if (['agendado_na_brevo', 'enviado', 'sent', 'delivered'].includes(norm)) {
+          return {
+            key: 'delivered',
+            label: 'Entregue',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eaf1f8] px-2.5 py-1 text-[11px] font-bold text-[#47708d]" title="A mensagem chegou com sucesso ao paciente."><span class="h-1.5 w-1.5 rounded-full bg-[#47708d]"></span>Entregue</span>',
+            isSent: true
+          };
+        }
+
+        return {
+          key: norm,
+          label: schedule?.status || 'Pendente',
+          badgeHtml: `<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-2.5 py-1 text-[11px] font-bold text-gray-600">${escape(schedule?.status)}</span>`,
+          isSent: false
+        };
       };
 
       const isFutureSchedule = schedule => {
         const timestamp = Date.parse(schedule?.scheduledFor || '');
-        return Number.isFinite(timestamp) && timestamp >= (Date.now() - 3600000);
+        return Number.isFinite(timestamp) && timestamp > Date.now();
       };
 
       const updateKpis = schedules => {
@@ -4376,13 +4554,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         let earliestFutureIso = '';
 
         schedules.forEach(s => {
-          const st = normalized(s.status);
           const isFut = isFutureSchedule(s);
-          if (st === 'agendado_na_brevo') brevo++;
-          else if (st === 'aguardando_brevo') queue++;
-          else if (st === 'pausado') paused++;
+          const stKey = s.resolvedStatus?.key;
+          if (stKey === 'agendado_na_brevo' && isFut) brevo++;
+          else if (stKey === 'aguardando_brevo' && isFut) queue++;
+          else if (stKey === 'pausado') paused++;
 
-          if (['agendado_na_brevo', 'aguardando_brevo'].includes(st) && isFut) {
+          if (['agendado_na_brevo', 'aguardando_brevo'].includes(stKey) && isFut) {
             activeFuture++;
             const t = Date.parse(s.scheduledFor);
             if (t < earliestFutureTimestamp) {
@@ -4409,26 +4587,39 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       const getFilteredAndSorted = () => {
         const query = (searchInput?.value || '').trim().toLocaleLowerCase('pt-BR');
-        const stFilter = statusFilter?.value || 'active_future';
+        const stFilter = statusFilter?.value || 'active_and_sent';
         const mdFilter = modeFilter?.value || '';
 
         const filtered = rawSchedules.filter(s => {
-          const st = normalized(s.status);
+          const statusInfo = s.resolvedStatus || resolveScheduleStatus(s);
+          const stKey = statusInfo.key;
+          const isFut = isFutureSchedule(s);
           const modeInfo = getSendModeInfo(s);
 
-          if (stFilter === 'active_future') {
-            if (['cancelado', 'cancelled', 'falha_de_agendamento', 'failed'].includes(st)) return false;
-            if (!isFutureSchedule(s) && !['agendado_na_brevo', 'aguardando_brevo', 'pausado'].includes(st)) return false;
+          if (stFilter === 'active_and_sent') {
+            if (['cancelado', 'falha_de_agendamento'].includes(stKey)) return false;
+          } else if (stFilter === 'future_only') {
+            if (!isFut || ['cancelado', 'falha_de_agendamento'].includes(stKey)) return false;
           } else if (stFilter === 'agendado_na_brevo') {
-            if (st !== 'agendado_na_brevo') return false;
+            if (stKey !== 'agendado_na_brevo') return false;
           } else if (stFilter === 'aguardando_brevo') {
-            if (st !== 'aguardando_brevo') return false;
+            if (stKey !== 'aguardando_brevo') return false;
           } else if (stFilter === 'pausado') {
-            if (st !== 'pausado') return false;
+            if (stKey !== 'pausado') return false;
+          } else if (stFilter === 'delivered') {
+            if (stKey !== 'delivered') return false;
+          } else if (stFilter === 'opened') {
+            if (stKey !== 'opened') return false;
+          } else if (stFilter === 'clicked') {
+            if (stKey !== 'clicked') return false;
+          } else if (stFilter === 'responded') {
+            if (stKey !== 'responded') return false;
+          } else if (stFilter === 'failed') {
+            if (stKey !== 'failed') return false;
           } else if (stFilter === 'cancelado') {
-            if (!['cancelled', 'cancelado'].includes(st)) return false;
+            if (stKey !== 'cancelado') return false;
           } else if (stFilter === 'falha_de_agendamento') {
-            if (!['failed', 'falha_de_agendamento'].includes(st)) return false;
+            if (stKey !== 'falha_de_agendamento') return false;
           }
 
           if (mdFilter) {
@@ -4440,7 +4631,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             const pEmail = String(s.recipientEmail || '').toLocaleLowerCase('pt-BR');
             const qTitle = String(s.quizTitle || '').toLocaleLowerCase('pt-BR');
             const mLabel = String(modeInfo.label || '').toLocaleLowerCase('pt-BR');
-            if (!pName.includes(query) && !pEmail.includes(query) && !qTitle.includes(query) && !mLabel.includes(query)) return false;
+            const sLabel = String(statusInfo.label || '').toLocaleLowerCase('pt-BR');
+            if (!pName.includes(query) && !pEmail.includes(query) && !qTitle.includes(query) && !mLabel.includes(query) && !sLabel.includes(query)) return false;
           }
 
           return true;
@@ -4461,8 +4653,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             valA = getSendModeInfo(a).label;
             valB = getSendModeInfo(b).label;
           } else if (sortState.key === 'status') {
-            valA = String(a.status || '');
-            valB = String(b.status || '');
+            valA = String(a.resolvedStatus?.label || '');
+            valB = String(b.resolvedStatus?.label || '');
           }
 
           if (valA < valB) return sortState.direction === 'asc' ? -1 : 1;
@@ -4504,14 +4696,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         }
 
         rows.innerHTML = visible.map(schedule => {
+          const statusInfo = schedule.resolvedStatus || resolveScheduleStatus(schedule);
           const dateFormatted = formatDateTime(schedule.scheduledFor);
-          const relativeBadge = formatRelativeBadge(schedule.scheduledFor);
+          const relativeBadge = formatRelativeBadge(schedule.scheduledFor, statusInfo.isSent);
           const modeInfo = getSendModeInfo(schedule);
-          const statusBadge = formatStatusBadge(schedule.status);
-          const st = normalized(schedule.status);
-          const canPause = ['agendado_na_brevo', 'aguardando_brevo'].includes(st);
-          const canResume = st === 'pausado';
-          const canCancel = ['agendado_na_brevo', 'aguardando_brevo', 'pausado'].includes(st);
+          const canPause = !statusInfo.isSent && ['agendado_na_brevo', 'aguardando_brevo'].includes(statusInfo.key);
+          const canResume = !statusInfo.isSent && statusInfo.key === 'pausado';
+          const canCancel = !statusInfo.isSent && ['agendado_na_brevo', 'aguardando_brevo', 'pausado'].includes(statusInfo.key);
 
           let actionButtons = '';
           if (canResume) {
@@ -4523,7 +4714,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             actionButtons += `<button type="button" class="ml-1.5 rounded-lg bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600 hover:bg-red-100 transition" data-sched-action="cancel" data-sched-id="${escape(schedule.id)}" title="Cancelar agendamento">Cancelar</button>`;
           }
           if (!actionButtons) {
-            actionButtons = '<span class="text-xs text-gray-400">—</span>';
+            actionButtons = `<span class="text-xs text-gray-400" title="${statusInfo.isSent ? 'Envio já disparado' : 'Sem ações disponíveis'}">—</span>`;
           }
 
           const isReminder = modeInfo.code === 'reminder';
@@ -4552,7 +4743,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
                 <span class="inline-flex rounded-lg bg-primary/[.08] px-2.5 py-1 text-xs font-semibold text-dark">${escape(modeInfo.label)}</span>
               </td>
               <td>
-                ${statusBadge}
+                ${statusInfo.badgeHtml}
               </td>
               <td class="text-right">
                 <div class="flex items-center justify-end">
@@ -4605,14 +4796,43 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         draw();
 
         try {
-          const [schedulesResult, linksResult] = await Promise.all([
+          const localDateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          const now = new Date();
+          const fromDate = localDateKey(new Date(now.getTime() - 85 * 24 * 60 * 60 * 1000));
+          const toDate = localDateKey(now);
+
+          const [schedulesResult, linksResult, emailReportResult] = await Promise.all([
             db.getEmailQuizSchedules('', ''),
-            db.getPatientQuizLinks()
+            db.getPatientQuizLinks(),
+            db.getEmailQuizReport(fromDate, toDate).catch(() => ({ success:false, events:[] }))
           ]);
 
           cachedQuizLinks = Array.isArray(linksResult) ? linksResult : [];
+          cachedReportEvents = Array.isArray(emailReportResult?.events) ? emailReportResult.events : [];
+
+          eventsByMessageId = new Map();
+          eventsByScheduleKey = new Map();
+          eventsByRecipient = new Map();
+
+          cachedReportEvents.forEach(ev => {
+            const mId = cleanId(ev.providerMessageId || ev.messageId || ev.id);
+            if (mId) eventsByMessageId.set(mId, ev);
+            if (ev.scheduleKey) eventsByScheduleKey.set(ev.scheduleKey, ev);
+
+            const recipient = String(ev.recipientEmail || ev.email || '').trim().toLowerCase();
+            if (recipient) {
+              const list = eventsByRecipient.get(recipient) || [];
+              list.push(ev);
+              eventsByRecipient.set(recipient, list);
+            }
+          });
+
           if (schedulesResult?.success) {
-            rawSchedules = Array.isArray(schedulesResult.schedules) ? schedulesResult.schedules : [];
+            const list = Array.isArray(schedulesResult.schedules) ? schedulesResult.schedules : [];
+            rawSchedules = list.map(s => ({
+              ...s,
+              resolvedStatus: resolveScheduleStatus(s)
+            }));
             const updatedAt = schedulesResult.updatedAt ? new Date(schedulesResult.updatedAt).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
             if (period) period.textContent = `Atualizado às ${updatedAt} · ${rawSchedules.length} agendamentos registrados no total.`;
           } else {
@@ -4639,13 +4859,14 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
         visible.forEach(s => {
           const modeInfo = getSendModeInfo(s);
+          const statusInfo = s.resolvedStatus || resolveScheduleStatus(s);
           const fields = [
             `"${formatDateTime(s.scheduledFor)}"`,
             `"${(s.patientName || '').replace(/"/g, '""')}"`,
             `"${(s.recipientEmail || '').replace(/"/g, '""')}"`,
             `"${(s.quizTitle || '').replace(/"/g, '""')}"`,
             `"${modeInfo.label}"`,
-            `"${s.status || ''}"`,
+            `"${statusInfo.label || ''}"`,
             `"${s.id || ''}"`,
             `"${s.provider || 'brevo'}"`
           ];
