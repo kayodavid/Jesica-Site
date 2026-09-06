@@ -3883,7 +3883,27 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const percent = (value, total) => total ? `${((Number(value || 0) / total) * 100).toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 })}%` : '0,00%';
       const normalized = value => String(value || '').trim().toLowerCase();
       const sendModeLabels = { unique:'Envio Único', daily:'Envio Diário', weekly:'Envio Semanal', manual:'Envio Manual', open:'Envio Aberto' };
-      const sendModeLabelFor = event => { const direct = String(event?.sendModeLabel || '').trim(); if (direct) return direct; const mode = normalized(event?.sendMode); if (sendModeLabels[mode]) return sendModeLabels[mode]; const keyMatch = String(event?.scheduleKey || '').match(/(?:^|:)(unique|daily|weekly|manual|open)(?=:|$)/i); return sendModeLabels[normalized(keyMatch?.[1])] || 'Envio Único'; };
+      let cachedQuizLinks = [];
+      const sendModeLabelFor = event => {
+        const direct = String(event?.sendModeLabel || '').trim();
+        if (direct) return direct;
+        const mode = normalized(event?.sendMode);
+        if (sendModeLabels[mode]) return sendModeLabels[mode];
+        const keyMatch = String(event?.scheduleKey || '').match(/(?:^|:)(unique|daily|weekly|manual|open)(?=:|$)/i);
+        if (keyMatch && sendModeLabels[normalized(keyMatch[1])]) return sendModeLabels[normalized(keyMatch[1])];
+        if (Array.isArray(cachedQuizLinks) && cachedQuizLinks.length) {
+          const matchedLink = cachedQuizLinks.find(l => {
+            if (event?.quizLinkId && String(l.id || '').toLowerCase() === String(event.quizLinkId).toLowerCase()) return true;
+            const lKey = String(l.patientKey || '').toLowerCase();
+            const eventKey = String(event?.patientKey || '').toLowerCase();
+            if (eventKey && lKey && lKey === eventKey) return true;
+            return false;
+          });
+          const linkMode = normalized(matchedLink?.sendMode || matchedLink?.sendConfig?.sendMode);
+          if (sendModeLabels[linkMode]) return sendModeLabels[linkMode];
+        }
+        return 'Envio Único';
+      };
       const phoneKey = value => String(value || '').replace(/\D/g, '');
       const metadataOf = event => event?.metadata && typeof event.metadata === 'object' ? event.metadata : {};
       const firstDate = (...values) => values.find(value => value && !Number.isNaN(new Date(value).getTime())) || '';
@@ -3935,6 +3955,9 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             const person = { name:profile.name || profile.email || 'Paciente', country:profile.phoneCountry || profile.countryCode || '', phone:profile.whatsapp || profile.phone || profile.phoneNumber || '' };
             addPerson(directory, [profile.email, profile.phone, profile.whatsapp, profile.id, profile.key], person);
           });
+        } catch {}
+        try {
+          cachedQuizLinks = await db.getPatientQuizLinks();
         } catch {}
         peopleByRecipient = directory;
         patientFilter.innerHTML = '<option value="">Selecione uma opção</option>';
@@ -4610,7 +4633,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           if (!canSend) return notify(paused ? 'Retome o questionário antes de enviar.' : 'Cadastre um e-mail válido no paciente antes de enviar.');
           const confirmed = await window.__askQuizSendConfirmation?.(email);
           if (!confirmed) return;
-          const result = await db.sendQuizByEmail({ patientKey:patientKeyValue, patientName:patient.profile?.name || patient.name, recipientEmail:email, quizLinkId:link.id, quiz, expiresInDays:14 });
+          const result = await db.sendQuizByEmail({ patientKey:patientKeyValue, patientName:patient.profile?.name || patient.name, recipientEmail:email, quizLinkId:link.id, sendMode:link.sendMode || link.sendConfig?.sendMode || 'unique', quiz, expiresInDays:14 });
           if (result?.success === false) return notify(result.message || 'Não foi possível enviar o questionário por e-mail.');
           notify('Questionário enviado por e-mail.');
           renderQuizzes();

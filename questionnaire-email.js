@@ -87,21 +87,64 @@ async function getPlatformPreferences(sessionToken) {
   try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => item?.theme === PLATFORM_PREFERENCES_THEME || recordSource(item) === PLATFORM_PREFERENCES_SOURCE); if (!record) return {}; let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return data; } catch { return {}; }
 }
 
+const _serverRpcCache = new Map();
+const _serverRpcInFlight = new Map();
+const SERVER_RPC_CACHE_TTL = 15000;
+
+function invalidateServerRpcCache() {
+  _serverRpcCache.clear();
+  _serverRpcInFlight.clear();
+}
+
 async function callRpc(name, body) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  const text = await response.text();
-  let value = text;
-  try { value = text ? JSON.parse(text) : null; } catch {}
-  if (!response.ok) throw new Error(typeof value === 'string' ? value : (value?.message || `Supabase RPC ${response.status}`));
-  return value;
+  const isRead = name.startsWith('app_list_') || name.startsWith('app_get_');
+  const isWrite = name.startsWith('app_add_') || name.startsWith('app_update_') || name.startsWith('app_delete_') || name.startsWith('app_upsert_') || name.startsWith('app_save_') || name.startsWith('app_questionnaire_schedule_enqueue') || name.startsWith('app_questionnaire_schedule_claim');
+
+  if (isWrite) {
+    invalidateServerRpcCache();
+  }
+
+  const cacheKey = `${name}:${JSON.stringify(body)}`;
+
+  if (isRead) {
+    const cached = _serverRpcCache.get(cacheKey);
+    if (cached && (Date.now() - cached.time < SERVER_RPC_CACHE_TTL)) {
+      return cached.data;
+    }
+    if (_serverRpcInFlight.has(cacheKey)) {
+      return _serverRpcInFlight.get(cacheKey);
+    }
+  }
+
+  const exec = async () => {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    const text = await response.text();
+    let value = text;
+    try { value = text ? JSON.parse(text) : null; } catch {}
+    if (!response.ok) throw new Error(typeof value === 'string' ? value : (value?.message || `Supabase RPC ${response.status}`));
+    if (isRead) {
+      _serverRpcCache.set(cacheKey, { data: value, time: Date.now() });
+    }
+    return value;
+  };
+
+  if (isRead) {
+    const promise = exec().finally(() => {
+      _serverRpcInFlight.delete(cacheKey);
+    });
+    _serverRpcInFlight.set(cacheKey, promise);
+    return promise;
+  }
+
+  return exec();
 }
 
 async function requireAdmin(sessionToken) {
@@ -391,7 +434,7 @@ function mergeQuestionnaireEmailStates(providerEvents, invitations, clicks, resp
     const response = isCompleteResponse(responseRecord) ? responseRecord : null;
     if (invitationId) representedInvitations.add(invitationId);
     const clickedAt = [event.clickedAt, click?.clickedAt].filter(Boolean).sort((a, b) => Date.parse(b) - Date.parse(a))[0] || '';
-    rows.push({ ...event, invitationId, patientKey:invitation?.patientKey || '',       patientName:invitation?.patientName || '', quizLinkId:invitation?.quizLinkId || '', quizId:invitation?.quizId || '', quizTitle:invitation?.quizTitle || event.subject || 'Questionário', sendMode:normalizeEmailSendMode(invitation?.sendMode) || emailSendModeFromScheduleKey(invitation?.scheduleKey), scheduleKey:invitation?.scheduleKey || '', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '' });
+    rows.push({ ...event, recipientEmail:invitation?.recipientEmail || event.email || '', invitationId, patientKey:invitation?.patientKey || '', patientName:invitation?.patientName || '', quizLinkId:invitation?.quizLinkId || '', quizId:invitation?.quizId || '', quizTitle:invitation?.quizTitle || event.subject || 'Questionário', sendMode:normalizeEmailSendMode(invitation?.sendMode) || emailSendModeFromScheduleKey(invitation?.scheduleKey), scheduleKey:invitation?.scheduleKey || '', clickedAt, respondedAt:response?.respondedAt || '', responseId:response?.id || '', responseStatus:response ? 'responded' : '' });
   });
   invitationList.forEach(invitation => {
     const click = clickByInvitation.get(invitation.invitationId);
@@ -418,8 +461,9 @@ function parseStoredRecord(record) {
 }
 
 function isPatientProfileRecord(record) {
+  const theme = recordTheme(record);
   const source = recordSource(record).toLowerCase();
-  return recordTheme(record) === PATIENT_PROFILE_THEME || /^patient-profile:\/\//i.test(source);
+  return theme === PATIENT_PROFILE_THEME || theme === 'patient_profile' || /^patient-profile:\/\//i.test(source);
 }
 
 function normalizeStoredPatientProfile(record) {
@@ -446,8 +490,9 @@ function emailSendModeLabel(value) {
 }
 
 function isPatientQuizLinkRecord(record) {
+  const theme = recordTheme(record);
   const source = recordSource(record).toLowerCase();
-  return recordTheme(record) === PATIENT_QUIZ_LINK_THEME || /^patient-quiz-link:\/\//i.test(source);
+  return theme === PATIENT_QUIZ_LINK_THEME || theme === 'patient_quiz_link' || /^patient-quiz-link:\/\//i.test(source);
 }
 
 function normalizeStoredQuizLink(record) {
@@ -473,37 +518,201 @@ function emailSendModeFromQuizLink(link) {
   return '';
 }
 
-function sameEmailContext(left, right) {
-  if (!left || !right) return false;
-  const same = (a, b) => { const first = String(a || '').trim().toLowerCase(); const second = String(b || '').trim().toLowerCase(); return Boolean(first && second && first === second); };
-  return (same(left.quizLinkId, right.quizLinkId) && Boolean(left.quizLinkId)) || ((same(left.patientKey, right.patientKey) || same(left.recipientEmail, right.recipientEmail)) && (same(left.quizId, right.quizId) || same(left.quizTitle, right.quizTitle)));
+function normalizeMessageId(id) {
+  return String(id || '').replace(/[<>]/g, '').trim().toLowerCase();
 }
 
-function resolveEmailSendMode(event, invitations = [], quizLinks = [], schedules = []) {
+function normalizeReportQuizTitle(title) {
+  return String(title || '')
+    .replace(/^(?:questionário\s*disponível|questionário|convite)\s*[—-]\s*/i, '')
+    .trim()
+    .toLowerCase();
+}
+
+function cleanQuizDisplayTitle(title, fallback = 'Questionário') {
+  const cleaned = String(title || '')
+    .replace(/^(?:questionário\s*disponível|questionário|convite)\s*[—-]\s*/i, '')
+    .trim();
+  return cleaned || fallback;
+}
+
+function sameEmailContext(left, right, helpers = {}) {
+  if (!left || !right) return false;
+  const leftMsgId = normalizeMessageId(left.providerMessageId || left.messageId);
+  const rightMsgId = normalizeMessageId(right.providerMessageId || right.messageId);
+  if (leftMsgId && rightMsgId && leftMsgId === rightMsgId) return true;
+
+  if (left.quizLinkId && right.quizLinkId && String(left.quizLinkId).toLowerCase() === String(right.quizLinkId).toLowerCase()) return true;
+
+  const { patientKeyByEmail, emailByPatientKey } = helpers;
+  const leftEmail = String(left.recipientEmail || left.email || emailByPatientKey?.get(String(left.patientKey || '').toLowerCase()) || '').trim().toLowerCase();
+  const rightEmail = String(right.recipientEmail || right.email || emailByPatientKey?.get(String(right.patientKey || '').toLowerCase()) || '').trim().toLowerCase();
+  const leftKey = String(left.patientKey || patientKeyByEmail?.get(leftEmail) || '').trim().toLowerCase();
+  const rightKey = String(right.patientKey || patientKeyByEmail?.get(rightEmail) || '').trim().toLowerCase();
+
+  const samePatient = (leftEmail && rightEmail && leftEmail === rightEmail) || (leftKey && rightKey && leftKey === rightKey);
+  if (!samePatient) return false;
+
+  const leftQuizId = String(left.quizId || '').trim().toLowerCase();
+  const rightQuizId = String(right.quizId || '').trim().toLowerCase();
+  if (leftQuizId && rightQuizId && leftQuizId === rightQuizId) return true;
+
+  const leftTitle = normalizeReportQuizTitle(left.quizTitle || left.subject);
+  const rightTitle = normalizeReportQuizTitle(right.quizTitle || right.subject);
+  if (leftTitle && rightTitle && (leftTitle === rightTitle || leftTitle.includes(rightTitle) || rightTitle.includes(leftTitle))) return true;
+
+  return Boolean(samePatient && (!leftQuizId || !rightQuizId));
+}
+
+function resolveEmailSendModeDetails(event, invitations = [], quizLinks = [], schedules = [], helpers = {}) {
   const invitation = (Array.isArray(invitations) ? invitations : []).find(item => item?.invitationId && item.invitationId === event?.invitationId);
-  const direct = normalizeEmailSendMode(event?.sendMode || invitation?.sendMode);
-  if (direct) return direct;
+
   const fromKey = emailSendModeFromScheduleKey(event?.scheduleKey || invitation?.scheduleKey);
-  if (fromKey) return fromKey;
-  const context = { ...invitation, ...event };
-  const eventTime = Date.parse(event?.sentAt || invitation?.sentAt || '') || 0;
-  const matchingSchedule = (Array.isArray(schedules) ? schedules : []).map(schedule => {
-    const scheduleContext = { ...schedule, recipientEmail:schedule.recipientEmail, sentAt:schedule.scheduledFor };
-    const sameContext = sameEmailContext(context, scheduleContext) || (String(context?.quizLinkId || '') && String(context.quizLinkId) === String(schedule?.quizLinkId || ''));
-    const scheduleTime = Date.parse(schedule?.scheduledFor || '') || 0;
-    return { schedule, sameContext, distance:eventTime && scheduleTime ? Math.abs(eventTime - scheduleTime) : Number.MAX_SAFE_INTEGER };
-  }).filter(item => item.sameContext).sort((left, right) => left.distance - right.distance)[0];
-  const scheduledMode = emailSendModeFromScheduleKey(matchingSchedule?.schedule?.scheduleKey);
-  if (scheduledMode) return scheduledMode;
-  const link = (Array.isArray(quizLinks) ? quizLinks : []).find(item => sameEmailContext(context, item) || (context?.quizLinkId && context.quizLinkId === item.id));
-  return emailSendModeFromQuizLink(link) || 'unique';
+  if (fromKey) return { mode: fromKey, schedule: null, link: null };
+
+  const { patientKeyByEmail, emailByPatientKey } = helpers;
+  const eventMsgId = normalizeMessageId(event?.providerMessageId || event?.messageId || event?.id);
+  const eventEmail = String(event?.recipientEmail || event?.email || '').trim().toLowerCase();
+  const eventPatientKey = String(event?.patientKey || patientKeyByEmail?.get(eventEmail) || '').trim().toLowerCase();
+  const normEventTitle = normalizeReportQuizTitle(event?.quizTitle || event?.subject);
+
+  if (eventMsgId) {
+    const matchByMsg = (Array.isArray(schedules) ? schedules : []).find(s => normalizeMessageId(s.providerMessageId) === eventMsgId);
+    if (matchByMsg) {
+      const mode = emailSendModeFromScheduleKey(matchByMsg.scheduleKey) || normalizeEmailSendMode(matchByMsg.sendMode);
+      if (mode) return { mode, schedule: matchByMsg, link: null };
+    }
+  }
+
+  if (event?.quizLinkId) {
+    const matchByLink = (Array.isArray(schedules) ? schedules : []).find(s => String(s.quizLinkId || '').toLowerCase() === String(event.quizLinkId).toLowerCase());
+    if (matchByLink) {
+      const mode = emailSendModeFromScheduleKey(matchByLink.scheduleKey);
+      if (mode) return { mode, schedule: matchByLink, link: null };
+    }
+  }
+
+  const patientSchedules = (Array.isArray(schedules) ? schedules : []).filter(s => {
+    const sEmail = String(s.recipientEmail || emailByPatientKey?.get(String(s.patientKey || '').toLowerCase()) || '').trim().toLowerCase();
+    const sKey = String(s.patientKey || patientKeyByEmail?.get(sEmail) || '').trim().toLowerCase();
+    return (eventEmail && sEmail === eventEmail) || (eventPatientKey && sKey === eventPatientKey);
+  });
+
+  if (patientSchedules.length) {
+    const eventTime = Date.parse(event?.sentAt || invitation?.sentAt || '') || 0;
+    const matchingSched = patientSchedules.filter(s => {
+      if (event?.quizId && s.quizId && String(event.quizId).toLowerCase() === String(s.quizId).toLowerCase()) return true;
+      const sTitle = normalizeReportQuizTitle(s.quizTitle);
+      if (normEventTitle && sTitle && (normEventTitle === sTitle || normEventTitle.includes(sTitle) || sTitle.includes(normEventTitle))) return true;
+      return !event?.quizId && !normEventTitle;
+    }).map(s => {
+      const sTime = Date.parse(s.scheduledFor || '') || 0;
+      return { s, distance: eventTime && sTime ? Math.abs(eventTime - sTime) : Number.MAX_SAFE_INTEGER };
+    }).sort((a, b) => a.distance - b.distance)[0]?.s;
+
+    if (matchingSched) {
+      const mode = emailSendModeFromScheduleKey(matchingSched.scheduleKey);
+      if (mode) return { mode, schedule: matchingSched, link: null };
+    }
+  }
+
+  if (event?.quizLinkId) {
+    const matchLink = (Array.isArray(quizLinks) ? quizLinks : []).find(l => String(l.id || '').toLowerCase() === String(event.quizLinkId).toLowerCase());
+    if (matchLink) {
+      const mode = emailSendModeFromQuizLink(matchLink);
+      if (mode) return { mode, schedule: null, link: matchLink };
+    }
+  }
+
+  const matchingQuizLink = (Array.isArray(quizLinks) ? quizLinks : []).find(l => {
+    const lKey = String(l.patientKey || '').trim().toLowerCase();
+    const lEmail = String(l.recipientEmail || emailByPatientKey?.get(lKey) || '').trim().toLowerCase();
+    const samePatient = (eventEmail && lEmail === eventEmail) || (eventPatientKey && lKey === eventPatientKey);
+    if (!samePatient) return false;
+    if (event?.quizId && l.quizId && String(event.quizId).toLowerCase() === String(l.quizId).toLowerCase()) return true;
+    const lTitle = normalizeReportQuizTitle(l.quizTitle);
+    if (normEventTitle && lTitle && (normEventTitle === lTitle || normEventTitle.includes(lTitle) || lTitle.includes(normEventTitle))) return true;
+    return true;
+  });
+
+  if (matchingQuizLink) {
+    const mode = emailSendModeFromQuizLink(matchingQuizLink);
+    if (mode) return { mode, schedule: null, link: matchingQuizLink };
+  }
+
+  const direct = normalizeEmailSendMode(event?.sendMode || invitation?.sendMode);
+  return { mode: direct || 'unique', schedule: null, link: null };
+}
+
+function resolveEmailSendMode(event, invitations = [], quizLinks = [], schedules = [], helpers = {}) {
+  return resolveEmailSendModeDetails(event, invitations, quizLinks, schedules, helpers).mode;
 }
 
 function enrichEmailSendModes(events, invitations = [], records = [], schedules = []) {
-  const quizLinks = (Array.isArray(records) ? records : []).filter(isPatientQuizLinkRecord).map(normalizeStoredQuizLink).filter(item => item.id || item.patientKey || item.quizId);
+  const patientProfiles = (Array.isArray(records) ? records : [])
+    .filter(isPatientProfileRecord)
+    .map(normalizeStoredPatientProfile)
+    .filter(p => p.id);
+
+  const patientKeyByEmail = new Map();
+  const emailByPatientKey = new Map();
+  const patientNameByEmail = new Map();
+  const patientNameByKey = new Map();
+
+  patientProfiles.forEach(p => {
+    const email = String(p.email || '').trim().toLowerCase();
+    const key = String(p.id).trim().toLowerCase();
+    const name = String(p.name || '').trim();
+    if (email) {
+      patientKeyByEmail.set(email, key);
+      patientNameByEmail.set(email, name);
+    }
+    if (key) {
+      if (email) emailByPatientKey.set(key, email);
+      if (name) patientNameByKey.set(key, name);
+    }
+  });
+
+  const quizLinks = (Array.isArray(records) ? records : [])
+    .filter(isPatientQuizLinkRecord)
+    .map(normalizeStoredQuizLink)
+    .filter(item => item.id || item.patientKey || item.quizId);
+
+  quizLinks.forEach(link => {
+    const key = String(link.patientKey || '').trim().toLowerCase();
+    if (!link.recipientEmail && key) {
+      link.recipientEmail = emailByPatientKey.get(key) || '';
+    }
+    if (!link.patientName && key) {
+      link.patientName = patientNameByKey.get(key) || '';
+    }
+  });
+
+  const helpers = { patientKeyByEmail, emailByPatientKey, patientNameByEmail, patientNameByKey };
+
   return (Array.isArray(events) ? events : []).map(event => {
-    const sendMode = resolveEmailSendMode(event, invitations, quizLinks, schedules);
-    return { ...event, sendMode, sendModeLabel:emailSendModeLabel(sendMode) };
+    const resolution = resolveEmailSendModeDetails(event, invitations, quizLinks, schedules, helpers);
+    const sendMode = resolution.mode || 'unique';
+    const email = String(event.recipientEmail || event.email || '').trim().toLowerCase();
+    const patientKey = event.patientKey || patientKeyByEmail.get(email) || resolution.schedule?.patientKey || resolution.link?.patientKey || '';
+    const patientName = event.patientName || patientNameByEmail.get(email) || patientNameByKey.get(patientKey) || resolution.schedule?.patientName || resolution.link?.patientName || '';
+    const quizLinkId = event.quizLinkId || resolution.schedule?.quizLinkId || resolution.link?.id || '';
+    const quizId = event.quizId || resolution.schedule?.quizId || resolution.link?.quizId || '';
+    const quizTitle = resolution.schedule?.quizTitle || resolution.link?.quizTitle || (event.quizTitle && !/^questionário disponível/i.test(event.quizTitle) ? event.quizTitle : cleanQuizDisplayTitle(event.subject || event.quizTitle));
+    const scheduleKey = event.scheduleKey || resolution.schedule?.scheduleKey || '';
+
+    return {
+      ...event,
+      recipientEmail: email,
+      patientKey,
+      patientName,
+      quizLinkId,
+      quizId,
+      quizTitle,
+      scheduleKey,
+      sendMode,
+      sendModeLabel: emailSendModeLabel(sendMode)
+    };
   });
 }
 
@@ -1515,13 +1724,12 @@ async function listSchedulesWithProviderStatus(sessionToken, patientKey = '', qu
   return Promise.all(schedules.map(async schedule => {
     if (!schedule.providerMessageId || !['agendado_na_brevo', 'scheduled', 'queued', 'pending'].includes(String(schedule.status).toLowerCase())) return schedule;
     try {
-      const live = await getBrevoScheduledEmail(schedule.providerMessageId);
-      if (!live || live.status === 'not_found') {
-        const cancelled = await markQueueCancelled(sessionToken, schedule.id, 'Cancelado diretamente no provedor de envio.');
-        return { ...schedule, status:cancelled.status || 'cancelado' };
-      }
-      return schedule;
-    } catch {
+      const provider = await getBrevoEmailStatus(schedule.providerMessageId);
+      const providerStatus = usableText(provider.status || provider.messageStatus || provider.event);
+      const mapped = scheduleStatusFromProvider(providerStatus, schedule.status);
+      return { ...schedule, providerStatus, status: schedule.storage === 'queue' ? ({ scheduled:'agendado_na_brevo', sent:'enviado', failed:'falha_de_agendamento', cancelled:'cancelado' }[mapped] || mapped) : mapped };
+    } catch (error) {
+      console.error('Brevo schedule status error:', error.message);
       return schedule;
     }
   })).then(items => items.sort((a, b) => new Date(a.scheduledFor || 0) - new Date(b.scheduledFor || 0)));
@@ -1580,13 +1788,8 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
       try {
         const snapshot = schedule.quiz_snapshot && typeof schedule.quiz_snapshot === 'object' ? schedule.quiz_snapshot : null;
         const invitation = decryptInvitation(schedule.invitation_token);
-        const isReminder = Boolean(snapshot?.__emailReminder);
-        const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object'
-          ? snapshot.__emailTemplate
-          : (isReminder ? await getReminderTemplate(invitation.sessionToken) : await getEmailTemplate(invitation.sessionToken));
-        const reminderTemplate = snapshot?.__emailReminderTemplate && typeof snapshot.__emailReminderTemplate === 'object'
-          ? snapshot.__emailReminderTemplate
-          : await getReminderTemplate(invitation.sessionToken);
+        const template = snapshot?.__emailTemplate && typeof snapshot.__emailTemplate === 'object' ? snapshot.__emailTemplate : await getEmailTemplate(invitation.sessionToken);
+        const reminderTemplate = snapshot?.__emailReminderTemplate && typeof snapshot.__emailReminderTemplate === 'object' ? snapshot.__emailReminderTemplate : await getReminderTemplate(invitation.sessionToken);
         if (snapshot?.__emailReminder) {
           if (snapshot.__emailReminder.kind === 'response_due') {
             const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
@@ -1656,31 +1859,73 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
     }
   }
 
-  if (totalClaimed > 0) {
+  if (true) {
     try {
+      // Obter o relatório completo via RPC
+      const reportValue = await callRpc('app_questionnaire_schedule_daily_report', { p_secret: secret });
+      const report = Array.isArray(reportValue) ? reportValue[0] : reportValue || {};
+      
+      const sentLast24h = report.sent_last_24h || 0;
+      const scheduledNext24h = report.scheduled_next_24h || 0;
+      const scheduledFuture = report.scheduled_future || 0;
+      const failedRecent = report.failed_recent || [];
+      const recipientEmail = report.recipient_email || 'kayodavids@gmail.com';
+      
+      const failedItemsHtml = failedRecent.length > 0 
+        ? failedRecent.map(f => `<li><strong>${f.patient_name || f.recipient_email}</strong>: ${f.last_error || 'Falha técnica'}</li>`).join('')
+        : '';
+      
+      const failedSectionHtml = failedRecent.length > 0
+        ? `<div style="margin-top: 20px; padding: 15px; border-left: 4px solid #d9534f; background-color: #fdf7f7;">
+            <p style="color: #d9534f; font-weight: bold; margin: 0 0 10px 0;">${failedRecent.length} envios recentes falharam e precisam de atenção:</p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.9em; color: #555;">
+              ${failedItemsHtml}
+            </ul>
+           </div>`
+        : '';
+
       const htmlContent = `
-        <div style="font-family: sans-serif; color: #333;">
-          <h2 style="color: #a88b36;">Relatório Diário de Agendamentos</h2>
-          <p>A automação (Cron) processou os e-mails da janela de 71 horas.</p>
-          <p><strong>${processed.length}</strong> e-mails foram inseridos com sucesso na Brevo.</p>
-          ${failed.length > 0 ? `<p style="color: #d9534f;"><strong>Atenção:</strong> ${failed.length} envios falharam ao serem adicionados.</p>` : ''}
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 0.9em; color: #666;">
-            <strong>Nota sobre pendentes:</strong><br/>
-            Os envios programados para prazos superiores a 71 horas permanecem pendentes e seguros no banco de dados. 
-            Eles serão automaticamente inseridos na Brevo pelas próximas execuções diárias, assim que entrarem na janela de 71 horas.
+        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+          <h2 style="color: #a88b36; margin-bottom: 5px;">Relatório Diário da Plataforma</h2>
+          <p style="margin-top: 0; color: #666; font-size: 0.9em;">Resumo dos envios programados e atividades recentes.</p>
+          
+          <div style="margin: 25px 0; display: flex; flex-wrap: wrap; gap: 15px;">
+            <div style="flex: 1; min-width: 120px; padding: 15px; background: #faf8f3; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+              <span style="display: block; font-size: 2em; font-weight: bold; color: #a88b36;">${sentLast24h}</span>
+              <span style="font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.5px;">Enviados nas<br/>últimas 24h</span>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px; padding: 15px; background: #faf8f3; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+              <span style="display: block; font-size: 2em; font-weight: bold; color: #a88b36;">${scheduledNext24h}</span>
+              <span style="font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.5px;">Programados para<br/>hoje</span>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px; padding: 15px; background: #faf8f3; border: 1px solid #eee; border-radius: 8px; text-align: center;">
+              <span style="display: block; font-size: 2em; font-weight: bold; color: #a88b36;">${scheduledFuture}</span>
+              <span style="font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.5px;">Na fila para os<br/>próximos dias</span>
+            </div>
+          </div>
+
+          <p><strong>${processed.length}</strong> novos e-mails foram processados hoje e adicionados à Brevo com sucesso.</p>
+          
+          ${failedSectionHtml}
+          
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+          <p style="font-size: 0.85em; color: #888;">
+            Este é um e-mail automático enviado pela sua plataforma. Você pode alterar quem recebe este relatório na área "Personalizar Plataforma" no painel.
           </p>
         </div>
       `;
+
       await sendBrevoEmail({
-        to: { email: 'kayodavids@gmail.com', name: 'Kayo David' },
-        subject: `[Vercel Cron] Relatório de Envios - ${processed.length} adicionados na Brevo`,
+        to: { email: recipientEmail, name: 'Administrador' },
+        subject: `[Plataforma] Resumo Diário - ${sentLast24h} enviados e ${scheduledNext24h} programados`,
         htmlContent,
-        tags: ['cron-report'],
-        replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: 'Sistema de Agendamento' }
+        tags: ['cron-report', 'daily-summary'],
+        replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: 'Sistema' }
       });
     } catch (reportError) {
-      console.error('Failed to send report email:', reportError.message);
+      console.error('Failed to send daily report email:', reportError.message);
     }
   }
 
@@ -1748,13 +1993,24 @@ export default async function handler(req, res) {
       const requestedSendMode = normalizeEmailSendMode(body.sendMode);
       if (!sessionToken || !patientKey || !validEmail(recipientEmail) || !quizId) return json(res, 400, { success: false, message: 'Não foi possível preparar o convite. Confira o paciente, o e-mail e o questionário.' });
       await requireAdmin(sessionToken);
+      let effectiveSendMode = requestedSendMode;
+      if (!effectiveSendMode && quizLinkId) {
+        try {
+          const records = await listStoredQuestionnaireRecords(sessionToken);
+          const linkRecord = records.find(r => isPatientQuizLinkRecord(r) && (r.id === quizLinkId || parseStoredRecord(r).id === quizLinkId));
+          if (linkRecord) {
+            effectiveSendMode = emailSendModeFromQuizLink(normalizeStoredQuizLink(linkRecord));
+          }
+        } catch {}
+      }
+      if (!effectiveSendMode) effectiveSendMode = 'unique';
       const quiz = await loadQuiz(sessionToken, quizId);
       const todayKey = localDateFromTimestamp(Date.now());
       const targetDateKey = addDateKey(todayKey, expiresInDays);
       const expiresAtIso = localDateTimeToIso(targetDateKey, '23:59');
       const expiresAt = Date.parse(expiresAtIso) || (Date.now() + (expiresInDays * 24 * 60 * 60 * 1000));
       const sentAt = new Date().toISOString();
-      const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, quizLinkId, sendMode:requestedSendMode || 'unique', sentAt, expiresAt };
+      const invitation = { version: 2, id: randomBytes(12).toString('hex'), sessionToken, patientKey, patientName, recipientEmail, quizId: quiz.id, quizLinkId, sendMode:effectiveSendMode, sentAt, expiresAt };
       const accessToken = encryptInvitation(invitation);
       const template = await getEmailTemplate(sessionToken);
       const reminderTemplate = await getReminderTemplate(sessionToken);
