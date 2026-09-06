@@ -75,7 +75,7 @@ function invalidateRpcCache() {
 }
 
 async function rpc(name, body = {}) {
-  if (name === 'app_list_videos' && body && body.p_token) delete body.p_token;
+  
   const isRead = name.startsWith('app_list_') || name.startsWith('app_get_') || name.startsWith('app_current_');
   const isWrite = name.startsWith('app_add_') || name.startsWith('app_update_') || name.startsWith('app_delete_') || name.startsWith('app_upsert_') || name.startsWith('app_save_');
 
