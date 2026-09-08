@@ -5481,9 +5481,12 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       };
       window.__quizScheduleController = { openForPatient, openLinkedSchedule, openLinkedDrawer };
       
+      
       const reorderModal = document.getElementById('quiz-reorder-modal');
       const reorderList = document.getElementById('quiz-reorder-list');
+      
       const renderReorderModal = () => {
+        if (!reorderList) return;
         reorderList.innerHTML = '';
         const selected = getSelectedQuestions();
         selected.forEach((question, index) => {
@@ -5527,25 +5530,38 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           reorderList.appendChild(item);
         });
       };
-      
-      const trigger = document.getElementById('quiz-reorder-trigger');
-      if (trigger) {
-        trigger.addEventListener('click', () => {
-          renderReorderModal();
-          reorderModal.classList.remove('opacity-0', 'pointer-events-none');
-          reorderModal.removeAttribute('aria-hidden');
-        });
-      }
-      document.getElementById('quiz-reorder-close').addEventListener('click', () => {
-        reorderModal.classList.add('opacity-0', 'pointer-events-none');
-        reorderModal.setAttribute('aria-hidden', 'true');
-      });
-      document.getElementById('quiz-reorder-done').addEventListener('click', () => {
-        reorderModal.classList.add('opacity-0', 'pointer-events-none');
-        reorderModal.setAttribute('aria-hidden', 'true');
-      });
 
-      return { open, refresh, openSchedule:openLinkedSchedule, openLinkedDrawer, openForPatient };
+      document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('#quiz-reorder-trigger');
+        if (trigger) {
+          event.preventDefault();
+          event.stopPropagation();
+          try {
+            renderReorderModal();
+            if (reorderModal) {
+              reorderModal.classList.remove('opacity-0', 'pointer-events-none');
+              reorderModal.classList.add('opacity-100', 'pointer-events-auto');
+              reorderModal.removeAttribute('aria-hidden');
+            }
+          } catch(e) {
+            console.error(e);
+          }
+        }
+        
+        const closeBtn = event.target.closest('#quiz-reorder-close');
+        const doneBtn = event.target.closest('#quiz-reorder-done');
+        if (closeBtn || doneBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (reorderModal) {
+            reorderModal.classList.add('opacity-0', 'pointer-events-none');
+            reorderModal.classList.remove('opacity-100', 'pointer-events-auto');
+            reorderModal.setAttribute('aria-hidden', 'true');
+          }
+        }
+      });
+      
+return { open, refresh, openSchedule:openLinkedSchedule, openLinkedDrawer, openForPatient };
     }
 
     function renderRemindersManager(notify = () => {}) {
