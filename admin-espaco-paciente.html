@@ -5497,8 +5497,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             reorderList.innerHTML = '<p class="text-red-500">Erro: selectedIds está vazio.</p>';
             return;
         }
-        const selected = getSelectedQuestions();
-        if (selected.length === 0) {
+        const selectedList = getSelectedQuestions();
+        if (selectedList.length === 0) {
             reorderList.innerHTML = '<p class="text-red-500">Erro: getSelectedQuestions() retornou 0 itens.</p>';
             return;
         }
