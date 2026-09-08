@@ -1956,8 +1956,8 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <div class="flex flex-col gap-1">
                 <label for="scheduled-sends-filter-status" class="text-[11px] font-semibold text-gray-500">Status</label>
                 <select id="scheduled-sends-filter-status" class="w-full rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
+                  <option value="future_only" selected>Apenas futuros programados</option>
                   <option value="active_and_sent">Envios ativos e realizados</option>
-                  <option value="future_only">Apenas futuros programados</option>
                   <option value="agendado_na_brevo">Agendados no Brevo (futuros)</option>
                   <option value="aguardando_brevo">Fila da plataforma</option>
                   <option value="pausado">Pausados</option>
@@ -4716,7 +4716,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (mdVal && sendModeLabels[mdVal]) {
           chips.push({ key: 'mode', label: `Modo: ${sendModeLabels[mdVal]}` });
         }
-        if (stVal && stVal !== 'active_and_sent') {
+        if (stVal && stVal !== 'future_only') {
           chips.push({ key: 'status', label: `Status: ${statusLabels[stVal] || stVal}` });
         }
         if (qVal) {
@@ -4742,7 +4742,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
               if (key === 'patient' && patientFilter) patientFilter.value = '';
               if (key === 'quiz' && quizFilter) quizFilter.value = '';
               if (key === 'mode' && modeFilter) modeFilter.value = '';
-              if (key === 'status' && statusFilter) statusFilter.value = 'active_and_sent';
+              if (key === 'status' && statusFilter) statusFilter.value = 'future_only';
               if (key === 'search' && searchInput) searchInput.value = '';
               draw();
             });
@@ -4758,7 +4758,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (patientFilter) patientFilter.value = '';
         if (quizFilter) quizFilter.value = '';
         if (modeFilter) modeFilter.value = '';
-        if (statusFilter) statusFilter.value = 'active_and_sent';
+        if (statusFilter) statusFilter.value = 'future_only';
         if (searchInput) searchInput.value = '';
         draw();
       };
@@ -5063,7 +5063,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
       const getFilteredAndSorted = () => {
         const query = (searchInput?.value || '').trim().toLocaleLowerCase('pt-BR');
-        const stFilter = statusFilter?.value || 'active_and_sent';
+        const stFilter = statusFilter?.value || 'future_only';
         const mdFilter = modeFilter?.value || '';
         const ptFilter = (patientFilter?.value || '').trim().toLocaleLowerCase('pt-BR');
         const qzFilter = (quizFilter?.value || '').trim().toLocaleLowerCase('pt-BR');
@@ -5178,7 +5178,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
         const visible = getFilteredAndSorted();
         if (countSummary) {
-          const hasAnyFilter = Boolean(patientFilter?.value || quizFilter?.value || modeFilter?.value || (statusFilter?.value && statusFilter.value !== 'active_and_sent') || searchInput?.value?.trim());
+          const hasAnyFilter = Boolean(patientFilter?.value || quizFilter?.value || modeFilter?.value || (statusFilter?.value && statusFilter.value !== 'future_only') || searchInput?.value?.trim());
           if (hasAnyFilter) {
             countSummary.textContent = `Exibindo ${visible.length} de ${rawSchedules.length} agendamento${rawSchedules.length === 1 ? '' : 's'} (filtrado)`;
           } else {
