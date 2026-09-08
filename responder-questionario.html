@@ -408,7 +408,7 @@
     async function boot(){
       if(!token)return showState('error','Convite inválido','Este link não contém um convite válido. Verifique o e-mail recebido ou entre em contato com a Dra. Jessica.');
       try{
-        try{await req('click',{token},{keepalive:true});}catch{}
+        req('click',{token},{keepalive:true}).catch(()=>{});
         const inv=await req('get',{token});
         if(inv.state==='ready')return renderQuiz(inv);
         if(inv.state==='expired')return showState('error','Convite expirado','O prazo para responder este questionário terminou. Solicite um novo convite à Dra. Jessica.');

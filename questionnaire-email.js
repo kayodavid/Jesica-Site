@@ -2175,15 +2175,18 @@ export default async function handler(req, res) {
     if (action === 'get') {
       try {
         const invitation = decryptInvitation(String(body.token || ''));
-        await storeClick(invitation);
-        const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
-        const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+        const [quiz, records, preferences] = await Promise.all([
+          loadQuiz(invitation.sessionToken, invitation.quizId),
+          listStoredQuestionnaireRecords(invitation.sessionToken),
+          storeClick(invitation).catch(() => {}),
+          getPlatformPreferences(invitation.sessionToken)
+        ]);
         const responseRecord = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse).find(response => response.invitationId === invitation.id || responseTargetScore(response, invitation) >= 0);
         const savedResponse = responseRecord || null;
         if (savedResponse) return json(res, 200, { state:'answered', patient_name:invitation.patientName, quiz_title:quiz.title, summary:savedResponse.summary || null });
         const progressRecord = records.find(record => isEmailQuizProgressRecord(record) && normalizeStoredProgress(record).invitationId === invitation.id);
         const savedProgress = progressRecord ? normalizeStoredProgress(progressRecord) : null;
-        const preferences = await getPlatformPreferences(invitation.sessionToken);
+        
         const emojiScaleDisplayMode = EMOJI_SCALE_DISPLAY_MODES.has(preferences?.emojiScaleDisplayMode) ? preferences.emojiScaleDisplayMode : 'emoji-text';
         return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString(), progress: savedProgress ? { totalQuestions:savedProgress.totalQuestions, answeredQuestions:savedProgress.answeredQuestions, updatedAt:savedProgress.updatedAt } : null, emojiScaleDisplayMode });
       } catch (error) {
