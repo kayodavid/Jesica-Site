@@ -5487,7 +5487,22 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       
       const renderReorderModal = () => {
         if (!reorderList) return;
+        
         reorderList.innerHTML = '';
+        if (!questions || !questions.length) {
+            reorderList.innerHTML = '<p class="text-red-500">Erro: array questions está vazio.</p>';
+            return;
+        }
+        if (!selectedIds || selectedIds.size === 0) {
+            reorderList.innerHTML = '<p class="text-red-500">Erro: selectedIds está vazio.</p>';
+            return;
+        }
+        const selected = getSelectedQuestions();
+        if (selected.length === 0) {
+            reorderList.innerHTML = '<p class="text-red-500">Erro: getSelectedQuestions() retornou 0 itens.</p>';
+            return;
+        }
+
         const selected = getSelectedQuestions();
         selected.forEach((question, index) => {
           const item = document.createElement('div');
@@ -6134,9 +6149,13 @@ window.openReorderModal = function() {
       modal.removeAttribute('aria-hidden');
       
       // Also try to trigger the internal render if available
+      
       if (window._renderReorderModal) {
-        window._renderReorderModal();
+        try { window._renderReorderModal(); } catch (err) { modal.querySelector('#quiz-reorder-list').innerHTML = '<p class="text-red-500">Exceção interna: ' + err.message + '</p>'; }
+      } else {
+        modal.querySelector('#quiz-reorder-list').innerHTML = '<p class="text-red-500">Erro: _renderReorderModal não está definido no window.</p>';
       }
+
     } else {
       alert('Modal não encontrado no HTML!');
     }
