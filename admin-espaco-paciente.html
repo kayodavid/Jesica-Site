@@ -60,12 +60,12 @@
     .admin-sidebar-menu::-webkit-scrollbar-track, .admin-sidebar-menu::-webkit-scrollbar-track-piece { background:#eee7d8; }
     .admin-sidebar-menu::-webkit-scrollbar-thumb { min-height:36px; border:2px solid #eee7d8; border-radius:999px; background:#b39a5a; }
     .admin-sidebar-footer { flex:none; margin-top:auto; margin-left:-.85rem; margin-right:-.85rem; padding:.75rem .85rem calc(.75rem + env(safe-area-inset-bottom, 0px)); border-top:1px solid rgba(168,139,54,.14); background:#fffdf7; }
-    .admin-sidebar-heading { padding:.65rem .6rem .8rem; color:#a88b36; font-size:.64rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
-    .admin-nav-link, .admin-nav-toggle { display:flex; align-items:center; gap:.72rem; width:100%; padding:.78rem .75rem; border-radius:.78rem; color:#5d5140; font-size:.82rem; font-weight:600; text-align:left; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease; }
+    .admin-sidebar-heading { padding:.65rem .6rem .8rem; color:#a88b36; font-size:.72rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+    .admin-nav-link, .admin-nav-toggle { display:flex; align-items:center; gap:.72rem; width:100%; padding:.74rem .75rem; border-radius:.78rem; color:#5d5140; font-size:.9rem; font-weight:600; text-align:left; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease; }
     .admin-nav-link:hover, .admin-nav-toggle:hover { color:#3d3226; background:#f5e6c8; transform:translateX(2px); }
-    .admin-sidebar-suggestion { display:flex; align-items:center; gap:.72rem; width:100%; min-height:2.6rem; padding:.65rem .85rem; border-radius:.78rem; border:1px solid rgba(168,139,54,.24); background:rgba(168,139,54,.07); color:#5d5140; font-size:.82rem; font-weight:600; text-align:left; cursor:pointer; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease, border-color .18s ease; }
+    .admin-sidebar-suggestion { display:flex; align-items:center; gap:.72rem; width:100%; min-height:2.65rem; padding:.68rem .85rem; border-radius:.78rem; border:1px solid rgba(168,139,54,.24); background:rgba(168,139,54,.07); color:#5d5140; font-size:.88rem; font-weight:600; text-align:left; cursor:pointer; transition:transform .18s cubic-bezier(.23,1,.32,1), background .18s ease, color .18s ease, border-color .18s ease; }
     .admin-sidebar-suggestion:hover { color:#3d3226; background:#f5e6c8; border-color:#a88b36; transform:translateX(2px); }
-    .admin-sidebar-suggestion .admin-nav-icon { width:1.05rem; height:1.05rem; flex:none; color:#a88b36; }
+    .admin-sidebar-suggestion .admin-nav-icon { width:1.15rem; height:1.15rem; flex:none; color:#a88b36; }
     .suggestion-overlay { position:fixed; inset:0; z-index:160; background:rgba(23,24,29,.48); opacity:0; pointer-events:none; transition:opacity .18s ease; }
     .suggestion-overlay.is-open { opacity:1; pointer-events:auto; }
     .suggestion-modal { position:fixed; inset:0; z-index:161; display:flex; align-items:center; justify-content:center; padding:1rem; opacity:0; pointer-events:none; transform:scale(.98); transition:opacity .18s ease,transform .18s cubic-bezier(.23,1,.32,1); }
@@ -85,12 +85,12 @@
     body[data-patient-theme='black'] .suggestion-form-status.is-success { background:#173e2a; color:#9be0ad; }
     body[data-patient-theme='black'] .suggestion-form-status.is-error { background:#48272b; color:#ffb6b5; }
     .admin-nav-link.is-active { position:relative; color:#4b3b26; background:#f5e6c8; box-shadow:inset 4px 0 0 #a88b36; }
-    .admin-nav-icon { width:1.05rem; height:1.05rem; flex:none; }
-    .admin-nav-badge { margin-left:auto; display:inline-flex; min-width:1.25rem; height:1.25rem; align-items:center; justify-content:center; border-radius:999px; background:#47708d; color:#fff; font-size:.63rem; font-weight:700; }
+    .admin-nav-icon { width:1.15rem; height:1.15rem; flex:none; }
+    .admin-nav-badge { margin-left:auto; display:inline-flex; min-width:1.35rem; height:1.35rem; align-items:center; justify-content:center; border-radius:999px; background:#47708d; color:#fff; font-size:.68rem; font-weight:700; }
     .admin-nav-chevron { width:.9rem; height:.9rem; margin-left:auto; transition:transform .18s ease; }
     .admin-nav-toggle[aria-expanded='true'] .admin-nav-chevron { transform:rotate(180deg); }
     .admin-nav-submenu { display:grid; gap:.25rem; margin:.2rem 0 .45rem .78rem; padding:.3rem 0 .2rem .8rem; border-left:1px solid rgba(168,139,54,.22); }
-    .admin-nav-submenu a, .admin-nav-submenu button { display:flex; align-items:center; gap:.48rem; width:100%; padding:.52rem .62rem; border-radius:.62rem; color:#756858; font-size:.72rem; font-weight:600; text-align:left; }
+    .admin-nav-submenu a, .admin-nav-submenu button { display:flex; align-items:center; gap:.52rem; width:100%; padding:.55rem .65rem; border-radius:.62rem; color:#756858; font-size:.82rem; font-weight:600; text-align:left; }
     .admin-nav-submenu a:hover, .admin-nav-submenu button:hover { color:#a88b36; background:#f5e6c8; }
     .admin-sidebar-divider { height:1px; margin:.7rem .45rem; background:rgba(168,139,54,.14); }
     .admin-sidebar-mobile-toggle { display:none; }
@@ -1646,7 +1646,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
     <div id="admin-layout-container" class="admin-layout-container">
       <div class="admin-shell">
         <aside id="admin-sidebar" class="admin-sidebar" aria-label="Navegação administrativa do ClinicPro">
-          <div class="flex items-center gap-2 px-2 pt-1 pb-2"><div><p class="text-[10px] font-bold uppercase tracking-[.16em] text-primary">Acompanhamento</p><h2 class="mt-0.5 text-sm font-bold text-dark">ClinicPro</h2></div><button id="sidebar-mobile-toggle" type="button" class="admin-sidebar-mobile-toggle" aria-expanded="true" aria-controls="admin-sidebar-menu">Menu</button></div>
+          <div class="flex items-center gap-2 px-2 pt-1 pb-2"><div><p class="text-[11px] font-bold uppercase tracking-[.16em] text-primary">Acompanhamento</p><h2 class="mt-0.5 text-[15px] font-bold text-dark">ClinicPro</h2></div><button id="sidebar-mobile-toggle" type="button" class="admin-sidebar-mobile-toggle" aria-expanded="true" aria-controls="admin-sidebar-menu">Menu</button></div>
           <nav id="admin-sidebar-menu" class="admin-sidebar-menu" aria-label="Recursos administrativos">
             <p class="admin-sidebar-heading">Visão geral</p>
             <a href="#inicio" class="admin-nav-link is-active" data-admin-nav="inicio"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg>Início</a>
