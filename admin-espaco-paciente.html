@@ -1007,6 +1007,7 @@ body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='bl
     body[data-patient-theme='black'] #quiz-reorder-modal .quiz-reorder-btn { border-color:rgba(255,255,255,.16) !important; background:#343844 !important; color:#e3e7ee !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .quiz-reorder-btn:hover:not(:disabled) { border-color:#d4b76a !important; background:#404654 !important; color:#ffe7a4 !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .quiz-sigla-badge { background:rgba(212,183,106,.2) !important; color:#ffe7a4 !important; border-color:rgba(212,183,106,.4) !important; }
+    body[data-patient-theme='black'] #quiz-reorder-modal .quiz-index-badge { background:rgba(255,255,255,.08) !important; color:#f7f8fb !important; border-color:rgba(255,255,255,.14) !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .text-dark { color:#f7f8fb !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .text-gray-500, body[data-patient-theme='black'] #quiz-reorder-modal .text-gray-600 { color:#aeb7c5 !important; }
     body[data-patient-theme='black'] .quiz-editor-page { background:#1f2128 !important; border-color:rgba(255,255,255,.13) !important; color:#f7f8fb; }
@@ -5333,6 +5334,187 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const refresh = async () => { rows.innerHTML = (function(cols,rowCount){var pairs=[['45%','90%'],['30%','70%'],['55%','80%'],['40%','65%'],['60%','85%'],['35%','75%']];var out='';for(var r=0;r<rowCount;r++){var cells='';for(var c=0;c<cols;c++){var pair=pairs[(r*cols+c)%pairs.length];cells+='<td><span class="table-skeleton-bone" style="width:'+pair[r%2]+'"></span></td>';}out+='<tr class="table-skeleton-row" aria-hidden="true">'+cells+'</tr>';}return out;})(5,5); [quizzes, questions] = await Promise.all([db.getQuizzes(), db.getQuestions()]); draw(); };
       document.getElementById('quiz-add-button').addEventListener('click', () => openDrawer()); document.getElementById('quiz-editor-back').addEventListener('click', closeDrawer); document.getElementById('quiz-form-cancel').addEventListener('click', closeDrawer); document.getElementById('quiz-search-toggle').addEventListener('click', () => { const wrap = document.getElementById('quiz-search-wrap'); wrap.classList.toggle('hidden'); if (!wrap.classList.contains('hidden')) search.focus(); }); search.addEventListener('input', () => { page = 1; draw(); }); document.querySelectorAll('[data-quiz-tab]').forEach(button => button.addEventListener('click', () => { tab = button.dataset.quizTab; page = 1; document.querySelectorAll('[data-quiz-tab]').forEach(item => { const active = item === button; item.classList.toggle('is-active', active); item.setAttribute('aria-selected', String(active)); }); draw(); })); document.getElementById('quiz-page-size').addEventListener('change', event => { pageSize = Number(event.target.value); page = 1; draw(); }); [['quiz-first-page', () => { page = 1; }], ['quiz-prev-page', () => { page--; }], ['quiz-next-page', () => { page++; }], ['quiz-last-page', () => { page = Math.max(1, Math.ceil(getVisible().length / pageSize)); }]].forEach(([id, action]) => document.getElementById(id).addEventListener('click', () => { action(); draw(); })); ['quiz-title','quiz-cover-text','quiz-description'].forEach(id => document.getElementById(id).addEventListener('input', updatePreview)); document.getElementById('quiz-show-score').addEventListener('change', updatePreview); document.getElementById('quiz-add-question-trigger').addEventListener('click', openQuestionPickerModal); document.getElementById('quiz-add-context-trigger').addEventListener('click', () => openContextBlockModal()); document.getElementById('quiz-context-close').addEventListener('click', () => document.getElementById('quiz-context-panel').classList.add('hidden')); document.getElementById('quiz-context-add').addEventListener('click', () => { const title = document.getElementById('quiz-context-title').value.trim(); const body = document.getElementById('quiz-context-body').value.trim(); if (!title && !body) { notify('Preencha o título ou a mensagem do bloco contextual.'); return; } contextBlocks.push({ title, body }); document.getElementById('quiz-context-title').value = ''; document.getElementById('quiz-context-body').value = ''; renderContextBlocks(); document.getElementById('quiz-context-panel').classList.add('hidden'); }); document.getElementById('quiz-cover-upload').addEventListener('change', async event => { const status = document.getElementById('quiz-form-status'); try { quizCoverImageData = await compressQuizCover(event.target.files?.[0]); setCoverPreview(); openCoverEditor(quizCoverImageData); status.className = 'hidden text-xs font-semibold'; } catch (error) { status.textContent = error.message || 'Não foi possível preparar a imagem.'; status.className = 'text-xs font-semibold text-red-600'; event.target.value = ''; } }); document.getElementById('quiz-cover-remove').addEventListener('click', () => { quizCoverImageData = ''; document.getElementById('quiz-cover-upload').value = ''; setCoverPreview(); });
       form.addEventListener('submit', async event => { event.preventDefault(); const data = { title:document.getElementById('quiz-title').value.trim(), coverText:document.getElementById('quiz-cover-text').value.trim(), coverImage:quizCoverImageData, description:document.getElementById('quiz-description').value.trim(), scoreVisible:document.getElementById('quiz-show-score').checked, contextBlocks, questionIds:[...selectedIds], questionSettings:selectedSettings }; const status = document.getElementById('quiz-form-status'); if (!data.coverImage) { status.textContent = 'Adicione uma imagem de capa para o questionário.'; status.className = 'text-xs font-semibold text-red-600'; return; } if (!data.questionIds.length) { status.textContent = 'Selecione ao menos uma pergunta para salvar o questionário.'; status.className = 'text-xs font-semibold text-red-600'; return; } status.textContent = 'Salvando questionário...'; status.className = 'text-xs font-semibold text-primary'; const id = document.getElementById('quiz-edit-id').value; const result = id ? await db.updateQuiz(id, data) : await db.addQuiz(data); if (result?.success === false) { status.textContent = result.message || 'Não foi possível salvar o questionário.'; status.className = 'text-xs font-semibold text-red-600'; return; } closeDrawer(); notify(id ? 'Questionário atualizado com sucesso.' : 'Questionário criado com sucesso.'); await refresh(); });
+      const reorderModal = document.getElementById('quiz-reorder-modal');
+      const reorderList = document.getElementById('quiz-reorder-list');
+
+      const renderReorderModal = () => {
+        const list = document.getElementById('quiz-reorder-list');
+        const subtitle = document.getElementById('quiz-reorder-subtitle');
+        const countBadge = document.getElementById('quiz-reorder-count-badge');
+        if (!list) return;
+
+        const localEscape = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
+
+        list.innerHTML = '';
+        const selected = getSelectedQuestions();
+
+        if (countBadge) countBadge.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'}`;
+        if (subtitle) subtitle.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'} selecionada${selected.length === 1 ? '' : 's'}. Arraste as siglas ou use as setas para ajustar a sequência.`;
+
+        if (!selected.length) {
+          list.innerHTML = '<div class="py-12 text-center text-sm text-gray-500 rounded-xl border border-dashed border-primary/20 p-6">Nenhuma pergunta foi adicionada a este questionário ainda.<br><span class="text-xs text-primary mt-1 inline-block">Clique em "Adicionar pergunta" no editor para selecionar perguntas.</span></div>';
+          return;
+        }
+
+        selected.forEach((question, index) => {
+          const item = document.createElement('div');
+          const isFirst = index === 0;
+          const isLast = index === selected.length - 1;
+          const code = String(question.code || question.originalCode || question.id || `P${index + 1}`).trim().toUpperCase();
+          const title = String(question.title || question.questionText || code).trim();
+
+          item.className = 'quiz-reorder-item flex items-center justify-between gap-2.5 p-2.5 sm:p-3 rounded-2xl border border-primary/20 bg-white shadow-sm transition hover:border-primary/50 select-none';
+          item.draggable = true;
+          item.dataset.questionId = String(question.id);
+
+          item.innerHTML = `
+            <div class="flex min-w-0 items-center gap-2.5 sm:gap-3 flex-1">
+              <span class="cursor-grab text-gray-400 hover:text-dark text-base px-0.5 font-bold" title="Arraste para mover" aria-label="Arraste para mover">⠿</span>
+              <span class="quiz-index-badge inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-dark border border-primary/15">${index + 1}</span>
+              <span class="quiz-sigla-badge inline-flex shrink-0 items-center justify-center rounded-xl bg-primary/15 px-2.5 py-1 text-xs font-black font-mono text-dark border border-primary/30 tracking-wider shadow-xs" title="${localEscape(title)}">${localEscape(code)}</span>
+              <span class="truncate text-xs font-medium text-gray-600 sm:text-sm" title="${localEscape(title)}">${localEscape(title)}</span>
+            </div>
+            <div class="flex shrink-0 items-center gap-1">
+              <button type="button" data-move-top="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Mover para o topo">⤒</button>
+              <button type="button" data-move-up="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Subir uma posição">▲</button>
+              <button type="button" data-move-down="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Descer uma posição">▼</button>
+              <button type="button" data-move-bottom="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Mover para o final">⤓</button>
+            </div>
+          `;
+
+          item.querySelector('[data-move-top]')?.addEventListener('click', () => {
+            const ids = [...selectedIds];
+            const idx = ids.findIndex(id => String(id) === String(question.id));
+            if (idx > 0) {
+              const [removed] = ids.splice(idx, 1);
+              ids.unshift(removed);
+              selectedIds = new Set(ids);
+              renderReorderModal();
+              renderSettings();
+            }
+          });
+
+          item.querySelector('[data-move-bottom]')?.addEventListener('click', () => {
+            const ids = [...selectedIds];
+            const idx = ids.findIndex(id => String(id) === String(question.id));
+            if (idx >= 0 && idx < ids.length - 1) {
+              const [removed] = ids.splice(idx, 1);
+              ids.push(removed);
+              selectedIds = new Set(ids);
+              renderReorderModal();
+              renderSettings();
+            }
+          });
+
+          item.querySelector('[data-move-up]')?.addEventListener('click', () => {
+            const ids = [...selectedIds];
+            const idx = ids.findIndex(id => String(id) === String(question.id));
+            if (idx > 0) {
+              const temp = ids[idx];
+              ids[idx] = ids[idx - 1];
+              ids[idx - 1] = temp;
+              selectedIds = new Set(ids);
+              renderReorderModal();
+              renderSettings();
+            }
+          });
+
+          item.querySelector('[data-move-down]')?.addEventListener('click', () => {
+            const ids = [...selectedIds];
+            const idx = ids.findIndex(id => String(id) === String(question.id));
+            if (idx >= 0 && idx < ids.length - 1) {
+              const temp = ids[idx];
+              ids[idx] = ids[idx + 1];
+              ids[idx + 1] = temp;
+              selectedIds = new Set(ids);
+              renderReorderModal();
+              renderSettings();
+            }
+          });
+
+          item.addEventListener('dragstart', event => {
+            draggedQuestionId = String(question.id);
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', String(question.id));
+            window.requestAnimationFrame(() => item.classList.add('opacity-50'));
+          });
+          item.addEventListener('dragend', () => {
+            draggedQuestionId = null;
+            list.querySelectorAll('.quiz-reorder-item').forEach(el => el.classList.remove('opacity-50', 'border-t-2', 'border-b-2', 'border-primary'));
+          });
+          item.addEventListener('dragover', event => {
+            if (!draggedQuestionId || draggedQuestionId === String(question.id)) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            const bounds = item.getBoundingClientRect();
+            const isBottom = event.clientY > bounds.top + bounds.height / 2;
+            item.classList.remove('border-t-2', 'border-b-2', 'border-primary');
+            item.classList.add(isBottom ? 'border-b-2' : 'border-t-2', 'border-primary');
+          });
+          item.addEventListener('dragleave', () => {
+            item.classList.remove('border-t-2', 'border-b-2', 'border-primary');
+          });
+          item.addEventListener('drop', event => {
+            if (!draggedQuestionId || draggedQuestionId === String(question.id)) return;
+            event.preventDefault();
+            const sourceId = draggedQuestionId;
+            draggedQuestionId = null;
+            const bounds = item.getBoundingClientRect();
+            reorderSelectedQuestions(sourceId, String(question.id), event.clientY > bounds.top + bounds.height / 2);
+            renderReorderModal();
+            renderSettings();
+          });
+
+          list.appendChild(item);
+        });
+      };
+
+      document.getElementById('quiz-reorder-invert')?.addEventListener('click', () => {
+        const ids = [...selectedIds].reverse();
+        selectedIds = new Set(ids);
+        renderReorderModal();
+        renderSettings();
+      });
+
+      window._renderReorderModal = renderReorderModal;
+
+      document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('#quiz-reorder-trigger');
+        if (trigger) {
+          event.preventDefault();
+          event.stopPropagation();
+          try {
+            renderReorderModal();
+            if (reorderModal) {
+              reorderModal.style.display = 'flex';
+              reorderModal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+              reorderModal.classList.add('opacity-100', 'pointer-events-auto');
+              reorderModal.removeAttribute('aria-hidden');
+            }
+          } catch(e) {
+            console.error('Erro ao abrir reordenação:', e);
+          }
+        }
+        
+        const closeBtn = event.target.closest('#quiz-reorder-close');
+        const cancelBtn = event.target.closest('#quiz-reorder-cancel');
+        const doneBtn = event.target.closest('#quiz-reorder-done');
+        if (closeBtn || cancelBtn || doneBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (reorderModal) {
+            reorderModal.classList.add('opacity-0', 'pointer-events-none');
+            reorderModal.classList.remove('opacity-100', 'pointer-events-auto');
+            reorderModal.setAttribute('aria-hidden', 'true');
+            setTimeout(() => {
+              if (reorderModal.classList.contains('pointer-events-none')) {
+                reorderModal.style.display = 'none';
+              }
+            }, 200);
+          }
+        }
+      });
+
       return { refresh };
     }
 
@@ -5517,180 +5699,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         await openQuizPickerForPatient(patient);
       };
       window.__quizScheduleController = { openForPatient, openLinkedSchedule, openLinkedDrawer };
-      
-      
-      const reorderModal = document.getElementById('quiz-reorder-modal');
-      const reorderList = document.getElementById('quiz-reorder-list');
-      
-      const renderReorderModal = () => {
-        const list = document.getElementById('quiz-reorder-list');
-        const subtitle = document.getElementById('quiz-reorder-subtitle');
-        const countBadge = document.getElementById('quiz-reorder-count-badge');
-        if (!list) return;
-
-        const localEscape = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
-
-        list.innerHTML = '';
-        const selected = getSelectedQuestions();
-
-        if (countBadge) countBadge.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'}`;
-        if (subtitle) subtitle.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'} selecionada${selected.length === 1 ? '' : 's'}. Arraste as siglas ou use as setas para ajustar a sequência.`;
-
-        if (!selected.length) {
-          list.innerHTML = '<div class="py-12 text-center text-sm text-gray-500 rounded-xl border border-dashed border-primary/20 p-6">Nenhuma pergunta foi adicionada a este questionário ainda.<br><span class="text-xs text-primary mt-1 inline-block">Clique em "Adicionar pergunta" no editor para selecionar perguntas.</span></div>';
-          return;
-        }
-
-        selected.forEach((question, index) => {
-          const item = document.createElement('div');
-          const isFirst = index === 0;
-          const isLast = index === selected.length - 1;
-          const code = String(question.code || question.originalCode || question.id || `P${index + 1}`).trim();
-          const title = String(question.title || question.questionText || code).trim();
-
-          item.className = 'quiz-reorder-item flex items-center justify-between gap-2.5 p-2.5 sm:p-3 rounded-2xl border border-primary/20 bg-white shadow-sm transition hover:border-primary/50 select-none';
-          item.draggable = true;
-          item.dataset.questionId = String(question.id);
-
-          item.innerHTML = `
-            <div class="flex min-w-0 items-center gap-2.5 sm:gap-3 flex-1">
-              <span class="cursor-grab text-gray-400 hover:text-dark text-base px-0.5 font-bold" title="Arraste para mover" aria-label="Arraste para mover">⠿</span>
-              <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-dark border border-primary/15">${index + 1}</span>
-              <span class="quiz-sigla-badge inline-flex shrink-0 items-center justify-center rounded-xl bg-primary/15 px-2.5 py-1 text-xs font-black font-mono text-dark border border-primary/30 tracking-wider shadow-xs">${localEscape(code)}</span>
-              <span class="truncate text-xs font-medium text-gray-600 sm:text-sm" title="${localEscape(title)}">${localEscape(title)}</span>
-            </div>
-            <div class="flex shrink-0 items-center gap-1">
-              <button type="button" data-move-top="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Mover para o topo">⤒</button>
-              <button type="button" data-move-up="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Subir uma posição">▲</button>
-              <button type="button" data-move-down="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Descer uma posição">▼</button>
-              <button type="button" data-move-bottom="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Mover para o final">⤓</button>
-            </div>
-          `;
-
-          item.querySelector('[data-move-top]')?.addEventListener('click', () => {
-            const ids = [...selectedIds];
-            const idx = ids.findIndex(id => String(id) === String(question.id));
-            if (idx > 0) {
-              const [removed] = ids.splice(idx, 1);
-              ids.unshift(removed);
-              selectedIds = new Set(ids);
-              renderReorderModal();
-              renderSettings();
-            }
-          });
-
-          item.querySelector('[data-move-bottom]')?.addEventListener('click', () => {
-            const ids = [...selectedIds];
-            const idx = ids.findIndex(id => String(id) === String(question.id));
-            if (idx >= 0 && idx < ids.length - 1) {
-              const [removed] = ids.splice(idx, 1);
-              ids.push(removed);
-              selectedIds = new Set(ids);
-              renderReorderModal();
-              renderSettings();
-            }
-          });
-
-          item.querySelector('[data-move-up]')?.addEventListener('click', () => {
-            const ids = [...selectedIds];
-            const idx = ids.findIndex(id => String(id) === String(question.id));
-            if (idx > 0) {
-              const temp = ids[idx];
-              ids[idx] = ids[idx - 1];
-              ids[idx - 1] = temp;
-              selectedIds = new Set(ids);
-              renderReorderModal();
-              renderSettings();
-            }
-          });
-
-          item.querySelector('[data-move-down]')?.addEventListener('click', () => {
-            const ids = [...selectedIds];
-            const idx = ids.findIndex(id => String(id) === String(question.id));
-            if (idx >= 0 && idx < ids.length - 1) {
-              const temp = ids[idx];
-              ids[idx] = ids[idx + 1];
-              ids[idx + 1] = temp;
-              selectedIds = new Set(ids);
-              renderReorderModal();
-              renderSettings();
-            }
-          });
-
-          item.addEventListener('dragstart', event => {
-            draggedQuestionId = String(question.id);
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/plain', String(question.id));
-            window.requestAnimationFrame(() => item.classList.add('opacity-50'));
-          });
-          item.addEventListener('dragend', () => {
-            draggedQuestionId = null;
-            list.querySelectorAll('.quiz-reorder-item').forEach(el => el.classList.remove('opacity-50', 'border-t-2', 'border-b-2', 'border-primary'));
-          });
-          item.addEventListener('dragover', event => {
-            if (!draggedQuestionId || draggedQuestionId === String(question.id)) return;
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'move';
-            const bounds = item.getBoundingClientRect();
-            const isBottom = event.clientY > bounds.top + bounds.height / 2;
-            item.classList.remove('border-t-2', 'border-b-2', 'border-primary');
-            item.classList.add(isBottom ? 'border-b-2' : 'border-t-2', 'border-primary');
-          });
-          item.addEventListener('dragleave', () => {
-            item.classList.remove('border-t-2', 'border-b-2', 'border-primary');
-          });
-          item.addEventListener('drop', event => {
-            if (!draggedQuestionId || draggedQuestionId === String(question.id)) return;
-            event.preventDefault();
-            const sourceId = draggedQuestionId;
-            draggedQuestionId = null;
-            const bounds = item.getBoundingClientRect();
-            reorderSelectedQuestions(sourceId, String(question.id), event.clientY > bounds.top + bounds.height / 2);
-            renderReorderModal();
-          });
-
-          list.appendChild(item);
-        });
-      };
-      document.getElementById('quiz-reorder-invert')?.addEventListener('click', () => {
-        const ids = [...selectedIds].reverse();
-        selectedIds = new Set(ids);
-        renderReorderModal();
-        renderSettings();
-      });
-      window._renderReorderModal = renderReorderModal;
-
-      document.addEventListener('click', (event) => {
-        const trigger = event.target.closest('#quiz-reorder-trigger');
-        if (trigger) {
-          event.preventDefault();
-          event.stopPropagation();
-          try {
-            renderReorderModal();
-            if (reorderModal) {
-              reorderModal.classList.remove('opacity-0', 'pointer-events-none');
-              reorderModal.classList.add('opacity-100', 'pointer-events-auto');
-              reorderModal.removeAttribute('aria-hidden');
-            }
-          } catch(e) {
-            console.error(e);
-          }
-        }
-        
-        const closeBtn = event.target.closest('#quiz-reorder-close');
-        const doneBtn = event.target.closest('#quiz-reorder-done');
-        if (closeBtn || doneBtn) {
-          event.preventDefault();
-          event.stopPropagation();
-          if (reorderModal) {
-            reorderModal.classList.add('opacity-0', 'pointer-events-none');
-            reorderModal.classList.remove('opacity-100', 'pointer-events-auto');
-            reorderModal.setAttribute('aria-hidden', 'true');
-          }
-        }
-      });
-      
-return { open, refresh, openSchedule:openLinkedSchedule, openLinkedDrawer, openForPatient };
+      return { open, refresh, openSchedule:openLinkedSchedule, openLinkedDrawer, openForPatient };
     }
 
     function renderRemindersManager(notify = () => {}) {
