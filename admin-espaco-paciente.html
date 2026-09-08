@@ -995,7 +995,7 @@
     body[data-patient-theme='black'] .patient-profile-empty { border-color:#596171; color:#c9ced8; }
     body[data-patient-theme='black'] .patient-profile-metric { background:#2e3440; border-color:#50596a; }
     body[data-patient-theme='black'] .patient-profile-page .patient-status { background:#24422f; color:#9be0ad; }
-body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='black'] .dashboard-metric, body[data-patient-theme='black'] .dashboard-alert, body[data-patient-theme='black'] .patient-filter-drawer, body[data-patient-theme='black'] .patient-table-config-drawer, body[data-patient-theme='black'] .patient-directory, body[data-patient-theme='black'] .pending-review, body[data-patient-theme='black'] .send-report, body[data-patient-theme='black'] .scheduled-sends, body[data-patient-theme='black'] .send-metric, body[data-patient-theme='black'] .response-report, body[data-patient-theme='black'] .response-metric, body[data-patient-theme='black'] .response-filter-drawer, body[data-patient-theme='black'] .engagement-report, body[data-patient-theme='black'] .engagement-filter-drawer, body[data-patient-theme='black'] .engagement-info-modal, body[data-patient-theme='black'] .transaction-report, body[data-patient-theme='black'] .transaction-chart-card, body[data-patient-theme='black'] .transaction-metric, body[data-patient-theme='black'] .transaction-filter-drawer, body[data-patient-theme='black'] .transaction-customize-drawer, body[data-patient-theme='black'] .transaction-entry-drawer, body[data-patient-theme='black'] .services-manager, body[data-patient-theme='black'] .service-drawer, body[data-patient-theme='black'] .service-action-menu, body[data-patient-theme='black'] .questions-manager, body[data-patient-theme='black'] .question-drawer, body[data-patient-theme='black'] .question-preview, body[data-patient-theme='black'] .reminders-manager, body[data-patient-theme='black'] .reminder-modal, body[data-patient-theme='black'] .patient-registration-modal, body[data-patient-theme='black'] .patient-label-options, body[data-patient-theme='black'] .quizzes-manager, body[data-patient-theme='black'] .quiz-drawer, body[data-patient-theme='black'] .quiz-preview, body[data-patient-theme='black'] .quiz-builder-question { background:#22242b; border-color:rgba(255,255,255,.08); }
+body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='black'] .dashboard-metric, body[data-patient-theme='black'] .dashboard-alert, body[data-patient-theme='black'] .patient-filter-drawer, body[data-patient-theme='black'] .patient-table-config-drawer, body[data-patient-theme='black'] .patient-directory, body[data-patient-theme='black'] .pending-review, body[data-patient-theme='black'] .send-report, body[data-patient-theme='black'] .scheduled-sends, body[data-patient-theme='black'] .scheduled-sends-filter-card, body[data-patient-theme='black'] .send-metric, body[data-patient-theme='black'] .response-report, body[data-patient-theme='black'] .response-metric, body[data-patient-theme='black'] .response-filter-drawer, body[data-patient-theme='black'] .engagement-report, body[data-patient-theme='black'] .engagement-filter-drawer, body[data-patient-theme='black'] .engagement-info-modal, body[data-patient-theme='black'] .transaction-report, body[data-patient-theme='black'] .transaction-chart-card, body[data-patient-theme='black'] .transaction-metric, body[data-patient-theme='black'] .transaction-filter-drawer, body[data-patient-theme='black'] .transaction-customize-drawer, body[data-patient-theme='black'] .transaction-entry-drawer, body[data-patient-theme='black'] .services-manager, body[data-patient-theme='black'] .service-drawer, body[data-patient-theme='black'] .service-action-menu, body[data-patient-theme='black'] .questions-manager, body[data-patient-theme='black'] .question-drawer, body[data-patient-theme='black'] .question-preview, body[data-patient-theme='black'] .reminders-manager, body[data-patient-theme='black'] .reminder-modal, body[data-patient-theme='black'] .patient-registration-modal, body[data-patient-theme='black'] .patient-label-options, body[data-patient-theme='black'] .quizzes-manager, body[data-patient-theme='black'] .quiz-drawer, body[data-patient-theme='black'] .quiz-preview, body[data-patient-theme='black'] .quiz-builder-question { background:#22242b; border-color:rgba(255,255,255,.08); }
     body[data-patient-theme='black'] .send-tab.is-active, body[data-patient-theme='black'] .send-filter-drawer, body[data-patient-theme='black'] .send-filter-field { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); }
     body[data-patient-theme='black'] .patient-tab.is-active, body[data-patient-theme='black'] .question-tab.is-active, body[data-patient-theme='black'] .directory-tool, body[data-patient-theme='black'] .patient-search, body[data-patient-theme='black'] .patient-label-trigger { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); } body[data-patient-theme='black'] .patient-label-add { background:rgba(212,183,106,.12); color:#d4b76a; border-color:rgba(212,183,106,.26); }
     body[data-patient-theme='black'] .patient-label-option { color:#f5f5f5; } body[data-patient-theme='black'] .patient-label-option:hover { background:#2a2c34; }
@@ -1661,8 +1661,8 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
           </div>
         </header>
 
-        <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <article class="send-metric rounded-2xl p-4" title="Envios confirmados e agendados diretamente no provedor de e-mail (Brevo)." tabindex="0">
+                <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="send-metric rounded-2xl p-4 cursor-pointer transition hover:ring-2 hover:ring-emerald-400/50" data-sched-kpi-filter="agendado_na_brevo" title="Clique para filtrar apenas agendados no Brevo." tabindex="0">
             <div class="flex items-start gap-3">
               <span class="send-metric-icon bg-[#e6f3e9] text-[#2f8b54]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12.5 4.5 4.5L19 7.5"/></svg>
@@ -1675,7 +1675,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             </div>
           </article>
 
-          <article class="send-metric rounded-2xl p-4" title="Envios na fila da plataforma que aguardam a janela do provedor para transmissão." tabindex="0">
+          <article class="send-metric rounded-2xl p-4 cursor-pointer transition hover:ring-2 hover:ring-blue-400/50" data-sched-kpi-filter="aguardando_brevo" title="Clique para filtrar apenas a fila da plataforma." tabindex="0">
             <div class="flex items-start gap-3">
               <span class="send-metric-icon bg-[#eaf1f8] text-[#47708d]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg>
@@ -1688,7 +1688,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             </div>
           </article>
 
-          <article class="send-metric rounded-2xl p-4" title="Envios programados que foram suspensos temporariamente." tabindex="0">
+          <article class="send-metric rounded-2xl p-4 cursor-pointer transition hover:ring-2 hover:ring-amber-400/50" data-sched-kpi-filter="pausado" title="Clique para filtrar apenas agendamentos pausados." tabindex="0">
             <div class="flex items-start gap-3">
               <span class="send-metric-icon bg-[#f3edda] text-[#8b6d1e]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 9v6m4-6v6"/></svg>
@@ -1701,7 +1701,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
             </div>
           </article>
 
-          <article class="send-metric rounded-2xl p-4" title="Total de envios ativos futuros e momento do próximo envio previsto." tabindex="0">
+          <article class="send-metric rounded-2xl p-4 cursor-pointer transition hover:ring-2 hover:ring-primary/50" data-sched-kpi-filter="future_only" title="Clique para filtrar apenas agendamentos futuros." tabindex="0">
             <div class="flex items-start gap-3">
               <span class="send-metric-icon bg-[#f4efe7] text-[#786b5d]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>
@@ -1715,37 +1715,86 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
           </article>
         </div>
 
-        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div class="relative flex-1 max-w-md">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
-            </span>
-            <input id="scheduled-sends-search" type="search" placeholder="Buscar por paciente, e-mail ou questionário..." class="w-full rounded-xl border border-primary/20 bg-white py-2 pl-9 pr-3 text-xs text-dark placeholder:text-gray-400 focus:border-primary focus:outline-none">
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <select id="scheduled-sends-filter-status" class="rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
-              <option value="active_and_sent">Envios ativos e realizados</option>
-              <option value="future_only">Apenas futuros programados</option>
-              <option value="agendado_na_brevo">Agendados no Brevo (futuros)</option>
-              <option value="aguardando_brevo">Fila da plataforma</option>
-              <option value="pausado">Pausados</option>
-              <option value="delivered">Entregues</option>
-              <option value="opened">Lidos</option>
-              <option value="clicked">Clicados</option>
-              <option value="responded">Respondidos</option>
-              <option value="failed">Não entregues</option>
-              <option value="cancelado">Cancelados</option>
-              <option value="falha_de_agendamento">Falhas de agendamento</option>
-              <option value="all">Todos os envios</option>
-            </select>
-            <select id="scheduled-sends-filter-mode" class="rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
-              <option value="">Todos os modos</option>
-              <option value="weekly">Envio Semanal</option>
-              <option value="daily">Envio Diário</option>
-              <option value="unique">Envio Único</option>
-              <option value="manual">Envio Manual</option>
-              <option value="reminder">Lembrete Automático</option>
-            </select>
+        <!-- Painel de Filtros por Coluna -->
+        <div class="mt-5 rounded-2xl border border-primary/15 bg-white/80 p-4 shadow-sm backdrop-blur-sm scheduled-sends-filter-card">
+          <div class="flex flex-col gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
+                </span>
+                <span class="text-xs font-bold text-dark">Filtrar por colunas:</span>
+                <span class="text-[11px] text-gray-400 hidden sm:inline">Selecione paciente, questionário, modo de envio ou status</span>
+              </div>
+              <button id="scheduled-sends-clear-filters" type="button" class="hidden text-xs font-semibold text-primary hover:underline hover:text-dark transition cursor-pointer">
+                Limpar filtros
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2.5">
+              <!-- Filtro Coluna: Paciente -->
+              <div class="flex flex-col gap-1">
+                <label for="scheduled-sends-filter-patient" class="text-[11px] font-semibold text-gray-500">Paciente</label>
+                <select id="scheduled-sends-filter-patient" class="w-full rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
+                  <option value="">Todos os pacientes</option>
+                </select>
+              </div>
+
+              <!-- Filtro Coluna: Questionário -->
+              <div class="flex flex-col gap-1">
+                <label for="scheduled-sends-filter-quiz" class="text-[11px] font-semibold text-gray-500">Questionário</label>
+                <select id="scheduled-sends-filter-quiz" class="w-full rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
+                  <option value="">Todos os questionários</option>
+                </select>
+              </div>
+
+              <!-- Filtro Coluna: Modo de envio -->
+              <div class="flex flex-col gap-1">
+                <label for="scheduled-sends-filter-mode" class="text-[11px] font-semibold text-gray-500">Modo de envio</label>
+                <select id="scheduled-sends-filter-mode" class="w-full rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
+                  <option value="">Todos os modos</option>
+                  <option value="weekly">Envio Semanal</option>
+                  <option value="daily">Envio Diário</option>
+                  <option value="unique">Envio Único</option>
+                  <option value="manual">Envio Manual</option>
+                  <option value="reminder">Lembrete Automático</option>
+                </select>
+              </div>
+
+              <!-- Filtro Coluna: Status -->
+              <div class="flex flex-col gap-1">
+                <label for="scheduled-sends-filter-status" class="text-[11px] font-semibold text-gray-500">Status</label>
+                <select id="scheduled-sends-filter-status" class="w-full rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs text-dark font-medium focus:border-primary focus:outline-none">
+                  <option value="active_and_sent">Envios ativos e realizados</option>
+                  <option value="future_only">Apenas futuros programados</option>
+                  <option value="agendado_na_brevo">Agendados no Brevo (futuros)</option>
+                  <option value="aguardando_brevo">Fila da plataforma</option>
+                  <option value="pausado">Pausados</option>
+                  <option value="delivered">Entregues</option>
+                  <option value="opened">Lidos</option>
+                  <option value="clicked">Clicados</option>
+                  <option value="responded">Respondidos</option>
+                  <option value="failed">Não entregues</option>
+                  <option value="cancelado">Cancelados</option>
+                  <option value="falha_de_agendamento">Falhas de agendamento</option>
+                  <option value="all">Todos os envios</option>
+                </select>
+              </div>
+
+              <!-- Busca rápida livre -->
+              <div class="flex flex-col gap-1 sm:col-span-2 lg:col-span-4 xl:col-span-1">
+                <label for="scheduled-sends-search" class="text-[11px] font-semibold text-gray-500">Busca rápida</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+                  </span>
+                  <input id="scheduled-sends-search" type="search" placeholder="E-mail, texto..." class="w-full rounded-xl border border-primary/20 bg-white py-2 pl-9 pr-3 text-xs text-dark placeholder:text-gray-400 focus:border-primary focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- Chips de filtros ativos -->
+            <div id="scheduled-sends-active-chips" class="hidden flex flex-wrap items-center gap-1.5 pt-1"></div>
           </div>
         </div>
 
@@ -4354,6 +4403,10 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const searchInput = document.getElementById('scheduled-sends-search');
       const statusFilter = document.getElementById('scheduled-sends-filter-status');
       const modeFilter = document.getElementById('scheduled-sends-filter-mode');
+      const patientFilter = document.getElementById('scheduled-sends-filter-patient');
+      const quizFilter = document.getElementById('scheduled-sends-filter-quiz');
+      const clearFiltersBtn = document.getElementById('scheduled-sends-clear-filters');
+      const activeChips = document.getElementById('scheduled-sends-active-chips');
       const refreshBtn = document.getElementById('scheduled-sends-refresh');
       const exportBtn = document.getElementById('scheduled-sends-export');
       const backBtn = document.getElementById('scheduled-sends-back');
@@ -4390,6 +4443,133 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         manual: 'Envio Manual',
         open: 'Envio Aberto',
         reminder: 'Lembrete Automático'
+      };
+
+      const statusLabels = {
+        active_and_sent: 'Envios ativos e realizados',
+        future_only: 'Apenas futuros programados',
+        agendado_na_brevo: 'Agendados no Brevo',
+        aguardando_brevo: 'Fila da plataforma',
+        pausado: 'Pausados',
+        delivered: 'Entregues',
+        opened: 'Lidos',
+        clicked: 'Clicados',
+        responded: 'Respondidos',
+        failed: 'Não entregues',
+        cancelado: 'Cancelados',
+        falha_de_agendamento: 'Falhas de agendamento',
+        all: 'Todos os envios'
+      };
+
+      const populateFilterOptions = () => {
+        if (!patientFilter || !quizFilter) return;
+
+        const currentSelectedPatient = patientFilter.value;
+        const currentSelectedQuiz = quizFilter.value;
+
+        const patientMap = new Map();
+        const quizMap = new Map();
+
+        rawSchedules.forEach(s => {
+          const pName = String(s.patientName || s.recipientEmail || '').trim();
+          if (pName) {
+            patientMap.set(pName, (patientMap.get(pName) || 0) + 1);
+          }
+          const qTitle = String(s.quizTitle || '').trim();
+          if (qTitle) {
+            quizMap.set(qTitle, (quizMap.get(qTitle) || 0) + 1);
+          }
+        });
+
+        const sortedPatients = Array.from(patientMap.entries()).sort((a, b) =>
+          a[0].localeCompare(b[0], 'pt-BR', { sensitivity: 'base' })
+        );
+        let ptOptions = '<option value="">Todos os pacientes</option>';
+        sortedPatients.forEach(([name, count]) => {
+          ptOptions += `<option value="${escape(name)}">${escape(name)} (${count})</option>`;
+        });
+        patientFilter.innerHTML = ptOptions;
+        if (currentSelectedPatient && patientMap.has(currentSelectedPatient)) {
+          patientFilter.value = currentSelectedPatient;
+        }
+
+        const sortedQuizzes = Array.from(quizMap.entries()).sort((a, b) =>
+          a[0].localeCompare(b[0], 'pt-BR', { sensitivity: 'base' })
+        );
+        let qzOptions = '<option value="">Todos os questionários</option>';
+        sortedQuizzes.forEach(([title, count]) => {
+          qzOptions += `<option value="${escape(title)}">${escape(title)} (${count})</option>`;
+        });
+        quizFilter.innerHTML = qzOptions;
+        if (currentSelectedQuiz && quizMap.has(currentSelectedQuiz)) {
+          quizFilter.value = currentSelectedQuiz;
+        }
+      };
+
+      const updateActiveFilterChips = () => {
+        if (!activeChips || !clearFiltersBtn) return;
+
+        const chips = [];
+        const ptVal = patientFilter?.value?.trim();
+        const qzVal = quizFilter?.value?.trim();
+        const mdVal = modeFilter?.value?.trim();
+        const stVal = statusFilter?.value;
+        const qVal = searchInput?.value?.trim();
+
+        if (ptVal) {
+          chips.push({ key: 'patient', label: `Paciente: ${ptVal}` });
+        }
+        if (qzVal) {
+          chips.push({ key: 'quiz', label: `Questionário: ${qzVal}` });
+        }
+        if (mdVal && sendModeLabels[mdVal]) {
+          chips.push({ key: 'mode', label: `Modo: ${sendModeLabels[mdVal]}` });
+        }
+        if (stVal && stVal !== 'active_and_sent') {
+          chips.push({ key: 'status', label: `Status: ${statusLabels[stVal] || stVal}` });
+        }
+        if (qVal) {
+          chips.push({ key: 'search', label: `Busca: "${qVal}"` });
+        }
+
+        if (chips.length > 0) {
+          clearFiltersBtn.classList.remove('hidden');
+          activeChips.classList.remove('hidden');
+          activeChips.innerHTML = `
+            <span class="text-[11px] font-semibold text-gray-500 mr-1">Filtros ativos:</span>
+            ${chips.map(c => `
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-dark border border-primary/20">
+                <span>${escape(c.label)}</span>
+                <button type="button" class="text-gray-400 hover:text-red-500 font-bold ml-0.5 cursor-pointer leading-none" data-sched-clear-chip="${escape(c.key)}" title="Remover este filtro">×</button>
+              </span>
+            `).join('')}
+          `;
+
+          activeChips.querySelectorAll('[data-sched-clear-chip]').forEach(chipBtn => {
+            chipBtn.addEventListener('click', () => {
+              const key = chipBtn.dataset.schedClearChip;
+              if (key === 'patient' && patientFilter) patientFilter.value = '';
+              if (key === 'quiz' && quizFilter) quizFilter.value = '';
+              if (key === 'mode' && modeFilter) modeFilter.value = '';
+              if (key === 'status' && statusFilter) statusFilter.value = 'active_and_sent';
+              if (key === 'search' && searchInput) searchInput.value = '';
+              draw();
+            });
+          });
+        } else {
+          clearFiltersBtn.classList.add('hidden');
+          activeChips.classList.add('hidden');
+          activeChips.innerHTML = '';
+        }
+      };
+
+      const clearAllFilters = () => {
+        if (patientFilter) patientFilter.value = '';
+        if (quizFilter) quizFilter.value = '';
+        if (modeFilter) modeFilter.value = '';
+        if (statusFilter) statusFilter.value = 'active_and_sent';
+        if (searchInput) searchInput.value = '';
+        draw();
       };
 
       const getSendModeInfo = item => {
@@ -4448,83 +4628,88 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         if (isSent) {
           if (diffDays === 0) return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Enviado hoje</span>';
           if (diffDays === -1) return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Enviado ontem</span>';
-          if (diffDays < -1) return `<span class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600">Enviado há ${Math.abs(diffDays)} dias</span>`;
           return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Enviado</span>';
         }
-        if (diffDays < 0) return '<span class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-500">Passado</span>';
-        if (diffDays === 0) return '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Hoje</span>';
-        if (diffDays === 1) return '<span class="inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">Amanhã</span>';
-        return `<span class="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Em ${diffDays} dias</span>`;
+        if (diffDays === 0) return '<span class="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Hoje</span>';
+        if (diffDays === 1) return '<span class="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Amanhã</span>';
+        if (diffDays > 1 && diffDays <= 7) return `<span class="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Em ${diffDays} dias</span>`;
+        if (diffDays > 7) return `<span class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600">Em ${diffDays} dias</span>`;
+        return '<span class="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Vencido</span>';
+      };
+
+      const findMatchingReportEvent = schedule => {
+        if (!cachedReportEvents.length) return null;
+        const provId = cleanId(schedule.providerScheduleId || schedule.provider_schedule_id);
+        if (provId && eventsByMessageId.has(provId)) return eventsByMessageId.get(provId);
+        const schedId = cleanId(schedule.id);
+        if (schedId && eventsByMessageId.has(schedId)) return eventsByMessageId.get(schedId);
+        const sKey = schedule.scheduleKey || schedule.schedule_key;
+        if (sKey && eventsByScheduleKey.has(sKey)) return eventsByScheduleKey.get(sKey);
+        const recipient = String(schedule.recipientEmail || '').trim().toLowerCase();
+        if (recipient && eventsByRecipient.has(recipient)) {
+          const list = eventsByRecipient.get(recipient);
+          const schedTime = new Date(schedule.scheduledFor || 0).getTime();
+          const targetQuiz = String(schedule.quizTitle || '').trim().toLowerCase();
+          const candidate = list.find(ev => {
+            const evTime = new Date(ev.sentAt || ev.date || 0).getTime();
+            const timeDiff = Math.abs(evTime - schedTime);
+            if (timeDiff < 2 * 60 * 60 * 1000) return true;
+            if (targetQuiz && String(ev.quizTitle || '').trim().toLowerCase() === targetQuiz && timeDiff < 24 * 60 * 60 * 1000) return true;
+            return false;
+          });
+          if (candidate) return candidate;
+        }
+        return null;
       };
 
       const formatReportStatus = event => {
         if (!event) return null;
-        if (event.failed) {
-          return {
-            key: 'failed',
-            label: 'Não entregue',
-            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#fae8e7] px-2.5 py-1 text-[11px] font-bold text-[#b44b48]" title="A mensagem não pôde ser entregue. Verifique os dados de contato do paciente."><span class="h-1.5 w-1.5 rounded-full bg-[#b44b48]"></span>Não entregue</span>',
-            isSent: true
-          };
-        }
-        if (event.respondedAt || event.responseStatus === 'responded' || event.status === 'responded') {
+        if (event.respondedAt) {
           return {
             key: 'responded',
             label: 'Respondido',
-            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#f3edda] px-2.5 py-1 text-[11px] font-bold text-[#8b6d1e]" title="O paciente respondeu todo o questionário."><span class="h-1.5 w-1.5 rounded-full bg-[#8b6d1e]"></span>Respondido</span>',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#e6f3e9] px-2.5 py-1 text-[11px] font-bold text-[#377255]" title="O paciente concluiu e enviou o questionário."><span class="h-1.5 w-1.5 rounded-full bg-[#377255]"></span>Respondido</span>',
             isSent: true
           };
         }
-        if (event.clickedAt || event.status === 'clicked') {
+        if (event.clickedAt) {
           return {
             key: 'clicked',
             label: 'Clicado',
-            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eef8ef] px-2.5 py-1 text-[11px] font-bold text-[#2f8b54]" title="O paciente clicou no link que foi enviado dentro da mensagem."><span class="h-1.5 w-1.5 rounded-full bg-[#2f8b54]"></span>Clicado</span>',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#f3edda] px-2.5 py-1 text-[11px] font-bold text-[#8b6d1e]" title="O paciente clicou no link do questionário."><span class="h-1.5 w-1.5 rounded-full bg-[#8b6d1e]"></span>Clicado</span>',
             isSent: true
           };
         }
-        if (event.openedAt || event.status === 'opened') {
+        if (event.openedAt) {
           return {
             key: 'opened',
             label: 'Lido',
-            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#e6f3e9] px-2.5 py-1 text-[11px] font-bold text-[#377255]" title="O paciente visualizou a mensagem."><span class="h-1.5 w-1.5 rounded-full bg-[#377255]"></span>Lido</span>',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#f4efe7] px-2.5 py-1 text-[11px] font-bold text-[#786b5d]" title="O paciente abriu o e-mail do questionário."><span class="h-1.5 w-1.5 rounded-full bg-[#786b5d]"></span>Lido</span>',
+            isSent: true
+          };
+        }
+        if (event.deliveredAt) {
+          return {
+            key: 'delivered',
+            label: 'Entregue',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eaf1f8] px-2.5 py-1 text-[11px] font-bold text-[#47708d]" title="A mensagem chegou com sucesso à caixa postal do paciente."><span class="h-1.5 w-1.5 rounded-full bg-[#47708d]"></span>Entregue</span>',
+            isSent: true
+          };
+        }
+        if (event.failedAt || ['soft_bounce', 'hard_bounce', 'blocked', 'spam', 'invalid_email', 'error'].includes(event.status)) {
+          return {
+            key: 'failed',
+            label: 'Não entregue',
+            badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#fae8e7] px-2.5 py-1 text-[11px] font-bold text-[#b44b48]" title="Houve falha na entrega do e-mail."><span class="h-1.5 w-1.5 rounded-full bg-[#b44b48]"></span>Não entregue</span>',
             isSent: true
           };
         }
         return {
           key: 'delivered',
-          label: 'Entregue',
-          badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eaf1f8] px-2.5 py-1 text-[11px] font-bold text-[#47708d]" title="A mensagem chegou com sucesso ao paciente."><span class="h-1.5 w-1.5 rounded-full bg-[#47708d]"></span>Entregue</span>',
+          label: 'Enviado',
+          badgeHtml: '<span class="inline-flex items-center gap-1.5 rounded-full bg-[#eaf1f8] px-2.5 py-1 text-[11px] font-bold text-[#47708d]" title="Envio concluído com sucesso"><span class="h-1.5 w-1.5 rounded-full bg-[#47708d]"></span>Enviado</span>',
           isSent: true
         };
-      };
-
-      const findMatchingReportEvent = schedule => {
-        const mId = cleanId(schedule?.providerMessageId || schedule?.provider_message_id);
-        if (mId && eventsByMessageId.has(mId)) return eventsByMessageId.get(mId);
-
-        const schedKey = String(schedule?.scheduleKey || schedule?.schedule_key || '').trim();
-        if (schedKey && eventsByScheduleKey.has(schedKey)) return eventsByScheduleKey.get(schedKey);
-
-        const recipient = String(schedule?.recipientEmail || schedule?.recipient_email || '').trim().toLowerCase();
-        const candidates = eventsByRecipient.get(recipient) || [];
-        if (candidates.length) {
-          const schedTime = new Date(schedule?.scheduledFor || 0).getTime();
-          const quizId = String(schedule?.quizId || schedule?.quiz_id || '').trim().toLowerCase();
-          const sorted = candidates
-            .filter(ev => {
-              if (!quizId) return true;
-              const evQuiz = String(ev?.quizId || '').trim().toLowerCase();
-              return !evQuiz || evQuiz === quizId;
-            })
-            .map(ev => ({ ev, diff: Math.abs(new Date(ev.sentAt || 0).getTime() - schedTime) }))
-            .sort((a, b) => a.diff - b.diff);
-
-          if (sorted.length && sorted[0].diff < 4 * 60 * 60 * 1000) {
-            return sorted[0].ev;
-          }
-        }
-        return null;
       };
 
       const resolveScheduleStatus = schedule => {
@@ -4532,7 +4717,6 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const schedTime = Date.parse(schedule?.scheduledFor || '');
         const isPast = Number.isFinite(schedTime) && schedTime <= Date.now();
 
-        // Se o envio é FUTURO, mantém exatamente como está
         if (!isPast) {
           if (norm === 'agendado_na_brevo') {
             return {
@@ -4582,7 +4766,6 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           };
         }
 
-        // Tempo PASSADO:
         if (['cancelled', 'cancelado'].includes(norm)) {
           const matched = findMatchingReportEvent(schedule);
           if (matched && (matched.deliveredAt || matched.openedAt || matched.clickedAt || matched.respondedAt)) {
@@ -4614,13 +4797,11 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           };
         }
 
-        // Envio no passado disparado: busca status real do relatório pós-envio
         const matched = findMatchingReportEvent(schedule);
         if (matched) {
           return formatReportStatus(matched);
         }
 
-        // Se estava agendado no Brevo / enviado e o momento já passou, foi transmitido com sucesso
         if (['agendado_na_brevo', 'enviado', 'sent', 'delivered'].includes(norm)) {
           return {
             key: 'delivered',
@@ -4632,15 +4813,15 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
         return {
           key: norm,
-          label: schedule?.status || 'Pendente',
-          badgeHtml: `<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-2.5 py-1 text-[11px] font-bold text-gray-600">${escape(schedule?.status)}</span>`,
-          isSent: false
+          label: schedule?.status || 'Finalizado',
+          badgeHtml: `<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-bold text-gray-700">${escape(schedule?.status || 'Finalizado')}</span>`,
+          isSent: true
         };
       };
 
       const isFutureSchedule = schedule => {
-        const timestamp = Date.parse(schedule?.scheduledFor || '');
-        return Number.isFinite(timestamp) && timestamp > Date.now();
+        const schedTime = Date.parse(schedule?.scheduledFor || '');
+        return Number.isFinite(schedTime) && schedTime > Date.now();
       };
 
       const updateKpis = schedules => {
@@ -4648,22 +4829,28 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         let queue = 0;
         let paused = 0;
         let activeFuture = 0;
-        let earliestFutureTimestamp = Infinity;
-        let earliestFutureIso = '';
+        let earliestFutureIso = null;
 
         schedules.forEach(s => {
+          const statusInfo = s.resolvedStatus || resolveScheduleStatus(s);
+          const stKey = statusInfo.key;
           const isFut = isFutureSchedule(s);
-          const stKey = s.resolvedStatus?.key;
-          if (stKey === 'agendado_na_brevo' && isFut) brevo++;
-          else if (stKey === 'aguardando_brevo' && isFut) queue++;
-          else if (stKey === 'pausado') paused++;
 
-          if (['agendado_na_brevo', 'aguardando_brevo'].includes(stKey) && isFut) {
-            activeFuture++;
-            const t = Date.parse(s.scheduledFor);
-            if (t < earliestFutureTimestamp) {
-              earliestFutureTimestamp = t;
-              earliestFutureIso = s.scheduledFor;
+          if (isFut) {
+            if (stKey === 'agendado_na_brevo') {
+              brevo += 1;
+              activeFuture += 1;
+            } else if (stKey === 'aguardando_brevo') {
+              queue += 1;
+              activeFuture += 1;
+            } else if (stKey === 'pausado') {
+              paused += 1;
+            }
+
+            if (['agendado_na_brevo', 'aguardando_brevo'].includes(stKey)) {
+              if (!earliestFutureIso || new Date(s.scheduledFor).getTime() < new Date(earliestFutureIso).getTime()) {
+                earliestFutureIso = s.scheduledFor;
+              }
             }
           }
         });
@@ -4687,6 +4874,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const query = (searchInput?.value || '').trim().toLocaleLowerCase('pt-BR');
         const stFilter = statusFilter?.value || 'active_and_sent';
         const mdFilter = modeFilter?.value || '';
+        const ptFilter = (patientFilter?.value || '').trim().toLocaleLowerCase('pt-BR');
+        const qzFilter = (quizFilter?.value || '').trim().toLocaleLowerCase('pt-BR');
 
         const filtered = rawSchedules.filter(s => {
           const statusInfo = s.resolvedStatus || resolveScheduleStatus(s);
@@ -4722,6 +4911,17 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
           if (mdFilter) {
             if (modeInfo.code !== mdFilter) return false;
+          }
+
+          if (ptFilter) {
+            const pName = String(s.patientName || '').trim().toLocaleLowerCase('pt-BR');
+            const pEmail = String(s.recipientEmail || '').trim().toLocaleLowerCase('pt-BR');
+            if (pName !== ptFilter && pEmail !== ptFilter) return false;
+          }
+
+          if (qzFilter) {
+            const qTitle = String(s.quizTitle || '').trim().toLocaleLowerCase('pt-BR');
+            if (qTitle !== qzFilter) return false;
           }
 
           if (query) {
@@ -4778,6 +4978,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       const draw = () => {
         updateSortHeaders();
         updateKpis(rawSchedules);
+        updateActiveFilterChips();
 
         if (loading) {
           if (rows) rows.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-sm text-gray-500">Carregando relação de envios programados...</td></tr>';
@@ -4785,11 +4986,30 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         }
 
         const visible = getFilteredAndSorted();
-        if (countSummary) countSummary.textContent = `Exibindo ${visible.length} de ${rawSchedules.length} agendamento${rawSchedules.length === 1 ? '' : 's'}`;
+        if (countSummary) {
+          const hasAnyFilter = Boolean(patientFilter?.value || quizFilter?.value || modeFilter?.value || (statusFilter?.value && statusFilter.value !== 'active_and_sent') || searchInput?.value?.trim());
+          if (hasAnyFilter) {
+            countSummary.textContent = `Exibindo ${visible.length} de ${rawSchedules.length} agendamento${rawSchedules.length === 1 ? '' : 's'} (filtrado)`;
+          } else {
+            countSummary.textContent = `Exibindo ${visible.length} de ${rawSchedules.length} agendamento${rawSchedules.length === 1 ? '' : 's'}`;
+          }
+        }
 
         if (!rows) return;
         if (!visible.length) {
-          rows.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-sm text-gray-500">Nenhum envio programado encontrado para os filtros selecionados.</td></tr>';
+          rows.innerHTML = `
+            <tr>
+              <td colspan="6" class="py-12 text-center text-sm text-gray-500">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <p>Nenhum envio programado encontrado para os filtros selecionados.</p>
+                  <button type="button" id="scheduled-sends-empty-clear" class="mt-1 inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-white px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary/10 transition shadow-sm cursor-pointer">
+                    Limpar filtros aplicados
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          document.getElementById('scheduled-sends-empty-clear')?.addEventListener('click', clearAllFilters);
           return;
         }
 
@@ -4805,12 +5025,12 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
 
           let actionButtons = '';
           if (canResume) {
-            actionButtons += `<button type="button" class="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary hover:bg-primary hover:text-white transition" data-sched-action="resume" data-sched-id="${escape(schedule.id)}" title="Retomar agendamento">Retomar</button>`;
+            actionButtons += `<button type="button" class="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary hover:bg-primary hover:text-white transition cursor-pointer" data-sched-action="resume" data-sched-id="${escape(schedule.id)}" title="Retomar agendamento">Retomar</button>`;
           } else if (canPause) {
-            actionButtons += `<button type="button" class="rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 hover:bg-amber-100 transition" data-sched-action="pause" data-sched-id="${escape(schedule.id)}" title="Pausar agendamento">Pausar</button>`;
+            actionButtons += `<button type="button" class="rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 hover:bg-amber-100 transition cursor-pointer" data-sched-action="pause" data-sched-id="${escape(schedule.id)}" title="Pausar agendamento">Pausar</button>`;
           }
           if (canCancel) {
-            actionButtons += `<button type="button" class="ml-1.5 rounded-lg bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600 hover:bg-red-100 transition" data-sched-action="cancel" data-sched-id="${escape(schedule.id)}" title="Cancelar agendamento">Cancelar</button>`;
+            actionButtons += `<button type="button" class="ml-1.5 rounded-lg bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600 hover:bg-red-100 transition cursor-pointer" data-sched-action="cancel" data-sched-id="${escape(schedule.id)}" title="Cancelar agendamento">Cancelar</button>`;
           }
           if (!actionButtons) {
             actionButtons = `<span class="text-xs text-gray-400" title="${statusInfo.isSent ? 'Envio já disparado' : 'Sem ações disponíveis'}">—</span>`;
@@ -4828,21 +5048,31 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
               </td>
               <td>
                 <div class="flex flex-col">
-                  <span class="font-semibold text-dark">${escape(schedule.patientName || 'Paciente')}</span>
+                  <button type="button" class="text-left font-semibold text-dark hover:text-primary transition group inline-flex items-center gap-1 cursor-pointer" data-sched-filter-patient="${escape(schedule.patientName || schedule.recipientEmail || '')}" title="Filtrar por este paciente">
+                    <span>${escape(schedule.patientName || 'Paciente')}</span>
+                    <svg class="h-3 w-3 opacity-0 group-hover:opacity-100 text-primary transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
+                  </button>
                   <span class="text-[11px] text-gray-500">${escape(schedule.recipientEmail || 'E-mail não informado')}</span>
                 </div>
               </td>
               <td>
                 <div class="flex flex-col">
-                  <span class="font-medium text-dark">${escape(schedule.quizTitle || 'Questionário')}</span>
+                  <button type="button" class="text-left font-medium text-dark hover:text-primary transition group inline-flex items-center gap-1 cursor-pointer" data-sched-filter-quiz="${escape(schedule.quizTitle || '')}" title="Filtrar por este questionário">
+                    <span>${escape(schedule.quizTitle || 'Questionário')}</span>
+                    <svg class="h-3 w-3 opacity-0 group-hover:opacity-100 text-primary transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2.586a1 1 0 0 1-.293.707l-6.414 6.414a1 1 0 0 0-.293.707V17l-4 4v-6.586a1 1 0 0 0-.293-.707L3.293 7.293A1 1 0 0 1 3 6.586V4Z"/></svg>
+                  </button>
                   ${isReminder ? '<span class="text-[10px] font-bold text-primary">Lembrete de resposta</span>' : ''}
                 </div>
               </td>
               <td>
-                <span class="inline-flex rounded-lg bg-primary/[.08] px-2.5 py-1 text-xs font-semibold text-dark">${escape(modeInfo.label)}</span>
+                <button type="button" class="inline-flex items-center gap-1 rounded-lg bg-primary/[.08] px-2.5 py-1 text-xs font-semibold text-dark hover:bg-primary/20 transition cursor-pointer" data-sched-filter-mode="${escape(modeInfo.code)}" title="Filtrar por modo ${escape(modeInfo.label)}">
+                  <span>${escape(modeInfo.label)}</span>
+                </button>
               </td>
               <td>
-                ${statusInfo.badgeHtml}
+                <span class="inline-block cursor-pointer hover:opacity-80 transition" data-sched-filter-status="${escape(statusInfo.key)}" title="Filtrar por status ${escape(statusInfo.label || '')}">
+                  ${statusInfo.badgeHtml}
+                </span>
               </td>
               <td class="text-right">
                 <div class="flex items-center justify-end">
@@ -4852,6 +5082,46 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             </tr>
           `;
         }).join('');
+
+        rows.querySelectorAll('[data-sched-filter-patient]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.schedFilterPatient;
+            if (patientFilter && val) {
+              patientFilter.value = val;
+              draw();
+            }
+          });
+        });
+
+        rows.querySelectorAll('[data-sched-filter-quiz]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.schedFilterQuiz;
+            if (quizFilter && val) {
+              quizFilter.value = val;
+              draw();
+            }
+          });
+        });
+
+        rows.querySelectorAll('[data-sched-filter-mode]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.schedFilterMode;
+            if (modeFilter && val) {
+              modeFilter.value = val;
+              draw();
+            }
+          });
+        });
+
+        rows.querySelectorAll('[data-sched-filter-status]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.schedFilterStatus;
+            if (statusFilter && val) {
+              statusFilter.value = val;
+              draw();
+            }
+          });
+        });
 
         rows.querySelectorAll('[data-sched-action]').forEach(btn => {
           btn.addEventListener('click', async () => {
@@ -4932,6 +5202,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
               ...s,
               resolvedStatus: resolveScheduleStatus(s)
             }));
+            populateFilterOptions();
             const updatedAt = schedulesResult.updatedAt ? new Date(schedulesResult.updatedAt).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
             if (period) period.textContent = `Atualizado às ${updatedAt} · ${rawSchedules.length} agendamentos registrados no total.`;
           } else {
@@ -4989,6 +5260,18 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       searchInput?.addEventListener('input', draw);
       statusFilter?.addEventListener('change', draw);
       modeFilter?.addEventListener('change', draw);
+      patientFilter?.addEventListener('change', draw);
+      quizFilter?.addEventListener('change', draw);
+      clearFiltersBtn?.addEventListener('click', clearAllFilters);
+
+      document.querySelectorAll('[data-sched-kpi-filter]').forEach(card => {
+        card.addEventListener('click', () => {
+          const filterKey = card.dataset.schedKpiFilter;
+          if (!filterKey || !statusFilter) return;
+          statusFilter.value = filterKey;
+          draw();
+        });
+      });
 
       document.querySelectorAll('[data-sched-sort-btn]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -5002,6 +5285,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           draw();
         });
       });
+
+      populateFilterOptions();
 
       return { refresh, draw };
     }
