@@ -232,7 +232,7 @@
     function optScore(q,opt){return Number(optSetting(q,opt)?.score??0)||0;}
     function optLabel(q,opt){const f=optSetting(q,opt);return String(f?.evaluationLabel??f?.ratingLabel??f?.evaluation??f?.rating??(q.type==='emoji'?f?.text:'')?? opt??'').trim();}
     function optEmoji(q,opt){const f=optSetting(q,opt);return String(f?.evaluationEmoji??f?.ratingEmoji??f?.emoji??(q.type==='emoji'?opt:'')??'').trim();}
-    function scoreCfg(quiz,q){const id=typeof q==='object'?q?.id:q;const c=quiz?.questionSettings?.[id]||{};const w=Math.round(Number(c.weight));const fb=typeof q==='object'?q?.required!==false:true;return{active:c.active!==false,required:c.required===undefined?fb:c.required!==false,weight:Number.isFinite(w)&&w>=1&&w<=5?w:1};}
+    function scoreCfg(quiz,q){const id=typeof q==='object'?q?.id:q;const c=quiz?.questionSettings?.[id]||{};const w=Math.round(Number(c.weight));const fb=typeof q==='object'?q?.required!==false:true;return{active:c.active!==false,required:c.required===undefined?fb:c.required!==false,weight:Number.isFinite(w)&&w>=1&&w<=5?w:1,visible:c.visible!==false};}
     function scaleVals(q){const c=q.scaleConfig||{};const mn=Number.isFinite(Number(c.min))?Number(c.min):0;const mx=Number.isFinite(Number(c.max))?Number(c.max):10;return Array.from({length:Math.max(2,Math.min(11,mx-mn+1))},(_,i)=>mn+i);}
     function clarPrompt(q,val){const t=String(val??'');const s=Array.isArray(q?.optionSettings)?q.optionSettings.find(i=>['value','text','option','label','emoji'].some(k=>String(i?.[k]??'')===t)):null;return String(s?.clarificationPrompt||s?.clarification||s?.followUpQuestion||'').trim();}
     function clarMarkup(q){const id=esc(q.id);return '<div class="clarification-card hidden" data-clarification-for="'+id+'"><label data-clarification-label>Pergunta complementar</label><textarea data-question-clarification="'+id+'" aria-label="Resposta complementar" placeholder="Escreva sua resposta, se desejar."></textarea><p>Esta pergunta aparece conforme a alternativa selecionada.</p></div>';}
@@ -397,7 +397,7 @@
 
     function renderQuiz(invitation){
       const quiz=invitation.quiz||{};const snaps=Array.isArray(quiz.questionSnapshots)?quiz.questionSnapshots:[];
-      const qs=snaps.map(q=>({...q,required:scoreCfg(quiz,q).required}));quiz.questionSnapshots=qs;
+      const qs=snaps.filter(q=>scoreCfg(quiz,q).visible).map(q=>({...q,required:scoreCfg(quiz,q).required}));quiz.questionSnapshots=qs;
       state.invitation=invitation;state.steps=buildSteps(invitation);
       const revStep=state.steps.find(s=>s.type==='review');if(revStep)revStep.data.snapshots=qs;
       state.currentStep=0;

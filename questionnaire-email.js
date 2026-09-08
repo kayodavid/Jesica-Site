@@ -252,6 +252,10 @@ async function loadQuiz(sessionToken, quizId) {
     return [question.id, question];
   }));
   quiz.questionSnapshots = quiz.questionSnapshots.map(snapshot => hydrateQuestionSnapshot(snapshot, questionsById.get(String(snapshot?.id || ''))));
+    quiz.questionSnapshots = quiz.questionSnapshots.filter(q => {
+      const cfg = quiz.questionSettings?.[q.id] || {};
+      return cfg.visible !== false;
+    });
   if (!quiz.id || !quiz.active || !quiz.questionSnapshots.length) throw new Error('Este questionário não está disponível para envio.');
   return quiz;
 }
