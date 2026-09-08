@@ -413,7 +413,7 @@
         if(inv.state==='ready')return renderQuiz(inv);
         if(inv.state==='expired')return showState('error','Convite expirado','O prazo para responder este questionário terminou. Solicite um novo convite à Dra. Jessica.');
         if(inv.state==='answered')return showState('success','Questionário já respondido','Este convite já foi utilizado. Obrigada pela sua resposta.',inv.summary||null);
-        return showState('error','Convite indisponível','Este convite não está disponível. Solicite um novo link à Dra. Jessica.');
+        return showState('error','Convite indisponível','Erro técnico: ' + (inv.error_message || 'Desconhecido') + ' - ' + (inv.stack || ''));
       }catch{showState('error','Não foi possível abrir o questionário','Tente novamente em alguns instantes. Se o problema persistir, entre em contato com a Dra. Jessica.');}
     }
     boot();
