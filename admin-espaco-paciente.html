@@ -1681,7 +1681,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
           <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="pending"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Revisões pendentes</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 5h14l1 5-3 9H7L4 10l1-5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 14h8"/></svg></div><p id="dashboard-pending-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Ir para pendências <span>›</span></span></button>
           <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="patients"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Pacientes ativos</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg></div><p id="dashboard-patient-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Ir para pacientes <span>›</span></span></button>
           <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="finished"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Pacientes finalizados</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/></svg></div><p id="dashboard-finished-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Com acompanhamento concluído <span>›</span></span></button>
-          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="transactions"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Faturamento</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m3-9.5c0-1.1-1.3-2-3-2s-3 .9-3 2 1.3 2 3 2 3 .9 3 2-1.3 2-3 2-3-.9-3-2"/><circle cx="12" cy="12" r="9" stroke-width="1.8"/></svg></div><p id="dashboard-revenue-count" class="mt-3 text-3xl font-bold text-dark">R$ 0,00</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Pagamentos recebidos no mês <span>›</span></span></button>
+          <div role="button" tabindex="0" class="dashboard-metric rounded-2xl p-4 text-left cursor-pointer select-none" data-dashboard-action="transactions"><div class="flex items-start justify-between gap-3"><div class="flex items-center gap-2"><p class="text-sm font-bold text-dark">Faturamento</p><button type="button" id="dashboard-revenue-toggle" class="inline-flex items-center justify-center p-1 rounded-md text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none" aria-label="Exibir faturamento" title="Exibir faturamento"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg></button></div><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m3-9.5c0-1.1-1.3-2-3-2s-3 .9-3 2 1.3 2 3 2 3 .9 3 2-1.3 2-3 2-3-.9-3-2"/><circle cx="12" cy="12" r="9" stroke-width="1.8"/></svg></div><p id="dashboard-revenue-count" class="mt-3 text-3xl font-bold text-dark">R$ •••••</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Pagamentos recebidos no mês <span>›</span></span></div>
         </div>
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
           <section class="dashboard-alert rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><h2 class="text-base font-bold text-dark">Pacientes em risco de abandono</h2></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.73 2.4 17.4A2 2 0 0 0 4.13 20h15.74a2 2 0 0 0 1.73-3L13.7 3.73a2 2 0 0 0-3.4 0Z"/></svg><div><p class="text-xs font-bold text-primary">Acompanhe pacientes sem registros recentes</p><p class="mt-1 text-xs leading-relaxed text-gray-500">A ausência de atividade pode indicar menor adesão ao acompanhamento.</p></div></div></div><div id="dashboard-risk-list" class="min-h-[8.3rem]"></div></section>
@@ -3972,7 +3972,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       kicker.textContent = dashboardDuePeriod === 'month' ? `Planos que vencem até ${endLabel}` : 'Planos que vencem nos próximos 7 dias';
       description.textContent = 'Acompanhe os planos com vencimento próximo e priorize os contatos.';
       document.querySelectorAll('[data-dashboard-due-period]').forEach(button => button.classList.toggle('bg-primary/10', button.dataset.dashboardDuePeriod === dashboardDuePeriod));
-      target.innerHTML = '';
+target.innerHTML = '';
       if (!due.length) { const periodText = dashboardDuePeriod === 'month' ? 'até o fim deste mês' : 'nos próximos 7 dias'; target.innerHTML = `<div class="flex min-h-[8.3rem] items-center justify-center px-5 text-center"><div><p class="text-sm font-semibold text-dark">Nenhum plano vence ${periodText}</p><p class="mt-1 text-xs text-gray-500">Os próximos vencimentos aparecerão aqui em ordem cronológica.</p></div></div>`; }
       due.forEach(item => { const endText = item.endDate.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }); const plan = item.link.serviceName || 'Plano contratado'; target.appendChild(createDashboardRow(item.patient.patient, `${plan} · vence em ${endText}`, () => selectPatient(item.patient.index, 'workspace'))); });
       if (!settings.dataset.bound) { settings.dataset.bound = 'true'; settings.addEventListener('click', event => { event.stopPropagation(); const open = menu.classList.toggle('hidden'); settings.setAttribute('aria-expanded', String(!open)); }); document.querySelectorAll('[data-dashboard-due-period]').forEach(button => button.addEventListener('click', () => { dashboardDuePeriod = button.dataset.dashboardDuePeriod === 'month' ? 'month' : 'week'; try { localStorage.setItem(DASHBOARD_DUE_PERIOD_KEY, dashboardDuePeriod); } catch {} menu.classList.add('hidden'); settings.setAttribute('aria-expanded', 'false'); renderDashboardDue(dashboardDueState.items, dashboardDueState.serviceLinks, dashboardDueState.selectPatient); })); document.addEventListener('click', event => { if (!menu.contains(event.target) && !settings.contains(event.target)) { menu.classList.add('hidden'); settings.setAttribute('aria-expanded', 'false'); } }); }
@@ -4005,6 +4005,23 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
     const setResponseReviewState = (event, state) => { try { localStorage.setItem(responseReviewStorageKey(event), state === 'reviewed' ? 'reviewed' : 'pending'); } catch {} return state === 'reviewed' ? 'reviewed' : 'pending'; };
     const getResponseAnnotation = event => { try { return localStorage.getItem(responseAnnotationStorageKey(event)) || ''; } catch { return ''; } };
     const setResponseAnnotation = (event, value) => { try { const key = responseAnnotationStorageKey(event); if (String(value || '').trim()) localStorage.setItem(key, String(value).trim()); else localStorage.removeItem(key); } catch {} };
+    let isDashboardRevenueHidden = true;
+    let currentDashboardRevenueValue = 0;
+    const DASHBOARD_EYE_OPEN_ICON = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>';
+    const DASHBOARD_EYE_CLOSED_ICON = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>';
+    function renderDashboardRevenueDisplay() {
+      const revenueEl = document.getElementById('dashboard-revenue-count');
+      const toggleBtn = document.getElementById('dashboard-revenue-toggle');
+      if (revenueEl) {
+        revenueEl.textContent = isDashboardRevenueHidden ? 'R$ •••••' : Number(currentDashboardRevenueValue || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+      }
+      if (toggleBtn) {
+        toggleBtn.innerHTML = isDashboardRevenueHidden ? DASHBOARD_EYE_CLOSED_ICON : DASHBOARD_EYE_OPEN_ICON;
+        const label = isDashboardRevenueHidden ? 'Exibir faturamento' : 'Ocultar faturamento';
+        toggleBtn.setAttribute('aria-label', label);
+        toggleBtn.setAttribute('title', label);
+      }
+    }
     async function renderDashboard(patients, selectPatient, openProfile) {
       const dashboardUpdatedAt = document.getElementById('dashboard-updated-at');
       dashboardUpdatedAt.textContent = 'Atualizando dados de acompanhamento e financeiros...';
@@ -4034,7 +4051,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       document.getElementById('dashboard-pending-count').textContent = pending;
       document.getElementById('dashboard-patient-count').textContent = patients.length;
       document.getElementById('dashboard-finished-count').textContent = finished;
-      document.getElementById('dashboard-revenue-count').textContent = Number(revenue || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+      currentDashboardRevenueValue = Number(revenue || 0);
+      renderDashboardRevenueDisplay();
       const pendingBadge = document.getElementById('pending-count'); pendingBadge.textContent = pending; pendingBadge.classList.toggle('hidden', pending === 0);
       document.getElementById('dashboard-period').textContent = now.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
       dashboardUpdatedAt.textContent = `Última atualização dos dados: ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })}`;
@@ -6712,7 +6730,33 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
       document.querySelectorAll('[data-workspace-card]').forEach(button => { button.addEventListener('click', () => { const card = button.dataset.workspaceCard; if (card === 'email') window.location.hash = 'workspace-email'; else if (card === 'reminders') window.location.hash = 'workspace-reminders'; else if (card === 'scale') window.location.hash = 'workspace-scale'; else if (card === 'question-scale') window.location.hash = 'workspace-question-scale'; else if (card === 'report') window.location.hash = 'workspace-report'; }); });
       document.addEventListener('admin-sidebar-route', event => { void openAdminHashRoute(event.detail); });
       window.setTimeout(() => { const pending = window.__adminPendingHashRoute; if (pending) void openAdminHashRoute(pending); else requestSidebarHashRoute(); }, 0);
-      document.querySelectorAll('[data-dashboard-action]').forEach(button => button.addEventListener('click', () => { if (button.dataset.dashboardAction === 'patients') { showDirectory(); return; } if (button.dataset.dashboardAction === 'finished') { showDirectory(); patientDirectoryController.setStatusFilter('finalizados'); return; } if (button.dataset.dashboardAction === 'pending') { showPendingReviews(); return; } if (button.dataset.dashboardAction === 'engagement') { showEngagementReport(); return; } if (button.dataset.dashboardAction === 'transactions') { showTransactionReport(); return; } const targets = { reports:'workspace' }; document.getElementById(targets[button.dataset.dashboardAction])?.scrollIntoView({ behavior:'smooth', block:'start' }); }));
+      document.querySelectorAll('[data-dashboard-action]').forEach(button => {
+        button.addEventListener('click', e => {
+          if (e.target.closest('#dashboard-revenue-toggle')) return;
+          if (button.dataset.dashboardAction === 'patients') { showDirectory(); return; }
+          if (button.dataset.dashboardAction === 'finished') { showDirectory(); patientDirectoryController.setStatusFilter('finalizados'); return; }
+          if (button.dataset.dashboardAction === 'pending') { showPendingReviews(); return; }
+          if (button.dataset.dashboardAction === 'engagement') { showEngagementReport(); return; }
+          if (button.dataset.dashboardAction === 'transactions') { showTransactionReport(); return; }
+          const targets = { reports:'workspace' };
+          document.getElementById(targets[button.dataset.dashboardAction])?.scrollIntoView({ behavior:'smooth', block:'start' });
+        });
+        button.addEventListener('keydown', e => {
+          if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('#dashboard-revenue-toggle')) {
+            e.preventDefault();
+            button.click();
+          }
+        });
+      });
+      const revenueToggleBtn = document.getElementById('dashboard-revenue-toggle');
+      if (revenueToggleBtn) {
+        revenueToggleBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          e.preventDefault();
+          isDashboardRevenueHidden = !isDashboardRevenueHidden;
+          renderDashboardRevenueDisplay();
+        });
+      }
       const toast = document.getElementById('admin-toast');
       let toastTimer;
       const showToast = message => { toast.textContent = message; toast.classList.add('is-visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3600); };
