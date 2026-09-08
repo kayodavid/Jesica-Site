@@ -5505,6 +5505,9 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const countBadge = document.getElementById('quiz-reorder-count-badge');
         if (!list) return;
 
+        const localTypeLabels = { single:'Escolha única', linear:'Escala linear', emoji:'Escala de avaliação', metric:'Métrica', number:'Número', open:'Resposta aberta', photo:'Envio de foto' };
+        const localEscape = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
+
         list.innerHTML = '';
         const selected = getSelectedQuestions();
 
@@ -5520,7 +5523,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           const item = document.createElement('div');
           const isFirst = index === 0;
           const isLast = index === selected.length - 1;
-          const type = typeLabels[question.type] || question.type || 'Pergunta';
+          const type = localTypeLabels[question.type] || question.type || 'Pergunta';
 
           item.className = 'quiz-reorder-item flex items-center justify-between gap-3 p-3 rounded-xl border border-primary/15 bg-white shadow-sm transition hover:border-primary/40 select-none';
           item.draggable = true;
@@ -5531,8 +5534,8 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
               <span class="cursor-grab text-gray-400 hover:text-dark text-base px-1" title="Arraste para mover" aria-label="Arraste para mover">⠿</span>
               <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-dark">${index + 1}</span>
               <div class="min-w-0">
-                <p class="truncate text-sm font-bold text-dark" title="${escape(question.title)}">${escape(question.title)}</p>
-                <p class="truncate text-[11px] text-gray-500">${escape(question.questionText || type)}</p>
+                <p class="truncate text-sm font-bold text-dark" title="${localEscape(question.title)}">${localEscape(question.title)}</p>
+                <p class="truncate text-[11px] text-gray-500">${localEscape(question.questionText || type)}</p>
               </div>
             </div>
             <div class="flex shrink-0 items-center gap-1">
@@ -6233,7 +6236,15 @@ window.openReorderModal = function() {
     const modal = document.getElementById('quiz-reorder-modal');
     if (modal) {
       if (typeof window._renderReorderModal === 'function') {
-        window._renderReorderModal();
+        try {
+          window._renderReorderModal();
+        } catch (err) {
+          const list = modal.querySelector('#quiz-reorder-list');
+          if (list) {
+            list.innerHTML = '<p class="text-red-500 p-4">Erro de execução: ' + String(err.message || err) + '</p>';
+          }
+          console.error('Erro em _renderReorderModal:', err);
+        }
       }
       modal.style.display = 'flex';
       modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
