@@ -45,9 +45,7 @@
     .quiz-brand { display:flex; align-items:center; gap:8px; color:var(--gold); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; flex:0 0 auto; }
     .quiz-brand-icon { display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:var(--gold); color:#fff; font-size:13px; flex-shrink:0; }
     .quiz-progress-wrap { flex:1; min-width:0; }
-    .quiz-progress-meta { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; gap:8px; }
-    .quiz-step-label { font-size:12px; font-weight:700; color:var(--ink); margin:0; line-height:1.2; }
-    .quiz-step-pct { font-size:11px; font-weight:700; color:var(--gold); line-height:1.2; }
+    .quiz-step-label { font-size:12px; font-weight:700; color:var(--ink); margin-bottom:5px; line-height:1.2; }
     .quiz-progress-bar { height:6px; background:#ede6dc; border-radius:999px; overflow:hidden; position:relative; }
     .quiz-progress-fill { height:100%; background:linear-gradient(90deg, #c5a854, #a88b36); border-radius:inherit; transition:width .4s cubic-bezier(.4,0,.2,1); }
 
@@ -190,7 +188,6 @@
       .quiz-header { padding:10px 14px; }
       .quiz-header-inner { gap:10px; }
       .quiz-step-label { font-size:11px; }
-      .quiz-step-pct { font-size:10px; }
       .quiz-progress-bar { height:5px; }
     }
   </style>
@@ -213,10 +210,7 @@
           <span class="quiz-brand-name">Jessica Melo</span>
         </div>
         <div class="quiz-progress-wrap">
-          <div class="quiz-progress-meta">
-            <p class="quiz-step-label" id="step-label">Carregando…</p>
-            <span class="quiz-step-pct" id="step-pct">0%</span>
-          </div>
+          <p class="quiz-step-label" id="step-label">Carregando…</p>
           <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill" style="width:0%"></div></div>
         </div>
         <div class="quiz-dots" id="quiz-dots"></div>
@@ -278,18 +272,15 @@
       const answered=qSteps.filter(s=>curVal(s.data)).length;
       const qIdx=qSteps.indexOf(step)+1;
       const pct=isCover ? 0 : (isReview ? 100 : Math.round((Math.max(answered, qIdx) / total) * 100));
-      const lbl=document.getElementById('step-label'),pctEl=document.getElementById('step-pct'),fill=document.getElementById('progress-fill'),dots=document.getElementById('quiz-dots');
+      const lbl=document.getElementById('step-label'),fill=document.getElementById('progress-fill'),dots=document.getElementById('quiz-dots');
       if(isCover){
         if(lbl)lbl.textContent=total+' pergunta'+(total===1?'':'s');
-        if(pctEl)pctEl.textContent='0%';
         if(fill)fill.style.width='0%';
       }else if(isReview){
         if(lbl)lbl.textContent='Revisão final';
-        if(pctEl)pctEl.textContent='100%';
         if(fill)fill.style.width='100%';
       }else{
         if(lbl)lbl.textContent='Pergunta '+qIdx+' de '+total;
-        if(pctEl)pctEl.textContent=pct+'%';
         if(fill)fill.style.width=pct+'%';
       }
       if(dots){dots.innerHTML=qSteps.map((s,i)=>{const done=curVal(s.data);let c='quiz-dot';if(s===step)c+=' current';else if(done)c+=' done';return '<span class="'+c+'" title="Pergunta '+(i+1)+'"></span>';}).join('');}
