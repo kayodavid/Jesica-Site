@@ -40,17 +40,19 @@
     #quiz-wrap.active { display:flex; }
 
     /* HEADER */
-    .quiz-header { position:sticky; top:0; z-index:10; background:rgba(250,248,243,.92); backdrop-filter:blur(10px); border-bottom:1px solid rgba(232,223,208,.6); padding:12px 20px; }
-    .quiz-header-inner { display:flex; align-items:center; gap:12px; width:min(680px,100%); margin:0 auto; }
+    .quiz-header { position:sticky; top:0; z-index:10; background:rgba(250,248,243,.94); backdrop-filter:blur(10px); border-bottom:1px solid rgba(232,223,208,.65); padding:12px 20px; }
+    .quiz-header-inner { display:flex; align-items:center; gap:14px; width:min(680px,100%); margin:0 auto; }
     .quiz-brand { display:flex; align-items:center; gap:8px; color:var(--gold); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; flex:0 0 auto; }
-    .quiz-brand-icon { display:grid; place-items:center; width:26px; height:26px; border-radius:8px; background:var(--gold); color:#fff; font-size:13px; }
+    .quiz-brand-icon { display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:var(--gold); color:#fff; font-size:13px; flex-shrink:0; }
     .quiz-progress-wrap { flex:1; min-width:0; }
-    .quiz-step-label { font-size:11px; font-weight:600; color:var(--muted); margin-bottom:5px; }
-    .quiz-progress-bar { height:5px; background:#ede6dc; border-radius:999px; overflow:hidden; }
-    .quiz-progress-fill { height:100%; background:var(--gold); border-radius:inherit; transition:width .4s cubic-bezier(.4,0,.2,1); }
+    .quiz-progress-meta { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; gap:8px; }
+    .quiz-step-label { font-size:12px; font-weight:700; color:var(--ink); margin:0; line-height:1.2; }
+    .quiz-step-pct { font-size:11px; font-weight:700; color:var(--gold); line-height:1.2; }
+    .quiz-progress-bar { height:6px; background:#ede6dc; border-radius:999px; overflow:hidden; position:relative; }
+    .quiz-progress-fill { height:100%; background:linear-gradient(90deg, #c5a854, #a88b36); border-radius:inherit; transition:width .4s cubic-bezier(.4,0,.2,1); }
 
     /* DOTS */
-    .quiz-dots { display:flex; gap:5px; flex-wrap:wrap; }
+    .quiz-dots { display:flex; gap:5px; flex-wrap:wrap; max-width:180px; justify-content:flex-end; }
     .quiz-dot { width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .3s, transform .2s; }
     .quiz-dot.done    { background:rgba(168,139,54,.45); }
     .quiz-dot.current { background:var(--gold); transform:scale(1.35); }
@@ -184,6 +186,12 @@
       .question-image { max-width:100%; margin-left:0; }
       .linear-scale label { flex:1 1 calc(20% - 5px); min-width:30px; min-height:38px; font-size:13px; }
       .quiz-brand-name { display:none; }
+      .quiz-dots { display:none !important; }
+      .quiz-header { padding:10px 14px; }
+      .quiz-header-inner { gap:10px; }
+      .quiz-step-label { font-size:11px; }
+      .quiz-step-pct { font-size:10px; }
+      .quiz-progress-bar { height:5px; }
     }
   </style>
 </head>
@@ -205,7 +213,10 @@
           <span class="quiz-brand-name">Jessica Melo</span>
         </div>
         <div class="quiz-progress-wrap">
-          <p class="quiz-step-label" id="step-label">Carregando…</p>
+          <div class="quiz-progress-meta">
+            <p class="quiz-step-label" id="step-label">Carregando…</p>
+            <span class="quiz-step-pct" id="step-pct">0%</span>
+          </div>
           <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill" style="width:0%"></div></div>
         </div>
         <div class="quiz-dots" id="quiz-dots"></div>
@@ -264,11 +275,23 @@
     function renderHeader(){
       const qSteps=state.steps.filter(s=>s.type==='question');const total=qSteps.length;if(!total)return;
       const step=state.steps[state.currentStep];const isReview=step?.type==='review';const isCover=step?.type==='cover';
-      const answered=qSteps.filter(s=>curVal(s.data)).length;const pct=total?Math.round((answered/total)*100):0;
-      const lbl=document.getElementById('step-label'),fill=document.getElementById('progress-fill'),dots=document.getElementById('quiz-dots');
-      if(isCover){if(lbl)lbl.textContent=total+' pergunta'+(total===1?'':'s');if(fill)fill.style.width='0%';}
-      else if(isReview){if(lbl)lbl.textContent='Revisão final';if(fill)fill.style.width='100%';}
-      else{const qIdx=qSteps.indexOf(step)+1;if(lbl)lbl.textContent='Pergunta '+qIdx+' de '+total;if(fill)fill.style.width=pct+'%';}
+      const answered=qSteps.filter(s=>curVal(s.data)).length;
+      const qIdx=qSteps.indexOf(step)+1;
+      const pct=isCover ? 0 : (isReview ? 100 : Math.round((Math.max(answered, qIdx) / total) * 100));
+      const lbl=document.getElementById('step-label'),pctEl=document.getElementById('step-pct'),fill=document.getElementById('progress-fill'),dots=document.getElementById('quiz-dots');
+      if(isCover){
+        if(lbl)lbl.textContent=total+' pergunta'+(total===1?'':'s');
+        if(pctEl)pctEl.textContent='0%';
+        if(fill)fill.style.width='0%';
+      }else if(isReview){
+        if(lbl)lbl.textContent='Revisão final';
+        if(pctEl)pctEl.textContent='100%';
+        if(fill)fill.style.width='100%';
+      }else{
+        if(lbl)lbl.textContent='Pergunta '+qIdx+' de '+total;
+        if(pctEl)pctEl.textContent=pct+'%';
+        if(fill)fill.style.width=pct+'%';
+      }
       if(dots){dots.innerHTML=qSteps.map((s,i)=>{const done=curVal(s.data);let c='quiz-dot';if(s===step)c+=' current';else if(done)c+=' done';return '<span class="'+c+'" title="Pergunta '+(i+1)+'"></span>';}).join('');}
     }
     async function saveProgress(){if(state.submitted||!token)return;const p=progressSnap();if(!p.answered)return;try{await req('progress',{token,answeredQuestions:p.answered,totalQuestions:p.total});}catch{}}
