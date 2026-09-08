@@ -2175,7 +2175,7 @@ export default async function handler(req, res) {
     if (action === 'get') {
       try {
         const invitation = decryptInvitation(String(body.token || ''));
-        const [quiz, records, preferences] = await Promise.all([
+        const [quiz, records, clickResult, preferences] = await Promise.all([
           loadQuiz(invitation.sessionToken, invitation.quizId),
           listStoredQuestionnaireRecords(invitation.sessionToken),
           storeClick(invitation).catch(() => {}),
