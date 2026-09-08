@@ -1006,8 +1006,9 @@ body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='bl
     body[data-patient-theme='black'] #quiz-reorder-modal .quiz-reorder-item:hover { border-color:#d4b76a !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .quiz-reorder-btn { border-color:rgba(255,255,255,.16) !important; background:#343844 !important; color:#e3e7ee !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .quiz-reorder-btn:hover:not(:disabled) { border-color:#d4b76a !important; background:#404654 !important; color:#ffe7a4 !important; }
+    body[data-patient-theme='black'] #quiz-reorder-modal .quiz-sigla-badge { background:rgba(212,183,106,.2) !important; color:#ffe7a4 !important; border-color:rgba(212,183,106,.4) !important; }
     body[data-patient-theme='black'] #quiz-reorder-modal .text-dark { color:#f7f8fb !important; }
-    body[data-patient-theme='black'] #quiz-reorder-modal .text-gray-500 { color:#aeb7c5 !important; }
+    body[data-patient-theme='black'] #quiz-reorder-modal .text-gray-500, body[data-patient-theme='black'] #quiz-reorder-modal .text-gray-600 { color:#aeb7c5 !important; }
     body[data-patient-theme='black'] .quiz-editor-page { background:#1f2128 !important; border-color:rgba(255,255,255,.13) !important; color:#f7f8fb; }
     body[data-patient-theme='black'] .quiz-editor-page > header, body[data-patient-theme='black'] .quiz-editor-page > form > footer { background:#20232b; border-color:rgba(255,255,255,.13) !important; }
     body[data-patient-theme='black'] .quiz-editor-page .text-dark { color:#f8f9fc !important; }
@@ -2553,8 +2554,8 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
         <div class="flex items-start gap-3">
           <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">⇅</span>
           <div>
-            <h3 class="text-lg font-bold text-dark">Personalizar Ordem das Perguntas</h3>
-            <p id="quiz-reorder-subtitle" class="mt-0.5 text-xs text-gray-500">Arraste os itens ou use as setas para ajustar a sequência do questionário.</p>
+            <h3 class="text-lg font-bold text-dark">Reordenar Perguntas</h3>
+            <p id="quiz-reorder-subtitle" class="mt-0.5 text-xs text-gray-500">Arraste as siglas ou use as setas para ajustar a sequência do questionário.</p>
           </div>
         </div>
         <button type="button" id="quiz-reorder-close" onclick="if(window.closeReorderModal) window.closeReorderModal();" class="directory-tool !h-8 !w-8" aria-label="Fechar">✕</button>
@@ -5285,7 +5286,29 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         selectedIds = new Set(ids);
         renderSettings();
       };
-      const getSelectedQuestions = () => [...selectedIds].map(questionId => questions.find(question => String(question.id) === String(questionId))).filter(Boolean);
+      const getSelectedQuestions = () => {
+        const library = Array.isArray(window.QUESTION_LIBRARY_IMPORTS) ? window.QUESTION_LIBRARY_IMPORTS : [];
+        const allPool = [...questions, ...library];
+        return [...selectedIds].map(questionId => {
+          const qStr = String(questionId ?? '').trim();
+          const found = allPool.find(q => String(q?.id ?? '') === qStr || String(q?.code ?? '').toUpperCase() === qStr.toUpperCase() || String(q?.originalCode ?? '').toUpperCase() === qStr.toUpperCase() || String(q?.sourceId ?? '') === qStr);
+          if (found) {
+            return {
+              ...found,
+              id: questionId,
+              code: found.code || found.originalCode || qStr.slice(0, 8),
+              title: found.title || found.questionText || `Pergunta ${qStr}`
+            };
+          }
+          return {
+            id: questionId,
+            code: qStr.slice(0, 8) || 'SEM',
+            title: `Pergunta ${qStr}`,
+            questionText: '',
+            type: 'single'
+          };
+        }).filter(Boolean);
+      };
       const updatePreview = () => { const selected = getSelectedQuestions(); const summary = document.getElementById('quiz-selection-count'); if (summary) summary.textContent = `${selected.length} selecionada${selected.length === 1 ? '' : 's'}`; const scoreHint = document.querySelector('#quiz-score-stage span.bg-emerald-50'); if (scoreHint) scoreHint.textContent = document.getElementById('quiz-show-score').checked ? '◉ O paciente verá o score ao concluir o questionário' : '○ O score ficará oculto para o paciente'; };
       const contextBlockText = block => { const source = String(block?.body || block?.bodyHtml || ''); return source.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }; const renderContextBlocks = () => { const list = document.getElementById('quiz-context-list'); list.innerHTML = ''; contextBlocks.forEach((block, index) => { const row = document.createElement('article'); const body = contextBlockText(block); row.className = 'rounded-xl border border-primary/15 bg-white/[.68] p-3'; row.innerHTML = `<div class="flex items-start justify-between gap-3"><div class="flex min-w-0 items-start gap-3"><span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/[.08] text-primary">▣</span><div class="min-w-0"><p class="truncate text-sm font-bold text-dark">${escape(block.title || 'Bloco contextual')}</p><p class="mt-1 text-xs leading-relaxed text-gray-500">${escape(body || 'Sem descrição')}</p>${block.image ? '<span class="mt-2 inline-flex rounded-md bg-primary/[.08] px-2 py-1 text-[10px] font-bold text-primary">Imagem adicionada</span>' : ''}</div></div><button type="button" class="shrink-0 text-xs font-bold text-primary" data-context-delete="${index}">Remover</button></div>`; row.querySelector('[data-context-delete]').addEventListener('click', () => { contextBlocks.splice(index, 1); renderContextBlocks(); }); list.appendChild(row); }); };
       const renderSettings = () => { const selected = getSelectedQuestions(); const settingsSection = document.getElementById('quiz-settings-section'); settingsSection.classList.toggle('hidden', !selected.length); settingsList.innerHTML = ''; selected.forEach((question, index) => { const qKey = String(question.id); const config = selectedSettings[qKey] || selectedSettings[question.id] || { weight:1, required:true, active:true, visible:true }; selectedSettings[qKey] = config; const locked = lockedQuestionIds.has(qKey); const scorable = isScoredQuestion(question); const storedWeight = Math.round(Number(config.weight)); const weight = scorable && storedWeight >= 1 && storedWeight <= 5 ? storedWeight : 1; if (scorable) config.weight = weight; else delete config.weight; const row = document.createElement('article'); row.className = 'quiz-question-setting-card rounded-xl border border-primary/15 bg-white/[.68] p-4'; const type = typeLabels[question.type] || question.type; const displayTitle = escape(question.title); const scoreControl = scorable ? `<div class="quiz-weight-control" role="group" aria-label="Peso clínico da pergunta"><div class="quiz-weight-track" style="--weight-progress:${(weight - 1) * 25}%">${[1,2,3,4,5].map(value => `<button type="button" data-weight="${value}" class="quiz-weight-option" title="Peso ${value} de 5" aria-label="Definir peso ${value} de 5" aria-pressed="${value === weight}"><span>${value}</span></button>`).join('')}</div></div>` : ''; row.innerHTML = `<div class="flex items-start justify-between gap-3"><div class="flex min-w-0 items-center gap-2"><button type="button" draggable="true" class="quiz-question-drag-handle" title="Arraste para reordenar" aria-label="Arraste a pergunta ${index + 1} para reordenar">⠿</button><span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[.08] text-sm font-bold text-dark">${index + 1}</span><div class="min-w-0"><p class="truncate text-sm font-bold text-dark">${displayTitle}</p><p class="mt-1 truncate text-xs text-gray-500">${escape(question.questionText || type)}</p></div></div><div class="flex shrink-0 items-center gap-2"><span class="hidden rounded-full bg-primary/[.08] px-2 py-1 text-[10px] font-bold text-primary sm:inline-flex">${escape(type)}</span>${locked ? '<span class="text-[10px] font-bold text-gray-400">Protegida</span>' : '<button type="button" class="text-xs font-bold text-primary quiz-remove-question">Remover</button>'}</div></div><div class="question-setting-footer mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-primary/10 pt-3">${scorable ? `<div class="flex flex-wrap items-center gap-x-5 gap-y-2"><label class="inline-flex items-center gap-2 text-xs font-semibold text-dark"><input type="checkbox" class="h-4 w-4 accent-primary quiz-visible" ${config.visible !== false ? 'checked' : ''}>Exibir pergunta</label><label class="inline-flex items-center gap-2 text-xs font-semibold text-dark"><input type="checkbox" class="h-4 w-4 accent-primary quiz-active" ${config.active !== false ? 'checked' : ''}>Incluir no score</label><label class="inline-flex items-center gap-2 text-xs font-semibold text-dark"><input type="checkbox" class="h-4 w-4 accent-primary quiz-required" ${config.required !== false ? 'checked' : ''}>Pergunta obrigatória</label></div><div class="flex items-center gap-2"><span class="text-xs font-bold text-dark">Peso</span>${scoreControl}</div>` : `<div class="flex flex-wrap items-center gap-x-5 gap-y-2"><label class="inline-flex items-center gap-2 text-xs font-semibold text-dark"><input type="checkbox" class="h-4 w-4 accent-primary quiz-visible" ${config.visible !== false ? 'checked' : ''}>Exibir pergunta</label><label class="inline-flex items-center gap-2 text-xs font-semibold text-dark"><input type="checkbox" class="h-4 w-4 accent-primary quiz-required" ${config.required !== false ? 'checked' : ''}>Pergunta obrigatória</label></div>`}</div>`; if (scorable) { const syncWeight = selectedWeight => { row.querySelectorAll('.quiz-weight-option').forEach(button => { const selectedOption = Number(button.dataset.weight) === selectedWeight; button.classList.toggle('is-selected', selectedOption); button.setAttribute('aria-pressed', String(selectedOption)); }); const track = row.querySelector('.quiz-weight-track'); if (track) track.style.setProperty('--weight-progress', `${(selectedWeight - 1) * 25}%`); }; syncWeight(weight); row.querySelectorAll('.quiz-weight-option').forEach(button => button.addEventListener('click', () => { const selectedWeight = Number(button.dataset.weight); selectedSettings[qKey].weight = selectedWeight; syncWeight(selectedWeight); })); row.querySelector('.quiz-active').addEventListener('change', event => { selectedSettings[qKey].active = event.target.checked; }); } row.querySelector('.quiz-required').addEventListener('change', event => { selectedSettings[qKey].required = event.target.checked; }); row.querySelector('.quiz-visible').addEventListener('change', event => { selectedSettings[qKey].visible = event.target.checked; }); const dragHandle = row.querySelector('.quiz-question-drag-handle'); dragHandle.addEventListener('dragstart', event => { draggedQuestionId = question.id; event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', question.id); window.requestAnimationFrame(() => row.classList.add('is-dragging')); }); dragHandle.addEventListener('dragend', () => { draggedQuestionId = null; document.querySelectorAll('.quiz-question-setting-card').forEach(card => card.classList.remove('is-dragging','is-drop-target')); }); row.addEventListener('dragover', event => { if (!draggedQuestionId || draggedQuestionId === question.id) return; event.preventDefault(); event.dataTransfer.dropEffect = 'move'; row.classList.add('is-drop-target'); }); row.addEventListener('dragleave', event => { if (!row.contains(event.relatedTarget)) row.classList.remove('is-drop-target'); }); row.addEventListener('drop', event => { if (!draggedQuestionId || draggedQuestionId === question.id) return; event.preventDefault(); const sourceId = draggedQuestionId; draggedQuestionId = null; const bounds = row.getBoundingClientRect(); reorderSelectedQuestions(sourceId, question.id, event.clientY > bounds.top + bounds.height / 2); }); const remove = row.querySelector('.quiz-remove-question'); if (remove) remove.addEventListener('click', () => { selectedIds.delete(qKey); delete selectedSettings[qKey]; delete selectedSettings[question.id]; renderPicker(); renderSettings(); }); settingsList.appendChild(row); }); updatePreview(); };
@@ -5505,14 +5528,13 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const countBadge = document.getElementById('quiz-reorder-count-badge');
         if (!list) return;
 
-        const localTypeLabels = { single:'Escolha única', linear:'Escala linear', emoji:'Escala de avaliação', metric:'Métrica', number:'Número', open:'Resposta aberta', photo:'Envio de foto' };
         const localEscape = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
 
         list.innerHTML = '';
         const selected = getSelectedQuestions();
 
         if (countBadge) countBadge.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'}`;
-        if (subtitle) subtitle.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'} selecionada${selected.length === 1 ? '' : 's'}. Arraste os itens ou use as setas para ajustar a ordem.`;
+        if (subtitle) subtitle.textContent = `${selected.length} pergunta${selected.length === 1 ? '' : 's'} selecionada${selected.length === 1 ? '' : 's'}. Arraste as siglas ou use as setas para ajustar a sequência.`;
 
         if (!selected.length) {
           list.innerHTML = '<div class="py-12 text-center text-sm text-gray-500 rounded-xl border border-dashed border-primary/20 p-6">Nenhuma pergunta foi adicionada a este questionário ainda.<br><span class="text-xs text-primary mt-1 inline-block">Clique em "Adicionar pergunta" no editor para selecionar perguntas.</span></div>';
@@ -5523,26 +5545,25 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           const item = document.createElement('div');
           const isFirst = index === 0;
           const isLast = index === selected.length - 1;
-          const type = localTypeLabels[question.type] || question.type || 'Pergunta';
+          const code = String(question.code || question.originalCode || question.id || `P${index + 1}`).trim();
+          const title = String(question.title || question.questionText || code).trim();
 
-          item.className = 'quiz-reorder-item flex items-center justify-between gap-3 p-3 rounded-xl border border-primary/15 bg-white shadow-sm transition hover:border-primary/40 select-none';
+          item.className = 'quiz-reorder-item flex items-center justify-between gap-2.5 p-2.5 sm:p-3 rounded-2xl border border-primary/20 bg-white shadow-sm transition hover:border-primary/50 select-none';
           item.draggable = true;
           item.dataset.questionId = String(question.id);
 
           item.innerHTML = `
-            <div class="flex min-w-0 items-center gap-3">
-              <span class="cursor-grab text-gray-400 hover:text-dark text-base px-1" title="Arraste para mover" aria-label="Arraste para mover">⠿</span>
-              <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-dark">${index + 1}</span>
-              <div class="min-w-0">
-                <p class="truncate text-sm font-bold text-dark" title="${localEscape(question.title)}">${localEscape(question.title)}</p>
-                <p class="truncate text-[11px] text-gray-500">${localEscape(question.questionText || type)}</p>
-              </div>
+            <div class="flex min-w-0 items-center gap-2.5 sm:gap-3 flex-1">
+              <span class="cursor-grab text-gray-400 hover:text-dark text-base px-0.5 font-bold" title="Arraste para mover" aria-label="Arraste para mover">⠿</span>
+              <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-dark border border-primary/15">${index + 1}</span>
+              <span class="quiz-sigla-badge inline-flex shrink-0 items-center justify-center rounded-xl bg-primary/15 px-2.5 py-1 text-xs font-black font-mono text-dark border border-primary/30 tracking-wider shadow-xs">${localEscape(code)}</span>
+              <span class="truncate text-xs font-medium text-gray-600 sm:text-sm" title="${localEscape(title)}">${localEscape(title)}</span>
             </div>
             <div class="flex shrink-0 items-center gap-1">
-              <button type="button" data-move-top="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed" title="Mover para o topo">⤒</button>
-              <button type="button" data-move-up="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed" title="Subir uma posição">▲</button>
-              <button type="button" data-move-down="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed" title="Descer uma posição">▼</button>
-              <button type="button" data-move-bottom="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed" title="Mover para o final">⤓</button>
+              <button type="button" data-move-top="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Mover para o topo">⤒</button>
+              <button type="button" data-move-up="${String(question.id)}" ${isFirst ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Subir uma posição">▲</button>
+              <button type="button" data-move-down="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Descer uma posição">▼</button>
+              <button type="button" data-move-bottom="${String(question.id)}" ${isLast ? 'disabled' : ''} class="quiz-reorder-btn inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-primary/20 bg-white text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-25 disabled:cursor-not-allowed" title="Mover para o final">⤓</button>
             </div>
           `;
 
@@ -5626,7 +5647,6 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
             const bounds = item.getBoundingClientRect();
             reorderSelectedQuestions(sourceId, String(question.id), event.clientY > bounds.top + bounds.height / 2);
             renderReorderModal();
-            renderSettings();
           });
 
           list.appendChild(item);
