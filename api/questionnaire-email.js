@@ -1989,7 +1989,7 @@ export default async function handler(req, res) {
       const recipientEmail = String(body.recipientEmail || '').trim().toLowerCase();
       const quizId = String(body?.quiz?.id || body.quizId || '').trim();
       const quizLinkId = String(body.quizLinkId || '').trim();
-      const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 7), 60));
+      const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 3), 60));
       const requestedSendMode = normalizeEmailSendMode(body.sendMode);
       if (!sessionToken || !patientKey || !validEmail(recipientEmail) || !quizId) return json(res, 400, { success: false, message: 'Não foi possível preparar o convite. Confira o paciente, o e-mail e o questionário.' });
       await requireAdmin(sessionToken);
