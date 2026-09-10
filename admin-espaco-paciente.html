@@ -376,16 +376,38 @@
     .response-answer-modal-content { color:#3d3226; }
     .response-annotation-modal textarea { min-height:8rem; resize:vertical; }
     body[data-patient-theme='black'] .pending-review-table thead th { background:#1d222b; color:#d6dbe4; }
+    .response-history-answer-card .response-detail-answer-evaluation { margin-top:.65rem; padding:.55rem .65rem; }
+    .response-answer-modal-overlay, .response-annotation-overlay { position:fixed; inset:0; z-index:121; display:flex; align-items:center; justify-content:center; padding:1rem; background:rgba(23,24,29,.52); opacity:0; pointer-events:none; transition:opacity .2s ease; }
+    .response-answer-modal-overlay.is-open, .response-annotation-overlay.is-open { opacity:1; pointer-events:auto; }
+    .response-answer-modal, .response-annotation-modal { width:min(34rem,100%); max-height:calc(100vh - 2rem); overflow-y:auto; border:1px solid rgba(168,139,54,.2); border-radius:1.25rem; background:#fff; box-shadow:0 24px 70px rgba(0,0,0,.28); transform:translateY(.65rem) scale(.98); transition:transform .2s cubic-bezier(.23,1,.32,1); }
+    .response-answer-modal-overlay.is-open .response-answer-modal, .response-annotation-overlay.is-open .response-annotation-modal { transform:translateY(0) scale(1); }
+    .response-answer-modal-content { color:#3d3226; }
+    .response-annotation-modal textarea { min-height:8rem; resize:vertical; }
+    body[data-patient-theme='black'] .pending-review-table thead th { background:#1d222b; color:#d6dbe4; }
     body[data-patient-theme='black'] .pending-review-table tbody tr:hover { background:#303847; }
     body[data-patient-theme='black'] .pending-search-shell, body[data-patient-theme='black'] .pending-open-action, body[data-patient-theme='black'] .response-history-action, body[data-patient-theme='black'] .response-detail-quickbar, body[data-patient-theme='black'] .response-detail-tab:hover, body[data-patient-theme='black'] .response-detail-tab.is-active, body[data-patient-theme='black'] .response-detail-review-action { border-color:#596171; background:#2b303b; color:#e3e6ec; }
     body[data-patient-theme='black'] .pending-search-shell input { color:#fff; }
     body[data-patient-theme='black'] .pending-summary-chip { background:rgba(212,183,106,.16); color:#f0d98e; }
     body[data-patient-theme='black'] .response-history-row.is-reviewed { background:rgba(39,79,55,.24); }
     body[data-patient-theme='black'] .response-history-expanded-row > td, body[data-patient-theme='black'] .response-history-answer-panel { background:#1f242d; }
-    body[data-patient-theme='black'] .response-history-indicator, body[data-patient-theme='black'] .response-history-answer-card { border-color:#50596a; background:#2e3440; color:#e3e6ec; }
+    body[data-patient-theme='black'] .response-history-indicator { border-color:#50596a; background:#2e3440; color:#e3e6ec; }
     body[data-patient-theme='black'] .response-history-indicator-icon { background:#4a3e24; }
-    body[data-patient-theme='black'] .response-history-answer-card h4, body[data-patient-theme='black'] .response-answer-modal-content { color:#fff; }
-    body[data-patient-theme='black'] .response-history-answer-card .answer-value { border-left-color:#d4b76a; background:#1e222b; color:#f1f3f7; }
+    body[data-patient-theme='black'] .response-history-expanded-card { border-color:#454e60; background:#181c24; color:#e3e6ec; }
+    body[data-patient-theme='black'] .response-history-answer-panel-header { border-bottom-color:rgba(80,89,106,.5); }
+    body[data-patient-theme='black'] .response-history-answer-card { border-color:#454e60; background:#242933; color:#e3e6ec; box-shadow:0 4px 14px rgba(0,0,0,.35); }
+    body[data-patient-theme='black'] .response-history-answer-card:hover { border-color:#636f86; box-shadow:0 8px 22px rgba(0,0,0,.5); }
+    body[data-patient-theme='black'] .response-history-answer-card h4, body[data-patient-theme='black'] .response-answer-modal-content { color:#f1f3f7; }
+    body[data-patient-theme='black'] .response-history-answer-card .answer-open { border-color:#556073; background:#1d222b; color:#f0d98e; }
+    body[data-patient-theme='black'] .response-history-answer-card .answer-open:hover { border-color:#d4b76a; background:#b69545; color:#171a21; }
+    body[data-patient-theme='black'] .response-history-answer-card .answer-value { border-left-color:#d4b76a; background:#1b2028; color:#f1f3f7; }
+    body[data-patient-theme='black'] .response-detail-answer-evaluation { border-color:#454e60; background:#1b2028; }
+    body[data-patient-theme='black'] .response-detail-answer-evaluation .evaluation-emoji { background:#2d3442; }
+    body[data-patient-theme='black'] .response-detail-answer-evaluation small { color:#aeb7c5 !important; }
+    body[data-patient-theme='black'] .response-detail-answer-evaluation strong { color:#f7f8fb !important; }
+    body[data-patient-theme='black'] .response-detail-answer-evaluation .evaluation-score { color:#f0d98e !important; }
+    body[data-patient-theme='black'] .answer-supplemental { border-left-color:#d4b76a; background:#1b2028; color:#f1f3f7; }
+    body[data-patient-theme='black'] .answer-supplemental-prompt { color:#aeb7c5 !important; }
+    body[data-patient-theme='black'] .answer-supplemental-response { color:#f7f8fb !important; }
     body[data-patient-theme='black'] .response-answer-modal, body[data-patient-theme='black'] .response-annotation-modal { border-color:#596171; background:#242933; color:#f1f3f7; }
     #response-answer-modal-footer { border-top: 1px solid rgba(168,139,54,.15); }
     body[data-patient-theme='black'] #response-answer-modal-footer { border-color:#4d5667; background:#1a1e26; }
