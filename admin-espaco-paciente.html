@@ -5833,7 +5833,6 @@ target.innerHTML = '';
             <p class="text-[10px] font-bold uppercase tracking-[.1em] text-primary">Pergunta ${answerIndex + 1} de ${totalAnswers}${answer.questionCode ? ` · ${safe(answer.questionCode)}` : ''}</p>
             ${savedNote ? '<span class="pending-summary-chip !text-[10px] !py-0.5 !px-2">Anotação salva</span>' : ''}
           </div>
-          <h3 class="mt-2 text-base font-normal text-dark leading-snug">${safe(questionPrompt)}</h3>
           ${mainBlock}
           ${answerSupplementalMarkup(answer)}
         </div>
