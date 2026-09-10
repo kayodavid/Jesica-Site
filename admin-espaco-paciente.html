@@ -5751,8 +5751,19 @@ target.innerHTML = '';
         const displayValue = responseAnswerValue(answer);
         const questionPrompt = resolveQuestionPrompt(answer, eventRef);
         const qNote = eventRef ? getQuestionAnnotation(eventRef, answerIndex, answer) : '';
-        const viewButton = historyIndex === null ? '' : `<button type="button" class="answer-open" data-history-index="${historyIndex}" data-answer-index="${answerIndex}" title="Ler resposta em detalhe" aria-label="Ler resposta em detalhe"><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.4 12s3.25-5.2 9.6-5.2 9.6 5.2 9.6 5.2-3.25 5.2-9.6 5.2S2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="2.7" stroke-width="1.8"/></svg></button>`;
-        const evaluation = scored ? `<div class="response-detail-answer-evaluation"><span class="evaluation-emoji" aria-hidden="true">${starsMarkup}</span><span><small>Avaliação da resposta</small><strong>${safe(label)}</strong></span><span class="evaluation-score">${rating.tone === 'positive' ? 'Avaliação positiva' : rating.tone === 'attention' ? 'Ponto de atenção' : 'Avaliação neutra'}</span></div>` : '';
+        const viewButton = historyIndex === null ? '' : `<button type="button" class="answer-open" data-history-index="${historyIndex}" data-answer-index="${answerIndex}" title="Ler resposta em detalhe" aria-label="Ler resposta em detalhe"><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.4 12s3.25-5.2 9.6-5.2 9.6 5.2-3.25 5.2-9.6 5.2S2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="2.7" stroke-width="1.8"/></svg></button>`;
+        
+        const mainContent = scored
+          ? `<div class="response-detail-answer-evaluation mt-2.5">
+              <span class="evaluation-emoji" aria-hidden="true">${starsMarkup}</span>
+              <div>
+                <small>Avaliação da resposta</small>
+                <strong>${safe(label)}</strong>
+              </div>
+              <span class="evaluation-score">${rating.tone === 'positive' ? 'Avaliação positiva' : rating.tone === 'attention' ? 'Ponto de atenção' : 'Avaliação neutra'}</span>
+            </div>`
+          : `<p class="answer-value mt-2.5">${safe(displayValue || 'Sem resposta')}</p>`;
+
         return `<article class="response-history-answer-card">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
@@ -5764,9 +5775,8 @@ target.innerHTML = '';
             </div>
             ${viewButton}
           </div>
-          <p class="answer-value ${responseDisplayMode === 'emoji' && scored ? 'is-stars' : ''}">${responseDisplayMode === 'emoji' && scored ? starsMarkup : safe(displayValue || 'Sem resposta')}</p>
+          ${mainContent}
           ${answerSupplementalMarkup(answer)}
-          ${evaluation}
         </article>`;
       };
 
@@ -5778,21 +5788,29 @@ target.innerHTML = '';
         const questionPrompt = resolveQuestionPrompt(answer, event);
         const savedNote = getQuestionAnnotation(event, answerIndex, answer);
 
+        const mainBlock = scored
+          ? `<div class="response-detail-answer-evaluation mt-3">
+              <span class="evaluation-emoji" aria-hidden="true">${answerStarsMarkup(answer)}</span>
+              <div>
+                <small>Avaliação da resposta</small>
+                <strong>${safe(label)}</strong>
+              </div>
+              <span class="evaluation-score">${rating.tone === 'positive' ? 'Avaliação positiva' : rating.tone === 'attention' ? 'Ponto de atenção' : 'Avaliação neutra'}</span>
+            </div>`
+          : `<div class="mt-3">
+              <p class="text-[11px] font-bold uppercase tracking-[.08em] text-gray-500">Resposta do paciente:</p>
+              <p class="mt-1.5 rounded-xl border-l-4 border-primary/55 bg-[#faf4e7] px-4 py-3 text-sm font-semibold leading-relaxed text-dark">
+                ${safe(displayValue || 'Sem resposta')}
+              </p>
+            </div>`;
+
         return `<div class="rounded-2xl border border-primary/15 bg-primary/[.03] p-4">
           <div class="flex items-center justify-between gap-2">
             <p class="text-[10px] font-bold uppercase tracking-[.1em] text-primary">Pergunta ${answerIndex + 1} de ${totalAnswers}${answer.questionCode ? ` · ${safe(answer.questionCode)}` : ''}</p>
             ${savedNote ? '<span class="pending-summary-chip !text-[10px] !py-0.5 !px-2">Anotação salva</span>' : ''}
           </div>
           <h3 class="mt-2 text-base font-bold text-dark leading-snug">${safe(questionPrompt)}</h3>
-          
-          <div class="mt-4">
-            <p class="text-[11px] font-bold uppercase tracking-[.08em] text-gray-500">Resposta do paciente:</p>
-            <p class="mt-1.5 rounded-xl border-l-4 border-primary/55 bg-[#faf4e7] px-4 py-3 text-sm font-semibold leading-relaxed text-dark ${responseDisplayMode === 'emoji' && scored ? 'response-answer-stars' : ''}">
-              ${responseDisplayMode === 'emoji' && scored ? answerStarsMarkup(answer) : safe(displayValue || 'Sem resposta')}
-            </p>
-          </div>
-
-          ${scored ? `<div class="response-detail-answer-evaluation mt-3"><span class="evaluation-emoji" aria-hidden="true">${answerStarsMarkup(answer)}</span><span><small>Avaliação da resposta</small><strong>${safe(label)}</strong></span><span class="evaluation-score">${rating.tone === 'positive' ? 'Avaliação positiva' : rating.tone === 'attention' ? 'Ponto de atenção' : 'Avaliação neutra'}</span></div>` : '<p class="mt-3 text-xs text-gray-500">Resposta descritiva sem pontuação configurada.</p>'}
+          ${mainBlock}
           ${answerSupplementalMarkup(answer)}
         </div>
 
@@ -5813,7 +5831,6 @@ target.innerHTML = '';
           </div>
         </div>`;
       };
-
       const openAnswerModal = (event, answerIndex) => {
         const answers = Array.isArray(event?.answers) ? event.answers : [];
         if (!answers.length || !answers[answerIndex]) return;
