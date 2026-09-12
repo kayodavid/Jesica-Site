@@ -7668,7 +7668,7 @@ target.innerHTML = '';
       const suggestionForm = document.getElementById('suggestion-form');
       const suggestionStatus = document.getElementById('suggestion-form-status');
       const suggestionSubmit = document.getElementById('suggestion-submit');
-      const suggestionClose = () => { suggestionOverlay?.classList.remove('is-open'); suggestionModal?.classList.remove('is-open'); suggestionOverlay?.setAttribute('aria-hidden', 'true'); suggestionModal?.setAttribute('aria-hidden', 'true'); };
+      const suggestionClose = () => { suggestionOverlay?.classList.remove('is-open'); suggestionModal?.classList.remove('is-open'); suggestionOverlay?.setAttribute('aria-hidden', 'true'); suggestionModal?.setAttribute('aria-hidden', 'true'); updateGlobalSidebarBlur?.(); };
       const suggestionOpen = () => { suggestionForm?.reset(); suggestionStatus?.classList.add('hidden'); suggestionStatus?.classList.remove('is-success', 'is-error'); suggestionOverlay?.classList.add('is-open'); suggestionModal?.classList.add('is-open'); suggestionOverlay?.setAttribute('aria-hidden', 'false'); suggestionModal?.setAttribute('aria-hidden', 'false'); window.setTimeout(() => document.getElementById('suggestion-name')?.focus(), 20); };
       suggestionButton?.addEventListener('click', suggestionOpen);
       document.getElementById('suggestion-close')?.addEventListener('click', suggestionClose);
@@ -7722,12 +7722,9 @@ target.innerHTML = '';
 
       // Automatic Observer to blur left sidebar whenever any right drawer or modal is open
       const updateGlobalSidebarBlur = () => {
-        const activeOverlay = document.querySelector('.patient-link-overlay.is-open, .service-drawer-overlay.is-open, .patient-filter-overlay.is-open, .patient-label-manager-overlay.is-open, .patient-table-config-overlay.is-open, .question-drawer-overlay.is-open, .quiz-drawer-overlay.is-open, .send-filter-overlay.is-open, .response-filter-overlay.is-open, .response-detail-overlay.is-open, .transaction-filter-overlay.is-open, .transaction-customize-overlay.is-open, .transaction-entry-overlay.is-open, .quiz-channel-config-overlay.is-open, .patient-registration-overlay.is-open');
-        const activeDrawer = document.querySelector('.patient-link-drawer.is-open, .service-drawer.is-open, .question-drawer.is-open, .quiz-drawer.is-open, .patient-filter-drawer.is-open, .patient-label-manager-drawer.is-open, .patient-table-config-drawer.is-open, .send-filter-drawer.is-open, .response-filter-drawer.is-open, .response-detail-drawer.is-open, .transaction-filter-drawer.is-open, .transaction-customize-drawer.is-open, .transaction-entry-drawer.is-open');
-        const suggestionOverlay = document.querySelector('.suggestion-overlay');
-        const isSuggestionOpen = suggestionOverlay && getComputedStyle(suggestionOverlay).opacity !== '0' && getComputedStyle(suggestionOverlay).display !== 'none';
-        
-        const hasOpen = Boolean(activeOverlay || activeDrawer || isSuggestionOpen);
+        const activeOverlay = document.querySelector('.patient-link-overlay.is-open, .service-drawer-overlay.is-open, .patient-filter-overlay.is-open, .patient-label-manager-overlay.is-open, .patient-table-config-overlay.is-open, .question-drawer-overlay.is-open, .quiz-drawer-overlay.is-open, .send-filter-overlay.is-open, .response-filter-overlay.is-open, .response-detail-overlay.is-open, .transaction-filter-overlay.is-open, .transaction-customize-overlay.is-open, .transaction-entry-overlay.is-open, .quiz-channel-config-overlay.is-open, .patient-registration-overlay.is-open, .suggestion-overlay.is-open');
+        const activeDrawer = document.querySelector('.patient-link-drawer.is-open, .service-drawer.is-open, .question-drawer.is-open, .quiz-drawer.is-open, .patient-filter-drawer.is-open, .patient-label-manager-drawer.is-open, .patient-table-config-drawer.is-open, .send-filter-drawer.is-open, .response-filter-drawer.is-open, .response-detail-drawer.is-open, .transaction-filter-drawer.is-open, .transaction-customize-drawer.is-open, .transaction-entry-drawer.is-open, .suggestion-modal.is-open');
+        const hasOpen = Boolean(activeOverlay || activeDrawer);
         document.body.classList.toggle('has-open-drawer', hasOpen);
         document.getElementById('admin-sidebar')?.classList.toggle('schedule-drawer-obscured', hasOpen);
       };
