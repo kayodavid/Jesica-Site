@@ -1740,28 +1740,56 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
   </style>
 
 <style id="custom-theme-overrides">
-  /* Dark mode overrides for Dashboard */
-  body[data-patient-theme='black'] .dashboard-summary,
-  body[data-patient-theme='black'] .dashboard-metric,
-  body[data-patient-theme='black'] .dashboard-alert {
-    background: #161a22 !important;
-    border-color: rgba(207, 175, 136, 0.2) !important;
+  /* High contrast light mode styling for left sidebar */
+  .admin-sidebar {
+    background: #fffdf8 !important;
   }
-  body[data-patient-theme='black'] .dashboard-metric:hover {
-    border-color: rgba(207, 175, 136, 0.4) !important;
+  .admin-sidebar-heading {
+    color: #876d28 !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.14em !important;
   }
-  
-  body[data-patient-theme='black'] .bg-primary\/10 {
-    background-color: #1e2329 !important;
+  .admin-nav-link, .admin-nav-toggle {
+    color: #383024 !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
   }
-  body[data-patient-theme='black'] .bg-\[\#E8F0EA\] {
-    background-color: #1d2624 !important;
+  .admin-nav-link .admin-nav-icon, .admin-nav-toggle .admin-nav-icon {
+    color: #635543 !important;
   }
-  body[data-patient-theme='black'] .text-\[\#3E764E\] {
-    color: #8eb093 !important;
+  .admin-nav-link:hover, .admin-nav-toggle:hover {
+    color: #1f1911 !important;
+    background: #f4e8d2 !important;
+  }
+  .admin-nav-link:hover .admin-nav-icon, .admin-nav-toggle:hover .admin-nav-icon {
+    color: #876d28 !important;
+  }
+  .admin-nav-link.is-active {
+    color: #261d10 !important;
+    background: #ede0c7 !important;
+    box-shadow: inset 4px 0 0 #9e7f2b !important;
+    font-weight: 700 !important;
+  }
+  .admin-nav-link.is-active .admin-nav-icon {
+    color: #876d28 !important;
+  }
+  .admin-sidebar-suggestion {
+    color: #383024 !important;
+    background: rgba(168, 139, 54, 0.08) !important;
+    border-color: rgba(168, 139, 54, 0.28) !important;
+    font-weight: 600 !important;
+  }
+  .admin-sidebar-suggestion:hover {
+    color: #1f1911 !important;
+    background: #f4e8d2 !important;
+    border-color: #876d28 !important;
+  }
+  .admin-sidebar-suggestion .admin-nav-icon {
+    color: #876d28 !important;
   }
 
-  /* Dark mode overrides for Sidebar */
+  /* Dark mode overrides */
   body[data-patient-theme='black'] .admin-sidebar {
     background: #0f1115 !important;
     border-right-color: rgba(207, 175, 136, 0.1) !important;
@@ -1773,14 +1801,66 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
     background: #0f1115 !important;
     border-top-color: rgba(207, 175, 136, 0.1) !important;
   }
-/* Specific fix for Sidebar Active Link in Dark Mode */
+  body[data-patient-theme='black'] .admin-sidebar-heading {
+    color: #6b7280 !important;
+  }
+  body[data-patient-theme='black'] .admin-nav-link, 
+  body[data-patient-theme='black'] .admin-nav-toggle {
+    color: #9ca3af !important;
+  }
+  body[data-patient-theme='black'] .admin-nav-link .admin-nav-icon, 
+  body[data-patient-theme='black'] .admin-nav-toggle .admin-nav-icon {
+    color: #9ca3af !important;
+  }
+  body[data-patient-theme='black'] .admin-nav-link:hover, 
+  body[data-patient-theme='black'] .admin-nav-toggle:hover {
+    background: rgba(30, 35, 41, 0.6) !important;
+    color: #e5e7eb !important;
+  }
+  body[data-patient-theme='black'] .admin-nav-link:hover .admin-nav-icon, 
+  body[data-patient-theme='black'] .admin-nav-toggle:hover .admin-nav-icon {
+    color: #cfaf88 !important;
+  }
   body[data-patient-theme='black'] .admin-nav-link.is-active {
     background: #1e2329 !important;
-    color: #e5e7eb !important;
+    color: #f3f4f6 !important;
     box-shadow: inset 4px 0 0 #cfaf88 !important;
   }
-  body[data-patient-theme='black'] .admin-nav-icon {
+  body[data-patient-theme='black'] .admin-nav-link.is-active .admin-nav-icon {
     color: #cfaf88 !important;
+  }
+  body[data-patient-theme='black'] .admin-sidebar-suggestion {
+    border-color: rgba(207, 175, 136, 0.24) !important;
+    background: rgba(207, 175, 136, 0.08) !important;
+    color: #d8c99c !important;
+  }
+  body[data-patient-theme='black'] .admin-sidebar-suggestion:hover {
+    border-color: #cfaf88 !important;
+    background: rgba(207, 175, 136, 0.16) !important;
+    color: #ffffff !important;
+  }
+  body[data-patient-theme='black'] .admin-sidebar-suggestion .admin-nav-icon {
+    color: #cfaf88 !important;
+  }
+
+  /* Dashboard dark mode */
+  body[data-patient-theme='black'] .dashboard-summary,
+  body[data-patient-theme='black'] .dashboard-metric,
+  body[data-patient-theme='black'] .dashboard-alert {
+    background: #161a22 !important;
+    border-color: rgba(207, 175, 136, 0.2) !important;
+  }
+  body[data-patient-theme='black'] .dashboard-metric:hover {
+    border-color: rgba(207, 175, 136, 0.4) !important;
+  }
+  body[data-patient-theme='black'] .bg-primary\/10 {
+    background-color: #1e2329 !important;
+  }
+  body[data-patient-theme='black'] .bg-\[\#E8F0EA\] {
+    background-color: #1d2624 !important;
+  }
+  body[data-patient-theme='black'] .text-\[\#3E764E\] {
+    color: #8eb093 !important;
   }
 </style>
 </head>
@@ -1834,74 +1914,66 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
         <aside id="admin-sidebar" class="admin-sidebar" aria-label="Navegação administrativa do ClinicPro">
           <div class="lg:hidden flex items-center justify-end px-2 pt-1 pb-2"><button id="sidebar-mobile-toggle" type="button" class="admin-sidebar-mobile-toggle" aria-expanded="true" aria-controls="admin-sidebar-menu">Menu</button></div>
           <nav id="admin-sidebar-menu" class="admin-sidebar-menu" aria-label="Recursos administrativos">
-            
             <p class="admin-sidebar-heading">Visão geral</p>
-            <a href="#inicio" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-gray-200 text-[13px] font-medium relative" data-admin-nav="inicio">
-              
+            
+            <a href="#inicio" class="admin-nav-link is-active" data-admin-nav="inicio">
               <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg>
-              Início
+              <span>Início</span>
             </a>
             
-            <a href="#patient-directory" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors" data-admin-nav="pacientes">
+            <a href="#patient-directory" class="admin-nav-link" data-admin-nav="pacientes">
               <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg>
-              Pacientes
+              <span>Pacientes</span>
             </a>
             
-            <a href="#pending-review" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors" data-admin-nav="pendencias">
-              <div class="flex items-center gap-3">
-                <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9"/></svg>
-                Pendências
-              </div>
-              <span id="pending-count" class="flex items-center justify-center h-5 w-5 rounded-full bg-[#8eb093]/20 text-[#3E764E] text-[10px] font-bold">1</span>
+            <a href="#pending-review" class="admin-nav-link" data-admin-nav="pendencias">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9"/></svg>
+              <span>Pendências</span>
+              <span id="pending-count" class="admin-nav-badge">1</span>
             </a>
             
-            <button type="button" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors w-full" data-sidebar-toggle="reports-menu" aria-expanded="false">
-              <div class="flex items-center gap-3">
-                <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 19V5m5 14v-6m5 6V9m5 10V3"/></svg>
-                Relatórios
-              </div>
-              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+            <button type="button" class="admin-nav-toggle" data-sidebar-toggle="reports-menu" aria-expanded="false">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 19V5m5 14v-6m5 6V9m5 10V3"/></svg>
+              <span>Relatórios</span>
+              <svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
             </button>
-            <div id="reports-menu" class="hidden flex-col gap-1 pl-10 pr-3 py-1">
-              <!-- Keeping these hidden inside the toggle just in case, but adding them to ACOMPANHAMENTO below as requested by the image -->
-            </div>
+            <div id="reports-menu" class="hidden"></div>
 
             <div class="admin-sidebar-divider"></div>
 
             <p class="admin-sidebar-heading">Acompanhamento</p>
             
-            <a href="#send-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors" data-admin-nav="envios">
+            <a href="#send-report" class="admin-nav-link" data-admin-nav="envios">
               <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 3 18 9-18 9 4-9-4-9Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 12h14"/></svg>
-              Envios
+              <span>Envios</span>
             </a>
             
-            <a href="#response-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors" data-admin-nav="respostas">
+            <a href="#response-report" class="admin-nav-link" data-admin-nav="respostas">
               <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 11.5a7.5 7.5 0 0 1-8 7.48A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 8-7.48A7.5 7.5 0 0 1 21 11.5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11h8m-8 3h5"/></svg>
-              Respostas
+              <span>Respostas</span>
             </a>
             
-            <a href="#engagement-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors" data-admin-nav="engajamento">
+            <a href="#engagement-report" class="admin-nav-link" data-admin-nav="engajamento">
               <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 17l6-6 4 4 8-8m0 0v4m0-4h-4"/></svg>
-              Engajamento
+              <span>Engajamento</span>
             </a>
 
             <div class="admin-sidebar-divider"></div>
 
             <p class="admin-sidebar-heading">Gestão</p>
 
-            <a href="#transaction-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-primary/10/50 text-[13px] font-medium transition-colors" data-admin-nav="transacoes">
+            <a href="#transaction-report" class="admin-nav-link" data-admin-nav="transacoes">
               <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 10h16m-9 5h2"/></svg>
-              Financeiro
+              <span>Financeiro</span>
             </a>
 
-            <!-- Hidden original settings block just to keep JS from breaking if it seeks #settings-menu -->
+            <!-- Hidden original settings block for JS stability -->
             <div class="hidden">
               <button type="button" class="admin-nav-toggle" data-sidebar-toggle="settings-menu" aria-expanded="false"></button>
               <div id="settings-menu" class="admin-nav-submenu"></div>
               <button type="button" class="admin-nav-toggle admin-subnav-toggle" data-sidebar-toggle="questionnaires-menu" aria-expanded="false"></button>
               <div id="questionnaires-menu" class="admin-nav-submenu"></div>
             </div>
-
           </nav>
           
           <div class="admin-sidebar-footer">
