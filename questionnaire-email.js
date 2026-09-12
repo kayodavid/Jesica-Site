@@ -2209,7 +2209,15 @@ export default async function handler(req, res) {
       const answers = Array.isArray(body.answers) ? body.answers : [];
       if (!answers.length || answers.length > 100) return json(res, 400, { success: false, message: 'As respostas informadas são inválidas.' });
       const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
-      const normalizedAnswers = answers.map(answer => enrichResponseAnswer(quiz, answer));
+      const visibleSnapshots = Array.isArray(quiz?.questionSnapshots) ? quiz.questionSnapshots : [];
+      const visibleIds = new Set(visibleSnapshots.map(q => String(q?.id || '')));
+      const filteredAnswers = answers.filter(a => {
+        const qId = String(a?.questionId || a?.id || '');
+        if (visibleIds.size && visibleIds.has(qId)) return true;
+        const cfg = quiz?.questionSettings?.[qId] || {};
+        return cfg.visible !== false;
+      });
+      const normalizedAnswers = filteredAnswers.map(answer => enrichResponseAnswer(quiz, answer));
       const responseSummary = calculateResponseSummary(quiz, normalizedAnswers, body.responseSummary || {});
       const saved = await storeResponse(invitation, quiz, normalizedAnswers, responseSummary);
       if (!saved) return json(res, 200, { success: false, reason: 'already_answered' });
