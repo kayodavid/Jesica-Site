@@ -1788,23 +1788,82 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
       <div class="admin-shell">
         <aside id="admin-sidebar" class="admin-sidebar" aria-label="Navegação administrativa do ClinicPro">
           <div class="lg:hidden flex items-center justify-end px-2 pt-1 pb-2"><button id="sidebar-mobile-toggle" type="button" class="admin-sidebar-mobile-toggle" aria-expanded="true" aria-controls="admin-sidebar-menu">Menu</button></div>
-          <nav id="admin-sidebar-menu" class="admin-sidebar-menu" aria-label="Recursos administrativos">
-            <p class="admin-sidebar-heading">Visão geral</p>
-            <a href="#inicio" class="admin-nav-link is-active" data-admin-nav="inicio"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg>Início</a>
-            <a href="#patient-directory" class="admin-nav-link" data-admin-nav="pacientes"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg>Pacientes</a>
-            <a href="#pending-review" class="admin-nav-link" data-admin-nav="pendencias"><svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 5h14l1 5-3 9H7L4 10l1-5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 5V3m8 2V3M8 14h8"/></svg>Pendências<span id="pending-count" class="admin-nav-badge">1</span></a>
-            <button type="button" class="admin-nav-toggle" data-sidebar-toggle="reports-menu" aria-expanded="true"><span class="admin-nav-icon"><svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 19V5m5 14v-6m5 6V9m5 10V3"/></svg></span>Relatórios<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button>
-            <div id="reports-menu" class="admin-nav-submenu"><a href="#send-report" data-admin-nav="envios"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 3 18 9-18 9 4-9-4-9Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 12h14"/></svg>Envios</a><a href="#response-report" data-admin-nav="respostas"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 11.5a7.5 7.5 0 0 1-8 7.48A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 8-7.48A7.5 7.5 0 0 1 21 11.5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11h8m-8 3h5"/></svg>Respostas</a><a href="#engagement-report" data-admin-nav="engajamento"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 21 4-5 4 5M12 16V3m0 0 4 4m-4-4-4 4"/></svg>Engajamento</a><a href="#transaction-report" data-admin-nav="transacoes"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 10h16m-9 5h2"/></svg>Financeiro</a></div>
-            <div class="admin-sidebar-divider"></div>
-            <p class="admin-sidebar-heading">Configurações</p>
-            <button type="button" class="admin-nav-toggle" data-sidebar-toggle="settings-menu" aria-expanded="true"><span class="admin-nav-icon"><svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.6 2.6-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3.68v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.6-2.6.06-.06A1.7 1.7 0 0 0 5.38 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3.68h.08A1.7 1.7 0 0 0 5.38 9.26a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.6-2.6.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3.68v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.6 2.6-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.08v3.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg></span>Configurações<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button>
-            <div id="settings-menu" class="admin-nav-submenu"><a href="#configuracoes" data-admin-nav="servicos"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 4h10l4 4v12H5z"/><path stroke-linecap="round" stroke-width="1.8" d="M15 4v4h4M8 13h8m-8 3h5"/></svg>Serviços</a><button type="button" class="admin-nav-toggle admin-subnav-toggle" data-sidebar-toggle="questionnaires-menu" aria-expanded="true"><span class="inline-flex h-3.5 w-3.5 shrink-0"><svg class="h-full w-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M9 9h6m-6 4h4m0 3h.01"/></svg></span>Gestão de Clientes<svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg></button><div id="questionnaires-menu" class="admin-nav-submenu ml-4"><button type="button" data-admin-nav="perguntas">Perguntas</button><button type="button" data-admin-nav="questionarios">Questionários</button></div><a href="#workspace" data-admin-nav="area-paciente"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4h16v16H4z"/><path stroke-linecap="round" stroke-width="1.8" d="M8 9h8m-8 4h8m-8 4h5"/></svg>Personalizar Plataforma</a><button type="button" data-admin-nav="lembretes"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h4"/></svg>Lembretes</button><button type="button" data-admin-nav="whatsapp-automations"><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path stroke-linecap="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01"/></svg>WhatsApp</button><button type="button" data-coming-soon="As integrações estarão disponíveis quando forem conectadas ao acompanhamento."><svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/></svg>Integrações</button></div>
-          </nav>
-          <div class="admin-sidebar-footer">
-            <button type="button" class="admin-sidebar-suggestion" data-suggestion-open>
-              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              <span>Enviar uma sugestão</span>
+          <nav id="admin-sidebar-menu" class="admin-sidebar-menu flex flex-col gap-1 px-3 py-4" aria-label="Recursos administrativos" style="background-color: #0f1115;">
+            
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2 px-3 mt-2">Visão geral</p>
+            <a href="#inicio" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#1e2329] text-gray-200 text-[13px] font-medium relative" data-admin-nav="inicio">
+              <div class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-[3px] bg-[#cfaf88] rounded-r-md"></div>
+              <svg class="h-4 w-4 text-[#cfaf88] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg>
+              Início
+            </a>
+            
+            <a href="#patient-directory" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors" data-admin-nav="pacientes">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg>
+              Pacientes
+            </a>
+            
+            <a href="#pending-review" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors" data-admin-nav="pendencias">
+              <div class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9"/></svg>
+                Pendências
+              </div>
+              <span id="pending-count" class="flex items-center justify-center h-5 w-5 rounded-full bg-[#8eb093]/20 text-[#8eb093] text-[10px] font-bold">1</span>
+            </a>
+            
+            <button type="button" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors w-full" data-sidebar-toggle="reports-menu" aria-expanded="false">
+              <div class="flex items-center gap-3">
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 19V5m5 14v-6m5 6V9m5 10V3"/></svg>
+                Relatórios
+              </div>
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
             </button>
+            <div id="reports-menu" class="hidden flex-col gap-1 pl-10 pr-3 py-1">
+              <!-- Keeping these hidden inside the toggle just in case, but adding them to ACOMPANHAMENTO below as requested by the image -->
+            </div>
+
+            <div class="h-px bg-gray-800 my-4 mx-3"></div>
+
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2 px-3">Acompanhamento</p>
+            
+            <a href="#send-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors" data-admin-nav="envios">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 3 18 9-18 9 4-9-4-9Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 12h14"/></svg>
+              Envios
+            </a>
+            
+            <a href="#response-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors" data-admin-nav="respostas">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 11.5a7.5 7.5 0 0 1-8 7.48A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 8-7.48A7.5 7.5 0 0 1 21 11.5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 11h8m-8 3h5"/></svg>
+              Respostas
+            </a>
+            
+            <a href="#engagement-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors" data-admin-nav="engajamento">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 17l6-6 4 4 8-8m0 0v4m0-4h-4"/></svg>
+              Engajamento
+            </a>
+
+            <div class="h-px bg-gray-800 my-4 mx-3"></div>
+
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2 px-3">Gestão</p>
+
+            <a href="#transaction-report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-[#1e2329]/50 text-[13px] font-medium transition-colors" data-admin-nav="transacoes">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 10h16m-9 5h2"/></svg>
+              Financeiro
+            </a>
+
+            <!-- Hidden original settings block just to keep JS from breaking if it seeks #settings-menu -->
+            <div class="hidden">
+              <button type="button" class="admin-nav-toggle" data-sidebar-toggle="settings-menu" aria-expanded="false"></button>
+              <div id="settings-menu" class="admin-nav-submenu"></div>
+              <button type="button" class="admin-nav-toggle admin-subnav-toggle" data-sidebar-toggle="questionnaires-menu" aria-expanded="false"></button>
+              <div id="questionnaires-menu" class="admin-nav-submenu"></div>
+            </div>
+
+          </nav>
+          
+          <div class="mt-auto px-5 pb-6 pt-4 border-t border-gray-800 mx-2" style="background-color: #0f1115;">
+            <div class="flex items-center gap-3 text-gray-500">
+              <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 22S6 16 6 10a6 6 0 1 1 12 0c0 6-6 12-6 12Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 22V10M12 14c-2.5 0-4-1.5-4-1.5M12 12c2.5 0 4-1.5 4-1.5"/></svg>
+              <p class="text-[9px] font-bold uppercase tracking-[0.2em] leading-tight text-gray-400">Nutrição que<br>Transforma</p>
+            </div>
           </div>
         </aside>
         <div class="admin-content">
@@ -1817,16 +1876,143 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
       </header>
 
       <section id="inicio-dashboard" class="mb-6 space-y-5">
-        <div class="dashboard-summary rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div class="flex items-center gap-2"><svg class="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg><p id="dashboard-updated-at" class="text-xs font-medium text-gray-500">Atualizando dados do painel...</p></div><p id="dashboard-period" class="rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">Mês atual</p></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="pending"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Revisões pendentes</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 5h14l1 5-3 9H7L4 10l1-5Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 14h8"/></svg></div><p id="dashboard-pending-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Ir para pendências <span>›</span></span></button>
-          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="patients"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Pacientes ativos</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg></div><p id="dashboard-patient-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Ir para pacientes <span>›</span></span></button>
-          <button type="button" class="dashboard-metric rounded-2xl p-4 text-left" data-dashboard-action="finished"><div class="flex items-start justify-between gap-3"><p class="text-sm font-bold text-dark">Pacientes finalizados</p><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/></svg></div><p id="dashboard-finished-count" class="mt-3 text-3xl font-bold text-dark">0</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Com acompanhamento concluído <span>›</span></span></button>
-          <div role="button" tabindex="0" class="dashboard-metric rounded-2xl p-4 text-left cursor-pointer select-none" data-dashboard-action="transactions"><div class="flex items-start justify-between gap-3"><div class="flex items-center gap-2"><p class="text-sm font-bold text-dark">Faturamento</p><button type="button" id="dashboard-revenue-toggle" class="inline-flex items-center justify-center p-1 rounded-md text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none" aria-label="Exibir faturamento" title="Exibir faturamento"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg></button></div><svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m3-9.5c0-1.1-1.3-2-3-2s-3 .9-3 2 1.3 2 3 2 3 .9 3 2-1.3 2-3 2-3-.9-3-2"/><circle cx="12" cy="12" r="9" stroke-width="1.8"/></svg></div><p id="dashboard-revenue-count" class="mt-3 text-3xl font-bold text-dark">R$ •••••</p><span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Pagamentos recebidos no mês <span>›</span></span></div>
+        <!-- Dashboard Summary -->
+        <div class="dashboard-summary rounded-[1.25rem] p-4 sm:p-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border border-primary/20 bg-[#161a22] !bg-[#161a22] !border-primary/20">
+          <div class="flex items-center gap-2">
+            <svg class="h-5 w-5 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg>
+            <p id="dashboard-updated-at" class="text-xs font-medium text-gray-300">Última atualização dos dados: 12/09/2026 às 10:48</p>
+          </div>
+          <p id="dashboard-period" class="rounded-full bg-[#202d28] px-4 py-1.5 text-xs font-bold text-[#8eb093]">setembro de 2026</p>
         </div>
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
-          <section class="dashboard-alert rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><h2 class="text-base font-bold text-dark">Pacientes em risco de abandono</h2></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.73 2.4 17.4A2 2 0 0 0 4.13 20h15.74a2 2 0 0 0 1.73-3L13.7 3.73a2 2 0 0 0-3.4 0Z"/></svg><div><p class="text-xs font-bold text-primary">Acompanhe pacientes sem registros recentes</p><p class="mt-1 text-xs leading-relaxed text-gray-500">A ausência de atividade pode indicar menor adesão ao acompanhamento.</p></div></div></div><div id="dashboard-risk-list" class="min-h-[8.3rem]"></div></section>
-          <section class="dashboard-alert relative rounded-2xl overflow-hidden shadow-sm"><div class="px-5 py-4"><div class="relative flex items-center gap-2"><button id="dashboard-due-settings" type="button" class="directory-tool !h-8 !w-8 shrink-0" aria-label="Configurar vencimentos" aria-expanded="false" title="Configurar vencimentos"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.6 2.6-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3.68v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.6-2.6.06-.06A1.7 1.7 0 0 0 5.38 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3.68h.08A1.7 1.7 0 0 0 5.38 9.26a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.6-2.6.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3.68v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.6 2.6-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.08v3.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg></button><h2 id="dashboard-due-title" class="text-base font-bold text-dark">Vencimentos da Semana</h2><div id="dashboard-due-menu" class="hidden absolute left-0 top-10 z-20 w-56 rounded-xl border border-primary/15 bg-white p-1.5 shadow-xl"><button type="button" data-dashboard-due-period="week" class="w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-dark hover:bg-primary/10">Vencimentos da Semana</button><button type="button" data-dashboard-due-period="month" class="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-dark hover:bg-primary/10">Vencimentos do Mês</button></div></div></div><div class="dashboard-notice px-5 py-3"><div class="flex gap-3"><svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg><div><p id="dashboard-due-kicker" class="text-xs font-bold text-primary">Planos que vencem nos próximos 7 dias</p><p id="dashboard-due-description" class="mt-1 text-xs leading-relaxed text-gray-500">Acompanhe os planos com vencimento próximo e priorize os contatos.</p></div></div></div><div id="dashboard-due-list" class="min-h-[8.3rem]"></div></section>
+
+        <!-- 4 Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          
+          <!-- Card 1 -->
+          <button type="button" class="dashboard-metric rounded-[1.25rem] p-5 text-left border border-primary/20 bg-[#161a22] transition-colors hover:border-primary/40 relative flex flex-col justify-between min-h-[9.5rem] !bg-[#161a22] !border-primary/20" data-dashboard-action="pending">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center justify-center h-10 w-10 rounded-full bg-[#1e2329] border border-primary/10">
+                <svg class="h-5 w-5 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg>
+              </div>
+              <svg class="h-4 w-4 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+            <div class="mt-4">
+              <p class="text-[13px] font-semibold text-gray-200">Revisões pendentes</p>
+              <p id="dashboard-pending-count" class="mt-1 text-3xl font-bold text-white">1</p>
+            </div>
+            <span class="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-[#cfaf88]">Ir para pendências ›</span>
+          </button>
+
+          <!-- Card 2 -->
+          <button type="button" class="dashboard-metric rounded-[1.25rem] p-5 text-left border border-primary/20 bg-[#161a22] transition-colors hover:border-primary/40 relative flex flex-col justify-between min-h-[9.5rem] !bg-[#161a22] !border-primary/20" data-dashboard-action="patients">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center justify-center h-10 w-10 rounded-full bg-[#1d2624] border border-[#8eb093]/20">
+                <svg class="h-5 w-5 text-[#8eb093]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8m7-4a3 3 0 1 1 0 6m4 6v-2a4 4 0 0 0-3-3.87"/></svg>
+              </div>
+              <svg class="h-4 w-4 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+            <div class="mt-4">
+              <p class="text-[13px] font-semibold text-gray-200">Pacientes ativos</p>
+              <p id="dashboard-patient-count" class="mt-1 text-3xl font-bold text-white">7</p>
+            </div>
+            <span class="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-[#cfaf88]">Ir para pacientes ›</span>
+          </button>
+
+          <!-- Card 3 -->
+          <button type="button" class="dashboard-metric rounded-[1.25rem] p-5 text-left border border-primary/20 bg-[#161a22] transition-colors hover:border-primary/40 relative flex flex-col justify-between min-h-[9.5rem] !bg-[#161a22] !border-primary/20" data-dashboard-action="finished">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center justify-center h-10 w-10 rounded-full bg-[#1d2624] border border-[#8eb093]/20">
+                <svg class="h-5 w-5 text-[#8eb093]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/></svg>
+              </div>
+              <svg class="h-4 w-4 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+            <div class="mt-4">
+              <p class="text-[13px] font-semibold text-gray-200">Pacientes finalizados</p>
+              <p id="dashboard-finished-count" class="mt-1 text-3xl font-bold text-white">0</p>
+            </div>
+            <span class="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-gray-400">Com acompanhamento<br>concluído</span>
+          </button>
+
+          <!-- Card 4 -->
+          <div role="button" tabindex="0" class="dashboard-metric rounded-[1.25rem] p-5 text-left border border-primary/20 bg-[#161a22] transition-colors hover:border-primary/40 relative flex flex-col justify-between min-h-[9.5rem] cursor-pointer select-none !bg-[#161a22] !border-primary/20" data-dashboard-action="transactions">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2">
+                <div class="flex items-center justify-center h-10 w-10 rounded-full bg-[#201d16] border border-[#cfaf88]/20">
+                  <span class="text-[#cfaf88] font-bold text-sm">$</span>
+                </div>
+              </div>
+              <svg class="h-4 w-4 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </div>
+            <div class="mt-4 relative">
+              <div class="flex items-center justify-between">
+                <p class="text-[13px] font-semibold text-gray-200">Faturamento</p>
+                <button type="button" id="dashboard-revenue-toggle" class="inline-flex items-center justify-center p-1 rounded-md text-gray-400 hover:text-[#cfaf88] hover:bg-[#cfaf88]/10 transition-colors focus:outline-none" aria-label="Exibir faturamento" title="Exibir faturamento">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                </button>
+              </div>
+              <p id="dashboard-revenue-count" class="mt-1 text-3xl font-bold text-white">R$ •••••</p>
+            </div>
+            <span class="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-[#cfaf88]">Pagamentos recebidos no mês ›</span>
+          </div>
+
+        </div>
+
+        <!-- 2 Large Blocks -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          
+          <!-- Risco de Abandono -->
+          <section class="dashboard-alert rounded-[1.25rem] overflow-hidden border border-primary/20 bg-[#161a22] !bg-[#161a22] !border-primary/20">
+            <div class="px-5 py-5 flex items-center justify-between border-b border-primary/10">
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.73 2.4 17.4A2 2 0 0 0 4.13 20h15.74a2 2 0 0 0 1.73-3L13.7 3.73a2 2 0 0 0-3.4 0Z"/></svg>
+                <h2 class="text-base font-semibold text-white">Pacientes em risco de abandono</h2>
+              </div>
+              <svg class="h-4 w-4 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6"/></svg>
+            </div>
+            
+            <div id="dashboard-risk-list" class="min-h-[8.3rem] flex flex-col px-5 py-2">
+            </div>
+            
+            <div class="px-5 py-4">
+              <div class="flex items-start gap-2 text-gray-400">
+                <svg class="h-4 w-4 shrink-0 mt-0.5 text-[#8eb093]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/></svg>
+                <p class="text-xs">A ausência de atividade pode indicar menor adesão ao acompanhamento.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Vencimentos da Semana -->
+          <section class="dashboard-alert relative rounded-[1.25rem] overflow-hidden border border-primary/20 bg-[#161a22] !bg-[#161a22] !border-primary/20">
+            <div class="px-5 py-5 flex items-center justify-between border-b border-primary/10">
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-[#8eb093]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.8"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.8"></line><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.8"></line><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.8"></line></svg>
+                <h2 id="dashboard-due-title" class="text-base font-semibold text-white">Vencimentos da semana</h2>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                <button id="dashboard-due-settings" type="button" class="text-gray-400 hover:text-[#cfaf88] transition-colors p-1" aria-label="Configurar vencimentos" aria-expanded="false" title="Configurar vencimentos">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.6 2.6-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3.68v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.6-2.6.06-.06A1.7 1.7 0 0 0 5.38 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3.68h.08A1.7 1.7 0 0 0 5.38 9.26a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.6-2.6.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3.68v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.6 2.6-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.08v3.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+                </button>
+                <svg class="h-4 w-4 text-[#cfaf88]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6"/></svg>
+                
+                <div id="dashboard-due-menu" class="hidden absolute right-5 top-14 z-20 w-56 rounded-xl border border-primary/20 bg-[#161a22] p-1.5 shadow-xl">
+                  <button type="button" data-dashboard-due-period="week" class="w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-gray-200 hover:bg-primary/20">Vencimentos da Semana</button>
+                  <button type="button" data-dashboard-due-period="month" class="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-gray-200 hover:bg-primary/20">Vencimentos do Mês</button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="dashboard-due-list" class="min-h-[8.3rem] flex flex-col px-5 py-2">
+            </div>
+            
+            <div class="px-5 py-4 border-t border-primary/10">
+              <div class="flex items-center gap-2 text-[#8eb093] rounded-lg bg-[#1a2522] px-4 py-3 border border-[#8eb093]/20">
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.8"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.8"></line><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.8"></line><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.8"></line></svg>
+                <p id="dashboard-due-kicker" class="text-xs font-medium">Planos que vencem nos próximos 7 dias.</p>
+              </div>
+            </div>
+          </section>
+
         </div>
       </section>
 
