@@ -1917,7 +1917,11 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <span>Relatórios</span>
               <svg class="admin-nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
             </button>
-            <div id="reports-menu" class="hidden"></div>
+            <div id="reports-menu" class="hidden admin-nav-submenu ml-4 space-y-1">
+              <a href="#send-report" class="admin-nav-link text-xs" data-admin-nav="envios"><span>Envios</span></a>
+              <a href="#response-report" class="admin-nav-link text-xs" data-admin-nav="respostas"><span>Respostas</span></a>
+              <a href="#engagement-report" class="admin-nav-link text-xs" data-admin-nav="engajamento"><span>Engajamento</span></a>
+            </div>
 
             <div class="admin-sidebar-divider"></div>
 
@@ -1947,13 +1951,44 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
               <span>Financeiro</span>
             </a>
 
-            <!-- Hidden original settings block for JS stability -->
-            <div class="hidden">
-              <button type="button" class="admin-nav-toggle" data-sidebar-toggle="settings-menu" aria-expanded="false"></button>
-              <div id="settings-menu" class="admin-nav-submenu"></div>
-              <button type="button" class="admin-nav-toggle admin-subnav-toggle" data-sidebar-toggle="questionnaires-menu" aria-expanded="false"></button>
-              <div id="questionnaires-menu" class="admin-nav-submenu"></div>
-            </div>
+            <a href="#configuracoes" class="admin-nav-link" data-admin-nav="servicos">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 4h10l4 4v12H5z"/><path stroke-linecap="round" stroke-width="1.8" d="M15 4v4h4M8 13h8m-8 3h5"/></svg>
+              <span>Serviços</span>
+            </a>
+
+            <a href="#quizzes-manager" class="admin-nav-link" data-admin-nav="questionarios">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M9 9h6m-6 4h4m0 3h.01"/></svg>
+              <span>Questionários</span>
+            </a>
+
+            <a href="#questions-manager" class="admin-nav-link" data-admin-nav="perguntas">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              <span>Perguntas</span>
+            </a>
+
+            <div class="admin-sidebar-divider"></div>
+
+            <p class="admin-sidebar-heading">Configurações</p>
+
+            <a href="#workspace" class="admin-nav-link" data-admin-nav="area-paciente">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4h16v16H4z"/><path stroke-linecap="round" stroke-width="1.8" d="M8 9h8m-8 4h8m-8 4h5"/></svg>
+              <span>Personalizar Plataforma</span>
+            </a>
+
+            <a href="#reminders-manager" class="admin-nav-link" data-admin-nav="lembretes">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h4"/></svg>
+              <span>Lembretes</span>
+            </a>
+
+            <a href="#whatsapp-automations" class="admin-nav-link" data-admin-nav="whatsapp-automations">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path stroke-linecap="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
+              <span>WhatsApp</span>
+            </a>
+
+            <button type="button" class="admin-nav-link" data-coming-soon="As integrações estarão disponíveis quando forem conectadas ao acompanhamento.">
+              <svg class="admin-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15"/></svg>
+              <span>Integrações</span>
+            </button>
           </nav>
           
           <div class="admin-sidebar-footer">
