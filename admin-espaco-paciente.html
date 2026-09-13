@@ -224,7 +224,7 @@
     html[data-patient-theme='black'] #patient-link-drawer #patient-link-service-detail, html[data-patient-theme='black'] #patient-link-drawer #patient-link-quiz-fields p, body[data-patient-theme='black'] #patient-link-drawer #patient-link-service-detail, body[data-patient-theme='black'] #patient-link-drawer #patient-link-quiz-fields p { border:1px solid #596273; background:rgba(212,183,106,.12) !important; color:#dbe0e8 !important; }
     html[data-patient-theme='black'] #patient-link-drawer .bg-primary\/10, body[data-patient-theme='black'] #patient-link-drawer .bg-primary\/10 { background:rgba(212,183,106,.16) !important; }
     html[data-patient-theme='black'] #patient-link-drawer .directory-tool, body[data-patient-theme='black'] #patient-link-drawer .directory-tool { border-color:#596273 !important; background:#303541 !important; color:#e3e6ec !important; }
-    html[data-patient-theme='black'] #patient-link-drawer .directory-tool:hover, body[data-patient-theme='black'] #patient-link-drawer .directory-tool:hover { border-color:#d4b76a !important; background:#3a3f4c !important; color:#ffe5a0 !important; }
+    html[data-patient-theme='black'] #patient-link-drawer .directory-tool:hover, body[data-patient-theme='black'] #patient-link-drawer .directory-tool:hover { border-color:#f5f5f5 !important; background:#f5f5f5 !important; color:#2a2c34 !important; }
     html[data-patient-theme='black'] #patient-link-drawer button[type='submit'], body[data-patient-theme='black'] #patient-link-drawer button[type='submit'] { border-color:#d4b76a !important; background:#d4b76a !important; color:#211d15 !important; box-shadow:0 4px 12px rgba(0,0,0,.2); }
     html[data-patient-theme='black'] #patient-link-drawer button[type='submit']:hover, body[data-patient-theme='black'] #patient-link-drawer button[type='submit']:hover { border-color:#e4c874 !important; background:#e4c874 !important; color:#211d15 !important; }
     html[data-patient-theme='black'] #patient-link-drawer button[type='button'], body[data-patient-theme='black'] #patient-link-drawer button[type='button'] { color:#dbe0e8; }
@@ -757,9 +757,9 @@
     }
     html[data-patient-theme='black'] .reminder-modal #reminder-modal-close:hover,
     body[data-patient-theme='black'] .reminder-modal #reminder-modal-close:hover {
-      background: #3a3f4c !important;
-      border-color: #d4b76a !important;
-      color: #ffe5a0 !important;
+      background: #f5f5f5 !important;
+      border-color: #f5f5f5 !important;
+      color: #2a2c34 !important;
     }
     html[data-patient-theme='black'] .reminder-modal .reminder-status,
     html[data-patient-theme='black'] .reminder-status,
@@ -1105,6 +1105,104 @@ body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='bl
     body[data-patient-theme='black'] #patient-profile-back-to-menu:hover {
       color:#f7f8fb !important;
     }
+    html[data-patient-theme='black'] [id$="-close"].directory-tool:hover,
+    body[data-patient-theme='black'] [id$="-close"].directory-tool:hover,
+    html[data-patient-theme='black'] .directory-tool[title*="echar"]:hover,
+    body[data-patient-theme='black'] .directory-tool[title*="echar"]:hover,
+    html[data-patient-theme='black'] .directory-tool[aria-label*="echar"]:hover,
+    body[data-patient-theme='black'] .directory-tool[aria-label*="echar"]:hover,
+    html[data-patient-theme='black'] #patient-profile-close:hover,
+    body[data-patient-theme='black'] #patient-profile-close:hover,
+    html[data-patient-theme='black'] #patient-filter-close:hover,
+    body[data-patient-theme='black'] #patient-filter-close:hover,
+    html[data-patient-theme='black'] #patient-table-config-close:hover,
+    body[data-patient-theme='black'] #patient-table-config-close:hover,
+    html[data-patient-theme='black'] #patient-registration-close:hover,
+    body[data-patient-theme='black'] #patient-registration-close:hover,
+    html[data-patient-theme='black'] #patient-label-modal-close:hover,
+    body[data-patient-theme='black'] #patient-label-modal-close:hover,
+    html[data-patient-theme='black'] #patient-label-manager-close:hover,
+    body[data-patient-theme='black'] #patient-label-manager-close:hover,
+    html[data-patient-theme='black'] #send-filter-close:hover,
+    body[data-patient-theme='black'] #send-filter-close:hover,
+    html[data-patient-theme='black'] #response-history-settings-close:hover,
+    body[data-patient-theme='black'] #response-history-settings-close:hover,
+    html[data-patient-theme='black'] #response-chart-close:hover,
+    body[data-patient-theme='black'] #response-chart-close:hover,
+    html[data-patient-theme='black'] #response-answer-modal-close:hover,
+    body[data-patient-theme='black'] #response-answer-modal-close:hover,
+    html[data-patient-theme='black'] #response-annotation-close:hover,
+    body[data-patient-theme='black'] #response-annotation-close:hover,
+    html[data-patient-theme='black'] #response-filter-close:hover,
+    body[data-patient-theme='black'] #response-filter-close:hover,
+    html[data-patient-theme='black'] #response-detail-close:hover,
+    body[data-patient-theme='black'] #response-detail-close:hover,
+    html[data-patient-theme='black'] #engagement-filter-close:hover,
+    body[data-patient-theme='black'] #engagement-filter-close:hover,
+    html[data-patient-theme='black'] #engagement-info-close:hover,
+    body[data-patient-theme='black'] #engagement-info-close:hover,
+    html[data-patient-theme='black'] #transaction-customize-close:hover,
+    body[data-patient-theme='black'] #transaction-customize-close:hover,
+    html[data-patient-theme='black'] #transaction-filter-close:hover,
+    body[data-patient-theme='black'] #transaction-filter-close:hover,
+    html[data-patient-theme='black'] #question-filter-close:hover,
+    body[data-patient-theme='black'] #question-filter-close:hover,
+    html[data-patient-theme='black'] #question-drawer-close:hover,
+    body[data-patient-theme='black'] #question-drawer-close:hover,
+    html[data-patient-theme='black'] #quiz-schedule-drawer-close:hover,
+    body[data-patient-theme='black'] #quiz-schedule-drawer-close:hover,
+    html[data-patient-theme='black'] #quiz-channel-config-close:hover,
+    body[data-patient-theme='black'] #quiz-channel-config-close:hover,
+    html[data-patient-theme='black'] #service-drawer-close:hover,
+    body[data-patient-theme='black'] #service-drawer-close:hover,
+    html[data-patient-theme='black'] #reminder-modal-close:hover,
+    body[data-patient-theme='black'] #reminder-modal-close:hover,
+    html[data-patient-theme='black'] #patient-link-close:hover,
+    body[data-patient-theme='black'] #patient-link-close:hover,
+    html[data-patient-theme='black'] #quiz-reorder-close:hover,
+    body[data-patient-theme='black'] #quiz-reorder-close:hover,
+    html[data-patient-theme='black'] #quiz-send-confirm-close:hover,
+    body[data-patient-theme='black'] #quiz-send-confirm-close:hover,
+    html[data-patient-theme='black'] #quiz-schedule-confirm-close:hover,
+    body[data-patient-theme='black'] #quiz-schedule-confirm-close:hover,
+    html[data-patient-theme='black'] #quiz-real-schedule-close:hover,
+    body[data-patient-theme='black'] #quiz-real-schedule-close:hover,
+    html[data-patient-theme='black'] #pqp-close:hover,
+    body[data-patient-theme='black'] #pqp-close:hover,
+    html[data-patient-theme='black'] #clinicpro-help-close:hover,
+    body[data-patient-theme='black'] #clinicpro-help-close:hover,
+    html[data-patient-theme='black'] .workspace-info-close:hover,
+    body[data-patient-theme='black'] .workspace-info-close:hover,
+    html[data-patient-theme='black'] #quiz-question-picker-close:hover,
+    body[data-patient-theme='black'] #quiz-question-picker-close:hover,
+    html[data-patient-theme='black'] #context-block-close:hover,
+    body[data-patient-theme='black'] #context-block-close:hover,
+    html[data-patient-theme='black'] #quiz-cover-editor-close:hover,
+    body[data-patient-theme='black'] #quiz-cover-editor-close:hover,
+    html[data-patient-theme='black'] #suggestion-close:hover,
+    body[data-patient-theme='black'] #suggestion-close:hover,
+    html[data-patient-theme='black'] [data-reminder-test-confirm-close]:hover,
+    body[data-patient-theme='black'] [data-reminder-test-confirm-close]:hover {
+      background:#f5f5f5 !important;
+      color:#2a2c34 !important;
+      border-color:#f5f5f5 !important;
+    }
+    html[data-patient-theme='black'] [id$="-close"].directory-tool:hover svg,
+    body[data-patient-theme='black'] [id$="-close"].directory-tool:hover svg,
+    html[data-patient-theme='black'] .directory-tool[title*="echar"]:hover svg,
+    body[data-patient-theme='black'] .directory-tool[title*="echar"]:hover svg,
+    html[data-patient-theme='black'] .directory-tool[aria-label*="echar"]:hover svg,
+    body[data-patient-theme='black'] .directory-tool[aria-label*="echar"]:hover svg,
+    html[data-patient-theme='black'] .workspace-info-close:hover svg,
+    body[data-patient-theme='black'] .workspace-info-close:hover svg,
+    html[data-patient-theme='black'] #clinicpro-help-close:hover svg,
+    body[data-patient-theme='black'] #clinicpro-help-close:hover svg,
+    html[data-patient-theme='black'] [id$="-close"]:hover svg,
+    body[data-patient-theme='black'] [id$="-close"]:hover svg {
+      stroke:#2a2c34 !important;
+      color:#2a2c34 !important;
+      fill:#2a2c34 !important;
+    }
     body[data-patient-theme='black'] .patient-label-option { color:#f5f5f5; } body[data-patient-theme='black'] .patient-label-option:hover { background:#2a2c34; }
     body[data-patient-theme='black'] .iti__country-list, body[data-patient-theme='black'] .iti__search-input { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); } body[data-patient-theme='black'] .iti__country:hover, body[data-patient-theme='black'] .iti__country.iti__highlight { background:#383b45; }
     body[data-patient-theme='black'] .patient-label-modal, body[data-patient-theme='black'] .patient-label-manager-drawer, body[data-patient-theme='black'] .patient-label-manager-row, body[data-patient-theme='black'] .patient-color-control, body[data-patient-theme='black'] .patient-label-preview { background:#22242b; border-color:rgba(255,255,255,.1); } body[data-patient-theme='black'] .patient-color-control input[type="text"] { color:#f5f5f5; }
@@ -1375,9 +1473,9 @@ body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='bl
     .workspace-info-dialog-icon { display:inline-flex; height:2.45rem; width:2.45rem; flex:none; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.24); border-radius:999px; background:rgba(168,139,54,.1); color:#94751e; font-family:Georgia,serif; font-size:1.12rem; font-style:italic; font-weight:700; }
     .workspace-info-eyebrow { margin:0; color:#a88b36; font-size:.62rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
     .workspace-info-dialog h2 { margin:.15rem 0 0; color:#3d3226; font-size:1.1rem; line-height:1.25; }
-    .workspace-info-close { display:inline-flex; height:2.2rem; width:2.2rem; flex:none; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.18); border-radius:.75rem; background:#fff; color:#746858; transition:background .16s ease,color .16s ease,transform .16s ease; }
+    .workspace-info-close { display:inline-flex; height:2.2rem; width:2.2rem; flex:none; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.18); border-radius:.75rem; background:#fff; color:#746858; transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease; }
     .workspace-info-close:hover { background:#f7efdf; color:#3d3226; transform:scale(1.04); }
-    .workspace-info-close svg { width:1.05rem; height:1.05rem; }
+    .workspace-info-close svg { width:1.05rem; height:1.05rem; transition:stroke .16s ease, color .16s ease; }
     .workspace-info-body { min-height:0; overflow-y:auto; padding:1.15rem 1.2rem 1.25rem; color:#675b4e; font-size:.8rem; line-height:1.65; }
     .workspace-info-body p { margin:0 0 .85rem; }
     .workspace-info-body p:last-child { margin-bottom:0; }
@@ -1394,7 +1492,8 @@ body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='bl
     body[data-patient-theme='black'] .workspace-info-dialog h2, body[data-patient-theme='black'] .workspace-info-body h3 { color:#fff; }
     body[data-patient-theme='black'] .workspace-info-body { color:#d4d9e1; }
     body[data-patient-theme='black'] .workspace-info-close { border-color:#596273; background:#303541; color:#d7dde6; }
-    body[data-patient-theme='black'] .workspace-info-close:hover { background:#3a414e; color:#fff; }
+    body[data-patient-theme='black'] .workspace-info-close:hover, html[data-patient-theme='black'] .workspace-info-close:hover { border-color:#f5f5f5 !important; background:#f5f5f5 !important; color:#2a2c34 !important; }
+    body[data-patient-theme='black'] .workspace-info-close:hover svg, html[data-patient-theme='black'] .workspace-info-close:hover svg { stroke:#2a2c34 !important; color:#2a2c34 !important; }
     @media (max-width: 640px) { .workspace-topic-actions { width:100%; margin-left:0; justify-content:flex-end; } .workspace-back-button { flex:1; } .workspace-info-dialog { max-height:calc(100vh - 2rem); } }
 
     .email-customizer-block { border:1px solid rgba(168,139,54,.14); border-radius:1.25rem; background:rgba(255,255,255,.58); padding:1rem; }
@@ -1779,7 +1878,7 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
     html[data-patient-theme='black'] #quiz-channel-config-modal .border-primary\/15, body[data-patient-theme='black'] #quiz-channel-config-modal .border-primary\/15 { border-color:#535b6b !important; }
 
     html[data-patient-theme='black'] #quiz-channel-config-modal .directory-tool, body[data-patient-theme='black'] #quiz-channel-config-modal .directory-tool { border-color:#596273 !important; background:#303541 !important; color:#e3e6ec !important; }
-    html[data-patient-theme='black'] #quiz-channel-config-modal .directory-tool:hover, body[data-patient-theme='black'] #quiz-channel-config-modal .directory-tool:hover { border-color:#d4b76a !important; background:#3a3f4c !important; color:#ffe5a0 !important; }
+    html[data-patient-theme='black'] #quiz-channel-config-modal .directory-tool:hover, body[data-patient-theme='black'] #quiz-channel-config-modal .directory-tool:hover { border-color:#f5f5f5 !important; background:#f5f5f5 !important; color:#2a2c34 !important; }
     html[data-patient-theme='black'] #quiz-channel-config-modal button[type='submit'], body[data-patient-theme='black'] #quiz-channel-config-modal button[type='submit'] { border-color:#d4b76a !important; background:#d4b76a !important; color:#211d15 !important; box-shadow:0 4px 12px rgba(0,0,0,.2); }
     html[data-patient-theme='black'] #quiz-channel-config-modal button[type='submit']:hover, body[data-patient-theme='black'] #quiz-channel-config-modal button[type='submit']:hover { border-color:#e4c874 !important; background:#e4c874 !important; color:#211d15 !important; }
     html[data-patient-theme='black'] #quiz-channel-config-modal button[type='button'], body[data-patient-theme='black'] #quiz-channel-config-modal button[type='button'] { color:#dbe0e8; }
