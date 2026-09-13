@@ -110,7 +110,8 @@
     .patient-tab.is-active { background:#fff; color:#3d3226; box-shadow:0 3px 9px rgba(61,50,38,.08); }
     .patient-tab-count { display:inline-flex; min-width:1.1rem; height:1.1rem; align-items:center; justify-content:center; border-radius:999px; background:rgba(168,139,54,.13); color:#a88b36; font-size:.62rem; }
     .patient-tab.is-active .patient-tab-count { background:#a88b36; color:#fff; }
-    .directory-tool { display:inline-flex; height:2.15rem; width:2.15rem; flex-shrink:0; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.18); border-radius:.7rem; background:#fff; color:#756858; transition:background .16s ease, color .16s ease, transform .16s cubic-bezier(.23,1,.32,1); }
+    .directory-tool { display:inline-flex; height:2.15rem; width:2.15rem; flex-shrink:0; align-items:center; justify-content:center; border:1px solid rgba(168,139,54,.18); border-radius:.7rem; background:#fff; color:#756858; transition:background .16s ease, color .16s ease, border-color .16s ease, transform .16s cubic-bezier(.23,1,.32,1); }
+    .directory-tool svg { transition:stroke .16s ease, color .16s ease; }
     .directory-tool:hover { background:#f5e6c8; color:#3d3226; transform:translateY(-1px); }
     .patient-search-wrap { position:relative; }
     .patient-search-wrap svg { position:absolute; left:.65rem; top:50%; width:.9rem; height:.9rem; transform:translateY(-50%); color:#a88b36; pointer-events:none; }
@@ -1056,7 +1057,54 @@
     body[data-patient-theme='black'] .patient-profile-page .patient-status { background:#24422f; color:#9be0ad; }
 body[data-patient-theme='black'] .dashboard-summary, body[data-patient-theme='black'] .dashboard-metric, body[data-patient-theme='black'] .dashboard-alert, body[data-patient-theme='black'] .patient-filter-drawer, body[data-patient-theme='black'] .patient-table-config-drawer, body[data-patient-theme='black'] .patient-directory, body[data-patient-theme='black'] .pending-review, body[data-patient-theme='black'] .send-report, body[data-patient-theme='black'] .scheduled-sends, body[data-patient-theme='black'] .scheduled-sends-filter-card, body[data-patient-theme='black'] .send-metric, body[data-patient-theme='black'] .response-report, body[data-patient-theme='black'] .response-metric, body[data-patient-theme='black'] .response-filter-drawer, body[data-patient-theme='black'] .engagement-report, body[data-patient-theme='black'] .engagement-filter-drawer, body[data-patient-theme='black'] .engagement-info-modal, body[data-patient-theme='black'] .transaction-report, body[data-patient-theme='black'] .transaction-chart-card, body[data-patient-theme='black'] .transaction-metric, body[data-patient-theme='black'] .transaction-filter-drawer, body[data-patient-theme='black'] .transaction-customize-drawer, body[data-patient-theme='black'] .transaction-entry-drawer, body[data-patient-theme='black'] .services-manager, body[data-patient-theme='black'] .service-drawer, body[data-patient-theme='black'] .service-action-menu, body[data-patient-theme='black'] .questions-manager, body[data-patient-theme='black'] .question-drawer, body[data-patient-theme='black'] .question-preview, body[data-patient-theme='black'] .reminders-manager, body[data-patient-theme='black'] .reminder-modal, body[data-patient-theme='black'] .patient-registration-modal, body[data-patient-theme='black'] .patient-label-options, body[data-patient-theme='black'] .quizzes-manager, body[data-patient-theme='black'] .quiz-drawer, body[data-patient-theme='black'] .quiz-preview, body[data-patient-theme='black'] .quiz-builder-question { background:#22242b; border-color:rgba(255,255,255,.08); }
     body[data-patient-theme='black'] .send-tab.is-active, body[data-patient-theme='black'] .send-filter-drawer, body[data-patient-theme='black'] .send-filter-field { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); }
-    body[data-patient-theme='black'] .patient-tab.is-active, body[data-patient-theme='black'] .question-tab.is-active, body[data-patient-theme='black'] .directory-tool, body[data-patient-theme='black'] .patient-search, body[data-patient-theme='black'] .patient-label-trigger { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); } body[data-patient-theme='black'] .patient-label-add { background:rgba(212,183,106,.12); color:#d4b76a; border-color:rgba(212,183,106,.26); }
+    body[data-patient-theme='black'] .patient-tab.is-active, body[data-patient-theme='black'] .question-tab.is-active, body[data-patient-theme='black'] .directory-tool, html[data-patient-theme='black'] .directory-tool, body[data-patient-theme='black'] .patient-search, body[data-patient-theme='black'] .patient-label-trigger { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); } body[data-patient-theme='black'] .patient-label-add { background:rgba(212,183,106,.12); color:#d4b76a; border-color:rgba(212,183,106,.26); }
+    html[data-patient-theme='black'] #quiz-editor-back:hover,
+    body[data-patient-theme='black'] #quiz-editor-back:hover,
+    html[data-patient-theme='black'] #quiz-schedule-back:hover,
+    body[data-patient-theme='black'] #quiz-schedule-back:hover,
+    html[data-patient-theme='black'] #patient-profile-back:hover,
+    body[data-patient-theme='black'] #patient-profile-back:hover,
+    html[data-patient-theme='black'] #scheduled-sends-back:hover,
+    body[data-patient-theme='black'] #scheduled-sends-back:hover,
+    html[data-patient-theme='black'] #response-detail-back:hover,
+    body[data-patient-theme='black'] #response-detail-back:hover,
+    html[data-patient-theme='black'] [id$="-back"].directory-tool:hover,
+    body[data-patient-theme='black'] [id$="-back"].directory-tool:hover,
+    html[data-patient-theme='black'] .directory-tool[title*="oltar"]:hover,
+    body[data-patient-theme='black'] .directory-tool[title*="oltar"]:hover,
+    html[data-patient-theme='black'] .directory-tool[aria-label*="oltar"]:hover,
+    body[data-patient-theme='black'] .directory-tool[aria-label*="oltar"]:hover,
+    html[data-patient-theme='black'] #patient-profile-back-to-menu:hover .directory-tool,
+    body[data-patient-theme='black'] #patient-profile-back-to-menu:hover .directory-tool {
+      background:#f5f5f5 !important;
+      color:#2a2c34 !important;
+      border-color:#f5f5f5 !important;
+    }
+    html[data-patient-theme='black'] #quiz-editor-back:hover svg,
+    body[data-patient-theme='black'] #quiz-editor-back:hover svg,
+    html[data-patient-theme='black'] #quiz-schedule-back:hover svg,
+    body[data-patient-theme='black'] #quiz-schedule-back:hover svg,
+    html[data-patient-theme='black'] #patient-profile-back:hover svg,
+    body[data-patient-theme='black'] #patient-profile-back:hover svg,
+    html[data-patient-theme='black'] #scheduled-sends-back:hover svg,
+    body[data-patient-theme='black'] #scheduled-sends-back:hover svg,
+    html[data-patient-theme='black'] #response-detail-back:hover svg,
+    body[data-patient-theme='black'] #response-detail-back:hover svg,
+    html[data-patient-theme='black'] [id$="-back"].directory-tool:hover svg,
+    body[data-patient-theme='black'] [id$="-back"].directory-tool:hover svg,
+    html[data-patient-theme='black'] .directory-tool[title*="oltar"]:hover svg,
+    body[data-patient-theme='black'] .directory-tool[title*="oltar"]:hover svg,
+    html[data-patient-theme='black'] .directory-tool[aria-label*="oltar"]:hover svg,
+    body[data-patient-theme='black'] .directory-tool[aria-label*="oltar"]:hover svg,
+    html[data-patient-theme='black'] #patient-profile-back-to-menu:hover .directory-tool svg,
+    body[data-patient-theme='black'] #patient-profile-back-to-menu:hover .directory-tool svg {
+      stroke:#2a2c34 !important;
+      color:#2a2c34 !important;
+    }
+    html[data-patient-theme='black'] #patient-profile-back-to-menu:hover,
+    body[data-patient-theme='black'] #patient-profile-back-to-menu:hover {
+      color:#f7f8fb !important;
+    }
     body[data-patient-theme='black'] .patient-label-option { color:#f5f5f5; } body[data-patient-theme='black'] .patient-label-option:hover { background:#2a2c34; }
     body[data-patient-theme='black'] .iti__country-list, body[data-patient-theme='black'] .iti__search-input { background:#2a2c34; color:#f5f5f5; border-color:rgba(255,255,255,.12); } body[data-patient-theme='black'] .iti__country:hover, body[data-patient-theme='black'] .iti__country.iti__highlight { background:#383b45; }
     body[data-patient-theme='black'] .patient-label-modal, body[data-patient-theme='black'] .patient-label-manager-drawer, body[data-patient-theme='black'] .patient-label-manager-row, body[data-patient-theme='black'] .patient-color-control, body[data-patient-theme='black'] .patient-label-preview { background:#22242b; border-color:rgba(255,255,255,.1); } body[data-patient-theme='black'] .patient-color-control input[type="text"] { color:#f5f5f5; }
