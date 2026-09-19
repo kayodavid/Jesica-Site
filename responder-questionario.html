@@ -120,12 +120,25 @@
     textarea { min-height:120px; resize:vertical; }
     textarea:focus, input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(168,139,54,.14); }
     .unit { margin:8px 0 0; color:var(--muted); font-size:12px; }
-    .linear-scale { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:7px; margin-top:12px; width:100%; }
-    .linear-scale label { display:grid; place-items:center; flex:1 1 32px; min-width:30px; max-width:56px; min-height:42px; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; transition:transform .14s, border-color .14s, background .14s; }
-    .linear-scale label:hover { border-color:rgba(168,139,54,.45); transform:translateY(-1px); }
-    .linear-scale label:has(input:checked) { color:#fff; background:var(--gold); border-color:var(--gold); }
+    .linear-scale-wheel { position:relative; width:100%; max-width:220px; height:150px; margin:0 auto; overflow-y:auto; scroll-snap-type:y mandatory; -ms-overflow-style:none; scrollbar-width:none; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:inset 0 2px 8px rgba(0,0,0,0.03); }
+    .linear-scale-wheel::-webkit-scrollbar { display:none; }
+    .linear-scale-wheel::before, .linear-scale-wheel::after { content:""; position:sticky; left:0; right:0; height:54px; pointer-events:none; z-index:2; }
+    .linear-scale-wheel::before { top:0; background:linear-gradient(to bottom, rgba(255,255,255,0.95) 10%, rgba(255,255,255,0)); margin-bottom:-54px; }
+    .linear-scale-wheel::after { bottom:0; background:linear-gradient(to top, rgba(255,255,255,0.95) 10%, rgba(255,255,255,0)); margin-top:-54px; }
+    .linear-scale-wheel-center { position:sticky; top:54px; left:0; right:0; height:42px; border-top:1px solid rgba(168,139,54,0.3); border-bottom:1px solid rgba(168,139,54,0.3); background:rgba(168,139,54,0.06); pointer-events:none; z-index:1; }
+    .linear-scale { display:flex; flex-direction:column; align-items:center; padding:54px 0; gap:0; margin:0; position:relative; z-index:0; }
+    .linear-scale label { scroll-snap-align:center; display:flex; align-items:center; justify-content:center; width:100%; height:42px; cursor:pointer; font-size:16px; font-weight:600; color:#a09585; transition:all .14s; }
+    .linear-scale label:hover { color:#756959; }
+    .linear-scale label:has(input:checked) { color:var(--gold); font-size:24px; font-weight:700; transform:scale(1.05); }
     .linear-scale input { position:absolute; opacity:0; pointer-events:none; }
-    .scale-labels { display:flex; justify-content:space-between; gap:18px; margin-top:8px; color:var(--muted); font-size:12px; font-weight:600; }
+    .linear-scale-label-top, .linear-scale-label-bottom { text-align:center; color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; margin:12px auto; }
+    .linear-scale-wrapper { position:relative; width:100%; max-width:220px; margin:0 auto; }
+    .wheel-btn-group { display:none; position:absolute; right:8px; top:50%; transform:translateY(-50%); flex-direction:column; justify-content:space-between; height:100px; z-index:5; pointer-events:none; }
+    .wheel-btn { pointer-events:auto; width:30px; height:30px; border:none; background:transparent; color:#c6ad6d; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .14s; }
+    .wheel-btn:hover { color:var(--gold); transform:scale(1.2); }
+    @media (hover:hover) and (pointer:fine) {
+      .wheel-btn-group { display:flex; }
+    }
     .emoji-scale { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; }
     .emoji-scale label { display:grid; place-items:center; min-width:56px; min-height:56px; border:2px solid var(--line); border-radius:14px; cursor:pointer; transition:transform .14s, border-color .14s, background .14s; padding:6px 8px; text-align:center; }
     .emoji-scale label:hover { transform:translateY(-2px); border-color:rgba(168,139,54,.45); }
@@ -279,7 +292,10 @@
         const c=q.scaleConfig||{},vals=scaleVals(q);
         const minText=String(c.minLabel||c.lowLabel||c.minTitle||'').trim()||'Menor';
         const maxText=String(c.maxLabel||c.highLabel||c.maxTitle||'').trim()||'Maior';
-        return '<div class="linear-scale">'+vals.map(v=>'<label title="'+esc(optLabel(q,v))+'"><input type="radio" name="'+name+'" value="'+v+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,v)||v)+'" data-score="'+optScore(q,v)+'" data-rating-emoji="'+esc(optEmoji(q,v))+'" />'+v+'</label>').join('')+'</div><div class="scale-labels"><span>'+esc(minText)+'</span><span>'+esc(maxText)+'</span></div>'+clarMarkup(q);
+        const minLabel=vals[0]+': '+minText;
+        const maxLabel=vals[vals.length-1]+': '+maxText;
+        const scrollJs = "clearTimeout(this.to);this.to=setTimeout(()=>{const wh=this.getBoundingClientRect();const m=wh.top+wh.height/2;let t=null,min=Infinity;for(let l of this.querySelectorAll('label')){const r=l.getBoundingClientRect();const d=Math.abs(r.top+r.height/2-m);if(d<min){min=d;t=l;}}if(t){let i=t.querySelector('input');if(i&&!i.checked){i.checked=true;i.dispatchEvent(new Event('change',{bubbles:true}));}}},150)";
+        return '<div class="linear-scale-label-top">'+esc(minLabel)+'</div><div class="linear-scale-wrapper"><div class="linear-scale-wheel" onscroll="'+scrollJs+'"><div class="linear-scale-wheel-center"></div><div class="linear-scale">'+vals.map(v=>'<label title="'+esc(optLabel(q,v))+'"><input type="radio" name="'+name+'" value="'+v+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,v)||v)+'" data-score="'+optScore(q,v)+'" data-rating-emoji="'+esc(optEmoji(q,v))+'" />'+v+'</label>').join('')+'</div></div><div class="wheel-btn-group"><button type="button" class="wheel-btn wheel-btn-up" onclick="this.parentElement.previousElementSibling.scrollBy({top:-42,behavior:\'smooth\'})" aria-label="Anterior">▲</button><button type="button" class="wheel-btn wheel-btn-down" onclick="this.parentElement.previousElementSibling.scrollBy({top:42,behavior:\'smooth\'})" aria-label="Próximo">▼</button></div></div><div class="linear-scale-label-bottom">'+esc(maxLabel)+'</div>'+clarMarkup(q);
       }
       if(type==='emoji'){const mode=state.invitation?.emojiScaleDisplayMode||'emoji-text';const items=opts.map((o,i)=>{const s=optSetting(q,o)||(Array.isArray(q.optionSettings)?q.optionSettings[i]:null);const emoji=String(s?.emoji||s?.evaluationEmoji||s?.ratingEmoji||['😭','😟','😐','😊','🤩'][Math.min(i,4)]||'😊').trim();const label=String(o||s?.text||s?.label||'').trim();return{emoji,label,raw:o};});return '<div class="emoji-scale mode-'+esc(mode)+'">'+items.map(it=>'<label title="'+esc(it.label||it.emoji)+'"><input type="radio" name="'+name+'" value="'+esc(it.raw)+'" data-question="'+esc(q.id)+'" data-label="'+esc(it.label)+'" data-score="'+optScore(q,it.raw)+'" data-rating-emoji="'+esc(it.emoji)+'" /><span class="es-glyph" aria-hidden="true">'+esc(it.emoji)+'</span><span class="es-label">'+esc(it.label)+'</span></label>').join('')+'</div>'+clarMarkup(q);}
       return '<div>'+opts.map(o=>'<label class="choice"><input type="radio" name="'+name+'" value="'+esc(o)+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,o)||o)+'" data-score="'+optScore(q,o)+'" data-rating-emoji="'+esc(optEmoji(q,o))+'" /><span>'+esc(o)+'</span></label>').join('')+'</div>'+clarMarkup(q);
