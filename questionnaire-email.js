@@ -208,7 +208,15 @@ function normalizeQuestion(record) {
     icon: usableText(data.icon || record?.icon) || '○',
     options: Array.isArray(data.options) ? data.options.filter(Boolean) : [],
     optionSettings: Array.isArray(data.optionSettings) ? data.optionSettings : [],
-    scaleConfig: data.scaleConfig && typeof data.scaleConfig === 'object' ? data.scaleConfig : null,
+    scaleConfig: data.scaleConfig && typeof data.scaleConfig === 'object' ? {
+      ...data.scaleConfig,
+      min: Number.isFinite(Number(data.scaleConfig.min)) ? Number(data.scaleConfig.min) : 0,
+      max: Number.isFinite(Number(data.scaleConfig.max)) ? Number(data.scaleConfig.max) : 10,
+      lowLabel: usableText(data.scaleConfig.lowLabel || data.scaleConfig.minLabel),
+      highLabel: usableText(data.scaleConfig.highLabel || data.scaleConfig.maxLabel),
+      minLabel: usableText(data.scaleConfig.minLabel || data.scaleConfig.lowLabel),
+      maxLabel: usableText(data.scaleConfig.maxLabel || data.scaleConfig.highLabel)
+    } : null,
     metricUnit: usableText(data.metricUnit),
     openResponseTitle: usableText(data.openResponseTitle),
     numericOnly: data.numericOnly === true || data.type === 'metric',
@@ -220,25 +228,37 @@ function normalizeQuestion(record) {
 function hydrateQuestionSnapshot(snapshot, sourceQuestion) {
   const saved = snapshot && typeof snapshot === 'object' ? snapshot : {};
   const current = sourceQuestion && typeof sourceQuestion === 'object' ? sourceQuestion : {};
+  const rawScale = (current.scaleConfig && typeof current.scaleConfig === 'object')
+    ? { ...(saved.scaleConfig || {}), ...current.scaleConfig }
+    : ((saved.scaleConfig && typeof saved.scaleConfig === 'object') ? saved.scaleConfig : null);
+  const scaleConfig = rawScale ? {
+    ...rawScale,
+    min: Number.isFinite(Number(rawScale.min)) ? Number(rawScale.min) : 0,
+    max: Number.isFinite(Number(rawScale.max)) ? Number(rawScale.max) : 10,
+    lowLabel: usableText(rawScale.lowLabel || rawScale.minLabel),
+    highLabel: usableText(rawScale.highLabel || rawScale.maxLabel),
+    minLabel: usableText(rawScale.minLabel || rawScale.lowLabel),
+    maxLabel: usableText(rawScale.maxLabel || rawScale.highLabel)
+  } : null;
   return {
-    ...current,
     ...saved,
+    ...current,
     id: usableText(saved.id) || usableText(current.id),
-    title: usableText(saved.title) || usableText(current.title) || 'Pergunta',
-    questionText: usableText(saved.questionText) || usableText(current.questionText),
-    questionHtml: usableText(saved.questionHtml) || usableText(current.questionHtml),
-    questionImage: usableText(saved.questionImage) || usableText(current.questionImage),
-    code: usableText(saved.code) || usableText(current.code),
-    label: usableText(saved.label) || usableText(current.label),
-    type: usableText(saved.type) || usableText(current.type) || 'single',
-    icon: usableText(saved.icon) || usableText(current.icon) || '○',
-    options: Array.isArray(saved.options) && saved.options.length ? saved.options : (Array.isArray(current.options) ? current.options : []),
-    optionSettings: Array.isArray(saved.optionSettings) && saved.optionSettings.length ? saved.optionSettings : (Array.isArray(current.optionSettings) ? current.optionSettings : []),
-    scaleConfig: saved.scaleConfig && typeof saved.scaleConfig === 'object' ? saved.scaleConfig : current.scaleConfig,
-    metricUnit: usableText(saved.metricUnit) || usableText(current.metricUnit),
-    openResponseTitle: usableText(saved.openResponseTitle) || usableText(current.openResponseTitle),
-    numericOnly: saved.numericOnly === true || current.numericOnly === true,
-    required: saved.required !== false && current.required !== false
+    title: usableText(current.title) || usableText(saved.title) || 'Pergunta',
+    questionText: usableText(current.questionText) || usableText(saved.questionText),
+    questionHtml: usableText(current.questionHtml) || usableText(saved.questionHtml),
+    questionImage: usableText(current.questionImage) || usableText(saved.questionImage),
+    code: usableText(current.code) || usableText(saved.code),
+    label: usableText(current.label) || usableText(saved.label),
+    type: usableText(current.type) || usableText(saved.type) || 'single',
+    icon: usableText(current.icon) || usableText(saved.icon) || '○',
+    options: Array.isArray(current.options) && current.options.length ? current.options : (Array.isArray(saved.options) ? saved.options : []),
+    optionSettings: Array.isArray(current.optionSettings) && current.optionSettings.length ? current.optionSettings : (Array.isArray(saved.optionSettings) ? saved.optionSettings : []),
+    scaleConfig,
+    metricUnit: usableText(current.metricUnit) || usableText(saved.metricUnit),
+    openResponseTitle: usableText(current.openResponseTitle) || usableText(saved.openResponseTitle),
+    numericOnly: current.numericOnly === true || saved.numericOnly === true,
+    required: current.required !== false && saved.required !== false
   };
 }
 
@@ -1993,7 +2013,7 @@ export default async function handler(req, res) {
       const recipientEmail = String(body.recipientEmail || '').trim().toLowerCase();
       const quizId = String(body?.quiz?.id || body.quizId || '').trim();
       const quizLinkId = String(body.quizLinkId || '').trim();
-      const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 7), 60));
+      const expiresInDays = Math.max(1, Math.min(Number(body.expiresInDays || 3), 60));
       const requestedSendMode = normalizeEmailSendMode(body.sendMode);
       if (!sessionToken || !patientKey || !validEmail(recipientEmail) || !quizId) return json(res, 400, { success: false, message: 'Não foi possível preparar o convite. Confira o paciente, o e-mail e o questionário.' });
       await requireAdmin(sessionToken);

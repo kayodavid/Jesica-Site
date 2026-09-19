@@ -121,11 +121,11 @@
     textarea:focus, input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(168,139,54,.14); }
     .unit { margin:8px 0 0; color:var(--muted); font-size:12px; }
     .linear-scale { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:7px; margin-top:12px; width:100%; }
-    .linear-scale label { display:grid; place-items:center; flex:1 1 38px; min-width:34px; max-width:56px; min-height:42px; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; transition:transform .14s, border-color .14s, background .14s; }
+    .linear-scale label { display:grid; place-items:center; flex:1 1 32px; min-width:30px; max-width:56px; min-height:42px; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; transition:transform .14s, border-color .14s, background .14s; }
     .linear-scale label:hover { border-color:rgba(168,139,54,.45); transform:translateY(-1px); }
     .linear-scale label:has(input:checked) { color:#fff; background:var(--gold); border-color:var(--gold); }
     .linear-scale input { position:absolute; opacity:0; pointer-events:none; }
-    .scale-labels { display:flex; justify-content:space-between; gap:18px; margin-top:8px; color:var(--muted); font-size:11px; }
+    .scale-labels { display:flex; justify-content:space-between; gap:18px; margin-top:8px; color:var(--muted); font-size:12px; font-weight:600; }
     .emoji-scale { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; }
     .emoji-scale label { display:grid; place-items:center; min-width:56px; min-height:56px; border:2px solid var(--line); border-radius:14px; cursor:pointer; transition:transform .14s, border-color .14s, background .14s; padding:6px 8px; text-align:center; }
     .emoji-scale label:hover { transform:translateY(-2px); border-color:rgba(168,139,54,.45); }
@@ -176,6 +176,13 @@
 
     .hidden { display:none !important; }
 
+    /* PREVIEW BANNER */
+    .quiz-preview-banner { position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 20px; background:#fff8e6; border-bottom:1.5px solid #f0d37a; color:#785810; font-size:12px; font-weight:600; box-shadow:0 2px 10px rgba(120,88,16,.08); }
+    .quiz-preview-banner-content { display:flex; align-items:center; gap:8px; line-height:1.4; }
+    .quiz-preview-banner-icon { font-size:16px; flex-shrink:0; }
+    .quiz-preview-banner-close { display:inline-flex; align-items:center; justify-content:center; padding:5px 12px; border:1px solid #d4b76a; border-radius:8px; background:#fff; color:#785810; font:inherit; font-size:11px; font-weight:700; cursor:pointer; transition:background .15s, color .15s; flex-shrink:0; }
+    .quiz-preview-banner-close:hover { background:#785810; color:#fff; border-color:#785810; }
+
     @media (max-width:600px) {
       .quiz-stage { padding:16px 10px 32px; }
       .quiz-slide  { padding:16px 10px 32px; }
@@ -223,7 +230,9 @@
 
   <script>
     const endpoint = '/api/questionnaire-email';
-    const token = new URLSearchParams(location.search).get('token') || '';
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token') || '';
+    const isPreview = urlParams.get('preview') === '1' || urlParams.get('preview') === 'true';
     const state = { invitation:null, steps:[], currentStep:0, answers:{}, progressTimer:null, submitted:false, navigating:false };
 
     function esc(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
@@ -237,7 +246,23 @@
     function getOptions(q){return Array.isArray(q.options)?q.options.filter(Boolean):[];}
     function optSetting(q,opt){const t=String(opt??'');return Array.isArray(q.optionSettings)?q.optionSettings.find(i=>['text','option','label','emoji','value'].some(k=>String(i?.[k]??'')===t))||null:null;}
     function optScore(q,opt){return Number(optSetting(q,opt)?.score??0)||0;}
-    function optLabel(q,opt){const f=optSetting(q,opt);return String(f?.evaluationLabel??f?.ratingLabel??f?.evaluation??f?.rating??(q.type==='emoji'?f?.text:'')?? opt??'').trim();}
+    function optLabel(q,opt){
+      const f=optSetting(q,opt);
+      if(q.type==='linear'){
+        const c=q.scaleConfig||{};
+        const mn=Number.isFinite(Number(c.min))?Number(c.min):0;
+        const mx=Number.isFinite(Number(c.max))?Number(c.max):10;
+        const num=Number(opt);
+        const minText=String(c.minLabel||c.lowLabel||c.minTitle||'').trim();
+        const maxText=String(c.maxLabel||c.highLabel||c.maxTitle||'').trim();
+        const ptText=String(f?.text||'').trim();
+        if(ptText)return `${num} - ${ptText}`;
+        if(num===mn&&minText)return `${num} (${minText})`;
+        if(num===mx&&maxText)return `${num} (${maxText})`;
+        return String(num);
+      }
+      return String(f?.evaluationLabel??f?.ratingLabel??f?.evaluation??f?.rating??(q.type==='emoji'?f?.text:'')?? opt??'').trim();
+    }
     function optEmoji(q,opt){const f=optSetting(q,opt);return String(f?.evaluationEmoji??f?.ratingEmoji??f?.emoji??(q.type==='emoji'?opt:'')??'').trim();}
     function scoreCfg(quiz,q){const id=typeof q==='object'?q?.id:q;const c=quiz?.questionSettings?.[id]||{};const w=Math.round(Number(c.weight));const fb=typeof q==='object'?q?.required!==false:true;return{active:c.active!==false,required:c.required===undefined?fb:c.required!==false,weight:Number.isFinite(w)&&w>=1&&w<=5?w:1,visible:c.visible!==false};}
     function scaleVals(q){const c=q.scaleConfig||{};const mn=Number.isFinite(Number(c.min))?Number(c.min):0;const mx=Number.isFinite(Number(c.max))?Number(c.max):10;return Array.from({length:Math.max(2,Math.min(11,mx-mn+1))},(_,i)=>mn+i);}
@@ -250,7 +275,12 @@
       if(type==='open')return '<textarea data-question="'+esc(q.id)+'" aria-label="Resposta" placeholder="Escreva sua resposta"></textarea>';
       if(type==='metric'||type==='number')return '<input data-question="'+esc(q.id)+'" type="number" inputmode="decimal" step="any" aria-label="Resposta numérica" placeholder="Digite um número" /><p class="unit">'+(q.metricUnit?'Unidade: '+esc(q.metricUnit):'Informe somente números.')+'</p>';
       if(type==='photo')return '<input data-question="'+esc(q.id)+'" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Enviar foto" /><p class="file-note">Envie uma imagem em JPG, PNG ou WebP de até 2 MB.</p>';
-      if(type==='linear'){const c=q.scaleConfig||{},vals=scaleVals(q);return '<div class="linear-scale">'+vals.map(v=>'<label title="'+esc(optLabel(q,v))+'"><input type="radio" name="'+name+'" value="'+v+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,v)||v)+'" data-score="'+optScore(q,v)+'" data-rating-emoji="'+esc(optEmoji(q,v))+'" />'+v+'</label>').join('')+'</div><div class="scale-labels"><span>'+esc(c.minLabel||'Menor')+'</span><span>'+esc(c.maxLabel||'Maior')+'</span></div>'+clarMarkup(q);}
+      if(type==='linear'){
+        const c=q.scaleConfig||{},vals=scaleVals(q);
+        const minText=String(c.minLabel||c.lowLabel||c.minTitle||'').trim()||'Menor';
+        const maxText=String(c.maxLabel||c.highLabel||c.maxTitle||'').trim()||'Maior';
+        return '<div class="linear-scale">'+vals.map(v=>'<label title="'+esc(optLabel(q,v))+'"><input type="radio" name="'+name+'" value="'+v+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,v)||v)+'" data-score="'+optScore(q,v)+'" data-rating-emoji="'+esc(optEmoji(q,v))+'" />'+v+'</label>').join('')+'</div><div class="scale-labels"><span>'+esc(minText)+'</span><span>'+esc(maxText)+'</span></div>'+clarMarkup(q);
+      }
       if(type==='emoji'){const mode=state.invitation?.emojiScaleDisplayMode||'emoji-text';const items=opts.map((o,i)=>{const s=optSetting(q,o)||(Array.isArray(q.optionSettings)?q.optionSettings[i]:null);const emoji=String(s?.emoji||s?.evaluationEmoji||s?.ratingEmoji||['😭','😟','😐','😊','🤩'][Math.min(i,4)]||'😊').trim();const label=String(o||s?.text||s?.label||'').trim();return{emoji,label,raw:o};});return '<div class="emoji-scale mode-'+esc(mode)+'">'+items.map(it=>'<label title="'+esc(it.label||it.emoji)+'"><input type="radio" name="'+name+'" value="'+esc(it.raw)+'" data-question="'+esc(q.id)+'" data-label="'+esc(it.label)+'" data-score="'+optScore(q,it.raw)+'" data-rating-emoji="'+esc(it.emoji)+'" /><span class="es-glyph" aria-hidden="true">'+esc(it.emoji)+'</span><span class="es-label">'+esc(it.label)+'</span></label>').join('')+'</div>'+clarMarkup(q);}
       return '<div>'+opts.map(o=>'<label class="choice"><input type="radio" name="'+name+'" value="'+esc(o)+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,o)||o)+'" data-score="'+optScore(q,o)+'" data-rating-emoji="'+esc(optEmoji(q,o))+'" /><span>'+esc(o)+'</span></label>').join('')+'</div>'+clarMarkup(q);
     }
@@ -311,7 +341,7 @@
       }
       if(dots){dots.innerHTML=qSteps.map((s,i)=>{const done=curVal(s.data);let c='quiz-dot';if(s===step)c+=' current';else if(done)c+=' done';return '<span class="'+c+'" title="Pergunta '+(i+1)+'"></span>';}).join('');}
     }
-    async function saveProgress(){if(state.submitted||!token)return;const p=progressSnap();if(!p.answered)return;try{await req('progress',{token,answeredQuestions:p.answered,totalQuestions:p.total});}catch{}}
+    async function saveProgress(){if(state.submitted||!token||state.invitation?.isPreview)return;const p=progressSnap();if(!p.answered)return;try{await req('progress',{token,answeredQuestions:p.answered,totalQuestions:p.total});}catch{}}
     function trackProgress(){renderHeader();clearTimeout(state.progressTimer);state.progressTimer=setTimeout(saveProgress,650);}
 
     function getSlide(i){return document.getElementById('slide-'+i);}
@@ -370,7 +400,9 @@
 
     function slideCover(step,si){
       const{quiz,invitation}=step.data;const total=state.steps.filter(s=>s.type==='question').length;
-      return '<div class="slide-inner"><div class="cover-card"><p class="cover-eyebrow">Ferramentas Nutricionais</p><h1 class="cover-title">'+esc(quiz.title||invitation.quiz_title||'Questionário')+'</h1>'+(quiz.description?'<p class="cover-desc">'+esc(quiz.description)+'</p>':'')+'<div class="cover-meta"><span class="cover-badge">◷ Disponível até '+esc(dateFmt(invitation.expires_at))+'</span><span class="cover-badge">📋 '+total+' pergunta'+(total===1?'':'s')+'</span></div><div class="cover-start-wrap"><button class="btn-start" id="btn-cover-start">Começar questionário <span aria-hidden="true">→</span></button><span class="cover-count">Responda com calma, uma pergunta por vez.</span></div></div></div>';
+      const coverImg=safeUrl(quiz.coverImage);
+      const coverImgMarkup=coverImg?'<div style="margin:16px 0 8px; text-align:center;"><img src="'+esc(coverImg)+'" alt="Capa do questionário" style="max-height:220px; max-width:100%; border-radius:14px; object-fit:cover; border:1px solid var(--line);" /></div>':'';
+      return '<div class="slide-inner"><div class="cover-card"><p class="cover-eyebrow">Ferramentas Nutricionais</p><h1 class="cover-title">'+esc(quiz.title||invitation.quiz_title||'Questionário')+'</h1>'+(quiz.description?'<p class="cover-desc">'+esc(quiz.description)+'</p>':'')+coverImgMarkup+'<div class="cover-meta"><span class="cover-badge">◷ Disponível até '+esc(dateFmt(invitation.expires_at))+'</span><span class="cover-badge">📋 '+total+' pergunta'+(total===1?'':'s')+'</span></div><div class="cover-start-wrap"><button class="btn-start" id="btn-cover-start">Começar questionário <span aria-hidden="true">→</span></button><span class="cover-count">Responda com calma, uma pergunta por vez.</span></div></div></div>';
     }
     function slideContext(step,si){
       const b=step.data;const title=usable(b?.title);const rawBody=usable(b?.bodyHtml)||usable(b?.body);
@@ -428,7 +460,16 @@
       }
       if(!valid){if(btn){btn.disabled=false;btn.textContent='Enviar respostas ✓';}state.submitted=false;alert('Algumas perguntas ou esclarecimentos obrigatórios não foram preenchidos. Volte e complete as respostas.');return;}
       const scores=answers.map(a=>Number(a.score||0)).filter(Number.isFinite);
-      const summary={totalQuestions:qs.length,answeredQuestions:answers.length,scoredQuestions:answers.filter(a=>a.scored).length,totalScore:scores.reduce((t,s)=>t+s,0),submittedAt:new Date().toISOString()};
+      const maxPossibleScore = answers.filter(a=>a.scored).reduce((acc, a) => acc + (5 * (a.weight || 1)), 0);
+      const totalScore = scores.reduce((t,s)=>t+s,0);
+      const scorePercent = maxPossibleScore > 0 ? Math.min(100, Math.max(0, Math.round((totalScore / maxPossibleScore) * 100))) : null;
+      const summary={totalQuestions:qs.length,answeredQuestions:answers.length,scoredQuestions:answers.filter(a=>a.scored).length,totalScore,scorePercent,submittedAt:new Date().toISOString()};
+      if(state.invitation?.isPreview){
+        setTimeout(()=>{
+          showState('success','Pré-visualização concluída com sucesso!','Suas respostas foram validadas no simulador. Ao enviar o link ao paciente, o sistema registrará as respostas com segurança e atualizará o painel da Dra. Jessica.',summary);
+        }, 300);
+        return;
+      }
       try{
         const result=await req('submit',{token,answers,responseSummary:summary});
         if(result.success)showState('success','Respostas enviadas com sucesso!','Obrigada por responder. A Dra. Jessica receberá suas informações para acompanhar sua evolução.',result.summary||summary);
@@ -471,6 +512,27 @@
     }
 
     async function boot(){
+      if(isPreview){
+        try{
+          const raw = sessionStorage.getItem('cp_quiz_preview_invitation') || localStorage.getItem('cp_quiz_preview_invitation');
+          if(!raw){
+            return showState('error','Nenhuma prévia encontrada','Abra a pré-visualização através da listagem ou edição de questionários no painel da Dra. Jessica.');
+          }
+          const inv = JSON.parse(raw);
+          inv.isPreview = true;
+          if(!document.getElementById('preview-mode-banner')){
+            const banner = document.createElement('aside');
+            banner.id = 'preview-mode-banner';
+            banner.className = 'quiz-preview-banner';
+            banner.innerHTML = '<div class="quiz-preview-banner-content"><span class="quiz-preview-banner-icon" aria-hidden="true">👁️</span><span><strong>Modo de Pré-visualização:</strong> Simulando a visão real do paciente. Nenhuma resposta será gravada no banco de dados.</span></div><button type="button" class="quiz-preview-banner-close" onclick="window.close()" title="Fechar esta aba de prévia">Fechar prévia ✕</button>';
+            document.body.prepend(banner);
+          }
+          return renderQuiz(inv);
+        }catch(err){
+          console.error('Erro ao carregar prévia:', err);
+          return showState('error','Erro ao carregar prévia','Não foi possível carregar os dados para pré-visualização.');
+        }
+      }
       if(!token)return showState('error','Convite inválido','Este link não contém um convite válido. Verifique o e-mail recebido ou entre em contato com a Dra. Jessica.');
       try{
         req('click',{token},{keepalive:true}).catch(()=>{});
