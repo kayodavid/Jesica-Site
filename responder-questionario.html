@@ -120,7 +120,7 @@
     textarea { min-height:120px; resize:vertical; }
     textarea:focus, input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(168,139,54,.14); }
     .unit { margin:8px 0 0; color:var(--muted); font-size:12px; }
-    .linear-scale-wheel { position:relative; width:100%; max-width:220px; height:150px; margin:0 auto; overflow-y:auto; scroll-snap-type:y mandatory; -ms-overflow-style:none; scrollbar-width:none; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:inset 0 2px 8px rgba(0,0,0,0.03); }
+    .linear-scale-wheel { position:relative; width:100%; max-width:220px; height:150px; margin:0 auto; overflow-y:auto; overflow-x:hidden; scroll-snap-type:y mandatory; -ms-overflow-style:none; scrollbar-width:none; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:inset 0 2px 8px rgba(0,0,0,0.03); }
     .linear-scale-wheel::-webkit-scrollbar { display:none; }
     .linear-scale-wheel::before, .linear-scale-wheel::after { content:""; position:sticky; left:0; right:0; height:54px; pointer-events:none; z-index:2; }
     .linear-scale-wheel::before { top:0; background:linear-gradient(to bottom, rgba(255,255,255,0.95) 10%, rgba(255,255,255,0)); margin-bottom:-54px; }
@@ -129,7 +129,7 @@
     .linear-scale { display:flex; flex-direction:column; align-items:center; padding:54px 0; gap:0; margin:0; position:relative; z-index:0; }
     .linear-scale label { scroll-snap-align:center; display:flex; align-items:center; justify-content:center; width:100%; height:42px; cursor:pointer; font-size:16px; font-weight:600; color:#a09585; transition:all .14s; }
     .linear-scale label:hover { color:#756959; }
-    .linear-scale label:has(input:checked) { color:var(--gold); font-size:24px; font-weight:700; transform:scale(1.05); }
+    .linear-scale label:has(input:checked) { }
     .linear-scale input { position:absolute; opacity:0; pointer-events:none; }
     .linear-scale-label-top, .linear-scale-label-bottom { text-align:center; color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; margin:12px auto; }
     .linear-scale-wrapper { position:relative; width:100%; max-width:220px; margin:0 auto; }
@@ -294,13 +294,40 @@
         const maxText=String(c.maxLabel||c.highLabel||c.maxTitle||'').trim()||'Maior';
         const minLabel=vals[0]+': '+minText;
         const maxLabel=vals[vals.length-1]+': '+maxText;
-        const scrollJs = "clearTimeout(this.to);this.to=setTimeout(()=>{const wh=this.getBoundingClientRect();const m=wh.top+wh.height/2;let t=null,min=Infinity;for(let l of this.querySelectorAll('label')){const r=l.getBoundingClientRect();const d=Math.abs(r.top+r.height/2-m);if(d<min){min=d;t=l;}}if(t){let i=t.querySelector('input');if(i&&!i.checked){i.checked=true;i.dispatchEvent(new Event('change',{bubbles:true}));}}},150)";
-        return '<div class="linear-scale-label-top">'+esc(minLabel)+'</div><div class="linear-scale-wrapper"><div class="linear-scale-wheel" onscroll="'+scrollJs+'"><div class="linear-scale-wheel-center"></div><div class="linear-scale">'+vals.map(v=>'<label title="'+esc(optLabel(q,v))+'"><input type="radio" name="'+name+'" value="'+v+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,v)||v)+'" data-score="'+optScore(q,v)+'" data-rating-emoji="'+esc(optEmoji(q,v))+'" />'+v+'</label>').join('')+'</div></div><div class="wheel-btn-group"><button type="button" class="wheel-btn wheel-btn-up" onclick="this.parentElement.previousElementSibling.scrollBy({top:-42,behavior:\'smooth\'})" aria-label="Anterior">▲</button><button type="button" class="wheel-btn wheel-btn-down" onclick="this.parentElement.previousElementSibling.scrollBy({top:42,behavior:\'smooth\'})" aria-label="Próximo">▼</button></div></div><div class="linear-scale-label-bottom">'+esc(maxLabel)+'</div>'+clarMarkup(q);
+        const scrollJs = "clearTimeout(this.to);const t=syncLinearScale3D(this);this.to=setTimeout(()=>{if(!t||!this.dataset.interacted)return;let i=t.querySelector('input');if(i&&!i.checked){i.checked=true;i.dispatchEvent(new Event('change',{bubbles:true}));syncLinearScale3D(this);}},150)";
+        return '<div class="linear-scale-label-top">'+esc(minLabel)+'</div><div class="linear-scale-wrapper"><div class="linear-scale-wheel" onpointerdown="this.dataset.interacted=\'true\'" onwheel="this.dataset.interacted=\'true\'" onkeydown="this.dataset.interacted=\'true\'" onscroll="'+scrollJs+'"><div class="linear-scale-wheel-center"></div><div class="linear-scale">'+vals.map(v=>'<label title="'+esc(optLabel(q,v))+'"><input type="radio" name="'+name+'" value="'+v+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,v)||v)+'" data-score="'+optScore(q,v)+'" data-rating-emoji="'+esc(optEmoji(q,v))+'" onchange="this.closest(\'div.linear-scale-wheel\').dataset.interacted=\'true\';syncLinearScale3D(this.closest(\'div.linear-scale-wheel\'))" />'+v+'</label>').join('')+'</div></div><div class="wheel-btn-group"><button type="button" class="wheel-btn wheel-btn-up" onclick="this.parentElement.previousElementSibling.dataset.interacted=\'true\';this.parentElement.previousElementSibling.scrollBy({top:-42,behavior:\'smooth\'})" aria-label="Anterior">▲</button><button type="button" class="wheel-btn wheel-btn-down" onclick="this.parentElement.previousElementSibling.dataset.interacted=\'true\';this.parentElement.previousElementSibling.scrollBy({top:42,behavior:\'smooth\'})" aria-label="Próximo">▼</button></div></div><div class="linear-scale-label-bottom">'+esc(maxLabel)+'</div>'+clarMarkup(q);
       }
       if(type==='emoji'){const mode=state.invitation?.emojiScaleDisplayMode||'emoji-text';const items=opts.map((o,i)=>{const s=optSetting(q,o)||(Array.isArray(q.optionSettings)?q.optionSettings[i]:null);const emoji=String(s?.emoji||s?.evaluationEmoji||s?.ratingEmoji||['😭','😟','😐','😊','🤩'][Math.min(i,4)]||'😊').trim();const label=String(o||s?.text||s?.label||'').trim();return{emoji,label,raw:o};});return '<div class="emoji-scale mode-'+esc(mode)+'">'+items.map(it=>'<label title="'+esc(it.label||it.emoji)+'"><input type="radio" name="'+name+'" value="'+esc(it.raw)+'" data-question="'+esc(q.id)+'" data-label="'+esc(it.label)+'" data-score="'+optScore(q,it.raw)+'" data-rating-emoji="'+esc(it.emoji)+'" /><span class="es-glyph" aria-hidden="true">'+esc(it.emoji)+'</span><span class="es-label">'+esc(it.label)+'</span></label>').join('')+'</div>'+clarMarkup(q);}
       return '<div>'+opts.map(o=>'<label class="choice"><input type="radio" name="'+name+'" value="'+esc(o)+'" data-question="'+esc(q.id)+'" data-label="'+esc(optLabel(q,o)||o)+'" data-score="'+optScore(q,o)+'" data-rating-emoji="'+esc(optEmoji(q,o))+'" /><span>'+esc(o)+'</span></label>').join('')+'</div>'+clarMarkup(q);
     }
 
+        function syncLinearScale3D(wheel) {
+      const wh = wheel.getBoundingClientRect();
+      if (wh.height === 0) return null;
+      const m = wh.top + wh.height / 2;
+      let t = null, min = Infinity;
+      const maxDist = wh.height / 2;
+      for (let l of wheel.querySelectorAll('label')) {
+        const r = l.getBoundingClientRect();
+        const dist = r.top + r.height / 2 - m;
+        const absDist = Math.abs(dist);
+        let angle = (dist / maxDist) * -50; 
+        angle = Math.max(-50, Math.min(50, angle));
+        const factor = Math.max(0, 1 - (absDist / maxDist));
+        const scale = 1 + 0.5 * factor;
+        const opacity = Math.max(0.15, factor);
+        l.style.transform = 'perspective(200px) rotateX(' + angle + 'deg) scale(' + scale + ')';
+        l.style.opacity = opacity;
+        const i = l.querySelector('input');
+        if (absDist < 20 && i && i.checked) {
+          l.style.color = 'var(--gold)';
+        } else {
+          l.style.color = '';
+        }
+        if (absDist < min) { min = absDist; t = l; }
+      }
+      return t;
+    }
     function curVal(q){
       const inp=document.querySelector('[data-question="'+CSS.escape(q.id)+'"]');if(!inp)return null;
       if(q.type==='single'||q.type==='linear'||q.type==='emoji'){const sel=document.querySelector('[data-question="'+CSS.escape(q.id)+'"]:checked');return sel?{value:sel.value,label:sel.dataset.label||sel.value,evaluationEmoji:sel.dataset.ratingEmoji||'',score:Number(sel.dataset.score||0)||0}:null;}
@@ -374,6 +401,7 @@
         cur.classList.add(exitCls);cur.classList.remove('active');
         nxt.classList.remove(enterCls);nxt.classList.add('active');
         nxt.style.position='';nxt.style.pointerEvents='';
+        nxt.querySelectorAll('.linear-scale-wheel').forEach(syncLinearScale3D);
         state.currentStep=next;renderHeader();
         if(next===state.steps.findIndex(s=>s.type==='review'))refreshReview();
         setTimeout(()=>{cur.classList.remove(exitCls,'active');state.navigating=false;window.scrollTo({top:0,behavior:'smooth'});},340);
@@ -525,6 +553,7 @@
       state.currentStep=0;
       const stage=document.getElementById('quiz-stage');stage.innerHTML=state.steps.map((s,i)=>buildSlide(s,i)).join('');
       bindEvents(stage);document.getElementById('app-state').style.display='none';document.getElementById('quiz-wrap').classList.add('active');renderHeader();
+      document.querySelectorAll('.quiz-slide.active .linear-scale-wheel').forEach(syncLinearScale3D);
     }
 
     async function boot(){
