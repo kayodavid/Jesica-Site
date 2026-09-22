@@ -4829,7 +4829,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const item = getCurrentReminder();
         const currentData = {
           id: activeReminderId,
-          title: item.title || (reminderTitles[activeReminderId]?.title || 'Lembrete'),
+          title: reminderTitles[activeReminderId]?.title || item.title || 'Lembrete',
           subject: (editors.subject ? editors.subject.getValue() : fields.subject?.value || item.subject || '').trim(),
           message: (editors.message ? editors.message.getValue() : fields.message?.value || item.message || '').trim(),
           whatsappMessage: (editors.whatsapp ? editors.whatsapp.getValue() : fields.whatsapp?.value || item.whatsappMessage || '').trim()
@@ -4917,6 +4917,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           if (item.id === activeReminderId) {
             return {
               ...item,
+              title: reminderTitles[activeReminderId]?.title || item.title || 'Lembrete',
               subject,
               message,
               whatsappMessage: whatsapp,

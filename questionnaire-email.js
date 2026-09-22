@@ -73,7 +73,7 @@ function emailAssetUrl(value) {
 }
 
 function replaceEmailTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{ano\}/g, values.year); }
-function replaceReminderTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{paciente\}/g, values.patient).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{dias_restantes\}/g, values.daysRemaining).replace(/\{link_questionario\}/g, values.questionnaireUrl).replace(/\{nutricionista\}/g, values.nutritionist); }
+function replaceReminderTokens(value, values) { return String(value || '').replace(/\{primeiro_nome\}/g, values.firstName).replace(/\{paciente\}/g, values.patient).replace(/\{questionario\}/g, values.quizTitle).replace(/\{prazo\}/g, values.deadline).replace(/\{dias_restantes\}/g, values.daysRemaining).replace(/\{link_questionario\}/g, values.questionnaireUrl).replace(/\{nutricionista\}/g, values.nutritionist).replace(/\{ano\}/g, values.year || new Date().getFullYear()); }
 
 async function getEmailTemplate(sessionToken) {
   try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => recordTheme(item) === EMAIL_TEMPLATE_THEME || recordSource(item) === EMAIL_TEMPLATE_SOURCE); if (!record) return defaultEmailTemplate(); let data = {}; try { data = JSON.parse(record.description || '{}'); } catch {} return normalizeEmailTemplate(data); } catch (error) { console.error('Email template load error:', error.message); return defaultEmailTemplate(); }
@@ -1250,6 +1250,14 @@ async function getStoredResponseReport(sessionToken, startDate, endDate) {
   return rows.filter(item => inDateRange(item.respondedAt) || inDateRange(item.sentAt)).sort((a, b) => new Date(b.respondedAt || b.sentAt || 0) - new Date(a.respondedAt || a.sentAt || 0));
 }
 
+function emailLogo(template, align = 'left') {
+  const logoSource = emailAssetUrl(template.logoUrl || template.logoDataUrl);
+  if (!logoSource) return '';
+  const brand = escapeHtml(template.brandName || 'Logomarca');
+  const margin = align === 'center' ? '0 auto 12px' : '0 0 12px';
+  return `<img src="${escapeHtml(logoSource)}" alt="${brand}" width="180" style="display:block;max-width:180px;max-height:64px;height:auto;object-fit:contain;object-position:${align};margin:${margin};border:0;outline:none;text-decoration:none">`;
+}
+
 function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, deadline, questionnaireUrl }) {
   const template = normalizeEmailTemplate(rawTemplate); const values = { firstName:firstName || 'Olá', quizTitle:quizTitle || 'Questionário', deadline, year:new Date().getFullYear() }; const primary = template.primaryColor; const background = template.backgroundColor; const text = template.textColor;   const brand = escapeHtml(template.brandName); const title = escapeHtml(replaceEmailTokens(template.title, values)); const greeting = escapeHtml(replaceEmailTokens(template.greeting, values)); const intro = escapeHtml(replaceEmailTokens(template.intro, values)).replace(/\n/g, '<br>'); const body = escapeHtml(replaceEmailTokens(template.body, values)).replace(/\n/g, '<br>'); const button = escapeHtml(replaceEmailTokens(template.buttonText, values)); const deadlineText = escapeHtml(replaceEmailTokens(template.deadlineText, values)); const footer = escapeHtml(replaceEmailTokens(template.footerText, values)); const safeUrl = escapeHtml(questionnaireUrl); const logoSource = emailAssetUrl(template.logoUrl || template.logoDataUrl); const logo = logoSource ? `<img src="${escapeHtml(logoSource)}" alt="${brand}" width="180" style="display:block;max-width:180px;max-height:64px;height:auto;object-fit:contain;margin:0 0 12px;border:0;outline:none;text-decoration:none">` : ''; const showBrandName = !logoSource || template.showBrandName !== false; const brandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:${primary};font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const softBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#7d73ad;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const midnightBrandMarkup = showBrandName ? `<p style="margin:0;color:#d4b76a;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const botanicalBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#557253;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const terracottaBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#a85f4d;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : ''; const classicBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p>` : ''; const paragraphBlock = `${intro ? `<p style="margin:0 0 17px;line-height:1.62;font-family:inherit">${intro}</p>` : ''}${body ? `<p style="margin:0 0 24px;line-height:1.62;font-family:inherit">${body}</p>` : ''}${button && safeUrl ? `<p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:${primary};border-radius:${template.layout === 'modern' ? '999px' : '10px'};color:#fff;padding:13px 20px;text-decoration:none;font-weight:700;font-family:inherit">${button}</a></p>` : ''}${deadlineText ? `<p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6;font-family:inherit">${deadlineText}</p>` : ''}`;
   let inner;
@@ -1264,32 +1272,126 @@ function buildInvitationEmail({ template: rawTemplate, firstName, quizTitle, dea
   const footerColor = template.layout === 'midnight' ? '#d4d8e0' : '#827766'; return `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:${background};font-family:Arial,Helvetica,sans-serif;color:${text};line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${['soft','botanical'].includes(template.layout) ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1)">${inner}</div><p style="font-size:12px;color:${footerColor};text-align:center;margin:18px 0 0">${footer}</p></div></body></html>`;
 }
 
-function buildReminderTestEmail({ reminder: rawReminder, template: rawTemplate, patientName = '' }) {
+const REMINDER_DEFAULT_TITLES = {
+  new_quiz: 'Lembrete: Novo Questionário',
+  service_ending: 'Lembrete: Serviço Finalizando',
+  response_due: 'Lembrete: Prazo de Resposta'
+};
+
+function buildReminderEmailHtml({ reminder: rawReminder, template: rawTemplate, patientName = '', quizTitle = '', expiresAt = '', questionnaireUrl = '', isTest = false, kind = '' }) {
   const reminder = rawReminder && typeof rawReminder === 'object' ? rawReminder : {};
-  const template = normalizeEmailTemplate(rawTemplate);
-  const isServiceEnding = reminder.id === 'service_ending';
-  const patient = usableText(patientName) || 'Paciente selecionado';
-  const values = { firstName:patient.split(/\s+/)[0] || 'Olá', patient, quizTitle:'Acompanhamento semanal', deadline:'15 de setembro de 2026 às 23:59', daysRemaining:'3', questionnaireUrl:`${QUESTIONNAIRE_BASE_URL}?teste=1`, nutritionist:'Jessica Melo', year:new Date().getFullYear() };
-  const subject = replaceReminderTokens(usableText(reminder.subject) || 'Teste de lembrete', values).slice(0, 180);
-  const message = replaceReminderTokens(usableText(reminder.message) || 'Esta é uma mensagem de teste do lembrete.', values).slice(0, 1200);
-  const brand = escapeHtml(template.brandName || 'Jessica Melo Nutricionista');
-  const safeSubject = escapeHtml(subject);
-  const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
-  const safeRecipient = escapeHtml(values.questionnaireUrl);
-  const title = escapeHtml(usableText(reminder.title) || 'Lembrete');
-  const primary = template.primaryColor || '#a88b36';
-  const background = template.backgroundColor || '#faf8f3';
-  const text = template.textColor || '#3d3226';
-  const logoSource = emailAssetUrl(template.logoUrl || template.logoDataUrl);
-  const logo = logoSource ? `<img src="${escapeHtml(logoSource)}" alt="${brand}" width="180" style="display:block;max-width:180px;max-height:64px;height:auto;object-fit:contain;margin:0 0 12px;border:0;outline:none;text-decoration:none">` : '';
-  const showBrandName = !logoSource || template.showBrandName !== false;
-  const brandMarkup = showBrandName ? `<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p>` : '';
-  const actionButtonHtml = isServiceEnding
-    ? ''
-    : `<p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6">Os dados exibidos são exemplos e o botão abaixo não representa um convite real.</p><p style="margin:20px 0 0"><a href="${safeRecipient}" style="display:inline-block;background:${primary};border-radius:10px;color:#fff;padding:12px 20px;text-decoration:none;font-weight:700">Responder questionário</a></p>`;
-  const testNoticeExtra = isServiceEnding ? '' : ' O botão abaixo é apenas ilustrativo e não representa um convite real.';
-  const htmlContent = `<!doctype html><html lang="pt-BR"><head><meta name="color-scheme" content="light"></head><body style="margin:0;background:${background};font-family:Arial,Helvetica,sans-serif;color:${text};line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(168,139,54,.22);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(61,50,38,.1)"><div style="background:${primary};color:#fff;padding:25px 28px">${logo}${brandMarkup}<p style="margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.82">E-mail de teste</p><h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="padding:28px"><div style="margin:0 0 22px;border:1px solid #ead9a6;border-radius:12px;background:#fffaf0;padding:13px 15px;color:#725b20;font-size:13px;line-height:1.5"><strong>Mensagem de teste:</strong> este e-mail foi enviado somente para validar o lembrete.${testNoticeExtra}</div><p style="margin:0 0 16px;font-size:16px;font-weight:700;color:${text}">${safeSubject}</p><p style="margin:0 0 20px;color:${text};line-height:1.7">${safeMessage}</p>${actionButtonHtml}</div></div><p style="font-size:12px;color:#827766;text-align:center;margin:18px 0 0">${brand} · Teste de lembrete</p></div></body></html>`;
-  return { subject:`Teste de lembrete — ${subject}`.slice(0, 180), htmlContent };
+  const current = normalizeEmailTemplate(rawTemplate);
+  const isServiceEnding = reminder.id === 'service_ending' || kind === 'service_ending';
+  const patient = usableText(patientName) || (isTest ? 'Marina Alves' : 'Paciente');
+  const firstName = patient.split(/\s+/)[0] || 'Olá';
+  const effectiveQuizTitle = usableText(quizTitle) || (isTest ? 'Acompanhamento semanal' : 'Questionário');
+  const deadline = expiresAt ? formatReminderDeadline(expiresAt) : (isTest ? '15 de setembro de 2026 às 23:59' : '');
+  const daysRemaining = expiresAt ? reminderDaysRemaining(expiresAt) : (isTest ? '3' : '');
+  const safeUrl = questionnaireUrl ? escapeHtml(questionnaireUrl) : (isTest && !isServiceEnding ? `${QUESTIONNAIRE_BASE_URL}?teste=1` : '');
+
+  const values = {
+    firstName,
+    patient,
+    quizTitle: effectiveQuizTitle,
+    deadline,
+    daysRemaining,
+    questionnaireUrl: safeUrl,
+    nutritionist: 'Jessica Melo',
+    year: new Date().getFullYear()
+  };
+
+  const primary = current.primaryColor;
+  const background = current.backgroundColor;
+  const text = current.textColor;
+  const brand = escapeHtml(current.brandName);
+
+  const logoLeft = emailLogo(current, 'left');
+  const logoCenter = emailLogo(current, 'center');
+  const showBrandName = !Boolean(logoLeft || logoCenter) || current.showBrandName !== false;
+
+  const brandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:${primary};font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+  const softBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#7d73ad;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+  const midnightBrandMarkup = showBrandName ? `<p style="margin:0;color:#d4b76a;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+  const botanicalBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#557253;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+  const terracottaBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;color:#a85f4d;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800">${brand}</p>` : '';
+  const classicBrandMarkup = showBrandName ? `<p style="margin:0 0 5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.9">${brand}</p>` : '';
+
+  const rawTitle = usableText(reminder.title);
+  const resolvedTitle = (rawTitle && rawTitle.startsWith('Lembrete')) ? rawTitle : (REMINDER_DEFAULT_TITLES[reminder.id] || (rawTitle ? `Lembrete: ${rawTitle}` : 'Lembrete'));
+  const title = escapeHtml(resolvedTitle);
+
+  const rawSubject = usableText(reminder.subject) || 'Lembrete';
+  const subjectText = replaceReminderTokens(rawSubject, values);
+  const safeSubject = escapeHtml(subjectText);
+
+  const rawMessage = usableText(reminder.message) || '';
+  const messageText = replaceReminderTokens(rawMessage, values);
+  const safeMessage = escapeHtml(messageText).replace(/\n/g, '<br>');
+
+  const button = isServiceEnding ? '' : 'Responder questionário';
+  const deadlineText = isServiceEnding ? '' : (deadline ? `Este questionário fica disponível até ${deadline}.` : '');
+
+  const buttonHtml = (button && safeUrl)
+    ? `<p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:${primary};border-radius:${current.layout === 'modern' ? '999px' : '10px'};color:#fff;padding:13px 20px;text-decoration:none;font-weight:700;font-family:inherit">${button}</a></p>`
+    : '';
+  const deadlineHtml = deadlineText
+    ? `<p style="margin:0;color:#6d6255;font-size:12px;line-height:1.6;font-family:inherit">${deadlineText}</p>`
+    : '';
+
+  const p = `<p style="margin:0 0 17px;font-size:15px;font-weight:700;line-height:1.4;font-family:inherit">${safeSubject}</p><p style="margin:0 0 24px;line-height:1.62;font-family:inherit">${safeMessage}</p>${buttonHtml}${deadlineHtml}`;
+
+  let inner = '';
+  if (current.layout === 'modern') {
+    inner = `<div style="border-left:7px solid ${primary};background:#fff;padding:28px 26px"><div style="margin-bottom:14px">${logoLeft}${brandMarkup}</div><h1 style="margin:0 0 24px;color:${text};font-size:25px;line-height:1.2">${title}</h1>${p}</div>`;
+  } else if (current.layout === 'editorial') {
+    inner = `<div style="background:#fffdf8;padding:30px 27px;border-top:8px solid ${primary};font-family:Georgia,serif"><div style="text-align:center">${logoCenter}</div><h1 style="margin:0 auto 24px;max-width:430px;text-align:center;color:${text};font-family:Georgia,serif;font-size:26px;font-weight:400;line-height:1.2">${title}</h1><div style="font-family:Georgia,serif">${p}</div></div>`;
+  } else if (current.layout === 'soft') {
+    inner = `<div style="background:linear-gradient(145deg,#fff,#f1effa);padding:28px;border-radius:24px;border:1px solid #ded9ef">${logoLeft}${softBrandMarkup}<h1 style="margin:0 0 22px;color:${text};font-size:24px;line-height:1.24">${title}</h1><div style="border-radius:16px;background:#fff;padding:21px;box-shadow:0 8px 22px rgba(77,67,112,.08)">${p}</div></div>`;
+  } else if (current.layout === 'midnight') {
+    const midnightButton = (button && safeUrl)
+      ? `<p style="margin:0 0 24px"><a href="${safeUrl}" style="display:inline-block;background:#d4b76a;border-radius:10px;color:#202532;padding:13px 20px;text-decoration:none;font-weight:800">${button}</a></p>`
+      : '';
+    const midnightDeadline = deadlineText
+      ? `<p style="margin:0;color:#c5c9d2;font-size:12px;line-height:1.6">${deadlineText}</p>`
+      : '';
+    inner = `<div style="background:#202532;padding:30px 27px;color:#fff"><div style="padding-bottom:22px;border-bottom:1px solid rgba(212,183,106,.35)">${logoLeft}${midnightBrandMarkup}</div><h1 style="margin:0 0 24px;color:#fff;font-size:25px;line-height:1.2">${title}</h1><p style="margin:0 0 17px;font-size:15px;font-weight:700;color:#fff;line-height:1.4">${safeSubject}</p><p style="margin:0 0 24px;color:#e7e8ed;line-height:1.62">${safeMessage}</p>${midnightButton}${midnightDeadline}</div>`;
+  } else if (current.layout === 'botanical') {
+    inner = `<div style="background:#f1f7ef;padding:27px 25px;border-top:6px solid ${primary}"><div style="padding-bottom:18px;border-bottom:1px solid #cfddca">${logoLeft}${botanicalBrandMarkup}</div><div style="padding:22px 0 0 15px;border-left:3px solid ${primary}"><h1 style="margin:0 0 22px;color:${text};font-size:25px;line-height:1.2">${title}</h1>${p}</div></div>`;
+  } else if (current.layout === 'terracotta') {
+    inner = `<div style="background:#fff4ed;padding:28px 26px"><div style="background:${primary};color:#fff;margin:-28px -26px 25px;padding:18px 26px">${logoLeft}${terracottaBrandMarkup}</div><h1 style="margin:0 0 22px;color:${text};font-size:25px;line-height:1.2">${title}</h1>${p}</div>`;
+  } else if (current.layout === 'minimal') {
+    inner = `<div style="background:#fff;padding:33px 29px;border-top:2px solid ${primary}"><div style="text-align:center">${logoCenter}</div><h1 style="margin:0 0 22px;text-align:center;color:${text};font-size:27px;line-height:1.16;font-weight:700">${title}</h1>${p}</div>`;
+  } else {
+    inner = `<div style="background:${primary};color:#fff;padding:25px 28px">${logoLeft}${classicBrandMarkup}<h1 style="margin:0;font-size:24px;line-height:1.25">${title}</h1></div><div style="background:#fff;padding:28px;color:${text}">${p}</div>`;
+  }
+
+  const footerColor = current.layout === 'midnight' ? '#d4d8e0' : '#827766';
+  const rawFooter = current.footerText || '© {ano} {marca}. Todos os direitos reservados.';
+  const footerText = replaceReminderTokens(rawFooter, values)
+    .replace(/\{ano\}/g, String(values.year))
+    .replace(/\{marca\}/g, current.brandName || 'Jessica Melo Nutricionista');
+  const footer = escapeHtml(footerText);
+
+  const htmlContent = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light"></head><body style="margin:0;padding:0;background:${background};font-family:Arial,Helvetica,sans-serif;color:${text};line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px 18px"><div style="overflow:hidden;border:1px solid rgba(120,100,70,.18);border-radius:${['soft','botanical'].includes(current.layout) ? '24px' : '18px'};box-shadow:0 8px 24px rgba(61,50,38,.1);background:#fff">${inner}</div><p style="margin:15px 0 0;text-align:center;color:${footerColor};font-size:11px;line-height:1.5">${footer}</p></div></body></html>`;
+
+  return { subject: subjectText, htmlContent, kind: reminder.id || kind };
+}
+
+function buildReminderTestEmail({ reminder: rawReminder, template: rawTemplate, patientName = '' }) {
+  const result = buildReminderEmailHtml({
+    reminder: rawReminder,
+    template: rawTemplate,
+    patientName,
+    quizTitle: 'Acompanhamento semanal',
+    expiresAt: '2026-09-15T23:59:00.000Z',
+    questionnaireUrl: `${QUESTIONNAIRE_BASE_URL}?teste=1`,
+    isTest: true
+  });
+  return {
+    subject: `Teste de lembrete — ${result.subject}`.slice(0, 180),
+    htmlContent: result.htmlContent,
+    kind: result.kind
+  };
 }
 
 const DEFAULT_SERVER_REMINDERS = [
@@ -1303,7 +1405,21 @@ function normalizeServerReminders(value) { const list = Array.isArray(value) ? v
 async function getReminderSettings(sessionToken) { try { const records = await listStoredQuestionnaireRecords(sessionToken); const record = records.find(item => recordTheme(item) === '__patient_reminder_settings__' || recordSource(item) === 'reminder://settings'); if (!record) return normalizeServerReminders([]); let data = []; try { data = JSON.parse(String(record.description || '[]')); } catch {} return normalizeServerReminders(data); } catch (error) { console.error('Reminder settings load error:', error.message); return normalizeServerReminders([]); } }
 function formatReminderDeadline(value) { const timestamp = typeof value === 'number' ? value : Date.parse(value); if (!Number.isFinite(timestamp)) return ''; const dateStr = new Intl.DateTimeFormat('pt-BR', { dateStyle:'long', timeZone:'America/Sao_Paulo' }).format(new Date(timestamp)); const timeStr = new Intl.DateTimeFormat('pt-BR', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Sao_Paulo' }).format(new Date(timestamp)); return `${dateStr} às ${timeStr}`; }
 function reminderDaysRemaining(value) { const timestamp = typeof value === 'number' ? value : Date.parse(value); return Number.isFinite(timestamp) ? String(Math.max(0, Math.ceil((timestamp - Date.now()) / 86400000))) : ''; }
-function buildReminderEmail({ reminder:rawReminder, template:rawTemplate, patientName = '', quizTitle = '', expiresAt = '', accessToken = '', kind = '' }) { const reminder = rawReminder && typeof rawReminder === 'object' ? rawReminder : {}; const isServiceEnding = reminder.id === 'service_ending' || kind === 'service_ending'; const patient = usableText(patientName) || 'Paciente'; const questionnaireUrl = (!isServiceEnding && accessToken) ? `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}` : ''; const deadline = formatReminderDeadline(expiresAt); const values = { firstName:patient.split(/\s+/)[0] || 'Olá', patient, quizTitle:usableText(quizTitle) || 'Questionário', deadline, daysRemaining:reminderDaysRemaining(expiresAt), questionnaireUrl, nutritionist:'Jessica Melo' }; const subject = replaceReminderTokens(usableText(reminder.subject) || 'Lembrete', values).slice(0, 180); const message = replaceReminderTokens(usableText(reminder.message) || 'Esta é uma mensagem de acompanhamento.', values); const template = normalizeEmailTemplate({ ...rawTemplate, title:usableText(reminder.title) || 'Lembrete', greeting:'', intro:message, body:'', buttonText:questionnaireUrl ? 'Responder questionário' : '', deadlineText:questionnaireUrl && deadline ? `Este questionário fica disponível até ${deadline}.` : '' }); const htmlContent = buildInvitationEmail({ template, firstName:values.firstName, quizTitle:values.quizTitle, deadline, questionnaireUrl }); return { subject, htmlContent, kind }; }
+function buildReminderEmail({ reminder: rawReminder, template: rawTemplate, patientName = '', quizTitle = '', expiresAt = '', accessToken = '', kind = '' }) {
+  const reminder = rawReminder && typeof rawReminder === 'object' ? rawReminder : {};
+  const isServiceEnding = reminder.id === 'service_ending' || kind === 'service_ending';
+  const questionnaireUrl = (!isServiceEnding && accessToken) ? `${QUESTIONNAIRE_BASE_URL}?token=${encodeURIComponent(accessToken)}` : '';
+  return buildReminderEmailHtml({
+    reminder,
+    template: rawTemplate,
+    patientName,
+    quizTitle,
+    expiresAt,
+    questionnaireUrl,
+    isTest: false,
+    kind
+  });
+}
 function reminderOffsetMilliseconds(trigger) { const value = Math.max(0, Number(trigger?.offset || 0)); const unit = trigger?.unit === 'minutes' ? 60000 : trigger?.unit === 'days' ? 86400000 : 3600000; return value * unit; }
 function localDateFromTimestamp(timestamp) { const parts = new Intl.DateTimeFormat('en-CA', { timeZone:'America/Sao_Paulo', year:'numeric', month:'2-digit', day:'2-digit' }).formatToParts(new Date(timestamp)); const pick = type => parts.find(part => part.type === type)?.value || ''; return `${pick('year')}-${pick('month')}-${pick('day')}`; }
 function clampToNormalHours(isoString) { const timestamp = Date.parse(isoString); if (!Number.isFinite(timestamp)) return isoString; const parts = new Intl.DateTimeFormat('en-CA', { timeZone:'America/Sao_Paulo', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(new Date(timestamp)); const pick = type => parts.find(p => p.type === type)?.value || ''; const dateKey = `${pick('year')}-${pick('month')}-${pick('day')}`; const hour = Number(pick('hour')); const minute = Number(pick('minute')); if (hour < 7) { return localDateTimeToIso(dateKey, '07:00'); } if (hour > 22 || (hour === 22 && minute > 0)) { return localDateTimeToIso(dateKey, '22:00'); } return isoString; }
