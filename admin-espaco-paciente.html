@@ -4498,7 +4498,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         const escapeHtml = v => String(v ?? '').replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[c]);
 
         select.innerHTML = `<option value="">Selecione um paciente...</option>${patients.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)} — ${escapeHtml(p.email)}</option>`).join('')}`;
-        const selectedPatient = () => patients[Number(select.value)];
+        const selectedPatient = () => (select.value === '' || isNaN(Number(select.value))) ? null : (patients[Number(select.value)] || null);
         const syncSelection = () => {
           const p = selectedPatient();
           recipient.textContent = p ? `${p.name} — ${p.email}` : 'Selecione um paciente para continuar.';
@@ -4516,7 +4516,7 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
           document.removeEventListener('keydown', escapeHandler);
           resolve(confirmed ? p : null);
         };
-        const acceptHandler = () => finish(Number(sendConfirmModal.querySelector('#quiz-send-expire-days')?.value || 3));
+        const acceptHandler = () => finish(true);
         const cancelHandler = () => finish(false);
         const selectionHandler = () => syncSelection();
         const backdropHandler = e => { if (e.target === modal) finish(false); };
@@ -4842,12 +4842,31 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         setStatus('Carregando pacientes com e-mail...');
         let patients = [];
         try {
-          patients = (await db.getPatientProfiles()).map(p => ({
-            id: String(p?.id || '').trim(),
-            name: String(p?.name || 'Paciente').trim() || 'Paciente',
-            email: String(p?.email || '').trim().toLowerCase()
-          })).filter(p => p.id && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
-        } catch {}
+          const [profiles, regPatients] = await Promise.all([
+            db.getPatientProfiles().catch(() => []),
+            db.getPatients().catch(() => [])
+          ]);
+          const map = new Map();
+          (profiles || []).forEach(p => {
+            const email = String(p?.email || '').trim().toLowerCase();
+            const id = String(p?.id || '').trim();
+            const name = String(p?.name || 'Paciente').trim() || 'Paciente';
+            if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              map.set(email, { id: id || email, name, email });
+            }
+          });
+          (regPatients || []).forEach(p => {
+            const email = String(p?.email || '').trim().toLowerCase();
+            const id = String(p?.id || '').trim();
+            const name = String(p?.name || 'Paciente').trim() || 'Paciente';
+            if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !map.has(email)) {
+              map.set(email, { id: id || email, name, email });
+            }
+          });
+          patients = Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+        } catch (err) {
+          console.error('Erro ao listar pacientes para teste:', err);
+        }
         if (!patients.length) {
           setStatus('Nenhum paciente cadastrado com e-mail válido foi encontrado.', 'error');
           if (fields.testBtn) fields.testBtn.disabled = false;
@@ -4860,15 +4879,26 @@ window.QUESTION_LIBRARY_IMPORTS = [{"code":"APLAN","originalCode":"APLAN","title
         }
         setStatus('Enviando e-mail de teste…');
         try {
-          const result = await db.sendReminderTestEmail(currentData, selectedPatient);
+          const currentTemplate = {
+            ...emailTemplate,
+            brandName: (brandFields.brandName?.value || emailTemplate.brandName || 'Jessica Melo Nutricionista').trim(),
+            logoUrl: (brandFields.logoUrl?.value || emailTemplate.logoUrl || '').trim(),
+            logoDataUrl: logoDataUrl || '',
+            showBrandName: brandFields.showBrandName ? brandFields.showBrandName.checked : emailTemplate.showBrandName !== false,
+            primaryColor: brandFields.primaryColor?.value || emailTemplate.primaryColor || '#a88b36',
+            backgroundColor: brandFields.backgroundColor?.value || emailTemplate.backgroundColor || '#faf8f3',
+            textColor: brandFields.textColor?.value || emailTemplate.textColor || '#3d3226',
+            layout: document.querySelector('input[name="reminder-template-layout"]:checked')?.value || emailTemplate.layout || 'classic'
+          };
+          const result = await db.sendReminderTestEmail({ ...currentData, template: currentTemplate }, selectedPatient);
           if (result?.success === false) {
             setStatus(result.message || 'Não foi possível enviar o e-mail de teste.', 'error');
             return;
           }
           setStatus(`E-mail de teste enviado para ${result.recipientEmail || selectedPatient.email}.`, 'success');
           showToast(`E-mail de teste enviado para ${result.recipientEmail || selectedPatient.email}.`);
-        } catch {
-          setStatus('Não foi possível enviar o e-mail de teste.', 'error');
+        } catch (err) {
+          setStatus(err?.message || 'Não foi possível enviar o e-mail de teste.', 'error');
         } finally {
           if (fields.testBtn) fields.testBtn.disabled = false;
         }

@@ -208,7 +208,15 @@ function normalizeQuestion(record) {
     icon: usableText(data.icon || record?.icon) || '○',
     options: Array.isArray(data.options) ? data.options.filter(Boolean) : [],
     optionSettings: Array.isArray(data.optionSettings) ? data.optionSettings : [],
-    scaleConfig: data.scaleConfig && typeof data.scaleConfig === 'object' ? data.scaleConfig : null,
+    scaleConfig: data.scaleConfig && typeof data.scaleConfig === 'object' ? {
+      ...data.scaleConfig,
+      min: Number.isFinite(Number(data.scaleConfig.min)) ? Number(data.scaleConfig.min) : 0,
+      max: Number.isFinite(Number(data.scaleConfig.max)) ? Number(data.scaleConfig.max) : 10,
+      lowLabel: usableText(data.scaleConfig.lowLabel || data.scaleConfig.minLabel),
+      highLabel: usableText(data.scaleConfig.highLabel || data.scaleConfig.maxLabel),
+      minLabel: usableText(data.scaleConfig.minLabel || data.scaleConfig.lowLabel),
+      maxLabel: usableText(data.scaleConfig.maxLabel || data.scaleConfig.highLabel)
+    } : null,
     metricUnit: usableText(data.metricUnit),
     openResponseTitle: usableText(data.openResponseTitle),
     numericOnly: data.numericOnly === true || data.type === 'metric',
@@ -220,25 +228,37 @@ function normalizeQuestion(record) {
 function hydrateQuestionSnapshot(snapshot, sourceQuestion) {
   const saved = snapshot && typeof snapshot === 'object' ? snapshot : {};
   const current = sourceQuestion && typeof sourceQuestion === 'object' ? sourceQuestion : {};
+  const rawScale = (current.scaleConfig && typeof current.scaleConfig === 'object')
+    ? { ...(saved.scaleConfig || {}), ...current.scaleConfig }
+    : ((saved.scaleConfig && typeof saved.scaleConfig === 'object') ? saved.scaleConfig : null);
+  const scaleConfig = rawScale ? {
+    ...rawScale,
+    min: Number.isFinite(Number(rawScale.min)) ? Number(rawScale.min) : 0,
+    max: Number.isFinite(Number(rawScale.max)) ? Number(rawScale.max) : 10,
+    lowLabel: usableText(rawScale.lowLabel || rawScale.minLabel),
+    highLabel: usableText(rawScale.highLabel || rawScale.maxLabel),
+    minLabel: usableText(rawScale.minLabel || rawScale.lowLabel),
+    maxLabel: usableText(rawScale.maxLabel || rawScale.highLabel)
+  } : null;
   return {
-    ...current,
     ...saved,
+    ...current,
     id: usableText(saved.id) || usableText(current.id),
-    title: usableText(saved.title) || usableText(current.title) || 'Pergunta',
-    questionText: usableText(saved.questionText) || usableText(current.questionText),
-    questionHtml: usableText(saved.questionHtml) || usableText(current.questionHtml),
-    questionImage: usableText(saved.questionImage) || usableText(current.questionImage),
-    code: usableText(saved.code) || usableText(current.code),
-    label: usableText(saved.label) || usableText(current.label),
-    type: usableText(saved.type) || usableText(current.type) || 'single',
-    icon: usableText(saved.icon) || usableText(current.icon) || '○',
-    options: Array.isArray(saved.options) && saved.options.length ? saved.options : (Array.isArray(current.options) ? current.options : []),
-    optionSettings: Array.isArray(saved.optionSettings) && saved.optionSettings.length ? saved.optionSettings : (Array.isArray(current.optionSettings) ? current.optionSettings : []),
-    scaleConfig: saved.scaleConfig && typeof saved.scaleConfig === 'object' ? saved.scaleConfig : current.scaleConfig,
-    metricUnit: usableText(saved.metricUnit) || usableText(current.metricUnit),
-    openResponseTitle: usableText(saved.openResponseTitle) || usableText(current.openResponseTitle),
-    numericOnly: saved.numericOnly === true || current.numericOnly === true,
-    required: saved.required !== false && current.required !== false
+    title: usableText(current.title) || usableText(saved.title) || 'Pergunta',
+    questionText: usableText(current.questionText) || usableText(saved.questionText),
+    questionHtml: usableText(current.questionHtml) || usableText(saved.questionHtml),
+    questionImage: usableText(current.questionImage) || usableText(saved.questionImage),
+    code: usableText(current.code) || usableText(saved.code),
+    label: usableText(current.label) || usableText(saved.label),
+    type: usableText(current.type) || usableText(saved.type) || 'single',
+    icon: usableText(current.icon) || usableText(saved.icon) || '○',
+    options: Array.isArray(current.options) && current.options.length ? current.options : (Array.isArray(saved.options) ? saved.options : []),
+    optionSettings: Array.isArray(current.optionSettings) && current.optionSettings.length ? current.optionSettings : (Array.isArray(saved.optionSettings) ? saved.optionSettings : []),
+    scaleConfig,
+    metricUnit: usableText(current.metricUnit) || usableText(saved.metricUnit),
+    openResponseTitle: usableText(current.openResponseTitle) || usableText(saved.openResponseTitle),
+    numericOnly: current.numericOnly === true || saved.numericOnly === true,
+    required: current.required !== false && saved.required !== false
   };
 }
 
@@ -252,10 +272,10 @@ async function loadQuiz(sessionToken, quizId) {
     return [question.id, question];
   }));
   quiz.questionSnapshots = quiz.questionSnapshots.map(snapshot => hydrateQuestionSnapshot(snapshot, questionsById.get(String(snapshot?.id || ''))));
-  quiz.questionSnapshots = quiz.questionSnapshots.filter(q => {
-    const cfg = quiz.questionSettings?.[q.id] || {};
-    return cfg.visible !== false;
-  });
+    quiz.questionSnapshots = quiz.questionSnapshots.filter(q => {
+      const cfg = quiz.questionSettings?.[q.id] || {};
+      return cfg.visible !== false;
+    });
   if (!quiz.id || !quiz.active || !quiz.questionSnapshots.length) throw new Error('Este questionário não está disponível para envio.');
   return quiz;
 }
@@ -721,11 +741,62 @@ function enrichEmailSendModes(events, invitations = [], records = [], schedules 
 }
 
 async function findRegisteredPatientForTest(sessionToken, patientKey, recipientEmail) {
-  const profiles = (await listStoredQuestionnaireRecords(sessionToken))
-    .filter(isPatientProfileRecord)
-    .map(normalizeStoredPatientProfile)
-    .filter(profile => profile.id && validEmail(profile.email));
-  return profiles.find(profile => profile.id === patientKey && profile.email === recipientEmail) || null;
+  const cleanEmail = String(recipientEmail || '').trim().toLowerCase();
+  const cleanKey = String(patientKey || '').trim().toLowerCase();
+
+  // 1. Procurar nos perfis de pacientes armazenados
+  try {
+    const records = await listStoredQuestionnaireRecords(sessionToken);
+    const profiles = records
+      .filter(isPatientProfileRecord)
+      .map(normalizeStoredPatientProfile)
+      .filter(profile => validEmail(profile.email));
+    const foundProfile = profiles.find(p =>
+      (cleanEmail && p.email.toLowerCase() === cleanEmail) ||
+      (cleanKey && String(p.id || '').toLowerCase() === cleanKey)
+    );
+    if (foundProfile) {
+      return {
+        id: foundProfile.id || cleanKey || cleanEmail,
+        name: foundProfile.name || 'Paciente',
+        email: foundProfile.email || cleanEmail
+      };
+    }
+  } catch (e) {
+    console.error('Error fetching stored patient profiles for test:', e?.message);
+  }
+
+  // 2. Procurar nos pacientes cadastrados via RPC app_list_patients
+  try {
+    const registered = await callRpc('app_list_patients', { p_token: sessionToken });
+    if (Array.isArray(registered)) {
+      const foundReg = registered.find(p => {
+        const pEmail = String(p.email || '').trim().toLowerCase();
+        const pId = String(p.id || '').trim().toLowerCase();
+        return (cleanEmail && pEmail === cleanEmail) || (cleanKey && pId === cleanKey);
+      });
+      if (foundReg) {
+        return {
+          id: String(foundReg.id || cleanKey || cleanEmail),
+          name: usableText(foundReg.name) || 'Paciente',
+          email: String(foundReg.email || cleanEmail).trim().toLowerCase()
+        };
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching registered patients for test:', e?.message);
+  }
+
+  // 3. Fallback: se o e-mail for válido e a requisição já foi autenticada como admin
+  if (validEmail(cleanEmail)) {
+    return {
+      id: cleanKey || cleanEmail,
+      name: 'Paciente',
+      email: cleanEmail
+    };
+  }
+
+  return null;
 }
 
 function isEmailQuizInvitationRecord(record) {
@@ -1938,6 +2009,9 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
 
 function requestBody(req) {
   if (req.method === 'GET') return req.query || {};
+  if (typeof req.body === 'string') {
+    try { return JSON.parse(req.body); } catch { return {}; }
+  }
   return req.body || {};
 }
 
@@ -1960,21 +2034,33 @@ export default async function handler(req, res) {
     if (action === 'test-reminder') {
       const sessionToken = String(body.sessionToken || '');
       const patientKey = String(body.patientKey || '').trim();
+      const patientName = String(body.patientName || '').trim();
       const requestedEmail = String(body.recipientEmail || '').trim().toLowerCase();
       if (!sessionToken) return json(res, 400, { success:false, message:'Não foi possível iniciar o teste. Entre novamente no painel.' });
       await requireAdmin(sessionToken);
       if (!patientKey || !validEmail(requestedEmail)) return json(res, 400, { success:false, message:'Selecione um paciente cadastrado com e-mail válido antes de enviar o teste.' });
       const patient = await findRegisteredPatientForTest(sessionToken, patientKey, requestedEmail);
       if (!patient) return json(res, 400, { success:false, message:'O paciente selecionado não foi encontrado ou não possui o e-mail informado no cadastro.' });
+      const effectiveName = patient.name && patient.name !== 'Paciente' ? patient.name : (patientName || patient.name || 'Paciente');
       const reminder = body.reminder && typeof body.reminder === 'object' ? body.reminder : {};
-      const template = await getReminderTemplate(sessionToken);
-      const { subject, htmlContent } = buildReminderTestEmail({ reminder, template, patientName:patient.name });
+      const storedTemplate = await getReminderTemplate(sessionToken);
+      const template = normalizeEmailTemplate({
+        ...storedTemplate,
+        ...(body.template && typeof body.template === 'object' ? body.template : {})
+      });
+      const { subject, htmlContent } = buildReminderTestEmail({ reminder, template, patientName: effectiveName });
       try {
-        await sendBrevoEmail({ to:{ email:patient.email, name:patient.name }, subject, htmlContent, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName || 'Jessica Melo Nutricionista' }, tags:['reminder-test','questionnaire-test'] });
-        return json(res, 200, { success:true, message:`E-mail de teste enviado para ${patient.email}.`, recipientEmail:patient.email, patientKey:patient.id, patientName:patient.name });
+        await sendBrevoEmail({
+          to: { email: patient.email, name: effectiveName },
+          subject,
+          htmlContent,
+          replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: template.brandName || 'Jessica Melo Nutricionista' },
+          tags: ['reminder-test', 'questionnaire-test']
+        });
+        return json(res, 200, { success: true, message: `E-mail de teste enviado para ${patient.email}.`, recipientEmail: patient.email, patientKey: patient.id, patientName: effectiveName });
       } catch (error) {
         console.error('Reminder test email error:', error.message);
-        return json(res, 502, { success:false, message:'Não foi possível enviar o e-mail de teste. Tente novamente e, caso o problema se repita, entre em contato com o suporte.' });
+        return json(res, 502, { success: false, message: `Não foi possível enviar o e-mail de teste: ${error.message || 'Erro no envio.'}` });
       }
     }
 
@@ -2175,15 +2261,18 @@ export default async function handler(req, res) {
     if (action === 'get') {
       try {
         const invitation = decryptInvitation(String(body.token || ''));
-        await storeClick(invitation);
-        const quiz = await loadQuiz(invitation.sessionToken, invitation.quizId);
-        const records = await listStoredQuestionnaireRecords(invitation.sessionToken);
+        const [quiz, records, clickResult, preferences] = await Promise.all([
+          loadQuiz(invitation.sessionToken, invitation.quizId),
+          listStoredQuestionnaireRecords(invitation.sessionToken),
+          storeClick(invitation).catch(() => {}),
+          getPlatformPreferences(invitation.sessionToken)
+        ]);
         const responseRecord = records.filter(isEmailQuizResponseRecord).map(normalizeStoredResponse).find(response => response.invitationId === invitation.id || responseTargetScore(response, invitation) >= 0);
         const savedResponse = responseRecord || null;
         if (savedResponse) return json(res, 200, { state:'answered', patient_name:invitation.patientName, quiz_title:quiz.title, summary:savedResponse.summary || null });
         const progressRecord = records.find(record => isEmailQuizProgressRecord(record) && normalizeStoredProgress(record).invitationId === invitation.id);
         const savedProgress = progressRecord ? normalizeStoredProgress(progressRecord) : null;
-        const preferences = await getPlatformPreferences(invitation.sessionToken);
+        
         const emojiScaleDisplayMode = EMOJI_SCALE_DISPLAY_MODES.has(preferences?.emojiScaleDisplayMode) ? preferences.emojiScaleDisplayMode : 'emoji-text';
         return json(res, 200, { state: 'ready', patient_name: invitation.patientName, quiz_title: quiz.title, quiz, expires_at: new Date(invitation.expiresAt).toISOString(), progress: savedProgress ? { totalQuestions:savedProgress.totalQuestions, answeredQuestions:savedProgress.answeredQuestions, updatedAt:savedProgress.updatedAt } : null, emojiScaleDisplayMode });
       } catch (error) {

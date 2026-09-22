@@ -741,11 +741,62 @@ function enrichEmailSendModes(events, invitations = [], records = [], schedules 
 }
 
 async function findRegisteredPatientForTest(sessionToken, patientKey, recipientEmail) {
-  const profiles = (await listStoredQuestionnaireRecords(sessionToken))
-    .filter(isPatientProfileRecord)
-    .map(normalizeStoredPatientProfile)
-    .filter(profile => profile.id && validEmail(profile.email));
-  return profiles.find(profile => profile.id === patientKey && profile.email === recipientEmail) || null;
+  const cleanEmail = String(recipientEmail || '').trim().toLowerCase();
+  const cleanKey = String(patientKey || '').trim().toLowerCase();
+
+  // 1. Procurar nos perfis de pacientes armazenados
+  try {
+    const records = await listStoredQuestionnaireRecords(sessionToken);
+    const profiles = records
+      .filter(isPatientProfileRecord)
+      .map(normalizeStoredPatientProfile)
+      .filter(profile => validEmail(profile.email));
+    const foundProfile = profiles.find(p =>
+      (cleanEmail && p.email.toLowerCase() === cleanEmail) ||
+      (cleanKey && String(p.id || '').toLowerCase() === cleanKey)
+    );
+    if (foundProfile) {
+      return {
+        id: foundProfile.id || cleanKey || cleanEmail,
+        name: foundProfile.name || 'Paciente',
+        email: foundProfile.email || cleanEmail
+      };
+    }
+  } catch (e) {
+    console.error('Error fetching stored patient profiles for test:', e?.message);
+  }
+
+  // 2. Procurar nos pacientes cadastrados via RPC app_list_patients
+  try {
+    const registered = await callRpc('app_list_patients', { p_token: sessionToken });
+    if (Array.isArray(registered)) {
+      const foundReg = registered.find(p => {
+        const pEmail = String(p.email || '').trim().toLowerCase();
+        const pId = String(p.id || '').trim().toLowerCase();
+        return (cleanEmail && pEmail === cleanEmail) || (cleanKey && pId === cleanKey);
+      });
+      if (foundReg) {
+        return {
+          id: String(foundReg.id || cleanKey || cleanEmail),
+          name: usableText(foundReg.name) || 'Paciente',
+          email: String(foundReg.email || cleanEmail).trim().toLowerCase()
+        };
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching registered patients for test:', e?.message);
+  }
+
+  // 3. Fallback: se o e-mail for válido e a requisição já foi autenticada como admin
+  if (validEmail(cleanEmail)) {
+    return {
+      id: cleanKey || cleanEmail,
+      name: 'Paciente',
+      email: cleanEmail
+    };
+  }
+
+  return null;
 }
 
 function isEmailQuizInvitationRecord(record) {
@@ -1958,6 +2009,9 @@ async function processQuestionnaireQueue(secret, workerId = 'supabase-pg-cron') 
 
 function requestBody(req) {
   if (req.method === 'GET') return req.query || {};
+  if (typeof req.body === 'string') {
+    try { return JSON.parse(req.body); } catch { return {}; }
+  }
   return req.body || {};
 }
 
@@ -1980,21 +2034,33 @@ export default async function handler(req, res) {
     if (action === 'test-reminder') {
       const sessionToken = String(body.sessionToken || '');
       const patientKey = String(body.patientKey || '').trim();
+      const patientName = String(body.patientName || '').trim();
       const requestedEmail = String(body.recipientEmail || '').trim().toLowerCase();
       if (!sessionToken) return json(res, 400, { success:false, message:'Não foi possível iniciar o teste. Entre novamente no painel.' });
       await requireAdmin(sessionToken);
       if (!patientKey || !validEmail(requestedEmail)) return json(res, 400, { success:false, message:'Selecione um paciente cadastrado com e-mail válido antes de enviar o teste.' });
       const patient = await findRegisteredPatientForTest(sessionToken, patientKey, requestedEmail);
       if (!patient) return json(res, 400, { success:false, message:'O paciente selecionado não foi encontrado ou não possui o e-mail informado no cadastro.' });
+      const effectiveName = patient.name && patient.name !== 'Paciente' ? patient.name : (patientName || patient.name || 'Paciente');
       const reminder = body.reminder && typeof body.reminder === 'object' ? body.reminder : {};
-      const template = await getReminderTemplate(sessionToken);
-      const { subject, htmlContent } = buildReminderTestEmail({ reminder, template, patientName:patient.name });
+      const storedTemplate = await getReminderTemplate(sessionToken);
+      const template = normalizeEmailTemplate({
+        ...storedTemplate,
+        ...(body.template && typeof body.template === 'object' ? body.template : {})
+      });
+      const { subject, htmlContent } = buildReminderTestEmail({ reminder, template, patientName: effectiveName });
       try {
-        await sendBrevoEmail({ to:{ email:patient.email, name:patient.name }, subject, htmlContent, replyTo:{ email:process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name:template.brandName || 'Jessica Melo Nutricionista' }, tags:['reminder-test','questionnaire-test'] });
-        return json(res, 200, { success:true, message:`E-mail de teste enviado para ${patient.email}.`, recipientEmail:patient.email, patientKey:patient.id, patientName:patient.name });
+        await sendBrevoEmail({
+          to: { email: patient.email, name: effectiveName },
+          subject,
+          htmlContent,
+          replyTo: { email: process.env.BREVO_REPLY_TO_EMAIL || 'contato@jessicamelonutri.com.br', name: template.brandName || 'Jessica Melo Nutricionista' },
+          tags: ['reminder-test', 'questionnaire-test']
+        });
+        return json(res, 200, { success: true, message: `E-mail de teste enviado para ${patient.email}.`, recipientEmail: patient.email, patientKey: patient.id, patientName: effectiveName });
       } catch (error) {
         console.error('Reminder test email error:', error.message);
-        return json(res, 502, { success:false, message:'Não foi possível enviar o e-mail de teste. Tente novamente e, caso o problema se repita, entre em contato com o suporte.' });
+        return json(res, 502, { success: false, message: `Não foi possível enviar o e-mail de teste: ${error.message || 'Erro no envio.'}` });
       }
     }
 
