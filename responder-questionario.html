@@ -500,7 +500,7 @@
         if(cur.file){try{value=await fileToDataUrl(cur.file);}catch(e){valid=false;continue;}}
         const sc=['single','linear','emoji'].includes(q.type);const cfg=scoreCfg(quiz,q);const inc=sc&&cfg.active;
         const raw=inc?(Number(cur.score||0)||0):0;const w=inc?cfg.weight:null;
-        answers.push({questionId:q.id,questionCode:q.code||'',questionTitle:q.title||q.questionText||'',type:q.type||'single',value,label:cur.label||'',evaluationLabel:cur.label||'',evaluationEmoji:cur.evaluationEmoji||'',clarificationPrompt:clarPrompt(q,cur.value),clarificationResponse:readClarResp(q,cur.value),score:inc?raw*w:0,rawScore:raw,weight:w,scored:inc});
+        answers.push({questionId:q.id,questionCode:q.code||'',questionIcon:q.icon||'',questionTitle:q.title||q.questionText||'',type:q.type||'single',value,label:cur.label||'',evaluationLabel:cur.label||'',evaluationEmoji:cur.evaluationEmoji||'',clarificationPrompt:clarPrompt(q,cur.value),clarificationResponse:readClarResp(q,cur.value),score:inc?raw*w:0,rawScore:raw,weight:w,scored:inc});
       }
       if(!valid){if(btn){btn.disabled=false;btn.textContent='Enviar respostas ✓';}state.submitted=false;alert('Algumas perguntas ou esclarecimentos obrigatórios não foram preenchidos. Volte e complete as respostas.');return;}
       const scores=answers.map(a=>Number(a.score||0)).filter(Number.isFinite);
