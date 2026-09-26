@@ -460,8 +460,9 @@
     body[data-patient-theme='black'] .answer-supplemental-prompt { color:#aeb7c5 !important; }
     body[data-patient-theme='black'] .answer-supplemental-response { color:#f7f8fb !important; }
     body[data-patient-theme='black'] .response-answer-modal, body[data-patient-theme='black'] .response-annotation-modal { border-color:#596171; background:#242933; color:#f1f3f7; }
-    #response-answer-modal-footer { border-top: 1px solid rgba(168,139,54,.15); }
-    body[data-patient-theme='black'] #response-answer-modal-footer { border-color:#4d5667; background:#1a1e26; }
+    #response-answer-modal-nav, #response-answer-modal-footer { border-color: rgba(168,139,54,.15); }
+    body[data-patient-theme='black'] .response-answer-modal header { background:#242933; border-color:#596171; }
+    body[data-patient-theme='black'] #response-answer-modal-nav, body[data-patient-theme='black'] #response-answer-modal-footer { border-color:#4d5667; background:#1a1e26; }
     body[data-patient-theme='black'] #response-answer-modal-prev, body[data-patient-theme='black'] #response-answer-modal-next { border-color:#4d5667; background:#282e3a; color:#f1f3f7; }
     body[data-patient-theme='black'] #response-answer-modal-counter { color:#f1f3f7; }
     body[data-patient-theme='black'] .response-question-note-card { border-color:#4d5667 !important; background:#1f242d !important; color:#e3e6ec; }
@@ -2694,27 +2695,29 @@ body[data-patient-theme='black'] .pending-review .pending-questionnaire-button:h
       <div id="response-chart-overlay" class="response-chart-overlay" aria-hidden="true"><section id="response-chart-modal" class="response-chart-modal" role="dialog" aria-modal="true" aria-labelledby="response-chart-title"><header class="flex flex-col gap-3 border-b border-primary/15 p-5 sm:flex-row sm:items-start sm:justify-between"><div class="min-w-0 flex-1"><div id="report-print-identity-slot"></div><div id="report-patient-header-block"><p id="response-chart-eyebrow" class="text-[10px] font-bold uppercase tracking-[.12em] text-primary">Relatório clínico</p><h2 id="response-chart-title" class="mt-1 text-xl font-bold text-dark">Evolução das respostas</h2><p id="response-chart-meta" class="mt-1 text-xs text-gray-500">—</p></div></div><div class="flex items-center gap-2"><button id="response-chart-export" type="button" class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white transition hover:bg-dark" title="Imprimir ou salvar como PDF"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6v-7Z"/></svg>Exportar PDF</button><button id="response-chart-close" type="button" class="directory-tool !h-9 !w-9" aria-label="Fechar relatório gráfico">×</button></div></header><div id="response-chart-content" class="response-chart-content p-5 sm:p-7"></div></section></div>
       <div id="response-answer-modal-overlay" class="response-answer-modal-overlay" aria-hidden="true">
   <section id="response-answer-modal" class="response-answer-modal" role="dialog" aria-modal="true" aria-labelledby="response-answer-modal-title">
-    <header class="flex items-start justify-between gap-4 border-b border-primary/15 p-5">
-      <div class="min-w-0 flex-1">
-        <p id="response-answer-modal-badge" class="text-[10px] font-bold uppercase tracking-[.12em] text-primary">Leitura clínica</p>
-        <h2 id="response-answer-modal-title" class="mt-1 text-lg font-bold text-dark leading-snug break-words">Detalhe da resposta</h2>
-        <p id="response-answer-modal-meta" class="mt-1 text-xs text-gray-500">—</p>
+    <header class="sticky top-0 z-10 bg-white border-b border-primary/15 rounded-t-[1.25rem]">
+      <div class="flex items-start justify-between gap-4 p-5 pb-3.5">
+        <div class="min-w-0 flex-1">
+          <p id="response-answer-modal-badge" class="text-[10px] font-bold uppercase tracking-[.12em] text-primary">Leitura clínica</p>
+          <h2 id="response-answer-modal-title" class="mt-1 text-lg font-bold text-dark leading-snug break-words">Detalhe da resposta</h2>
+          <p id="response-answer-modal-meta" class="mt-1 text-xs text-gray-500">—</p>
+        </div>
+        <button id="response-answer-modal-close" type="button" class="directory-tool !h-8 !w-8 shrink-0" aria-label="Fechar detalhe da resposta">×</button>
       </div>
-      <button id="response-answer-modal-close" type="button" class="directory-tool !h-8 !w-8 shrink-0" aria-label="Fechar detalhe da resposta">×</button>
+      <div id="response-answer-modal-nav" class="flex flex-wrap items-center justify-between gap-3 border-t border-primary/15 px-5 py-3 bg-primary/[.03]">
+        <button id="response-answer-modal-prev" type="button" class="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-white px-3.5 py-2 text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-35 disabled:pointer-events-none shadow-sm">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/></svg> Anterior
+        </button>
+        <div class="text-center">
+          <span id="response-answer-modal-counter" class="text-xs font-bold text-dark">Pergunta 1 de 1</span>
+          <p class="text-[10px] text-gray-400">Atalhos: [ ← ] e [ → ] no teclado</p>
+        </div>
+        <button id="response-answer-modal-next" type="button" class="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-white px-3.5 py-2 text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-35 disabled:pointer-events-none shadow-sm">
+          Próxima <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
     </header>
     <div id="response-answer-modal-content" class="response-answer-modal-content space-y-4 p-5"></div>
-    <footer id="response-answer-modal-footer" class="flex flex-wrap items-center justify-between gap-3 border-t border-primary/15 p-4 bg-primary/[.02]">
-      <button id="response-answer-modal-prev" type="button" class="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-white px-3.5 py-2 text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-35 disabled:pointer-events-none">
-        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/></svg> Anterior
-      </button>
-      <div class="text-center">
-        <span id="response-answer-modal-counter" class="text-xs font-bold text-dark">Pergunta 1 de 1</span>
-        <p class="text-[10px] text-gray-400">Atalhos: [ ← ] e [ → ] no teclado</p>
-      </div>
-      <button id="response-answer-modal-next" type="button" class="inline-flex items-center gap-1.5 rounded-xl border border-primary/15 bg-white px-3.5 py-2 text-xs font-bold text-dark transition hover:bg-primary/10 disabled:opacity-35 disabled:pointer-events-none">
-        Próxima <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/></svg>
-      </button>
-    </footer>
   </section>
 </div>
       <div id="response-annotation-overlay" class="response-annotation-overlay" aria-hidden="true"><section id="response-annotation-modal" class="response-annotation-modal" role="dialog" aria-modal="true" aria-labelledby="response-annotation-title"><header class="flex items-start justify-between gap-4 border-b border-primary/15 p-5"><div><p class="text-[10px] font-bold uppercase tracking-[.12em] text-primary">Notas do atendimento</p><h2 id="response-annotation-title" class="mt-1 text-lg font-bold text-dark">Adicionar anotação</h2><p id="response-annotation-meta" class="mt-1 text-xs text-gray-500">—</p></div><button id="response-annotation-close" type="button" class="directory-tool !h-8 !w-8" aria-label="Fechar anotação">×</button></header><form id="response-annotation-form"><div class="p-5"><label class="block text-xs font-bold text-dark" for="response-annotation-input">Anotação clínica</label><textarea id="response-annotation-input" class="send-filter-field mt-2" maxlength="2000" placeholder="Registre um ponto para retomar no próximo contato."></textarea><p class="mt-2 text-[11px] leading-relaxed text-gray-500">A anotação fica salva neste navegador e vinculada a este relato.</p></div><footer class="flex items-center justify-end gap-2 border-t border-primary/15 p-5"><button id="response-annotation-cancel" type="button" class="rounded-xl border border-primary/15 px-4 py-2.5 text-xs font-bold text-dark hover:bg-primary/10">Cancelar</button><button type="submit" class="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white hover:bg-dark">Salvar anotação</button></footer></form></section></div>
@@ -6586,11 +6589,16 @@ target.innerHTML = '';
       const questionnaireFilter = document.getElementById('response-filter-questionnaire');
       const refreshButton = document.getElementById('response-report-refresh');
       const chartOverlay = document.getElementById('response-chart-overlay');
-      if (chartOverlay && chartOverlay.parentElement !== document.body) document.body.appendChild(chartOverlay);
+      const answerModalOverlay = document.getElementById('response-answer-modal-overlay');
+      const annotationOverlay = document.getElementById('response-annotation-overlay');
+      ['response-chart-overlay', 'response-answer-modal-overlay', 'response-annotation-overlay', 'response-history-settings-overlay'].forEach(id => {
+        const layer = document.getElementById(id);
+        if (layer && layer.parentElement !== document.body) document.body.appendChild(layer);
+      });
       const chartContent = document.getElementById('response-chart-content');
       const chartTitle = document.getElementById('response-chart-title');
       const chartMeta = document.getElementById('response-chart-meta');
-      const answerModalOverlay = document.getElementById('response-answer-modal-overlay'); const answerModalTitle = document.getElementById('response-answer-modal-title'); const answerModalMeta = document.getElementById('response-answer-modal-meta'); const answerModalContent = document.getElementById('response-answer-modal-content'); const annotationOverlay = document.getElementById('response-annotation-overlay'); const annotationInput = document.getElementById('response-annotation-input'); const annotationMeta = document.getElementById('response-annotation-meta'); let annotationEvent = null;
+      const answerModalTitle = document.getElementById('response-answer-modal-title'); const answerModalMeta = document.getElementById('response-answer-modal-meta'); const answerModalContent = document.getElementById('response-answer-modal-content'); const annotationInput = document.getElementById('response-annotation-input'); const annotationMeta = document.getElementById('response-annotation-meta'); let annotationEvent = null;
       const localDateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       const defaultSendFrom = localDateKey(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
       const defaultSendTo = localDateKey(now);
@@ -6621,7 +6629,7 @@ target.innerHTML = '';
       const svgChart = (title, points, formatter = value => String(Math.round(value)), subtitle = 'Evolução por relato concluído', icon = '', isRating = false) => {
     const clean = points.filter(point => Number.isFinite(Number(point.value)));
     if (!clean.length) return `<div class="response-chart-card p-4"><h3 class="flex items-center gap-2 text-base font-bold text-dark">${icon ? `<span class="text-lg">${icon}</span>` : ''}${safe(title)}</h3><p class="mt-1 text-sm text-gray-500">Não há pontuação suficiente para desenhar este gráfico.</p></div>`;
-    const width = 760, height = 245, left = 48, right = 18, top = 34, bottom = 44;
+    const width = 760, height = 245, right = 18, top = 34, bottom = 44;
     const values = clean.map(point => Number(point.value));
     let minActual = Math.min(...values), maxActual = Math.max(...values);
     let min, max, gridValues;
@@ -6635,11 +6643,15 @@ target.innerHTML = '';
         while ((max - min) % 20 !== 0) { max += 5; }
         gridValues = [0,1,2,3,4].map(index => max - index * ((max - min) / 4));
     }
+    const sampleLabels = gridValues.map(value => String(formatter(value) || ''));
+    const maxLabelLen = Math.max(...sampleLabels.map(s => s.length), 0);
+    const left = maxLabelLen > 5 ? 74 : (maxLabelLen > 3 ? 56 : 48);
+    const axisFontSize = maxLabelLen > 5 ? '13' : '14.5';
     const x = index => clean.length === 1 ? (width - left - right) / 2 + left : left + index * ((width - left - right) / (clean.length - 1));
     const y = value => top + (max - value) * ((height - top - bottom) / (max - min));
     const grid = gridValues.map(value => {
         const yy = y(value);
-        return `<line class="chart-grid-line" x1="${left}" x2="${width-right}" y1="${yy.toFixed(1)}" y2="${yy.toFixed(1)}" stroke="#e8dfd0" stroke-dasharray="4 5"/><text class="chart-axis-text" x="${left-8}" y="${(yy+4).toFixed(1)}" text-anchor="end" fill="#766c5f" font-size="14.5">${safe(formatter(value))}</text>`;
+        return `<line class="chart-grid-line" x1="${left}" x2="${width-right}" y1="${yy.toFixed(1)}" y2="${yy.toFixed(1)}" stroke="#e8dfd0" stroke-dasharray="4 5"/><text class="chart-axis-text" x="${left-8}" y="${(yy+4).toFixed(1)}" text-anchor="end" fill="#766c5f" font-size="${axisFontSize}">${safe(formatter(value))}</text>`;
     }).join('');
     const line = clean.map((point,index) => `${x(index).toFixed(1)},${y(Number(point.value)).toFixed(1)}`).join(' ');
     const marks = clean.map((point,index) => `<circle class="chart-point-circle" cx="${x(index).toFixed(1)}" cy="${y(Number(point.value)).toFixed(1)}" r="4.5" fill="#000000" stroke="#fff" stroke-width="2" style="transition: all 0.25s ease; cursor: pointer; transform-origin: ${x(index).toFixed(1)}px ${y(Number(point.value)).toFixed(1)}px;" onmouseover="this.setAttribute('r', '6.5'); this.setAttribute('fill', '#A88B36'); this.setAttribute('stroke-width', '3')" onmouseout="this.setAttribute('r', '4.5'); this.setAttribute('fill', '#000000'); this.setAttribute('stroke-width', '2')"><title>${safe(`${point.label}: ${formatter(Number(point.value))}`)}</title></circle><text class="chart-axis-text" x="${x(index).toFixed(1)}" y="${height-15}" text-anchor="middle" fill="#766c5f" font-size="14.5">${safe(point.label)}</text>`).join('');
@@ -6763,15 +6775,35 @@ target.innerHTML = '';
           entryAnswers.forEach(answer => {
             const key = answerKey(answer);
             if (!headers.some(item => item.key === key)) {
-              const snaps = entryQuiz?.questionSnapshots || entryQuiz?.questions || quiz?.questionSnapshots || quiz?.questions || [];
-              const qDef = snaps.find(q => (answer.questionCode && String(q.code || '').trim().toUpperCase() === String(answer.questionCode).trim().toUpperCase()) || (answer.questionId && String(q.id) === String(answer.questionId)));
+              const snaps = [
+                ...(Array.isArray(entryQuiz?.questionSnapshots) ? entryQuiz.questionSnapshots : []),
+                ...(Array.isArray(entryQuiz?.questions) ? entryQuiz.questions : []),
+                ...(Array.isArray(quiz?.questionSnapshots) ? quiz.questionSnapshots : []),
+                ...(Array.isArray(quiz?.questions) ? quiz.questions : []),
+                ...(Array.isArray(window.__globalQuestionsCache) ? window.__globalQuestionsCache : []),
+                ...(Array.isArray(window.QUESTION_LIBRARY_IMPORTS) ? window.QUESTION_LIBRARY_IMPORTS : [])
+              ];
+              const qCode = String(answer.questionCode || '').trim().toUpperCase();
+              const qId = String(answer.questionId || '').trim();
+              const qDef = snaps.find(q => (qCode && String(q?.code || q?.originalCode || '').trim().toUpperCase() === qCode) || (qId && String(q?.id || '') === qId));
               const prompt = resolveQuestionPrompt(answer, event) || answer.questionTitle || answer.questionCode || 'Pergunta';
               const shortTitle = answer.questionShortTitle || answer.shortTitle || answer.questionTitle || answer.title || qDef?.title || prompt;
               const icon = resolveQuestionIcon(answer, event, entryQuiz);
-              headers.push({ key, label: prompt, shortTitle, icon });
+              const qType = String(answer?.type || answer?.questionType || qDef?.type || '').trim().toLowerCase();
+              headers.push({ key, label: prompt, shortTitle, icon, type: qType, qDef });
             }
           });
         });
+        const singleChoiceRatingLabel = value => {
+          const score = Number(value);
+          if (!Number.isFinite(score)) return '—';
+          const rounded = Math.round(score);
+          if (rounded >= 2) return 'Ótimo';
+          if (rounded === 1) return 'Bom';
+          if (rounded === 0) return 'Neutro';
+          if (rounded === -1) return 'Ruim';
+          return 'Péssimo';
+        };
         const questionCharts = headers.map(header => {
           const answers = history.map(entry => {
             const entryQuiz = getQuizForEvent(entry) || quiz;
@@ -6779,6 +6811,7 @@ target.innerHTML = '';
             return entryAnswers.find(item => answerKey(item) === header.key);
           }).filter(Boolean);
           const numericChart = answers.some(answer => /^[-+]?\d+(?:[.,]\d+)?$/.test(String(answer?.value ?? '').trim()));
+          const isSingleChoice = header.type === 'single' || answers.some(a => a?.type === 'single' || a?.questionType === 'single') || (!header.type && !numericChart && header.type !== 'emoji' && header.type !== 'linear');
           const points = history.map(entry => {
             const entryQuiz = getQuizForEvent(entry) || quiz;
             const entryAnswers = (entry.answers || []).filter(answer => isQuizQuestionVisible(entryQuiz, answer));
@@ -6786,7 +6819,10 @@ target.innerHTML = '';
             const numericValue = numericChart ? Number(String(answer?.value ?? '').replace(',', '.')) : answerBand(answer).raw;
             return { label:dateText(entry.respondedAt).slice(0,5), value:Number.isFinite(numericValue) ? numericValue : null };
           });
-          const formatter = value => numericChart ? Number(value).toLocaleString('pt-BR', { maximumFractionDigits:1 }) : ratingStarsText(value);
+          const formatter = value => {
+            if (isSingleChoice) return singleChoiceRatingLabel(value);
+            return numericChart ? Number(value).toLocaleString('pt-BR', { maximumFractionDigits:1 }) : ratingStarsText(value);
+          };
           return svgChart(header.shortTitle, points, formatter, header.label, header.icon, !numericChart);
         }).join('');
         const currentPercent = scorePercentFor(event);
@@ -7080,6 +7116,9 @@ target.innerHTML = '';
         });
         noteInput?.addEventListener('blur', saveNote);
 
+        if (answerModalOverlay && answerModalOverlay.parentElement !== document.body) {
+          document.body.appendChild(answerModalOverlay);
+        }
         answerModalOverlay.classList.add('is-open');
         answerModalOverlay.setAttribute('aria-hidden', 'false');
       };
@@ -7091,7 +7130,7 @@ target.innerHTML = '';
         currentModalEvent = null;
       };
 
-      const openAnnotation = event => { const patient = historyMode ? (historyPatient || patientByEmail(event.recipientEmail) || fallbackPatient(event)) : (patientByEmail(event.recipientEmail) || fallbackPatient(event)); annotationMeta.textContent = `${responsePatientName(patient)} · ${dateText(event.respondedAt)}`; annotationInput.value = getResponseAnnotation(event); annotationOverlay.classList.add('is-open'); annotationOverlay.setAttribute('aria-hidden', 'false'); window.setTimeout(() => annotationInput.focus(), 20); };
+      const openAnnotation = event => { const patient = historyMode ? (historyPatient || patientByEmail(event.recipientEmail) || fallbackPatient(event)) : (patientByEmail(event.recipientEmail) || fallbackPatient(event)); annotationMeta.textContent = `${responsePatientName(patient)} · ${dateText(event.respondedAt)}`; annotationInput.value = getResponseAnnotation(event); if (annotationOverlay && annotationOverlay.parentElement !== document.body) document.body.appendChild(annotationOverlay); annotationOverlay.classList.add('is-open'); annotationOverlay.setAttribute('aria-hidden', 'false'); window.setTimeout(() => annotationInput.focus(), 20); };
       const closeAnnotation = () => { annotationOverlay.classList.remove('is-open'); annotationOverlay.setAttribute('aria-hidden', 'true'); annotationEvent = null; };
       const toggleReview = event => { if (!event || historyMode) return; const reviewed = !isResponseReviewed(event); setResponseReviewState(event, reviewed ? 'reviewed' : 'pending'); document.dispatchEvent(new CustomEvent('response-review-status-updated', { detail:{ event, state:reviewed ? 'reviewed' : 'pending' } })); document.dispatchEvent(new CustomEvent('admin-toast-request', { detail:{ message: reviewed ? 'Relato revisado com sucesso!' : 'Relato marcado como pendente com sucesso!' } })); openDetail(event, currentReturnHash, { preserveViewport:true }); };
       const historyPatientMatches = (event, patient) => { const profile = patient?.profile || {}; const id = String(profile.id || patient?.id || '').trim().toLowerCase(); const email = String(profile.email || patient?.email || '').trim().toLowerCase(); const eventKey = String(event?.patientKey || '').trim().toLowerCase(); const acceptedKeys = new Set([id, email, email ? `email:${email}` : ''].filter(Boolean)); if (eventKey && acceptedKeys.has(eventKey)) return true; if (email && String(event?.recipientEmail || '').trim().toLowerCase() === email) return true; const patientName = responsePatientName(patient).toLocaleLowerCase('pt-BR'); const eventName = responsePatientName({ name:event?.patientName }).toLocaleLowerCase('pt-BR'); return patientName !== 'paciente sem nome' && patientName === eventName; }; const openPatientHistory = async (patient, link, quiz) => { if (!patient) return; const patientEmail = String(patient?.profile?.email || patient?.email || '').trim().toLowerCase(); const patientName = patient?.profile?.name || patient?.name || 'Paciente'; const from = '2000-01-01'; const to = localDateKey(new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())); let source = []; try { const result = await db.getEmailQuizResponsesReport(from, to); source = result?.success ? (Array.isArray(result.responses) ? result.responses : []) : []; } catch {} if (!source.length) source = [...events, ...((Array.isArray(dashboardResponseReviews) ? dashboardResponseReviews : []))].filter(Boolean); historyMode = true; historyPatient = patient; currentReturnHash = 'patient-directory'; const historySeen = new Set(); patientHistoryEvents = source.filter(event => historyPatientMatches(event, patient) && isSubmittedQuestionnaireResponse(event) && event.respondedAt).filter(event => { const key = responseReviewStorageKey(event); if (historySeen.has(key)) return false; historySeen.add(key); return true; }).sort((a, b) => new Date(a.respondedAt) - new Date(b.respondedAt)); const selected = patientHistoryEvents[patientHistoryEvents.length - 1] || { patientKey:patient?.profile?.id || patient?.id || (patientEmail ? `email:${patientEmail}` : ''), patientName, recipientEmail:patientEmail, quizId:quiz?.id || link?.quizId || '', quizTitle:quiz?.title || link?.quizTitle || 'Histórico de questionários', status:'history', respondedAt:'', answers:[], summary:{}, totalQuestions:0, answeredQuestions:0 }; openDetail(selected, 'patient-directory', { patientHistory:true }); }; const openDetail = async (event, returnHash = 'response-report', options = {}) => { if (!event) return; await getOrFetchQuizzes(); historyMode = options.patientHistory === true || (returnHash === 'patient-directory' && historyMode); if (!historyMode) { historyPatient = null; patientHistoryEvents = []; } currentReturnHash = returnHash === 'pending-review' ? 'pending-review' : (returnHash === 'patient-directory' ? 'patient-directory' : 'response-report'); currentEvent = event; const patient = historyMode ? (historyPatient || patientByEmail(event.recipientEmail) || fallbackPatient(event)) : (patientByEmail(event.recipientEmail) || fallbackPatient(event)); const quiz = getQuizForEvent(event); const summary = event.summary || {}; const rawAnswers = Array.isArray(event.answers) ? event.answers : []; const answers = rawAnswers.filter(a => isQuizQuestionVisible(quiz, a)); currentModalAnswers = answers; let totalQuestions = 0; if (Array.isArray(quiz?.questionSnapshots) && quiz.questionSnapshots.length) { totalQuestions = quiz.questionSnapshots.filter(q => isQuizQuestionVisible(quiz, q)).length; } else if (Array.isArray(quiz?.questionIds) && quiz.questionIds.length) { totalQuestions = quiz.questionIds.filter(id => isQuizQuestionVisible(quiz, id)).length; } if (!totalQuestions) { totalQuestions = Number(event.totalQuestions || summary.totalQuestions || answers.length || 0); } const answeredQuestions = answers.length; const name = responsePatientName(patient); const initial = name.charAt(0).toLocaleUpperCase('pt-BR') || 'P'; const history = historyFor(event); const totalSent = historyMode ? history.length : responseEventsForHistory().filter(entry => responseKey(entry) && responseKey(entry) === responseKey(event)).length; const responseRate = totalSent ? Math.round(history.length / totalSent * 100) : 0; const services = Array.isArray(patient.services) ? patient.services : []; const currentService = services.find(service => String(service.status || '').toLowerCase() !== 'finalizado') || services[0] || null; const serviceName = event.serviceName || currentService?.serviceName || currentService?.name || patient.serviceName || patient.service || 'Serviço em acompanhamento'; const serviceEnd = currentService?.endDate || currentService?.endsAt || patient.serviceEnd || patient.endDate || ''; const phone = String(patient.phone || patient.whatsapp || patient.profile?.phone || '').replace(/\D/g, ''); const formatEnd = value => { if (!value) return ''; const date = new Date(value); return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('pt-BR'); }; const reviewed = isResponseReviewed(event); document.getElementById('response-detail-page-title').textContent = historyMode ? 'Histórico de questionários' : name; document.getElementById('response-detail-page-status').textContent = historyMode ? 'Histórico permanente' : (reviewed ? 'Revisado' : 'Revisão pendente'); document.getElementById('response-detail-page-status').classList.toggle('is-reviewed', historyMode || reviewed); const detailBack = document.getElementById('response-detail-back'); detailBack.title = historyMode ? 'Voltar ao perfil do paciente' : (currentReturnHash === 'pending-review' ? 'Voltar às revisões pendentes' : 'Voltar ao relatório de respostas'); detailBack.setAttribute('aria-label', detailBack.title); document.getElementById('response-detail-page-context').innerHTML = historyMode ? `<span>Histórico completo do paciente</span><span>Todos os questionários concluídos</span><span>${history.length} relato${history.length === 1 ? '' : 's'} registrado${history.length === 1 ? '' : 's'}</span>` : `<span>${safe(event.quizTitle || 'Questionário')}</span><span>${safe(serviceEnd ? `${serviceName} finaliza em ${formatEnd(serviceEnd)}` : serviceName)}</span><span>Respostas ${responseRate}% (${history.length}/${totalSent || history.length})</span>`; const whatsapp = document.getElementById('response-detail-page-whatsapp'); whatsapp.classList.toggle('hidden', !phone); if (phone) whatsapp.href = `https://wa.me/${phone}`; document.getElementById('response-detail-page-patient').innerHTML = `<span class="response-detail-avatar">${safe(initial)}</span><span class="min-w-0"><span class="flex items-center gap-2"><strong class="truncate text-base text-dark">${safe(name)}</strong>${responsePatientFlag(patient)}</span><span class="mt-1 block truncate text-xs text-gray-500">${safe(patient.email || event.recipientEmail || 'Paciente acompanhado')}</span></span>`; const scorePercent = scorePercentFor(event); const scoreLabel = scoreLabelFor(event); document.getElementById('response-detail-page-stats').innerHTML = `<article class="response-detail-stat rounded-xl p-3"><p class="text-[10px] font-bold uppercase tracking-[.08em] text-gray-500">Respondidas</p><p class="mt-1 text-lg font-bold text-dark">${answeredQuestions}<span class="text-xs font-semibold text-gray-500">/${totalQuestions || answeredQuestions}</span></p></article><article class="response-detail-stat rounded-xl p-3"><p class="text-[10px] font-bold uppercase tracking-[.08em] text-gray-500">Nota ponderada</p><p class="mt-1 text-lg font-bold text-primary">${Number.isFinite(scorePercent) ? `${scorePercent.toLocaleString('pt-BR',{maximumFractionDigits:1})}%` : '—'}</p><p class="mt-1 text-[10px] font-semibold text-gray-500">${safe(scoreLabel)}</p></article><article class="response-detail-stat col-span-2 rounded-xl p-3 sm:col-span-1"><p class="text-[10px] font-bold uppercase tracking-[.08em] text-gray-500">Respondido em</p><p class="mt-1 text-sm font-bold text-dark">${safe(dateText(event.respondedAt))}</p></article>`; document.getElementById('response-detail-page-progress').textContent = `${history.length} relato${history.length === 1 ? '' : 's'} concluído${history.length === 1 ? '' : 's'} no histórico deste paciente`; document.getElementById('response-detail-history-count').textContent = `${history.length} relato${history.length === 1 ? '' : 's'}`; const scoreBadge = document.getElementById('response-detail-page-score'); scoreBadge.classList.toggle('hidden', !Number.isFinite(scorePercent)); scoreBadge.textContent = Number.isFinite(scorePercent) ? `Nota: ${scorePercent.toLocaleString('pt-BR',{maximumFractionDigits:1})}% · ${scoreLabel}` : ''; const detailReviewAction = document.getElementById('response-detail-review-action'); detailReviewAction.classList.toggle('hidden', historyMode); detailReviewAction.classList.toggle('is-reviewed', reviewed); detailReviewAction.title = reviewed ? 'Marcar relato como pendente' : 'Marcar relato como revisado'; detailReviewAction.innerHTML = reviewed ? '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M12 5v14m7-7H5"/></svg><span>Marcar como pendente</span>' : '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M5 12.5 9.5 17 19 7.5"/></svg><span>Marcar como revisado</span>'; const historyHead = document.getElementById('response-detail-history-head'); const historyBody = document.getElementById('response-detail-history-body'); const answerKey = (answer, answerIndex) => String(answer?.questionCode || answer?.questionTitle || `Pergunta ${answerIndex + 1}`).trim() || `Pergunta ${answerIndex + 1}`; const questionColumns = []; history.forEach(item => { const itemQuiz = getQuizForEvent(item) || quiz; const itemAnswers = (item.answers || []).filter(a => isQuizQuestionVisible(itemQuiz, a)); itemAnswers.forEach((answer, answerIndex) => { const key = answerKey(answer, answerIndex); if (!questionColumns.some(column => column.key === key)) {
@@ -8593,8 +8632,8 @@ target.innerHTML = '';
 
       // Automatic Observer to blur left sidebar whenever any right drawer or modal is open
       const updateGlobalSidebarBlur = () => {
-        const activeOverlay = document.querySelector('.patient-link-overlay.is-open, .service-drawer-overlay.is-open, .patient-filter-overlay.is-open, .patient-label-manager-overlay.is-open, .patient-table-config-overlay.is-open, .question-drawer-overlay.is-open, .quiz-drawer-overlay.is-open, .send-filter-overlay.is-open, .response-filter-overlay.is-open, .response-detail-overlay.is-open, .transaction-filter-overlay.is-open, .transaction-customize-overlay.is-open, .transaction-entry-overlay.is-open, .quiz-channel-config-overlay.is-open, .patient-registration-overlay.is-open, .suggestion-overlay.is-open');
-        const activeDrawer = document.querySelector('.patient-link-drawer.is-open, .service-drawer.is-open, .question-drawer.is-open, .quiz-drawer.is-open, .patient-filter-drawer.is-open, .patient-label-manager-drawer.is-open, .patient-table-config-drawer.is-open, .send-filter-drawer.is-open, .response-filter-drawer.is-open, .response-detail-drawer.is-open, .transaction-filter-drawer.is-open, .transaction-customize-drawer.is-open, .transaction-entry-drawer.is-open, .suggestion-modal.is-open');
+        const activeOverlay = document.querySelector('.patient-link-overlay.is-open, .service-drawer-overlay.is-open, .patient-filter-overlay.is-open, .patient-label-manager-overlay.is-open, .patient-table-config-overlay.is-open, .question-drawer-overlay.is-open, .quiz-drawer-overlay.is-open, .send-filter-overlay.is-open, .response-filter-overlay.is-open, .response-detail-overlay.is-open, .transaction-filter-overlay.is-open, .transaction-customize-overlay.is-open, .transaction-entry-overlay.is-open, .quiz-channel-config-overlay.is-open, .patient-registration-overlay.is-open, .suggestion-overlay.is-open, .response-answer-modal-overlay.is-open, .response-annotation-overlay.is-open, .response-chart-overlay.is-open, .response-history-settings-overlay.is-open, .patient-label-modal-overlay.is-open, .reminder-modal-overlay.is-open, .engagement-filter-overlay.is-open, .engagement-info-overlay.is-open, .quiz-schedule-drawer-overlay.is-open, [class*="-overlay"].is-open');
+        const activeDrawer = document.querySelector('.patient-link-drawer.is-open, .service-drawer.is-open, .question-drawer.is-open, .quiz-drawer.is-open, .patient-filter-drawer.is-open, .patient-label-manager-drawer.is-open, .patient-table-config-drawer.is-open, .send-filter-drawer.is-open, .response-filter-drawer.is-open, .response-detail-drawer.is-open, .transaction-filter-drawer.is-open, .transaction-customize-drawer.is-open, .transaction-entry-drawer.is-open, .suggestion-modal.is-open, .quiz-schedule-drawer.is-open, [class*="-drawer"].is-open');
         const hasOpen = Boolean(activeOverlay || activeDrawer);
         document.body.classList.toggle('has-open-drawer', hasOpen);
         document.getElementById('admin-sidebar')?.classList.toggle('schedule-drawer-obscured', hasOpen);
