@@ -6794,7 +6794,7 @@ target.innerHTML = '';
             }
           });
         });
-        const singleChoiceRatingLabel = value => {
+        const ratingTextLabel = value => {
           const score = Number(value);
           if (!Number.isFinite(score)) return '—';
           const rounded = Math.round(score);
@@ -6810,8 +6810,11 @@ target.innerHTML = '';
             const entryAnswers = (entry.answers || []).filter(answer => isQuizQuestionVisible(entryQuiz, answer));
             return entryAnswers.find(item => answerKey(item) === header.key);
           }).filter(Boolean);
-          const numericChart = answers.some(answer => /^[-+]?\d+(?:[.,]\d+)?$/.test(String(answer?.value ?? '').trim()));
-          const isSingleChoice = header.type === 'single' || answers.some(a => a?.type === 'single' || a?.questionType === 'single') || (!header.type && !numericChart && header.type !== 'emoji' && header.type !== 'linear');
+          const isSingleChoice = header.type === 'single' || answers.some(a => a?.type === 'single' || a?.questionType === 'single');
+          const isEvaluationScale = header.type === 'emoji' || answers.some(a => a?.type === 'emoji' || a?.questionType === 'emoji');
+          const isQualitativeRating = isSingleChoice || isEvaluationScale;
+          const numericChart = !isQualitativeRating && answers.some(answer => /^[-+]?\d+(?:[.,]\d+)?$/.test(String(answer?.value ?? '').trim()));
+          const isRating = isQualitativeRating || (!numericChart && header.type !== 'linear');
           const points = history.map(entry => {
             const entryQuiz = getQuizForEvent(entry) || quiz;
             const entryAnswers = (entry.answers || []).filter(answer => isQuizQuestionVisible(entryQuiz, answer));
@@ -6820,10 +6823,10 @@ target.innerHTML = '';
             return { label:dateText(entry.respondedAt).slice(0,5), value:Number.isFinite(numericValue) ? numericValue : null };
           });
           const formatter = value => {
-            if (isSingleChoice) return singleChoiceRatingLabel(value);
+            if (isRating) return ratingTextLabel(value);
             return numericChart ? Number(value).toLocaleString('pt-BR', { maximumFractionDigits:1 }) : ratingStarsText(value);
           };
-          return svgChart(header.shortTitle, points, formatter, header.label, header.icon, !numericChart);
+          return svgChart(header.shortTitle, points, formatter, header.label, header.icon, isRating);
         }).join('');
         const currentPercent = scorePercentFor(event);
         
